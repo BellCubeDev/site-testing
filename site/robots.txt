@@ -1,0 +1,8 @@
+# This robots.txt file controls crawling of URLs under https://example.com.
+# All crawlers are disallowed to crawl files in the "includes" directory, such
+# as .css, .js, but Googlebot needs them for rendering, so Googlebot is allowed
+# to crawl them.
+User-agent: *
+Allow: /
+
+Sitemap: https://bellcubedev.github.io/assets/sitemap.xml

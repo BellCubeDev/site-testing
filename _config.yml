@@ -1,0 +1,84 @@
+# ============================
+# Site Variables
+# ============================
+
+# Copyright variables
+first_publication_year: 2022
+latest_publication_year: 2022
+
+author: BellCube
+
+# ============================
+# Actual Jekyll Configuration
+# ============================
+open_url: true
+
+livereload_min_delay: 1
+livereload: true
+
+defaults:
+  - scope:
+      path: "assets/site/images"
+    values:
+      image: true
+  - scope:
+      path: "assets/Nexus/Banners"
+    values:
+      image: true
+
+# Where things are
+source      : ./site
+
+# Handling Reading
+safe               : true
+markdown_ext       : "md"
+strict_front_matter: true
+
+# Filtering Content
+show_drafts: false
+
+# Plugins
+whitelist:
+  - jekyll-redirect-from
+  - jekyll-brotli
+#  - jekyll-minifier
+plugins:
+  - jekyll-redirect-from
+  - jekyll-brotli
+  - jekyll-minifier
+
+# Conversion
+lsi : false
+
+# Outputting
+timezone: America/New_York
+verbose : true
+
+liquid:
+  error_mode      : warn
+  strict_filters  : true
+  strict_variables: false
+
+# Jekyll Minifier
+jekyll-minifier:
+  preserve_php: true
+  remove_spaces_inside_tags: true
+  remove_multi_spaces: true
+  remove_comments: true
+  remove_intertag_spaces: true
+  remove_quotes: true
+  compress_css: true
+  compress_javascript: true
+  compress_json: true
+  simple_doctype: true
+  remove_script_attributes: false
+  remove_style_attributes: false
+  remove_link_attributes: false
+  remove_form_attributes: false
+  remove_input_attributes: false
+  remove_javascript_protocol: false
+  remove_http_protocol: true
+  remove_https_protocol: false
+  preserve_line_breaks: false
+  simple_boolean_attributes: true
+  compress_js_templates: true
