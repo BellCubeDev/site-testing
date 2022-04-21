@@ -3,7 +3,7 @@
 <head>
 
     <title>BellCube: {{ page.title }}</title>
-    <link rel="shortcut icon" type="image/ico" href="/favicon.ico">
+    <link rel="shortcut icon" type="image/ico" href="{{site.root}}favicon.ico">
 
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,9 +14,9 @@
     <meta name="theme-color" content="#1b1b1b" /><meta name="color-scheme" content="dark" />
 
     <script src="https://code.getmdl.io/1.1.2/material.min.js"></script>
-    <link rel="stylesheet" href="/assets/site/css/material-blue.min.css">
+    <link rel="stylesheet" href="{{site.root}}assets/site/css/material-blue.min.css">
 
-    <link rel="stylesheet" href="/assets/site/css/site.css">
+    <link rel="stylesheet" href="{{site.root}}assets/site/css/site.css">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
@@ -26,28 +26,28 @@
         <div class="mdl-layout__drawer">
             <span class="mdl-layout-title">
                 <picture>
-                    <source srcset="/assets/site/images/icon.avif" type="image/avif" />
-                    <img loading=lazy style="height:48px;" src="/assets/site/images/icon.png" alt="" />
+                    <source srcset="{{site.root}}assets/site/images/icon.avif" type="image/avif" />
+                    <img loading=lazy style="height:48px;" src="{{site.root}}assets/site/images/icon.png" alt="" />
                 </picture>
                 <span>BellCube Dev</span>
             </span>
             <nav class="mdl-navigation">
                 <!-- https://fonts.google.com/icons -->
                 <h2>Site</h2>
-                <a class="mdl-navigation__link mdl-navigation__link--icon" href="/">
+                <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{site.root}}">
                     <i class="material-icons">home</i>
                     <span>Homepage</span>
                 </a>
-                <a class="mdl-navigation__link mdl-navigation__link--icon" href="/sitemap/">
+                <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{site.root}}sitemap/">
                     <i class="material-icons">map</i>
                     <span>Sitemap</span>
                 </a>
                 <details><summary><h3>Documentation</h3></summary>
-                    <details><summary style="padding-left: 40px;"><a class="mdl-navigation__link mdl-navigation__link--icon" style="margin-left:24px;padding-left:16px;margin-top:-50px;padding-right:91%;" href="/docs/linear-spell-progression"><div class="center-vert">
+                    <details><summary style="padding-left: 40px;"><a class="mdl-navigation__link mdl-navigation__link--icon" style="margin-left:24px;padding-left:16px;margin-top:-50px;padding-right:91%;" href="{{site.root}}docs/linear-spell-progression"><div class="center-vert">
                             <i class="material-icons">book</i>
                             <span>Linear Spell<br />Progression</span>
                         </div></a></summary>
-                        <a class="mdl-navigation__link mdl-navigation__link--icon" style="margin-left:64px;" href="/docs/linear-spell-progression/creating-a-plugin"><div class="center-vert">
+                        <a class="mdl-navigation__link mdl-navigation__link--icon" style="margin-left:64px;" href="{{site.root}}docs/linear-spell-progression/creating-a-plugin"><div class="center-vert">
                             <span>Creating a Plugin</span>
                         </div></a>
                     </details>

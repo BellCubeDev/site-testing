@@ -6,7 +6,11 @@
 first_publication_year: 2022
 latest_publication_year: 2022
 
+# Metadata stuff!
 author: BellCube
+
+# URL Root (used in URIs)
+root: /site-testing/
 
 # ============================
 # Actual Jekyll Configuration
