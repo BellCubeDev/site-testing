@@ -6,7 +6,7 @@
         {
             "label": "Serve Site",
             "type": "shell",
-            "command": "set \"JEKYLL_ENV=production\" && jekyll",
+            "command": "cd docs && set JEKYLL_ENV\"=production\" && jekyll",
             "args": [
                 "serve"
             ],

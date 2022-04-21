@@ -27,7 +27,7 @@ defaults:
       image: true
 
 # Where things are
-source      : ./site
+source      : .
 
 # Handling Reading
 safe               : true
