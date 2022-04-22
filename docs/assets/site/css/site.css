@@ -76,7 +76,7 @@ footer.mdl-layout__content {
     scrollbar-width: 0px;
 }
 
-footer.mdl-layout__content span {
+footer.mdl-layout__content p {
     position: relative;
     top: auto;
     bottom: auto;
