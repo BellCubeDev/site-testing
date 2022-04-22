@@ -80,7 +80,7 @@ footer.mdl-layout__content span {
     position: relative;
     top: auto;
     bottom: auto;
-    margin-bottom: 0px;
+    margin: 0px;
     text-align: center;
 }
 

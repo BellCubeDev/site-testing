@@ -96,9 +96,10 @@
             {{ content }}
 
         </main>
-        <footer class="mdl-layout__content">
-            <span>© {% if site.first_publication_year != site.latest_publication_year %}{{site.first_publication_year}}–{{site.latest_publication_year}}{% else %}{{site.latest_publication_year}}{% endif %}
-                BellCube Dev,&nbsp</span><span><a href="{{ site.repourl }}blob/main/LICENSE" target="_blank" rel="noopener noreferrer">GNU General Public License v3.0</a>.&nbsp</span><span><a href="{{ site.repourl }}" target="_blank" rel="noopener noreferrer">Source available on GitHub</a></span>
+        <footer class="mdl-layout__content"><p>
+            ©&nbsp{% if site.first_publication_year != site.latest_publication_year %}{{site.first_publication_year}}–{{site.latest_publication_year}}{% else %}{{site.latest_publication_year}}{% endif %}&nbspBellCube&nbspDev,
+            <a href="{{ site.repourl }}blob/main/LICENSE" target="_blank" rel="noopener noreferrer">GNU&nbspGeneral&nbspPublic&nbspLicense v3.0</a>.
+            <a href="{{ site.repourl }}" target="_blank" rel="noopener noreferrer">Source&nbspavailable&nbspon&nbspGitHub</a>
         </footer>
 </body>
 </html>
