@@ -73,14 +73,15 @@ footer.mdl-layout__content {
     display: flex;
     justify-content: center;
     align-items: center;
-    max-height: 50px;
+    max-height: 80px;
 }
 
-footer.mdl-layout__content p {
+footer.mdl-layout__content span {
     position: relative;
     top: auto;
     bottom: auto;
     margin-bottom: 0px;
+    text-align: center;
 }
 
 .center-vert {
