@@ -9,8 +9,10 @@ latest_publication_year: 2022
 # Metadata stuff!
 author: BellCube
 
-# URL Root (used in URIs)
+# URL Root (used in URIs) - THESE MUS END IN "/"
 baseurl: /site-testing/
+repourl: https://github.com/BellCubeDev/site-testing/
+
 
 # ============================
 # Actual Jekyll Configuration

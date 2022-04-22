@@ -65,15 +65,17 @@ p {
 }
 
 footer.mdl-layout__content {
+    /*
     height: min-content;
+    */
     vertical-align: middle;
     position: sticky;
     background-color: #222222;
-    bottom: 0px; /*  */
+    bottom: 0px;
     display: flex;
     justify-content: center;
     align-items: center;
-    max-height: 80px;
+    height: fit-content;
 }
 
 footer.mdl-layout__content span {
