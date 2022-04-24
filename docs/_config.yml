@@ -10,8 +10,8 @@ latest_publication_year: 2022
 author: BellCube
 
 # URL Root (used in URIs) - THESE MUS END IN "/"
-baseurl: /site-testing/
-repourl: https://github.com/BellCubeDev/site-testing/
+baseurl: /site-testing
+repourl: https://github.com/BellCubeDev/site-testing
 
 
 # ============================
@@ -19,8 +19,8 @@ repourl: https://github.com/BellCubeDev/site-testing/
 # ============================
 open_url: true
 
-livereload_min_delay: 1
-livereload: true
+livereload_min_delay: 100
+livereload: false
 
 defaults:
   - scope:
