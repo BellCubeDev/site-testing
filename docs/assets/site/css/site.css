@@ -308,8 +308,11 @@ details[open] > summary > .details-container.size04 {
 }
 
 
-.mdl-tooltip {
-    scale: 0.66;
+.mdl-tooltip * {
+    font-size: smaller;
+}
+.mdl-tooltip h3 {
+    font-size: small;
 }
 
 .mdl-tooltip.wide01 {
