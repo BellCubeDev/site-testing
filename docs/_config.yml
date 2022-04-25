@@ -9,7 +9,7 @@ latest_publication_year: 2022
 # Metadata stuff!
 author: BellCube
 
-# URL Root (used in URIs) - THESE MUS END IN "/"
+# URL Root (used in URIs) - THESE SHOULD NOT END IN "/"
 baseurl: /site-testing
 repourl: https://github.com/BellCubeDev/site-testing
 

@@ -168,7 +168,7 @@ code {
     background-color: #333;
     padding: 2px 5px;
     color: #fff;
-    border: 1px solid #eeeeee55;
+    border: 2px solid #eeeeee20;
     border-radius: 5px;
 }
 
@@ -194,6 +194,30 @@ a {
     font-weight: normal;
     color: #24b6ff;
     /*color: #22222222;*/
+}
+
+.text-alt01 {
+    color: #49ba56;
+}
+
+.text-alt02 {
+    color: #8d49ba;
+}
+
+.text-alt03 {
+    color: #ba5449;
+}
+
+.text-alt04 {
+    color: #ba4982;
+}
+
+.text-alt05 {
+    color: #b649ba;
+}
+
+.text-alt06 {
+    color: #baaf49;
 }
 
 .details-header * {

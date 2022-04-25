@@ -5,60 +5,60 @@ meta_description: Page for debugging stuff. Prints a bunch of variables that pro
 ---
 
 <h1>Page Variables</h1>
-{{ page.layout }}
-{{ page.title }}
-{{ page.formattedTitle }}
-{{ page.meta_description }}
+page.layout = {{ page.layout }}
+page.title = {{ page.title }}
+page.formattedTitle = {{ page.formattedTitle }}
+page.meta_description = {{ page.meta_description }}
 
 <h1>Site-Wide Variables</h1>
-<p>   {{ site.first_publication_year }}
-<br />{{ site.latest_publication_year }}
-<br />{{ site.author }}
-<br />{{ site.baseurl }}/
-<br />{{ site.open_url }}
-<br />{{ site.livereload_min_delay }}
-<br />{{ site.livereload }}
-<br />{{ site.defaults }}
-<br />{{ site.path }}
-<br />{{ site.values }}
-<br />{{ site.image }}
-<br />{{ site.path }}
-<br />{{ site.values }}
-<br />{{ site.image }}
-<br />{{ site.source }}
-<br />{{ site.safe }}
-<br />{{ site.markdown_ext }}
-<br />{{ site.strict_front_matter }}
-<br />{{ site.show_drafts }}
-<br />{{ site.whitelist }}
-<br />{{ site.plugins }}
-<br />{{ site.lsi  }}
-<br />{{ site.timezone }}
-<br />{{ site.verbose  }}
-<br />{{ site.liquid }}
-<br />{{ site.error_mode }}
-<br />{{ site.strict_filters }}
-<br />{{ site.strict_variables }}
-<br />{{ site.jekyll-minifier }}
-<br />{{ site.preserve_php }}
-<br />{{ site.remove_spaces_inside_tags }}
-<br />{{ site.remove_multi_spaces }}
-<br />{{ site.remove_comments }}
-<br />{{ site.remove_intertag_spaces }}
-<br />{{ site.remove_quotes }}
-<br />{{ site.compress_css }}
-<br />{{ site.compress_javascript }}
-<br />{{ site.compress_json }}
-<br />{{ site.simple_doctype }}
-<br />{{ site.remove_script_attributes }}
-<br />{{ site.remove_style_attributes }}
-<br />{{ site.remove_link_attributes }}
-<br />{{ site.remove_form_attributes }}
-<br />{{ site.remove_input_attributes }}
-<br />{{ site.remove_javascript_protocol }}
-<br />{{ site.remove_http_protocol }}
-<br />{{ site.remove_https_protocol }}
-<br />{{ site.preserve_line_breaks }}
-<br />{{ site.simple_boolean_attributes }}
-<br />{{ site.compress_js_templates }}
+<p>   site.first_publication_year = {{ site.first_publication_year }}
+<br />site.latest_publication_year = {{ site.latest_publication_year }}
+<br />site.author = {{ site.author }}
+<br />site.baseurl = {{ site.baseurl }}
+<br />site.open_url = {{ site.open_url }}
+<br />site.livereload_min_delay = {{ site.livereload_min_delay }}
+<br />site.livereload = {{ site.livereload }}
+<br />site.defaults = {{ site.defaults }}
+<br />site.path = {{ site.path }}
+<br />site.values = {{ site.values }}
+<br />site.image = {{ site.image }}
+<br />site.path = {{ site.path }}
+<br />site.values = {{ site.values }}
+<br />site.image = {{ site.image }}
+<br />site.source = {{ site.source }}
+<br />site.safe = {{ site.safe }}
+<br />site.markdown_ext = {{ site.markdown_ext }}
+<br />site.strict_front_matter = {{ site.strict_front_matter }}
+<br />site.show_drafts = {{ site.show_drafts }}
+<br />site.whitelist = {{ site.whitelist }}
+<br />site.plugins = {{ site.plugins }}
+<br />site.lsi  = {{ site.lsi  }}
+<br />site.timezone = {{ site.timezone }}
+<br />site.verbose  = {{ site.verbose  }}
+<br />site.liquid = {{ site.liquid }}
+<br />site.error_mode = {{ site.error_mode }}
+<br />site.strict_filters = {{ site.strict_filters }}
+<br />site.strict_variables = {{ site.strict_variables }}
+<br />site.jekyll-minifier = {{ site.jekyll-minifier }}
+<br />site.preserve_php = {{ site.preserve_php }}
+<br />site.remove_spaces_inside_tags = {{ site.remove_spaces_inside_tags }}
+<br />site.remove_multi_spaces = {{ site.remove_multi_spaces }}
+<br />site.remove_comments = {{ site.remove_comments }}
+<br />site.remove_intertag_spaces = {{ site.remove_intertag_spaces }}
+<br />site.remove_quotes = {{ site.remove_quotes }}
+<br />site.compress_css = {{ site.compress_css }}
+<br />site.compress_javascript = {{ site.compress_javascript }}
+<br />site.compress_json = {{ site.compress_json }}
+<br />site.simple_doctype = {{ site.simple_doctype }}
+<br />site.remove_script_attributes = {{ site.remove_script_attributes }}
+<br />site.remove_style_attributes = {{ site.remove_style_attributes }}
+<br />site.remove_link_attributes = {{ site.remove_link_attributes }}
+<br />site.remove_form_attributes = {{ site.remove_form_attributes }}
+<br />site.remove_input_attributes = {{ site.remove_input_attributes }}
+<br />site.remove_javascript_protocol = {{ site.remove_javascript_protocol }}
+<br />site.remove_http_protocol = {{ site.remove_http_protocol }}
+<br />site.remove_https_protocol = {{ site.remove_https_protocol }}
+<br />site.preserve_line_breaks = {{ site.preserve_line_breaks }}
+<br />site.simple_boolean_attributes = {{ site.simple_boolean_attributes }}
+<br />site.compress_js_templates = {{ site.compress_js_templates }}
 </p>
