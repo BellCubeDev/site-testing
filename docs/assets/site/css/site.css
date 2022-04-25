@@ -307,6 +307,25 @@ details[open] > summary > .details-container.size04 {
     max-height: 256px;
 }
 
+
+
+
+.mdl-tooltip.wide01 {
+    max-width: 64px;
+}
+
+.mdl-tooltip.wide02 {
+    max-width: 128px;
+}
+
+.mdl-tooltip.wide03 {
+    max-width: 192px;
+}
+
+.mdl-tooltip.wide04 {
+    max-width: 256px;
+}
+
 body.preload * {
     animation-duration: 0ms !important;
 }
