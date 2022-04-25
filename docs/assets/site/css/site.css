@@ -271,6 +271,14 @@ details > summary > .details-container {
     transition-timing-function: linear;
 }
 
+details > summary > .details-container * {
+    visibility: hidden;
+}
+
+details[open] > summary > .details-container * {
+    visibility: unset;
+}
+
 details > summary > .details-container.padded {
     padding-left: 16px;
 }
@@ -530,7 +538,7 @@ element.style {
 
 .mdl-tooltip li {
     display: flex;
-    gap: 16px;
+    gap: 8px;
     align-items: center;
     justify-content: center;
     align-content: center;
