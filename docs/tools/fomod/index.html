@@ -36,22 +36,86 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     <div class="details-header">
         <i class="material-icons open-icon-90CC">expand_more</i><h2 id="fomod_ModName">Metadata</h2>
     </div>
-    <div class="details-container size01">
+    <div class="details-container size03">
         <form autocomplete="on" name="Metadata">
             <div id="fomod_info_name" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
                 <input id="fomod_info_name_input" class="mdl-textfield__input" type="text" placeholder="Mod Name">
-                <label class="mdl-textfield__label" for="sample3">Mod Name</label>
+                <label class="mdl-textfield__label" for="fomod_info_name_input">Mod Name</label>
             </div>
             <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_name" data-mdl-for="fomod_info_name"><p>
-                The name of the mod. This name is displayed at the top of the installer window.
+                The name of the mod. This name is displayed at the top of the installer window.<br />
+                Mod Organizer 2 specifically uses this data to update whatever name it pulls from its metadata guessing, which it also displays at the top of the FOMOD installer window.
                 <br><hr>
                 <h3>Used By</h3><ul>
-                <li><img height="24px" src="{{site.baseurl}}/assets/site/images/third-party-icons/Vortex-min.svg" />
-                    Vortex
-                </li>
-                <li><img height="24px" src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2-min.svg" />
-                    Mod Organizer 2
-                </li>
+                    <li><img height="24px" src="{{site.baseurl}}/assets/site/images/third-party-icons/Vortex-min.svg" />
+                        Vortex
+                    </li>
+                    <li><img height="24px" src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2-min.svg" />
+                        Mod Organizer 2
+                    </li>
+                </ul>
+            </p></div>
+
+            <!-- From here on out, its all MO2, baby! -->
+
+            <div id="fomod_info_author" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
+                <input id="fomod_info_author_input" class="mdl-textfield__input" type="text" placeholder="AuthorMc4uthorPants123">
+                <label class="mdl-textfield__label" for="fomod_info_author_input">Author</label>
+            </div>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_author" data-mdl-for="fomod_info_author"><p>
+                Author of the mod. Displayed somewhere in the installer window.
+                <br><hr>
+                <h3>Used By</h3><ul>
+                    <li><img height="24px" src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2-min.svg" />
+                        Mod Organizer 2
+                    </li>
+                </ul>
+            </p></div>
+
+            <!-- TODO: Display a SemVer input with an optional toggle for manual version entry -->
+
+            <div id="fomod_info_version" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
+                <input id="fomod_info_version_input" class="mdl-textfield__input" type="text" placeholder="1.0.0">
+                <label class="mdl-textfield__label" for="fomod_info_version_input">Version</label>
+            </div>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version" data-mdl-for="fomod_info_version"><p>
+                Version of the mod. Displayed somewhere in the installer window. <!-- TODO: Specify WHERE the version num is displayed -->
+                I suggest using Semenatic Versioning (SemVer), e.g. <code>2.1.1</code>, where the first number is the second "major" or "breaking" version, the second is the "minor" or non-breaking" version, and the third is the "patch"/"hotfix"/"bugfix" version.
+                <br><hr>
+                <h3>Used By</h3><ul>
+                    <li><img height="24px" src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2-min.svg" />
+                        Mod Organizer 2
+                    </li>
+                </ul>
+            </p></div>
+
+            <div id="fomod_info_ID" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
+                <input id="fomod_info_ID_input" class="mdl-textfield__input" type="number" placeholder="1234567890">
+                <label class="mdl-textfield__label" for="fomod_info_ID_input">Identification Number (ID)</label>
+            </div>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_ID" data-mdl-for="fomod_info_ID"><p>
+                ID number of the mod. Possibly the Nexus Mods mod ID. Displayed somewhere in the installer window. <!-- TODO: Specify WHERE the version num is displayed and WHAT it's used for -->
+                MO2 runs the value through <a href="hhttps://github.com/Holt59/mo2-merge/blob/master/plugins/installer_fomod/src/fomodinstallerdialog.cpp#L634" target="_blank" rel="noopener noreferrer"><code>toInt()</code></a>, so you should ideally only enter an Integer value here.
+                <br><hr>
+                <h3>Used By</h3><ul>
+                    <li><img height="24px" src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2-min.svg" />
+                        Mod Organizer 2
+                    </li>
+                </ul>
+            </p></div>
+
+            <div id="fomod_info_website" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
+                <input id="fomod_info_website_input" class="mdl-textfield__input" type="url" placeholder="https://example.com/">
+                <label class="mdl-textfield__label" for="fomod_info_website_input">Website</label>
+            </div>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_website" data-mdl-for="fomod_info_website"><p>
+                Website URL for the mod. Typically either the mod's main download page or an author-hosted webpage, such as a documentation page with links to the download page(s).
+                MO2 displays the text "Link" as a hyperlink to the URL specified.
+                <br><hr>
+                <h3>Used By</h3><ul>
+                    <li><img height="24px" src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2-min.svg" />
+                        Mod Organizer 2
+                    </li>
                 </ul>
             </p></div>
         </form>
