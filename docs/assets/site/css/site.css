@@ -280,13 +280,14 @@ details > summary > .details-container * {
     animation-name: visibility-transition;
     animation-timing-function: step-end;
     animation-duration: var(transition-delay);
+    animation-delay: 10ms;
 }
 
 @keyframes visibility-transition{
-    from {
+    0% {
         visibility: unset;
     }
-    to {
+    100% {
         visibility: hidden;
     }
 }
