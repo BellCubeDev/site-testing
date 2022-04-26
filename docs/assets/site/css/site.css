@@ -1,8 +1,6 @@
----
-layout:
-  stylesheet
-#123:is(h3) {} /* Opening long coment to stop the CSS extension from having a heart attack
----
+/*
+    See '_layouts/stylesheet.yaml'
+*/
 /*  Typography
     The font sizes and line heights have been calculated assuming a body font
     size of 14sp and a subhead font size of 16sp, which are the MD values for

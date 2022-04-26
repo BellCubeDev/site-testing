@@ -23,14 +23,22 @@ livereload_min_delay: 100
 livereload: false
 
 defaults:
+#  - scope:
+#      path: "*.png"
+#    values:
+#      image: true
+#  - scope:
+#      path: "*.svg"
+#    values:
+#      layout: compress_html
   - scope:
-      path: "assets/site/images"
+      path: "sitemap.xml"
     values:
-      image: true
+      layout: compress_html
   - scope:
-      path: "assets/Nexus/Banners"
+      path: "assets/site/css"
     values:
-      image: true
+      layout: stylesheet
 
 # Where things are
 source      : .
@@ -51,7 +59,6 @@ whitelist:
 plugins:
   - jekyll-redirect-from
   - jekyll-brotli
-#  - jekyll-minifier
 # Default Plugins (loaded by GitHub)
   - jekyll-seo-tag
   - jekyll-coffeescript
@@ -77,30 +84,11 @@ liquid:
   strict_filters  : true
   strict_variables: false
 
-# Jekyll Minifier
-jekyll-minifier:
-  preserve_php: true
-  remove_spaces_inside_tags: true
-  remove_multi_spaces: true
-  remove_comments: true
-  remove_intertag_spaces: true
-  remove_quotes: true
-  compress_css: true
-  compress_javascript: true
-  compress_json: true
-  simple_doctype: true
-  remove_script_attributes: false
-  remove_style_attributes: false
-  remove_link_attributes: false
-  remove_form_attributes: false
-  remove_input_attributes: false
-  remove_javascript_protocol: false
-  remove_http_protocol: true
-  remove_https_protocol: false
-  preserve_line_breaks: false
-  simple_boolean_attributes: true
-  compress_js_templates: true
-
 # Compress CSS
 sass:
   style: compressed
+
+# Compress HTML Settings
+compress_html:
+  comments: ["<!-- ", " -->"]
+  startings: []
