@@ -277,6 +277,18 @@ details > summary > .details-container {
 
 details > summary > .details-container * {
     visibility: hidden;
+    animation-name: visibility-transition;
+    animation-timing-function: step-end;
+    animation-duration: var(transition-delay);
+}
+
+@keyframes visibility-transition{
+    from {
+        visibility: unset;
+    }
+    to {
+        visibility: hidden;
+    }
 }
 
 details[open] > summary > .details-container * {
