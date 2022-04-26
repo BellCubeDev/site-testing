@@ -267,20 +267,24 @@ img {
 }
 
 details > summary > .details-container {
+    --max-container-height: calc(fit-content * 1px); /* I LOVE me some hackery! */
+    --anim-trans-duration: calc(var(--max-container-height) * 1.5ms)
     overflow: hidden;
     max-height: 0px;
     transition-property: max-height;
-    transition-duration: 500ms;
+    transition-duration: var(--anim-trans-duration);
     transition-delay: 10ms;
     transition-timing-function: linear;
-}
-
-details > summary > .details-container * {
     visibility: hidden;
     animation-name: visibility-transition;
     animation-timing-function: step-end;
-    animation-duration: var(transition-delay);
     animation-delay: 10ms;
+    animation-duration: var(--anim-trans-duration);
+}
+
+details[open] > summary > .details-container {
+    max-height: var(--max-container-height, 64px);
+    animation-name: none;
 }
 
 @keyframes visibility-transition{
@@ -300,35 +304,19 @@ details > summary > .details-container.padded {
     padding-left: 16px;
 }
 
-details > summary > .details-container.size01 {
-    transition-duration: 166ms;
-}
-
-details > summary > .details-container.size02 {
-    transition-duration: 240ms;
-}
-
-details > summary > .details-container.size03 {
-    transition-duration: 304ms;
-}
-
-details > summary > .details-container.size04 {
-    transition-duration: 320ms;
-}
-
-details[open] > summary > .details-container.size01 {
+details[open] > summary > .details-container.size01, details[open] > summary > .details-container.size01 * {
     max-height: 64px;
 }
 
-details[open] > summary > .details-container.size02 {
+details[open] > summary > .details-container.size02, details[open] > summary > .details-container.size02 * {
     max-height: 128px;
 }
 
-details[open] > summary > .details-container.size03 {
+details[open] > summary > .details-container.size03, details[open] > summary > .details-container.size03 * {
     max-height: 192px;
 }
 
-details[open] > summary > .details-container.size04 {
+details[open] > summary > .details-container.size04, details[open] > summary > .details-container.size04 * {
     max-height: 256px;
 }
 
