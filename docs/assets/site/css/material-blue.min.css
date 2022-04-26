@@ -1,3 +1,8 @@
+---
+layout:
+  stylesheet
+#123:is(h3) {} /* Opening long coment to stop the CSS extension from having a heart attack
+---
 /**
  * material-design-lite - Material Design Components in CSS, JS and HTML
  * @version v1.3.0
@@ -5,6 +10,7 @@
  * @copyright 2015 Google, Inc.
  * @link https://github.com/google/material-design-lite
  */
+
 @charset "UTF-8";
 
 html {

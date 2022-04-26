@@ -2,12 +2,13 @@
 layout: page
 title: Tools - FOMOD Builder
 extra_head: >
-    <script src="fomod-builder.js"></script>
+    <script async src="fomod-builder.js"></script>
     <style>.mdl-layout__content {padding-bottom: 224px}</style>
 redirect_from:
   - /tools/fomod/builder/
   - /tools/fomod-builder/
 ---
+
 
 <h1>FOMOD Builder</h1>
 <p>The FOMOD (or <b class="text-alt01">F</b>all<b class="text-alt01">O</b>ut <b class="text-alt01">MOD</b>) is a mod installer format pioneered by the Fallout Mod Manager. It is the most popular mod installer format, at least for Bethesda games. Until this site, there was no easy-to-follow FOMOD builder and no dark mode. There was no auto-saving and there there were no tooltips.<br />
@@ -45,7 +46,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_name" data-mdl-for="fomod_info_name"><p>
                 The name of the mod. This name is displayed at the top of the installer window.<br />
                 Mod Organizer 2 specifically uses this data to update whatever name it pulls from its metadata guessing, which it also displays at the top of the FOMOD installer window.
-                <br><hr>
+                <br /><br /><hr /><br />
                 <h3>Used By</h3><ul>
                     <li><img height="24px" src="{{site.baseurl}}/assets/site/images/third-party-icons/Vortex-min.svg" />
                         Vortex
@@ -64,7 +65,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             </div>
             <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_author" data-mdl-for="fomod_info_author"><p>
                 Author of the mod. Displayed somewhere in the installer window.
-                <br><hr>
+                <br /><br /><hr /><br />
                 <h3>Used By</h3><ul>
                     <li><img height="24px" src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2-min.svg" />
                         Mod Organizer 2
@@ -81,7 +82,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version" data-mdl-for="fomod_info_version"><p>
                 Version of the mod. Displayed somewhere in the installer window. <!-- TODO: Specify WHERE the version num is displayed -->
                 I suggest using Semenatic Versioning (SemVer), e.g. <code>2.1.1</code>, where the first number is the second "major" or "breaking" version, the second is the "minor" or non-breaking" version, and the third is the "patch"/"hotfix"/"bugfix" version.
-                <br><hr>
+                <br /><br /><hr /><br />
                 <h3>Used By</h3><ul>
                     <li><img height="24px" src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2-min.svg" />
                         Mod Organizer 2
@@ -95,8 +96,8 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             </div>
             <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_ID" data-mdl-for="fomod_info_ID"><p>
                 ID number of the mod. Possibly the Nexus Mods mod ID. Displayed somewhere in the installer window. <!-- TODO: Specify WHERE the version num is displayed and WHAT it's used for -->
-                MO2 runs the value through <a href="hhttps://github.com/Holt59/mo2-merge/blob/master/plugins/installer_fomod/src/fomodinstallerdialog.cpp#L634" target="_blank" rel="noopener noreferrer"><code>toInt()</code></a>, so you should ideally only enter an Integer value here.
-                <br><hr>
+                MO2 runs the value through <a href="https://github.com/Holt59/mo2-merge/blob/master/plugins/installer_fomod/src/fomodinstallerdialog.cpp#L634" target="_blank" rel="noopener noreferrer"><code>toInt()</code></a>, so you should ideally only enter an Integer value here.
+                <br /><br /><hr /><br />
                 <h3>Used By</h3><ul>
                     <li><img height="24px" src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2-min.svg" />
                         Mod Organizer 2
@@ -111,7 +112,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_website" data-mdl-for="fomod_info_website"><p>
                 Website URL for the mod. Typically either the mod's main download page or an author-hosted webpage, such as a documentation page with links to the download page(s).
                 MO2 displays the text "Link" as a hyperlink to the URL specified.
-                <br><hr>
+                <br /><br /><hr /><br />
                 <h3>Used By</h3><ul>
                     <li><img height="24px" src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2-min.svg" />
                         Mod Organizer 2

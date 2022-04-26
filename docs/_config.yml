@@ -47,11 +47,23 @@ show_drafts: false
 whitelist:
   - jekyll-redirect-from
   - jekyll-brotli
-#  - jekyll-minifier
+
 plugins:
   - jekyll-redirect-from
   - jekyll-brotli
-  - jekyll-minifier
+#  - jekyll-minifier
+# Default Plugins (loaded by GitHub)
+  - jekyll-seo-tag
+  - jekyll-coffeescript
+  - jekyll-commonmark-ghpages
+  - jekyll-gist
+  - jekyll-github-metadata
+  - jekyll-paginate
+  - jekyll-relative-links
+  - jekyll-optional-front-matter
+  - jekyll-readme-index
+  - jekyll-default-layout
+  - jekyll-titles-from-headings
 
 # Conversion
 lsi : false
@@ -88,3 +100,7 @@ jekyll-minifier:
   preserve_line_breaks: false
   simple_boolean_attributes: true
   compress_js_templates: true
+
+# Compress CSS
+sass:
+  style: compressed

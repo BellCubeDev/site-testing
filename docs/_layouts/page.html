@@ -1,3 +1,6 @@
+---
+layout: compress_html
+---
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +16,7 @@
     <meta name="generator" content="jekyll" />
     <meta name="theme-color" content="#1b1b1b" /><meta name="color-scheme" content="dark" />
 
-    <script src="https://code.getmdl.io/1.1.2/material.min.js"></script>
+    <script async src="https://code.getmdl.io/1.1.2/material.min.js"></script>
     <script>
         // taken from https://stackoverflow.com/a/38296629/13076790
         setTimeout(function(){
@@ -24,9 +27,11 @@
 
     <link rel="stylesheet" href="{{ site.baseurl }}/assets/site/css/site.css">
 
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
-
+    <!--
+        Appended to the bottom of site.css
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
+    -->
     {{ page.extra_head }}
 </head>
 <body class="preload">
