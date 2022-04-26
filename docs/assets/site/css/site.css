@@ -270,12 +270,15 @@ details > summary > .details-container {
     --max-container-height: calc(fit-content * 1px); /* I LOVE me some hackery! */
     --anim-trans-duration: calc(var(--max-container-height) * 1.5ms)
     overflow: hidden;
-    max-height: 0px;
+    
     transition-property: max-height;
     transition-duration: var(--anim-trans-duration);
     transition-delay: 10ms;
     transition-timing-function: linear;
+
     visibility: hidden;
+    max-height: 0px;
+
     animation-name: visibility-transition;
     animation-timing-function: step-end;
     animation-delay: 10ms;
@@ -285,7 +288,9 @@ details > summary > .details-container {
 details[open] > summary > .details-container {
     max-height: var(--max-container-height, 64px);
     animation-name: none;
+    visibility: unset;
 }
+
 
 @keyframes visibility-transition{
     0% {
