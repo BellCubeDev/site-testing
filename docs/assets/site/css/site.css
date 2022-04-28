@@ -18,7 +18,7 @@ html>body {
 }
 
 /* Improve layout of navigation elements. */
-.mdl-layout-title > img|svg {
+.mdl-layout-title > :is(img, svg) {
     height: 48px;
     margin-right: 8px;
 }
@@ -27,9 +27,9 @@ html>body {
     height: 24px;
 }
 
-.mdl-navigation__link--icon > :not(.material-icons, div.center-vert) {
+.mdl-navigation__link--icon > :not(.material-icons, .center-vert) {
     height: 24px;
-    padding-left: 32px;
+    padding-left: 24px;
 }
 
 /* Misc */
@@ -92,12 +92,14 @@ footer.mdl-layout__content p {
 }
 
 .center-vert {
-    display: flex;
+    display: flex !important;
     justify-content: flex-start;
     align-content: center;
     flex-direction: row;
     align-items: center;
     flex-wrap: nowrap;
+
+    text-align: center;
 }
 
 /* Progress indication for search and contributor listing. */
@@ -249,6 +251,7 @@ summary {
     justify-content: flex-start;
     align-content: flex-start;
     overflow: hidden;
+    pointer-events: none;
 }
 /*
 img {
@@ -264,65 +267,82 @@ img {
     align-items: center;
     gap: 16px;
     height: max-content;
+    width: 50000px;
+    pointer-events: all;
 }
 
-details > summary > .details-container {
-    --max-container-height: calc(fit-content * 1px); /* I LOVE me some hackery! */
-    --anim-trans-duration: calc(var(--max-container-height) * 1.5ms)
+details > summary > .details-container{
     overflow: hidden;
-    
-    transition-property: max-height;
-    transition-duration: var(--anim-trans-duration);
-    transition-delay: 10ms;
-    transition-timing-function: linear;
+}
 
+details > summary > .details-container > div {
     visibility: hidden;
-    max-height: 0px;
+    display: none;
+    opacity: 0;
 
     animation-name: visibility-transition;
-    animation-timing-function: step-end;
-    animation-delay: 10ms;
-    animation-duration: var(--anim-trans-duration);
+
+    animation-duration: 400ms;
+    animation-timing-function: cubic-bezier(.66, 0, 0.66, 0);
+    animation-delay: 0ms;
 }
 
-details[open] > summary > .details-container {
-    max-height: var(--max-container-height, 64px);
-    animation-name: none;
+details:not([open]) > summary > .details-container > div {
+}
+
+details[open] > summary > .details-container > div {
     visibility: unset;
+    display: block;
+    opacity: 1;
+
+    animation-name: visibility-transition-reverse;
+    animation-timing-function: cubic-bezier(.33, 1, 0.33, 1);
 }
 
-
-@keyframes visibility-transition{
+@keyframes visibility-transition {
     0% {
+        opacity: 1;
+        margin-top: 0%;
         visibility: unset;
+        display: none;
+    }
+    1% {
+        opacity: 1;
+        margin-top: 0%;
+        visibility: unset;
+        display: block;
     }
     100% {
+        opacity: 0;
+        margin-top: -100%;
         visibility: hidden;
+        display: block;
     }
 }
 
-details[open] > summary > .details-container * {
-    visibility: unset;
+@keyframes visibility-transition-reverse {
+    100% {
+        opacity: 1;
+        margin-top: 0%;
+        visibility: unset;
+        display: block;
+    }
+    1% {
+        opacity: 0;
+        margin-top: -100%;
+        visibility: unset;
+        display: block;
+    }
+    0% {
+        opacity: 0;
+        margin-top: -100%;
+        visibility: hidden;
+        display: none;
+    }
 }
 
 details > summary > .details-container.padded {
     padding-left: 16px;
-}
-
-details[open] > summary > .details-container.size01, details[open] > summary > .details-container.size01 * {
-    max-height: 64px;
-}
-
-details[open] > summary > .details-container.size02, details[open] > summary > .details-container.size02 * {
-    max-height: 128px;
-}
-
-details[open] > summary > .details-container.size03, details[open] > summary > .details-container.size03 * {
-    max-height: 192px;
-}
-
-details[open] > summary > .details-container.size04, details[open] > summary > .details-container.size04 * {
-    max-height: 256px;
 }
 
 
@@ -335,24 +355,24 @@ details[open] > summary > .details-container.size04, details[open] > summary > .
     line-height: normal;
 }
 
-.mdl-tooltip.wide01 {
+.wide01 {
     max-width: 128px;
 }
 
-.mdl-tooltip.wide02 {
+.wide02 {
     max-width: 192px;
 }
 
-.mdl-tooltip.wide03 {
+.wide03 {
     max-width: 256px;
 }
 
-.mdl-tooltip.wide04 {
+.wide04 {
     max-width: 320px;
 }
 
 body.preload * {
-    animation-duration: 0ms !important;
+    animation-duration: 0s !important;
 }
 
 @keyframes rotate90CounterClockwiseReverse {
@@ -436,6 +456,7 @@ body.preload * {
     /* Don't allow navigation text to wrap. */
     .mdl-navigation__link {
         white-space: nowrap;
+        padding-right: 500px;
     }
 
     .mdl-navigation__link--icon {
@@ -464,6 +485,11 @@ body.preload * {
     div.mdl-layout__drawer :is(h1, h2, h3):first-child{
         padding-top: 0px;
         margin-top: -25px;
+    }
+
+    div.mdl-layout__drawer summary summary {
+        padding: 0px;
+        padding-left: 12px;
     }
 
     div.mdl-layout__drawer .center-vert{

@@ -12,6 +12,7 @@ author: BellCube
 # URL Root (used in URIs) - THESE SHOULD NOT END IN "/"
 baseurl: /site-testing
 repourl: https://github.com/BellCubeDev/site-testing
+fullurl: https://bellcubedev.github.io/site-testing
 
 
 # ============================
@@ -32,11 +33,11 @@ defaults:
 #    values:
 #      layout: compress_html
   - scope:
-      path: "sitemap.xml"
+      path: "/sitemap.xml"
     values:
       layout: compress_html
   - scope:
-      path: "assets/site/css"
+      path: "/assets/site/css"
     values:
       layout: stylesheet
 
