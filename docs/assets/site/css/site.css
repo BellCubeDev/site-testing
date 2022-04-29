@@ -277,8 +277,8 @@ details > summary > .details-container{
 
 details > summary > .details-container > div {
     visibility: hidden;
-    display: none;
     opacity: 0;
+    margin-top: -100%;
 
     animation-name: visibility-transition;
 
@@ -287,13 +287,10 @@ details > summary > .details-container > div {
     animation-delay: 0ms;
 }
 
-details:not([open]) > summary > .details-container > div {
-}
-
 details[open] > summary > .details-container > div {
     visibility: unset;
-    display: block;
     opacity: 1;
+    margin-top: 0%;
 
     animation-name: visibility-transition-reverse;
     animation-timing-function: cubic-bezier(.33, 1, 0.33, 1);
@@ -304,19 +301,11 @@ details[open] > summary > .details-container > div {
         opacity: 1;
         margin-top: 0%;
         visibility: unset;
-        display: none;
-    }
-    1% {
-        opacity: 1;
-        margin-top: 0%;
-        visibility: unset;
-        display: block;
     }
     100% {
         opacity: 0;
         margin-top: -100%;
-        visibility: hidden;
-        display: block;
+        visibility: unset;
     }
 }
 
@@ -325,19 +314,11 @@ details[open] > summary > .details-container > div {
         opacity: 1;
         margin-top: 0%;
         visibility: unset;
-        display: block;
-    }
-    1% {
-        opacity: 0;
-        margin-top: -100%;
-        visibility: unset;
-        display: block;
     }
     0% {
         opacity: 0;
         margin-top: -100%;
-        visibility: hidden;
-        display: none;
+        visibility: unset;
     }
 }
 
