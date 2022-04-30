@@ -1,4 +1,5 @@
-XMLParser = new DOMParser();
+const XMLParser = new DOMParser();
+const fileReader = new FileReader();
 
 function print(message) {
     console.log("[BCD-FomodBuilder] "+message);
@@ -10,7 +11,8 @@ var rootDirectory;
 var fomodDirectory;
 var info_file;
 var info_xml;
-var moduleConfigfile;
+var info_xml_tags;
+var moduleConfig_file;
 var moduleConfig_xml;
 
 var importantElements
@@ -33,7 +35,7 @@ async function init() {
         "inputVersionMajor": document.getElementById(`fomod_info_version_input_major`),
         "inputVersionMinor": document.getElementById(`fomod_info_version_input_minor`),
         "inputVersionPatch": document.getElementById(`fomod_info_version_input_patch`),
-        
+
 
         // Config
         "toggleAutosave": document.getElementById(`fomod_config_toggleAutosave`).parentElement,
@@ -60,7 +62,7 @@ async function openFomodDirectory(){
         var temp_fomodDirectory;
         var temp_info_file;
         var temp_info_xml;
-        var temp_moduleConfigfile;
+        var temp_moduleConfig_file;
         var temp_moduleConfig_xml;
         try {
 
@@ -78,22 +80,70 @@ async function openFomodDirectory(){
                 }
             }
             document.getElementById(`fomod_FolderPicker_folderName`).innerHTML = temp_rootDirectory.name;
-            
+
             temp_fomodDirectory = await temp_rootDirectory.getDirectoryHandle('fomod', {create: true});
-            
+
 
             //directory = FileSystemDirectoryHandle
             print(`folder name: ${temp_rootDirectory.name}`);
 
+            /*
             for await (const [key, value] of temp_rootDirectory.entries()) {
                 print(`resolve(): ${JSON.stringify({key, value})}`);
             }
+            *///364
 
-            temp_info_file = await temp_fomodDirectory.getFileHandle('Info.xml', {create: true});
-            temp_moduleConfig_file = await temp_fomodDirectory.getFileHandle('ModuleConfig.xml', {create: true});
+            await temp_fomodDirectory.getFileHandle('Info.xml', {create: true}).then(fileHandle => {
+                print(`fileHandle: ${fileHandle}`);
+                temp_info_file = fileHandle;
+                temp_info_file.getFile().then(file => {
+                    print(`file: ${file}`);
+                    temp_info_file = file;
+                    print(`temp_info_file: ${temp_info_file}`);
 
-            XMLParser.parseFromString(xmlText, "text/xml");
-            XMLParser.parseFromString(xmlText, "text/xml");
+                    temp_info_file.text().then(text => {
+                        print(`temp_info_file.text(): ${text}`);
+                    });
+
+                    const temp_xmlReader = new FileReader()
+                    temp_xmlReader.onload = readerEvent => {
+                        print(`readerEvent.target.result: ${readerEvent.target.result}`);
+                        temp_info_xml = XMLParser.parseFromString(readerEvent.target.result, "text/xml");
+                        print(`temp_info_xml: ${temp_info_xml}`);
+                        print(`innerText of temp_info_xml:\n====================\n${temp_info_xml.documentElement.innerHTML}\n====================`);
+
+                        info_xml_tags = temp_info_xml.children;
+
+                        print(`info_xml_tags: ${info_xml_tags}`);
+                        print(`info_xml_tags[0]: ${info_xml_tags[0]}`);
+                        print(`info_xml_tags.length: ${info_xml_tags.length}`);
+
+                        for (let item of info_xml_tags) {
+                            print(`info_xml_tags: ${item.innerHTML}`);
+                        }
+
+                    }
+
+                    print(`Reading file ${temp_info_file.webkitRelativePath}\\${temp_info_file.name}... fold your horses!`);
+                    temp_xmlReader.readAsText(temp_info_file)
+                });
+            });
+
+            /*
+            await temp_fomodDirectory.getFileHandle('ModuleConfig.xml', {create: true}).then(fileHandle => {
+                temp_info_file = fileHandle;
+            });
+            await temp_moduleConfig_file.getFile().then((file) => {
+                temp_info_file = file;
+            });
+            */
+
+            //temp_xmlReader.addEventListener('load', temp_loadEvent);
+            //temp_xmlReader.addEventListener('error', temp_loadEvent);
+            //temp_xmlReader.addEventListener('abort', temp_loadEvent);
+
+            //temp_moduleConfig_xml = XMLParser.parseFromString(await temp_moduleConfig_file.text(), "text/xml");
+
 
         } catch(e) {
             print(e);
@@ -135,6 +185,5 @@ async function tryForPermission(object, perm){
 
 async function updateFieldValue(fieldName, tagName){
     var field = document.getElementById(fieldName);
-    xmlDoc.getElementsByTagName("title")[0].childNodes[0].nodeValue;
 }
 

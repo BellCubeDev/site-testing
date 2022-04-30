@@ -34,22 +34,57 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 <details open><summary>
     <div class="details-header">
         <i class="material-icons open-icon-90CC">expand_more</i>
-        <h2>Folder</h2><h3 id="fomod_FolderPicker_folderName"></h3>
+        <h2>FOMOD - General and Config</h2><h3 id="fomod_FolderPicker_folderName">No folder selected...</h3>
     </div>
     <div class="details-container"><div>
         <form autocomplete="off" name="Folder & General Config" style="pointer-events:none;display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px">
             <a id="fomod_FolderPicker" style="pointer-events:all" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
                 Pick Directory
             </a>
-            <div class="mdl-tooltip mdl-tooltip--bottom wide02 small01" for="fomod_FolderPicker" data-mdl-for="fomod_FolderPicker"><p>
-                This is the folder that you will put into an archive to be installed by users. If it is not set up for a FOMOD, no worries! 
+            <div class="mdl-tooltip" for="fomod_FolderPicker" data-mdl-for="fomod_FolderPicker"><p>
+                This is the folder that you will put into an archive to be installed by users. If it is not set up for a FOMOD just yet, no worries! 
             </p></div>
 
-        <!-- SemVer Toggle -->
-            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="pointer-events:all;text-align:left" for="fomod_config_toggleAutosave">
+            <!-- AutoSave Toggle -->
+            <label id="fomod_config_toggleAutosave_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="pointer-events:all;text-align:left" for="fomod_config_toggleAutosave">
                 <input type="checkbox" id="fomod_config_toggleAutosave" class="mdl-switch__input" checked>
                 <span class="mdl-switch__label">Use Autosave</span>
             </label>
+            <div class="mdl-tooltip" for="fomod_config_toggleAutosave_cont" data-mdl-for="fomod_config_toggleAutosave_cont"><p>
+                Toggle controlling if the FOMOD Builder will automatically save the current configuration when you change it. This can be useful for making small tweaks, but can be a nightmare if you forget your backups. You've been warned!
+            </p></div>
+
+            <!-- Auto-Flag Toggle -->
+            <label id="fomod_config_use_autoflags_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="pointer-events:all;text-align:left" for="fomod_config_use_autoflags">
+                <input type="checkbox" id="fomod_config_use_autoflags" class="mdl-switch__input" checked>
+                <span class="mdl-switch__label">Use Automatic Install Flags</span>
+            </label>
+            <div class="mdl-tooltip" for="fomod_config_use_autoflags_cont" data-mdl-for="fomod_config_use_autoflags_cont"><p>
+                Converts file and folder installs to conditional installs. This speeds up the installer (very noticeably with Vortex), leading to a better user experience. The idea is that, instead of waiting for each file to install before continuing to the next page of the FOMOD, your files will be installed at the end of the installer. This allows users to choose their options all in one go before the mod manager works its magic.<br />
+                There is no drawback to this.
+            </p></div>
+
+            <!-- Save Configuration in Info.xml Toggle -->
+            <label id="fomod_config_saveConfig_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="pointer-events:all;text-align:left" for="fomod_config_saveConfig">
+                <input type="checkbox" id="fomod_config_saveConfig" class="mdl-switch__input">
+                <span class="mdl-switch__label">Include FOMOD Builder Config</span>
+            </label>
+            <div class="mdl-tooltip" for="fomod_config_saveConfig_cont" data-mdl-for="fomod_config_saveConfig_cont"><p>
+                Saves FOMOD Builder settings inside the <code>Info.xml</code> file (which stores mod metadata). Can be useful if you work on large FOMODs and often revisit them, however it may increase your final file size and look like icky, yucky branding.<br />
+                <br />
+                If you use this, I do suggest that you turn it off before publishing.
+            </p></div>
+
+            <!-- Add Reccomendation Comment Toggle -->
+            <label id="fomod_config_dobranding_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="pointer-events:all;text-align:left" for="fomod_config_dobranding">
+                <input type="checkbox" id="fomod_config_dobranding" class="mdl-switch__input">
+                <span class="mdl-switch__label">Add Reccomendation Comment</span>
+            </label>
+            <div class="mdl-tooltip" for="fomod_config_dobranding_cont" data-mdl-for="fomod_config_dobranding_cont"><p>
+                Saves a comment near the top of <code>Info.xml</code> and <code>ModuleConfig.xml</code>. This is disabled by default for a reason - I hate forced watermarks as much as the next guy!<br />
+                <br />
+                But hey, if you want it, it's here. I'll use it because it's my own product. But you? You've got no obligation. It's just here for people like me who like giving way more credit than anyone needs.
+            </p></div>
         </form>
     </div></div>
 </summary></details>
@@ -161,7 +196,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             </div>
             <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_ID" data-mdl-for="fomod_info_ID"><p>
                 <s>ID number of the mod. Used by MO2 to pull Nexus Mods information.</s> The ID appears to be unused after reading, however it <i>does</i> share a variable name with the Nexus ID.
-                MO2 runs the value through <code>toInt()</code>, so you should ideally only enter an Integer value here.
+                MO2 runs the value through <code>toInt()</code>, I've therefore limited the input of this field to an integer.
                 <br /><br /><hr /><br />
                 <h3>Used By</h3><ul class="mod-manager-list">
                     <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2.svg" />
