@@ -27,7 +27,7 @@
                 </xs:element>
 
                 <xs:element name="Id" minOccurs="0" maxOccurs="1" type="xs:positiveInteger">
-                    <xs:annotation><xs:documentation>Nexus Mods ID of the mod. <s>Used by MO2 to pull Nexus Mods metadata.</s> The ID appears to be unused after reading, however it <i>does</i> share a variable name with the Nexus ID.<br /><hr /><br />Not <i>actually</i> used either mainstream mod manager yet.</xs:documentation></xs:annotation>
+                    <xs:annotation><xs:documentation><h2>Nexus Mods ID of the mod.</h2><br /><s>Used by MO2 to pull Nexus Mods metadata.</s> The ID appears to be unused after reading, however it <i>does</i> share a variable name with the Nexus ID.<br /><hr /><br />Not <i>actually</i> used either mainstream mod manager yet.</xs:documentation></xs:annotation>
                 </xs:element>
 
                 <xs:element name="Website" minOccurs="0" maxOccurs="1" type="xs:anyURI">
@@ -35,11 +35,11 @@
                 </xs:element>
 
                 <xs:element name="Version" minOccurs="0" maxOccurs="1" type="xs:string">
-                    <xs:annotation><xs:documentation>Version number of the mod. Ideally, this field (and your mod page) should follow <a href="https://semver.org/">Semantic Versioning</a>.<br /><hr /><br />Used by:<ul><li>Mod Organizer 2</li></ul></xs:documentation></xs:annotation>
+                    <xs:annotation><xs:documentation><h2>Version number number of the mod.</h2><br />Ideally, this field (and your mod page) should follow <a href="https://semver.org/">Semantic Versioning</a>.<br /><hr /><br />Used by:<ul><li>Mod Organizer 2</li></ul></xs:documentation></xs:annotation>
                 </xs:element>
 
                 <xs:element name="Description" minOccurs="0" maxOccurs="1">
-                    <xs:annotation><xs:documentation>Description of the mod. Nexus-style BBCode <b>is</b> supported.<br />Equivilent to Nexus Mods' "Short Description" field.<br /><hr /><br />Not used either mainstream mod manager yet.</xs:documentation></xs:annotation>
+                    <xs:annotation><xs:documentation><h2>Description of the mod.</h2><br />Nexus-style BBCode <b>is</b> supported.<br />Equivilent to Nexus Mods' "Short Description" field.<br /><hr /><br />Not used either mainstream mod manager yet.</xs:documentation></xs:annotation>
                     <xs:complexType>
                         <xs:simpleContent>
                             <xs:extension base="xs:string">
