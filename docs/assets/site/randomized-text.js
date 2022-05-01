@@ -21,9 +21,9 @@ const possibilities_conditionalized = [
     [ {random: .1}, "Greetings, Dragonborn"], //rdunlap
     [ {random: .1}, "Welcome, Dovahkiin"], //rdunlap
     [ {random: .1}, "War. War never changes."], //rdunlap
-    [ {random: .01}, "The Institute liked that"] //rdunlap
-    [ {random: .01}, "Do you get to the Cloud District very often?"] //rdunlap
-    [ {random: .1}, "By Azura, by Azura, by Azura! It's you! The Grand Champion!"], //Otellino
+    [ {random: .01}, "The Institute liked that"], //rdunlap
+    [ {random: .01}, "Do you get to the Cloud District very often?"], //rdunlap
+    [ {random: .1}, "By Azura, by Azura, by Azura! It's you! The Grand Champion!"] //Otellino
 
 ];
 
