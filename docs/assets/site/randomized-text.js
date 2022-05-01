@@ -52,7 +52,9 @@ const possibilities_Generic = [
     "Have I mentioned I'm afraid of heights? Especially ones with ramshackle crumbly bits?", 
     "Here's the thing, I... <i>I forget the thing.</i>", 
     "That coin-pouch getting heavy?", 
-    "So rise up! <b>RIIIIIISE UP</b>, children of the Empire! <b>RIIIIIISE UP</b>, Stormcloaks!"
+    "So rise up! <b>RIIIIIISE UP</b>, children of the Empire! <b>RIIIIIISE UP</b>, Stormcloaks!", 
+    "We mug people! And wagons.", 
+    "By the rules of the street, I now own there."
 ];
 
 window.onload = () => {
