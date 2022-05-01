@@ -7,7 +7,6 @@ window.onload = () => {/*
     date: An array of date bounds in [M,D,YYYY]. Set either to [0,0,0] to mark it as unbounded.
     */
     const possibilities_conditionalized = [
-        [ {random: .001}, "Well, well, well. You must be perty lucky!" ],
         [ {random: .01}, "Your firstborn is Sheson's!" ],
         [ {random: .01}, "And why not? Imagine how unbearably, how unutterably cold the universe would be if one were all alone." ], // https://www.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html
         [ {random: .075}, "STOP REFRESHING!!!" ],
@@ -17,7 +16,9 @@ window.onload = () => {/*
         [ {time: [[18,00], [24,00]]}, "Good evening!" ],
         [ {time: [[0,00], [5,00]]}, "<s>Friendly reminder that you should probably be sleping right now</s>" ],
         [ {date: [[0,0,0], [11,11,2022]], random: .25}, "Starfield community beta when?"],
+        [ {random: .001}, "Well, well, well. You must be perty lucky!" ],
         [ {random: .00001}, "WHAT IN OBLIVION?!!! <b>WHY ARE YOU SO LUCKY?!!</b>" ],
+        [ {random: .05}, "Known Troublemakers:<ul><li>Lively</li><li>Lively's Cat</li><li>Lively Again</li></ul>- BigBizkit" ],
         [ {random: .33}, "Nexus Mods is the best!"],
         [ {random: .02}, "Greetings, Dragonborn."], //rdunlap
         [ {random: .1}, "Welcome, Dovahkiin."], //rdunlap
