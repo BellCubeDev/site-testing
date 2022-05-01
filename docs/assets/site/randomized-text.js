@@ -1,5 +1,5 @@
 /*
-    We pull from the ,Conditionalized array before the Generic array to ensure that we always have some text.
+    We pull from the Conditionalized array before the Generic array to ensure that we always have some text.
 
     Possible conditions:
     time: An array of time bounds in 24hr [H,MM].
@@ -43,7 +43,9 @@ const possibilities_Generic = [
     "<s>WELCOME to Belethor's General Goods!</s>", 
     "You. I've seen you. Let me see your face.", 
     "Halt! Halt!", 
-    "Hm? Need something?"
+    "Hm? Need something?", 
+    "May the force be with you.", //DarkDominion
+    "You're braver than I thought!", //DarkDominion
 
     // Codsworth!
     "You're asking my opinion? How uncharacteristic.",
