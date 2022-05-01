@@ -46,12 +46,13 @@ const possibilities_Generic = [
     "Hm? Need something?", 
     "May the force be with you.", //DarkDominion
     "You're braver than I thought!", //DarkDominion
-
-    // Codsworth!
     "You're asking my opinion? How uncharacteristic.",
-    "My olfactory sensors are picking up quite a strong odor.",
+    "My olfactory sensors are picking up <b>quite a strong odor.</b>",
     "With people like you making decisions, no wonder nuclear war broke out.",
-    "Have I mentioned I'm afraid of heights? Especially ones with ramshackle crumbly bits?"
+    "Have I mentioned I'm afraid of heights? Especially ones with ramshackle crumbly bits?", 
+    "Here's the thing, I... <i>I forget the thing.</i>", 
+    "That coin-pouch getting heavy?", 
+    "So rise up! <b>RIIIIIISE UP</b>, children of the Empire! <b>RIIIIIISE UP</b>, Stormcloaks!"
 ];
 
 window.onload = () => {
