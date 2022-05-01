@@ -1,5 +1,5 @@
 /*
-    We pull from the Conditionalized array before the Generic array to ensure that we always have some text.
+    We pull from the ,Conditionalized array before the Generic array to ensure that we always have some text.
 
     Possible conditions:
     time: An array of time bounds in 24hr [H,MM].
