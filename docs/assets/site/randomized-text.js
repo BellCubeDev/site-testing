@@ -1,5 +1,4 @@
 /*
-
     We pull from the Conditionalized array before the Generic array to ensure that we always have some text.
 
     Possible conditions:
@@ -19,8 +18,13 @@ const possibilities_conditionalized = [
     [ {date: [[0,0,0], [11,11,2022]]}, "Starfield community beta when?"],
     [ {random: .00001}, "WHAT IN OBLIVION?!!! <b>WHY ARE YOU SO LUCKY?!!</b>" ],
     [ {random: .1}, "Nexus Mods is the best!"],
-    [ {random: .1}, "Greetings, Dragonborn"], // - rdunlap
-    [ {random: .01}, "The Institute liked that"] // - rdunlap
+    [ {random: .1}, "Greetings, Dragonborn"], //rdunlap
+    [ {random: .1}, "Welcome, Dovahkiin"], //rdunlap
+    [ {random: .1}, "War. War never changes."], //rdunlap
+    [ {random: .01}, "The Institute liked that"] //rdunlap
+    [ {random: .01}, "Do you get to the Cloud District very often?"] //rdunlap
+    [ {random: .1}, "By Azura, by Azura, by Azura! It's you! The Grand Champion!"], //Otellino
+
 ];
 
 const possibilities_Generic = [
@@ -34,12 +38,12 @@ const possibilities_Generic = [
     "What a crazy world we live in!",
     "Starfield Community Patch BABY!!!",
     "Thank Vivec you've arrived. There is much to do!", // - Thallassa
-
-    // Nordic Friendly Greeting
+    "The cake is a lie", //rdunlap
     "May the ground quake as you pass!",
-
-    // Belethor
-    "<s>WELCOME to Belethor's General Goods!</s>",
+    "<s>WELCOME to Belethor's General Goods!</s>", 
+    "You. I've seen you. Let me see your face.", 
+    "Halt! Halt!", 
+    "Hm? Need something?"
 
     // Codsworth!
     "You're asking my opinion? How uncharacteristic.",
