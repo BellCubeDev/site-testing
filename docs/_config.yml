@@ -6,13 +6,52 @@
 first_publication_year: 2022
 latest_publication_year: 2022
 
-# Metadata stuff!
-author: BellCube
-
 # URL Root (used in URIs) - THESE SHOULD NOT END IN "/"
 baseurl: /site-testing
 repourl: https://github.com/BellCubeDev/site-testing
 fullurl: https://bellcubedev.github.io/site-testing
+mainurl: https://bellcubedev.github.io
+
+
+# ============================
+# SEO
+# ============================
+title: BellCubeDev.GitHub.IO
+tagline: The open-source site for BellCube
+author:
+  name: BellCube
+  picture: /site-testing/assets/site/images/icon.png
+  url: https://bellcubedev.github.io
+logo: /site-testing/assets/site/images/icon.png
+defaults:
+  - scope:
+      path: "sitemap.xml"
+    values:
+      layout: compress_html
+  - scope:
+      path: ""
+    values:
+      image:
+        path: /site-testing/assets/site/images/icon.png
+        alt: Cubic Bell
+  - scope:
+      path: "assets/site/misc/Info.xsd"
+    values:
+      layout: compress_html
+  - scope:
+      path: "assets/site/css"
+    values:
+      layout: stylesheet
+  - scope:
+      path: "assets/site/mdl/css"
+    values:
+      layout: stylesheet
+social:
+  name: BellCube's Site
+description: >
+  The website for BellCube, a hobbyist video game modder and web developer. The site hosts documentation, tools, and project updates—and possibly the occasional blog post. Best of all, it's all open-source!
+    
+  BellCube can be found on GitHub and Nexus Mods as well.
 
 
 # ============================
@@ -22,24 +61,6 @@ open_url: true
 
 livereload_min_delay: 100
 livereload: false
-
-defaults:
-#  - scope:
-#      path: "*.png"
-#    values:
-#      image: true
-#  - scope:
-#      path: "*.svg"
-#    values:
-#      layout: compress_html
-  - scope:
-      path: "/sitemap.xml"
-    values:
-      layout: compress_html
-  - scope:
-      path: "/assets/site/css"
-    values:
-      layout: stylesheet
 
 # Where things are
 source      : .
@@ -91,5 +112,5 @@ sass:
 
 # Compress HTML Settings
 compress_html:
-  comments: ["<!-- ", " -->"]
+  comments: ["<!--", "-->"]
   startings: []

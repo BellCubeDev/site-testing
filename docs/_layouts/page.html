@@ -6,17 +6,33 @@ layout: compress_html
 <head>
 
     <title>BellCube: {{ page.title }}</title>
+    <meta property="og:title" content="{{ page.title }}">
+
+
     <link rel="shortcut icon" type="image/ico" href="{{ site.baseurl }}/favicon.ico">
+
+    <meta property="og:site_name" content="BellCubeDev.GitHub.IO">
+    <link rel="canonical" href="{{site.mainurl}}{{page.url}}">
+    <meta property="og:url" content="{{site.mainurl}}{{page.url}}">
+    <meta property="og:type" content="website">
+    
+    <meta property="og:image" content="{{site.fullurl}}/assets/site/images/icon.png" />
+    <meta property="og:image:secure_url" content="{{site.fullurl}}/assets/site/images/icon.png" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="2048" />
+    <meta property="og:image:height" content="2048" />
+    <meta property="og:image:alt" content="Cubic Bell" />
 
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{{ page.meta_description }}" />
-    <meta name="author" content="{{ site.author }}" /><meta name="creator" content="{{ site.author }}" /><meta name="publisher" content="{{ site.author }}" />
+    <meta name="author" content="{{ site.author.name }}" /><meta name="creator" content="{{ site.author.name }}" /><meta name="publisher" content="{{ site.author.name }}" />
     <meta name="generator" content="jekyll" />
     <meta name="theme-color" content="#1b1b1b" /><meta name="color-scheme" content="dark" />
+    <meta name="charset" content="utf-8" />
 
-    <script async src="{{ site.baseurl }}/assets/site/js/material.min.js"></script>
+    <script async src="{{ site.baseurl }}/assets/site/mdl/material.min.js"></script>
     
     <!-- taken from https://stackoverflow.com/a/38296629/13076790 -->
     <script>
@@ -25,7 +41,7 @@ layout: compress_html
         },1000);
     </script>
 
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/site/css/material-blue.min.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}/assets/site/mdl/css/material-blue.min.css">
 
     <link rel="stylesheet" href="{{ site.baseurl }}/assets/site/css/site.css">
 
@@ -112,6 +128,8 @@ layout: compress_html
                     <img style="padding-left:0px;max-width: 24px;" src="{{site.baseurl}}/assets/site/images/third-party-icons/GitHub.svg">
                     <span>GitHub Page</span>
                 </a>
+
+                <p id="randomized-text" style="max-width:100%;position:absolute;bottom:0;margin:16px;">banana!</p>
             </nav>
         </div>
         <header class="mdl-layout__header">

@@ -4,10 +4,16 @@ title: Tools - FOMOD Builder
 extra_head: >
     <script async src="fomod-builder.js"></script>
     <style>.mdl-layout__content {padding-bottom: 224px}</style>
+meta_description: >
+    The FOMOD Builder is a tool for creating FOMOD installers, a popular XML-based format for video game mod installers. It is, at this time, incomplete
+# the first of its kind to feature intuitive tooltips, dark mode, full schema support, Real-time renders, auditing, 
 redirect_from:
   - /tools/fomod/builder/
   - /tools/fomod-builder/
 ---
+
+
+
 <!--
     MO2 - Info.xml
     https://github.com/Holt59/mo2-merge/blob/master/plugins/installer_fomod/src/fomodinstallerdialog.cpp#L626-L639
@@ -41,16 +47,16 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             <a id="fomod_FolderPicker" style="pointer-events:all" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
                 Pick Directory
             </a>
-            <div class="mdl-tooltip" for="fomod_FolderPicker" data-mdl-for="fomod_FolderPicker"><p>
+            <div class="mdl-tooltip" for="fomod_FolderPicker"><p>
                 This is the folder that you will put into an archive to be installed by users. If it is not set up for a FOMOD just yet, no worries! 
             </p></div>
 
             <!-- AutoSave Toggle -->
             <label id="fomod_config_toggleAutosave_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="pointer-events:all;text-align:left" for="fomod_config_toggleAutosave">
-                <input type="checkbox" id="fomod_config_toggleAutosave" class="mdl-switch__input" checked>
+                <input type="checkbox" id="fomod_config_toggleAutosave" class="mdl-switch__input">
                 <span class="mdl-switch__label">Use Autosave</span>
             </label>
-            <div class="mdl-tooltip" for="fomod_config_toggleAutosave_cont" data-mdl-for="fomod_config_toggleAutosave_cont"><p>
+            <div class="mdl-tooltip" for="fomod_config_toggleAutosave_cont"><p>
                 Toggle controlling if the FOMOD Builder will automatically save the current configuration when you change it. This can be useful for making small tweaks, but can be a nightmare if you forget your backups. You've been warned!
             </p></div>
 
@@ -59,20 +65,44 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 <input type="checkbox" id="fomod_config_use_autoflags" class="mdl-switch__input" checked>
                 <span class="mdl-switch__label">Use Automatic Install Flags</span>
             </label>
-            <div class="mdl-tooltip" for="fomod_config_use_autoflags_cont" data-mdl-for="fomod_config_use_autoflags_cont"><p>
+            <div class="mdl-tooltip" for="fomod_config_use_autoflags_cont"><p>
                 Converts file and folder installs to conditional installs. This speeds up the installer (very noticeably with Vortex), leading to a better user experience. The idea is that, instead of waiting for each file to install before continuing to the next page of the FOMOD, your files will be installed at the end of the installer. This allows users to choose their options all in one go before the mod manager works its magic.<br />
                 There is no drawback to this.
             </p></div>
 
             <!-- Save Configuration in Info.xml Toggle -->
-            <label id="fomod_config_saveConfig_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="pointer-events:all;text-align:left" for="fomod_config_saveConfig">
-                <input type="checkbox" id="fomod_config_saveConfig" class="mdl-switch__input">
+            <label id="fomod_config_saveConfigXML_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="pointer-events:all;text-align:left" for="fomod_config_saveConfigXML">
+                <input type="checkbox" id="fomod_config_saveConfigXML" class="mdl-switch__input">
                 <span class="mdl-switch__label">Include FOMOD Builder Config</span>
             </label>
-            <div class="mdl-tooltip" for="fomod_config_saveConfig_cont" data-mdl-for="fomod_config_saveConfig_cont"><p>
-                Saves FOMOD Builder settings inside the <code>Info.xml</code> file (which stores mod metadata). Can be useful if you work on large FOMODs and often revisit them, however it may increase your final file size and look like icky, yucky branding.<br />
+            <div class="mdl-tooltip" for="fomod_config_saveConfigXML_cont"><p>
+                Saves FOMOD Builder settings within comments in the <code>Info.xml</code> file (which stores mod metadata). Can be useful if you work on large FOMODs and often revisit them, however it may increase your final file size and look like icky, yucky branding.<br />
                 <br />
-                If you use this, I do suggest that you turn it off before publishing.
+                If you use this, I do suggest that you turn it off before publishing.<br />
+                <br />
+                If used in conjunction with <code>Use Cookies</code>, a unique-only-on-your-machine identifier will be placed inside of <code>Info.xml</code>, which will load settings from the Cookie. If <code>Use Cookies</code> is toggled off, the Builder will fetch configuration from the before baking it into <code>Info.xml</code>.
+            </p></div>
+
+            <!-- Save Configuration in Cookies Toggle -->
+            <label id="fomod_config_saveConfigCookies_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="pointer-events:all;text-align:left" for="fomod_config_saveConfigCookies">
+                <input type="checkbox" id="fomod_config_saveConfigCookies" class="mdl-switch__input">
+                <span class="mdl-switch__label">Use Cookies</span>
+            </label>
+            <div class="mdl-tooltip" for="fomod_config_saveConfigCookies_cont"><p>
+                Saves FOMOD Builder settings within a cookie. This is useful if you want to use the same FOMOD Builder configuration across multiple browser sessions and even FOMODs.<br />
+                <br />
+                If you use this, I do suggest that you turn it off before publishing.<br />
+                <br />
+                If used in conjunction with <code>Include FOMOD Builder Config</code>, a unique-only-on-your-machine identifier will be placed inside of <code>Info.xml</code>, which will load settings from the Cookie. If <code>Use Cookies</code> is toggled off, the Builder will fetch configuration from the before baking it into <code>Info.xml</code>.
+            </p></div>
+
+            <!-- Include Info.xml Schema -->
+            <label id="fomod_config_saveInfoSchema_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="pointer-events:all;text-align:left" for="fomod_config_saveInfoSchema">
+                <input type="checkbox" id="fomod_config_saveInfoSchema" class="mdl-switch__input">
+                <span class="mdl-switch__label">Use Cookies</span>
+            </label>
+            <div class="mdl-tooltip" for="fomod_config_saveInfoSchema_cont"><p>
+                Include a schema declaration in the <code>Info.xml</code> file? This is especially useful if using external programming tools, such as Visual Studio Code, to write your FOMOD.
             </p></div>
 
             <!-- Add Reccomendation Comment Toggle -->
@@ -80,7 +110,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 <input type="checkbox" id="fomod_config_dobranding" class="mdl-switch__input">
                 <span class="mdl-switch__label">Add Reccomendation Comment</span>
             </label>
-            <div class="mdl-tooltip" for="fomod_config_dobranding_cont" data-mdl-for="fomod_config_dobranding_cont"><p>
+            <div class="mdl-tooltip" for="fomod_config_dobranding_cont"><p>
                 Saves a comment near the top of <code>Info.xml</code> and <code>ModuleConfig.xml</code>. This is disabled by default for a reason - I hate forced watermarks as much as the next guy!<br />
                 <br />
                 But hey, if you want it, it's here. I'll use it because it's my own product. But you? You've got no obligation. It's just here for people like me who like giving way more credit than anyone needs.
@@ -99,7 +129,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 <input id="fomod_info_name_input" class="mdl-textfield__input" type="text" placeholder="Mod Name">
                 <label class="mdl-textfield__label" for="fomod_info_name_input">Mod Name</label>
             </div>
-            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_name" data-mdl-for="fomod_info_name"><p>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_name"><p>
                 The name of the mod. This name is displayed at the top of the installer window.<br />
                 Mod Organizer 2 also uses this data to update whatever mod name it pulls from its metadata guessing.
                 <br /><br /><hr /><br />
@@ -119,7 +149,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 <input id="fomod_info_author_input" class="mdl-textfield__input" type="text" placeholder="AuthorMc4uthorPants123">
                 <label class="mdl-textfield__label" for="fomod_info_author_input">Author</label>
             </div>
-            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_author" data-mdl-for="fomod_info_author"><p>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_author"><p>
                 Author of the mod. Displayed alongside other metadata in the installer window.
                 <br /><br /><hr /><br />
                 <h3>Used By</h3><ul class="mod-manager-list">
@@ -129,17 +159,15 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 </ul>
             </p></div>
 
-            <!-- TODO: Display a SemVer input with an optional toggle for manual version entry -->
-
             <!-- Version Number -->
-            <div style="pointer-events:all;display:inline-flex;align-items:center;gap:16px;flex-direction:row;flex-wrap:nowrap;">
+            <div style="display:inline-flex;align-items:center;gap:16px;flex-direction:row;flex-wrap:nowrap;">
 
                 <!-- Version Number - Full -->
                 <div id="fomod_info_version" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width:120px" hidden>
                     <input id="fomod_info_version_input_full" class="mdl-textfield__input" style="pointer-events: all" type="text" placeholder="1.0.0">
                     <label class="mdl-textfield__label" for="fomod_info_version_input_full" style="pointer-events: all">Version</label>
                 </div>
-                <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version" data-mdl-for="fomod_info_version"><p>
+                <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version"><p>
                     Version of the mod. Displayed alongside other metadata in the installer window.
                     I suggest using Semenatic Versioning (SemVer), e.g. <code>2.1.1</code>, where the first number is the second "major" or "breaking" version, the second is the "minor" or non-breaking" version, and the third is the "patch"/"hotfix"/"bugfix" version.
                     <br /><br /><hr /><br />
@@ -154,26 +182,26 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 <div id="fomod_info_version_semver">
                     <!-- SemVer Container -->
                     <div class="mdl-textfield--floating-label" style="display:inline-flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-end;width:120px;justify-content:space-evenly;">
-                        <div style="width: 32px" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
+                        <div style="width:32px;pointer-events:all" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
                             <!-- SemVer Major -->
                             <input id="fomod_info_version_input_major" class="mdl-textfield__input" style="text-align:center" type="text" placeholder="1" >
                             <label class="mdl-textfield__label" for="fomod_info_version_input_major">Major</label>
                         </div>
-                        <p style="padding-bottom:4px;pointer-events:none">.</p>
-                        <div style="width: 32px" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <p style="padding-bottom:4px">.</p>
+                        <div style="width:32px;pointer-events:all" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                             <!-- SemVer Minor -->
                             <input id="fomod_info_version_input_minor" class="mdl-textfield__input" style="text-align:center" type="text" placeholder="0" >
                             <label class="mdl-textfield__label" for="fomod_info_version_input_minor">Minor</label>
                         </div>
-                        <p style="padding-bottom:4px;pointer-events:none">.</p>
-                        <div style="width: 32px" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <p style="padding-bottom:4px">.</p>
+                        <div style="width:32px;pointer-events:all" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                             <!-- SemVer Patch -->
                             <input id="fomod_info_version_input_patch" class="mdl-textfield__input" style="text-align:center" type="text" placeholder="0" >
                             <label class="mdl-textfield__label" for="fomod_info_version_input_patch">Patch</label>
                         </div>
                     </div>
                 </div>
-                <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version_semver" style="pointer-events:all" data-mdl-for="fomod_info_version_semver"><p>
+                <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version_semver"><p>
                     Version of the mod. Displayed alongside other metadata in the installer window.
                     <br /><br /><hr /><br />
                     <h3>Used By</h3><ul class="mod-manager-list">
@@ -194,8 +222,9 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 <input id="fomod_info_ID_input" class="mdl-textfield__input" type="number" placeholder="1234567890">
                 <label class="mdl-textfield__label" for="fomod_info_ID_input">Identification Number (ID)</label>
             </div>
-            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_ID" data-mdl-for="fomod_info_ID"><p>
-                <s>ID number of the mod. Used by MO2 to pull Nexus Mods information.</s> The ID appears to be unused after reading, however it <i>does</i> share a variable name with the Nexus ID.
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_ID"><p>
+                <s>ID number of the mod. Used by MO2 to pull Nexus Mods information.</s><br />
+                The ID appears to be unused after reading, however it <i>does</i> share a variable name with the Nexus ID.
                 MO2 runs the value through <code>toInt()</code>, I've therefore limited the input of this field to an integer.
                 <br /><br /><hr /><br />
                 <h3>Used By</h3><ul class="mod-manager-list">
@@ -209,7 +238,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 <input id="fomod_info_website_input" class="mdl-textfield__input" type="url" placeholder="https://example.com/">
                 <label class="mdl-textfield__label" for="fomod_info_website_input">Website</label>
             </div>
-            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_website" data-mdl-for="fomod_info_website"><p>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_website"><p>
                 Website URL for the mod. Typically either the mod's main download page or an author-hosted webpage, such as a documentation page with links to the download page(s).
                 MO2 displays the text "Link" as a hyperlink to the URL specified.
                 <br /><br /><hr /><br />
@@ -224,3 +253,24 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 </summary></details>
 
 <h1>123</h1>
+
+<!-- To-do list
+
+    Needed:
+    TODO: Realtime Auditing
+    TODO: 
+
+    Wanted:
+    TODO: Add preview and output simulation for Vortex's installer window
+
+    Nice-to-have:
+    TODO: Add preview and output simulation for MO2's installer window
+    TODO: Show reccomendation to users adding 3+ files to a single option to use a folder instead
+    TODO: Show conflicts between files
+    TODO: Show conflicts between files contained within folders
+
+    IllusiveMan:
+    TODO: Add Bulk Actions (multiselect?!!)
+    TODO: Group Merging
+
+-->

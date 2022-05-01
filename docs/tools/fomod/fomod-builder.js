@@ -7,15 +7,75 @@ function print(message) {
 
 window.onload = init;
 
+// Some variables are defined here with values because it helps VS Code understand what's going on
+
 var rootDirectory;
 var fomodDirectory;
+
 var info_file;
 var info_xml;
 var info_xml_tags;
+
 var moduleConfig_file;
 var moduleConfig_xml;
 
-var importantElements
+var importantElements = {
+    // Core
+    "buttonFolderPicker":new HTMLElement,
+
+
+    // Version Number
+    "containerVersionFull":new HTMLElement,
+    "inputVersionFull":new HTMLElement,
+
+    "toggleUseSemVer":new HTMLElement,
+
+    "containerVersionSemVer":new HTMLElement,
+    "inputVersionMajor":new HTMLElement,
+    "inputVersionMinor":new HTMLElement,
+    "inputVersionPatch":new HTMLElement,
+
+
+    // Config
+    "toggleAutosave":new HTMLElement,
+};
+
+componentHandler.register({
+    constructor: MaterialTooltip,
+    classAsString: 'MaterialTooltip',
+    cssClass: 'mdl-tooltip'
+});
+
+var currentConfig
+const defaultConfig = {
+    autoSave:false,
+    autoConditionFlag:false,
+    configInInfo:false,
+}
+try {
+    currentConfig = JSON.parse(getCookie('fomod_builder_config', defaultConfig));
+} catch {
+    currentConfig = defaultConfig;
+}
+
+// NOTE: Use file type to determine path
+// Idea by IllusiveMan
+var fileExtPathAssociations = {
+    "esp": "",
+    "esm": "",
+    "esl": "",
+    "bsa": "",
+    "ba2": "",
+    "psc": "source\\scripts",
+    "pex": "Scripts",
+    "bik": "Video",
+    "strings": "Strings",
+    "dlstrings": "Strings",
+    "ilstrings": "Strings",
+    "seq": "seq",
+    "txt": "interface\\translations",
+    "xml": "DialogueViews"
+}
 
 async function init() {
     //print("Hello World!");
@@ -55,13 +115,19 @@ async function init() {
             importantElements.containerVersionFull.setAttribute('hidden', '');
         }
     });
+
+
+
+    getConfiguration();
 };
 
 async function openFomodDirectory(){
         var temp_rootDirectory;
         var temp_fomodDirectory;
+        
         var temp_info_file;
         var temp_info_xml;
+        
         var temp_moduleConfig_file;
         var temp_moduleConfig_xml;
         try {
@@ -93,7 +159,8 @@ async function openFomodDirectory(){
             }
             *///364
 
-            await temp_fomodDirectory.getFileHandle('Info.xml', {create: true}).then(fileHandle => {
+            // FIXME Make this work
+            await temp_fomodDirectory.getFileHandle('info.xml', {create: true}).then(fileHandle => {
                 print(`fileHandle: ${fileHandle}`);
                 temp_info_file = fileHandle;
                 temp_info_file.getFile().then(file => {
@@ -153,6 +220,36 @@ async function openFomodDirectory(){
 /**
     Runs a conditional to see if the file should be auto-saved before saving it with `writeFile()`.
 */
+
+function prepareInfoXML(){
+
+}
+
+/*
+ This function was taken from https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
+ That code is available under CC-0: http://creativecommons.org/publicdomain/zero/1.0/
+*//**
+  * Gets the value of the specified cookie.
+  * @param cookieName The name of the cookie to get.
+  * @param defaultValue Value to return should an error occur. Defaults to `''`
+*/
+function getCookie(cookieName, defaultValue){
+    try {
+        // Get the value of the cookie, if it exists
+        return document.cookie.split('; ')
+          .find(row => row.startsWith(`${cookieName}=`))
+          .split('=')[1];
+    } catch{
+        print(`Error getting the value of cookie '${cookieName}' - it may not exist.`);
+        if (typeof defaultValue !== 'undefined'){return defaultValue;}else{return '';}
+    }
+}
+
+function getConfiguration(){
+
+    document.cookie=`fomod_builder_config=${JSON.stringify(currentConfig)}; path=/;`;
+}
+
 async function autoSaveFile(fileHandle, contents) {
     if (importantElements.toggleAutosave.classList.contains('is-checked')) {
         writeFile(fileHandle, contents);
@@ -161,7 +258,7 @@ async function autoSaveFile(fileHandle, contents) {
 
 /*
  This function was taken from https://developer.mozilla.org/en-US/docs/Web/API/FileSystemFileHandle
- That code is available under http://creativecommons.org/publicdomain/zero/1.0/
+ That code is available under CC-0: http://creativecommons.org/publicdomain/zero/1.0/
 *//**
   Writes file contents to the file system.
 */
