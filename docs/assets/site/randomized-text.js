@@ -12,8 +12,8 @@ window.onload = () => {/*
         [ {random: .075}, "STOP REFRESHING!!!" ],
         [ {time: [[3,00], [11,59]]}, "Good morning!" ],
         [ {time: [[12,00], [12,00]]}, "Good noon!" ],
-        [ {time: [[12,01], [18,00]]}, "Good afternoon!" ],
-        [ {time: [[18,00], [24,00]]}, "Good evening!" ],
+        [ {time: [[12,01], [19,00]]}, "Good afternoon!" ],
+        [ {time: [[18,30], [24,00]]}, "Good evening!" ],
         [ {time: [[0,00], [5,00]]}, "<s>Friendly reminder that you should probably be sleping right now</s>" ],
         [ {date: [[0,0,0], [11,11,2022]], random: .25}, "Starfield community beta when?"],
         [ {random: .001}, "Well, well, well. You must be perty lucky!" ],
@@ -111,7 +111,8 @@ window.onload = () => {/*
         "Um... We're not talking about Barbas, are we? Clavicus Vile's... dog? Oohh... awkward.",
         "You know, I was there for that whole sordid affair. Marvelous time! Butterflies, blood, a Fox, a severed head... Oh, and the cheese! To die for.",
         "<img style=\"max-width: 64px\" src=\"https://cdn.discordapp.com/emojis/934113805670170714.webp?quality=lossless\" alt=\"Nexus Mods Mug\" decoding=\"async\" fetchpriority=\"low\" loading=\"lazy\" />",
-        "You. Yes, you. I'm still waiting."
+        "You. Yes, you. I'm still waiting.",
+        "Because it's dull, you twit. It'll hurt more."
     ]
 
     // Still in 'window.onload'

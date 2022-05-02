@@ -521,6 +521,10 @@ body.preload * {
     margin: 0px;
 }
 
+.mdl-textfield__input {
+    border-bottom-color: #ffffe03d;
+}
+
 .mod-manager-list img {
     height: 18px;
 }
