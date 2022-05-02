@@ -3072,8 +3072,9 @@ MaterialTooltip.prototype.handleMouseEnter_ = function (event) {
     var top = props.top + props.height / 2;
     var marginLeft = -1 * (this.element_.offsetWidth / 2);
 
+    //console.log(`[BCD-Material.Debug] window.innerWidth: ${window.innerWidth}, use desktop layout: ${window.innerWidth >= 1025}`);
     // Modification by BellCube to adjust for the navigation drawer
-    if (window.screen.width > 760 && left + marginLeft < 256) {
+    if (window.innerWidth >= 1025 && left + marginLeft < 256) {
         marginLeft += Math.abs(256 - (left + marginLeft))
     }
 
