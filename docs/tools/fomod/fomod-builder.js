@@ -3,12 +3,6 @@ const fileReader = new FileReader();
 
 window.onload = init;
 
-/** 
-    @var {FileSystemDirectoryHandle} rootDirectory - The root directory of the FOMOD
-    @var {FileSystemDirectoryHandle} rootDirectory - The directory containing the FOMOD's XML files
-
-*/
-
 var rootDirectory;
 var fomodDirectory;
 
@@ -44,6 +38,9 @@ var importantElements = {//*
     "toggleInfoSchema": HTMLElement.prototype,
     "toggleBranding": HTMLElement.prototype,
 
+    // Collapseables
+    "collapseableMetadata": HTMLElement.prototype,
+    "collapseableGeneralAndConfig": HTMLElement.prototype,
 /**/};
 
 // Idea by IllusiveMan
@@ -76,7 +73,7 @@ function parseIntSuperStrict(intString, radix = 10) {
         return parseInt(intString, radix)
     } else {
         console.log('Throwing ParseInt error for string ${intString}');
-        parseIntErr.throw()
+        throw parseIntErr;
     }
 }
 
@@ -134,6 +131,10 @@ async function init() {
         "toggleConfigInCookie": document.getElementById(`fomod_config_saveConfigCookies`),
         "toggleInfoSchema": document.getElementById(`fomod_config_saveInfoSchema`),
         "toggleBranding": document.getElementById(`fomod_config_dobranding`),
+
+        // Collapseables
+        "collapseableMetadata": document.getElementById(`collapseable_Metadata`),
+        "collapseableGeneralAndConfig": document.getElementById(`collapseable_GeneralAndConfig`),
     };
 
     //console.log("[BCD-FomodBuilder] "+JSON.stringify(importantElements));
@@ -143,11 +144,11 @@ async function init() {
     });
     importantElements.toggleUseSemVer.addEventListener('click', async () => {
         if (checkToggleSwitch(importantElements.toggleUseSemVer)){
-            setVersion(`${inputValue(importantElements.inputVersionMajor)}.${inputValue(importantElements.inputVersionMinor)}.${inputValue(importantElements.inputVersionPatch)}`, true)
+            setVersion(`${inputValue(importantElements.inputVersionMajor, false)}.${inputValue(importantElements.inputVersionMinor, false)}.${inputValue(importantElements.inputVersionPatch, false)}`.replace(/^\.+|\.+$/g, ''), true)
             importantElements.containerVersionSemVer.setAttribute('hidden', '');
             importantElements.containerVersionFull.removeAttribute('hidden');
         } else {
-            setVersion(inputValue(importantElements.inputVersionFull), true)
+            setVersion(inputValue(importantElements.inputVersionFull, false), true);
             importantElements.containerVersionSemVer.removeAttribute('hidden');
             importantElements.containerVersionFull.setAttribute('hidden', '');
         }
@@ -178,10 +179,7 @@ async function init() {
 async function openFomodDirectory(){
     var temp_rootDirectory;
     var temp_fomodDirectory;
-
-    var temp_info_file;
     try {
-
         temp_rootDirectory = await window.showDirectoryPicker();
         while (!temp_rootDirectory || temp_rootDirectory.name.toLowerCase() == 'fomod'){
             window.alert(`Please select the root folder (the one containing 'fomod') or name your folder something other than 'fomod'.`);
@@ -197,36 +195,55 @@ async function openFomodDirectory(){
         }
         document.getElementById(`fomod_FolderPicker_folderName`).innerHTML = temp_rootDirectory.name;
 
-        temp_rootDirectory.getDirectoryHandle('fomod', {create: true}).then(async (fomodDirectory) => {
-            temp_fomodDirectory = fomodDirectory;
+        console.log(`[BCD-FomodBuilder] Root Folder name: ${temp_rootDirectory.name}`);
+        temp_rootDirectory.getDirectoryHandle('fomod', {create: true}).then(async (dir) => {
+            temp_fomodDirectory = dir;
 
-            console.log(`[BCD-FomodBuilder] Root Folder name: ${temp_rootDirectory.name}`);
-            console.log(`[BCD-FomodBuilder] FOMOD Directory name: ${temp_fomodDirectory.name}`);
+            console.log(`[BCD-FomodBuilder] FOMOD Directory name: ${dir.name}`);
 
-            await temp_fomodDirectory.getFileHandle('info.xml', {create: true}).then(async function (fileHandle) {
+            dir.getFileHandle('info.xml', {create: true}).then(async function (fileHandle) {
                 console.log(`[BCD-FomodBuilder] fileHandle: ${fileHandle}, name: ${fileHandle.name}`);
-                temp_info_file = fileHandle;
-                temp_info_file.getFile().then(async function (file) {
-                    temp_info_file = file;
-
+                fileHandle.getFile().then(async function (file) {
                     const temp_xmlReader = new FileReader()
                     temp_xmlReader.onload = parseInfoXML;
-                    temp_xmlReader.readAsText(temp_info_file)
+                    temp_xmlReader.readAsText(file)
+                });
+            });
+            dir.getFileHandle('ModuleConfig.xml', {create: true}).then(async function (fileHandle) {
+                console.log(`[BCD-FomodBuilder] fileHandle: ${fileHandle}, name: ${fileHandle.name}`);
+                fileHandle.getFile().then(async function (file) {
+                    const temp_xmlReader = new FileReader()
+                    temp_xmlReader.onload = parseModuleConfigXML;
+                    temp_xmlReader.readAsText(file)
                 });
             });
         });
-    } catch(e) {
-        console.log("[BCD-FomodBuilder] "+e);
-    }
 
-    setTimeout(save, 3000)
+        rootDirectory = temp_rootDirectory
+        fomodDirectory = temp_fomodDirectory
+        importantElements.collapseableMetadata.setAttribute('open', '');
+    
+        setTimeout(save, 3000)
+    } catch(err) {
+        if(err instanceof DOMException && (err.name == 'AbortError')) {
+            console.log(`Intercepted error ${err.name}:\n${err.stack}`);
+        }else {
+            throw err;
+        }
+    }
 }
+
+/** Function to handle parsing `ModuleConfig.xml`
+    @param {ProgressEvent} readerEvent - The event object
+    @returns {nil}
+*/
+function parseModuleConfigXML(readerEvent) {}
 
 /** Function to handle parsing `Info.xml`
     @param {ProgressEvent} readerEvent - The event object
     @returns {nil}
 */
-async function parseInfoXML(readerEvent) {
+function parseInfoXML(readerEvent) {
     console.log(`[BCD-FomodBuilder] readerEvent.target.result: ${readerEvent.target.result}`);
     info_xml = XMLParser.parseFromString(readerEvent.target.result, "text/xml");
 
@@ -251,9 +268,9 @@ function setVersion(version, relaxed = false){
     importantElements.inputVersionFull.value = version;
     try{
         var splitVers = version.split('.');
-        try{importantElements.inputVersionMajor.value = parseIntExtremes(splitVers[0], relaxed)} catch(e){handlePerseError(e)}
-        try{importantElements.inputVersionMinor.value = parseIntExtremes(splitVers[1], relaxed)} catch(e){handlePerseError(e)}
-        try{importantElements.inputVersionPatch.value = parseIntExtremes(splitVers[2], relaxed)} catch(e){handlePerseError(e)}
+        if (splitVers.length > 0){try{importantElements.inputVersionMajor.value = parseIntExtremes(splitVers[0], relaxed)} catch(e){handlePerseError(e)}}else{importantElements.inputVersionMajor.value = ''}
+        if (splitVers.length > 1){try{importantElements.inputVersionMinor.value = parseIntExtremes(splitVers[1], relaxed)} catch(e){handlePerseError(e)}}else{importantElements.inputVersionMinor.value = ''}
+        if (splitVers.length > 2){try{importantElements.inputVersionPatch.value = parseIntExtremes(splitVers[2], relaxed)} catch(e){handlePerseError(e)}}else{importantElements.inputVersionPatch.value = ''}
     } catch(e){handlePerseError(e)}
     function handlePerseError(e){
         console.log(`Error parsing version ${version}: ${e}\n${e.stack}`);
