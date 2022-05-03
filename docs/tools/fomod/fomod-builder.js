@@ -9,42 +9,40 @@ window.onload = init;
 
 // Some variables are defined here with values because it helps VS Code understand what's going on
 
-var rootDirectory;
-var fomodDirectory;
+var rootDirectory = FileSystemDirectoryHandle.prototype;
+var fomodDirectory = FileSystemDirectoryHandle.prototype;
 
-var info_file;
-var info_xml;
-var info_xml_tags;
+var info_file = FileSystemFileHandle.prototype;
+var info_xml = XMLDocument.prototype;
+var info_xml_tags = HTMLElement.prototype;
 
-var moduleConfig_file;
-var moduleConfig_xml;
+var moduleConfig_file = FileSystemFileHandle.prototype;
+var moduleConfig_xml = XMLDocument.prototype;
 
 var importantElements = {
     // Core
-    "buttonFolderPicker":new HTMLElement,
+    "buttonFolderPicker": HTMLElement.prototype,
 
 
     // Version Number
-    "containerVersionFull":new HTMLElement,
-    "inputVersionFull":new HTMLElement,
+    "containerVersionFull": HTMLElement.prototype,
+    "inputVersionFull": HTMLElement.prototype,
 
-    "toggleUseSemVer":new HTMLElement,
+    "toggleUseSemVer": HTMLElement.prototype,
 
-    "containerVersionSemVer":new HTMLElement,
-    "inputVersionMajor":new HTMLElement,
-    "inputVersionMinor":new HTMLElement,
-    "inputVersionPatch":new HTMLElement,
+    "containerVersionSemVer": HTMLElement.prototype,
+    "inputVersionMajor": HTMLElement.prototype,
+    "inputVersionMinor": HTMLElement.prototype,
+    "inputVersionPatch": HTMLElement.prototype,
 
 
     // Config
-    "toggleAutosave":new HTMLElement,
+    "toggleAutosave": HTMLElement.prototype,
+    "toggleConfigInXML": HTMLElement.prototype,
+    "toggleConfigInCookie": HTMLElement.prototype,
+    "toggleInfoSchema": HTMLElement.prototype,
+    "toggleBranding": HTMLElement.prototype,
 };
-
-componentHandler.register({
-    constructor: MaterialTooltip,
-    classAsString: 'MaterialTooltip',
-    cssClass: 'mdl-tooltip'
-});
 
 var currentConfig
 const defaultConfig = {
@@ -99,6 +97,10 @@ async function init() {
 
         // Config
         "toggleAutosave": document.getElementById(`fomod_config_toggleAutosave`).parentElement,
+        "toggleConfigInXML": document.getElementById(`fomod_config_saveConfigXML`).parentElement,
+        "toggleConfigInCookie": document.getElementById(`fomod_config_saveConfigCookies`).parentElement,
+        "toggleInfoSchema": document.getElementById(`fomod_config_saveInfoSchema`).parentElement,
+        "toggleBranding": document.getElementById(`fomod_config_dobranding`).parentElement,
     };
 
     //print(JSON.stringify(importantElements));
@@ -118,112 +120,85 @@ async function init() {
 
 
 
-    getConfiguration();
 };
 
 async function openFomodDirectory(){
-        var temp_rootDirectory;
-        var temp_fomodDirectory;
-        
-        var temp_info_file;
-        var temp_info_xml;
-        
-        var temp_moduleConfig_file;
-        var temp_moduleConfig_xml;
-        try {
+    var temp_rootDirectory = FileSystemDirectoryHandle.prototype;
+    var temp_fomodDirectory = FileSystemDirectoryHandle.prototype;
+    
+    var temp_info_file = FileSystemFileHandle.prototype;
+    var temp_info_xml = XMLDocument.prototype;
+    var temp_info_xml_tags = HTMLElement.prototype;
+    
+    var temp_moduleConfig_file = FileSystemFileHandle.prototype;
+    var temp_moduleConfig_xml = XMLDocument.prototype;
+    try {
 
-            temp_rootDirectory = await window.showDirectoryPicker();
-            while (!temp_rootDirectory || temp_rootDirectory.name.toLowerCase() == 'fomod'){
-                window.alert(`Please select the root folder (the one containing 'fomod') or name your folder something other than 'fomod'.`);
+        temp_rootDirectory = await window.showDirectoryPicker();
+        while (!temp_rootDirectory || temp_rootDirectory.name.toLowerCase() == 'fomod'){
+            window.alert(`Please select the root folder (the one containing 'fomod') or name your folder something other than 'fomod'.`);
+            return;
+        }
+
+        while (
+            !(await tryForPermission(temp_rootDirectory, 'readwrite'))
+        ){
+            if (!window.confirm(`The editor requires write permissions to the root folder. Please grant write permissions to the root folder or hit cancel.`)){
                 return;
             }
+        }
+        document.getElementById(`fomod_FolderPicker_folderName`).innerHTML = temp_rootDirectory.name;
 
-            while (
-                !(await tryForPermission(temp_rootDirectory, 'readwrite'))
-            ){
-                if (!window.confirm(`The editor requires write permissions to the root folder. Please grant write permissions to the root folder or hit cancel.`)){
-                    return;
-                }
-            }
-            document.getElementById(`fomod_FolderPicker_folderName`).innerHTML = temp_rootDirectory.name;
+        temp_rootDirectory.getDirectoryHandle('fomod', {create: true}).then(async (fomodDirectory) => {
+            temp_fomodDirectory = fomodDirectory;
 
-            temp_fomodDirectory = await temp_rootDirectory.getDirectoryHandle('fomod', {create: true});
-
-
-            //directory = FileSystemDirectoryHandle
-            print(`folder name: ${temp_rootDirectory.name}`);
+            print(`Root Folder name: ${temp_rootDirectory.name}`);
+            print(`FOMOD Directory name: ${temp_fomodDirectory.name}`);
 
             /*
-            for await (const [key, value] of temp_rootDirectory.entries()) {
-                print(`resolve(): ${JSON.stringify({key, value})}`);
+            var temp_fomodDirectoryJSON = {};
+            for await (const [key, value] of temp_fomodDirectory.entries()) {
+                temp_fomodDirectoryJSON[key] = value;
+                temp_fomodDirectoryJSON[key]['file'] = await value.getFile();
             }
-            *///364
+            console.log(temp_fomodDirectoryJSON);
+
+            var filetext = await temp_fomodDirectoryJSON['info.xml'].file.text(); 
+            print(`text of Info.xml:\n====================\n${filetext}\n====================`);
+            */
 
             // FIXME Make this work
-            await temp_fomodDirectory.getFileHandle('info.xml', {create: true}).then(fileHandle => {
-                print(`fileHandle: ${fileHandle}`);
+            await temp_fomodDirectory.getFileHandle('info.xml', {create: true}).then(async function (fileHandle) {
+                print(`fileHandle: ${fileHandle}, name: ${fileHandle.name}`);
                 temp_info_file = fileHandle;
-                temp_info_file.getFile().then(file => {
-                    print(`file: ${file}`);
+                temp_info_file.getFile().then(async function (file) {
                     temp_info_file = file;
-                    print(`temp_info_file: ${temp_info_file}`);
-
-                    temp_info_file.text().then(text => {
-                        print(`temp_info_file.text(): ${text}`);
-                    });
 
                     const temp_xmlReader = new FileReader()
                     temp_xmlReader.onload = readerEvent => {
                         print(`readerEvent.target.result: ${readerEvent.target.result}`);
                         temp_info_xml = XMLParser.parseFromString(readerEvent.target.result, "text/xml");
-                        print(`temp_info_xml: ${temp_info_xml}`);
-                        print(`innerText of temp_info_xml:\n====================\n${temp_info_xml.documentElement.innerHTML}\n====================`);
+                        temp_info_xml_tags = temp_info_xml.getElementsByTagName('fomod')[0];
+                        console.log(temp_info_xml_tags);
 
-                        info_xml_tags = temp_info_xml.children;
-
-                        print(`info_xml_tags: ${info_xml_tags}`);
-                        print(`info_xml_tags[0]: ${info_xml_tags[0]}`);
-                        print(`info_xml_tags.length: ${info_xml_tags.length}`);
-
-                        for (let item of info_xml_tags) {
-                            print(`info_xml_tags: ${item.innerHTML}`);
-                        }
-
+                        info_file = temp_info_file;
+                        info_xml = temp_info_xml;
+                        info_xml_tags = temp_info_xml_tags;
                     }
-
-                    print(`Reading file ${temp_info_file.webkitRelativePath}\\${temp_info_file.name}... fold your horses!`);
                     temp_xmlReader.readAsText(temp_info_file)
                 });
             });
+        });
+    } catch(e) {
+        print(e);
+    }
 
-            /*
-            await temp_fomodDirectory.getFileHandle('ModuleConfig.xml', {create: true}).then(fileHandle => {
-                temp_info_file = fileHandle;
-            });
-            await temp_moduleConfig_file.getFile().then((file) => {
-                temp_info_file = file;
-            });
-            */
-
-            //temp_xmlReader.addEventListener('load', temp_loadEvent);
-            //temp_xmlReader.addEventListener('error', temp_loadEvent);
-            //temp_xmlReader.addEventListener('abort', temp_loadEvent);
-
-            //temp_moduleConfig_xml = XMLParser.parseFromString(await temp_moduleConfig_file.text(), "text/xml");
-
-
-        } catch(e) {
-            print(e);
-        }
+    setTimeout(save, 3000)
 }
 
 /**
     Runs a conditional to see if the file should be auto-saved before saving it with `writeFile()`.
 */
-
-function prepareInfoXML(){
-
-}
 
 /*
  This function was taken from https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
@@ -245,15 +220,46 @@ function getCookie(cookieName, defaultValue){
     }
 }
 
-function getConfiguration(){
-
-    document.cookie=`fomod_builder_config=${JSON.stringify(currentConfig)}; path=/;`;
+/**
+    * Conveinence function to get the value of a toggle switch.
+*/
+function checkToggleSwitch(element){
+    return element.classList.contains('is-checked')
 }
 
-async function autoSaveFile(fileHandle, contents) {
-    if (importantElements.toggleAutosave.classList.contains('is-checked')) {
-        writeFile(fileHandle, contents);
+/**
+    * Conveinence function to call `save()` if autosaving is enabled.
+*/
+async function autoSave() {
+    if (checkToggleSwitch(importantElements.toggleAutosave)) {
+        save()
     }
+}
+
+async function save(){
+    console.log('Before editing:\n', info_xml.documentElement);
+    setTimeout(() => {
+    if (checkToggleSwitch(importantElements.toggleConfigInXML)){
+        console.log('Adding Schema to Info.xml (disabled by default)');
+        // xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd"
+        info_xml_tags.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+        info_xml_tags.setAttribute('xsi:noNamespaceSchemaLocation', 'https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd')
+
+    }
+    if (checkToggleSwitch(importantElements.toggleBranding) && !info_xml.documentElement.innerHTML.includes('BellCube\'s FOMOD Builder')){
+        console.log('Adding Branding to Info.xml (disabled by default)');
+        var comment = info_xml.createComment('\n    Created using BellCube\'s FOMOD Builder\n    https://bellcubedev.github.io/site-testing/tools/fomod/\n    The tool is currently in early testing, so any extra testers would be very welcome.\n')
+        /*
+            <!--
+                Created using BellCube's FOMOD Builder
+                https://bellcubedev.github.io/site-testing/tools/fomod/
+                The tool is currently in early testing, so any extra testers would be very welcome!
+            -->
+        */
+        info_xml.documentElement.append(comment);
+    }
+    console.log('After editing:\n', info_xml.documentElement);
+    }, 1000);
 }
 
 /*
