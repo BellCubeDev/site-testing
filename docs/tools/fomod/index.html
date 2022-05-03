@@ -98,8 +98,8 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 
             <!-- Include Info.xml Schema -->
             <label id="fomod_config_saveInfoSchema_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="pointer-events:all;text-align:left" for="fomod_config_saveInfoSchema">
-                <input type="checkbox" id="fomod_config_saveInfoSchema" class="mdl-switch__input">
-                <span class="mdl-switch__label">Use Cookies</span>
+                <input type="checkbox" id="fomod_config_saveInfoSchema" class="mdl-switch__input" checked>
+                <span class="mdl-switch__label">Save <i>Info.xml</i> Schema</span>
             </label>
             <div class="mdl-tooltip" for="fomod_config_saveInfoSchema_cont"><p>
                 Include a schema declaration in the <code>Info.xml</code> file? This is especially useful if using external programming tools, such as Visual Studio Code, to write your FOMOD.
@@ -125,11 +125,11 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     </div>
     <div class="details-container"><div>
         <form autocomplete="off" style="pointer-events:none;display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px;"name="Metadata">
-            <div id="fomod_info_name" style="pointer-events:all" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
-                <input id="fomod_info_name_input" class="mdl-textfield__input" type="text" placeholder="Mod Name">
-                <label class="mdl-textfield__label" for="fomod_info_name_input">Mod Name</label>
+            <div id="fomod_info_name_cont" style="pointer-events:all" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
+                <input id="fomod_info_name" class="mdl-textfield__input" type="text" placeholder="Mod Name">
+                <label class="mdl-textfield__label" for="fomod_info_name">Mod Name</label>
             </div>
-            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_name"><p>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_name_cont"><p>
                 The name of the mod. This name is displayed at the top of the installer window.<br />
                 Mod Organizer 2 also uses this data to update whatever mod name it pulls from its metadata guessing.
                 <br /><br /><hr /><br />
@@ -145,11 +145,11 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 
             <!-- MO2 Metadata -->
 
-            <div id="fomod_info_author" style="pointer-events:all" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
-                <input id="fomod_info_author_input" class="mdl-textfield__input" type="text" placeholder="AuthorMc4uthorPants123">
-                <label class="mdl-textfield__label" for="fomod_info_author_input">Author</label>
+            <div id="fomod_info_author_cont" style="pointer-events:all" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
+                <input id="fomod_info_author" class="mdl-textfield__input" type="text" placeholder="AuthorMc4uthorPants123">
+                <label class="mdl-textfield__label" for="fomod_info_author">Author</label>
             </div>
-            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_author"><p>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_author_cont"><p>
                 Author of the mod. Displayed alongside other metadata in the installer window.
                 <br /><br /><hr /><br />
                 <h3>Used By</h3><ul class="mod-manager-list">
@@ -163,11 +163,11 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             <div style="display:inline-flex;align-items:center;gap:16px;flex-direction:row;flex-wrap:nowrap;">
 
                 <!-- Version Number - Full -->
-                <div id="fomod_info_version" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width:120px" hidden>
-                    <input id="fomod_info_version_input_full" class="mdl-textfield__input" style="pointer-events: all" type="text" placeholder="1.0.0">
-                    <label class="mdl-textfield__label" for="fomod_info_version_input_full" style="pointer-events: all">Version</label>
+                <div id="fomod_info_version_cont" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width:120px" hidden>
+                    <input id="fomod_info_version_full" class="mdl-textfield__input" style="pointer-events: all" type="text" placeholder="1.0.0">
+                    <label class="mdl-textfield__label" for="fomod_info_version_full" style="pointer-events: all">Version</label>
                 </div>
-                <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version"><p>
+                <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version_cont"><p>
                     Version of the mod. Displayed alongside other metadata in the installer window.
                     I suggest using Semenatic Versioning (SemVer), e.g. <code>2.1.1</code>, where the first number is the second "major" or "breaking" version, the second is the "minor" or non-breaking" version, and the third is the "patch"/"hotfix"/"bugfix" version.
                     <br /><br /><hr /><br />
@@ -179,29 +179,26 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 </p></div>
 
                 <!-- Version Number - SemVer -->
-                <div id="fomod_info_version_semver">
-                    <!-- SemVer Container -->
-                    <div class="mdl-textfield--floating-label" style="display:inline-flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-end;width:120px;justify-content:space-evenly;">
-                        <div style="width:32px;pointer-events:all" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
-                            <!-- SemVer Major -->
-                            <input id="fomod_info_version_input_major" class="mdl-textfield__input" style="text-align:center" type="text" placeholder="1" >
-                            <label class="mdl-textfield__label" for="fomod_info_version_input_major">Major</label>
-                        </div>
-                        <p style="padding-bottom:4px">.</p>
-                        <div style="width:32px;pointer-events:all" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <!-- SemVer Minor -->
-                            <input id="fomod_info_version_input_minor" class="mdl-textfield__input" style="text-align:center" type="text" placeholder="0" >
-                            <label class="mdl-textfield__label" for="fomod_info_version_input_minor">Minor</label>
-                        </div>
-                        <p style="padding-bottom:4px">.</p>
-                        <div style="width:32px;pointer-events:all" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                            <!-- SemVer Patch -->
-                            <input id="fomod_info_version_input_patch" class="mdl-textfield__input" style="text-align:center" type="text" placeholder="0" >
-                            <label class="mdl-textfield__label" for="fomod_info_version_input_patch">Patch</label>
-                        </div>
+                <div id="fomod_info_version_semver_cont" class="mdl-textfield--floating-label" style="display:inline-flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-end;width:120px;justify-content:space-evenly;">
+                    <div style="width:32px;pointer-events:all" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
+                        <!-- SemVer Major -->
+                        <input id="fomod_info_version_major" class="mdl-textfield__input" style="text-align:center" type="number" placeholder="1" >
+                        <label class="mdl-textfield__label" for="fomod_info_version_major">Major</label>
+                    </div>
+                    <p style="padding-bottom:4px">.</p>
+                    <div style="width:32px;pointer-events:all" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <!-- SemVer Minor -->
+                        <input id="fomod_info_version_minor" class="mdl-textfield__input" style="text-align:center" type="number" placeholder="0" >
+                        <label class="mdl-textfield__label" for="fomod_info_version_minor">Minor</label>
+                    </div>
+                    <p style="padding-bottom:4px">.</p>
+                    <div style="width:32px;pointer-events:all" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                        <!-- SemVer Patch -->
+                        <input id="fomod_info_version_patch" class="mdl-textfield__input" style="text-align:center" type="number" placeholder="0" >
+                        <label class="mdl-textfield__label" for="fomod_info_version_patch">Patch</label>
                     </div>
                 </div>
-                <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version_semver"><p>
+                <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version_semver_cont"><p>
                     Version of the mod. Displayed alongside other metadata in the installer window.
                     <br /><br /><hr /><br />
                     <h3>Used By</h3><ul class="mod-manager-list">
@@ -218,11 +215,11 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 </label>
             </div>
 
-            <div id="fomod_info_ID" style="pointer-events:all" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
-                <input id="fomod_info_ID_input" class="mdl-textfield__input" type="number" placeholder="1234567890">
-                <label class="mdl-textfield__label" for="fomod_info_ID_input">Identification Number (ID)</label>
+            <div id="fomod_info_ID_cont" style="pointer-events:all" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
+                <input id="fomod_info_ID" class="mdl-textfield__input" type="number" placeholder="1234567890">
+                <label class="mdl-textfield__label" for="fomod_info_ID">Identification Number (ID)</label>
             </div>
-            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_ID"><p>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_ID_cont"><p>
                 <s>ID number of the mod. Used by MO2 to pull Nexus Mods information.</s><br />
                 The ID appears to be unused after reading, however it <i>does</i> share a variable name with the Nexus ID.
                 MO2 runs the value through <code>toInt()</code>, I've therefore limited the input of this field to an integer.
@@ -234,11 +231,11 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 </ul>
             </p></div>
 
-            <div id="fomod_info_website" style="pointer-events:all" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
-                <input id="fomod_info_website_input" class="mdl-textfield__input" type="url" placeholder="https://example.com/">
-                <label class="mdl-textfield__label" for="fomod_info_website_input">Website</label>
+            <div id="fomod_info_website_cont" style="pointer-events:all" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
+                <input id="fomod_info_website" class="mdl-textfield__input" type="url" placeholder="https://example.com/">
+                <label class="mdl-textfield__label" for="fomod_info_website">Website</label>
             </div>
-            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_website"><p>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_website_cont"><p>
                 Website URL for the mod. Typically either the mod's main download page or an author-hosted webpage, such as a documentation page with links to the download page(s).
                 MO2 displays the text "Link" as a hyperlink to the URL specified.
                 <br /><br /><hr /><br />
