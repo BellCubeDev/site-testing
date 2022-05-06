@@ -47,7 +47,6 @@ window.onload = () => {/*
         "The cake is a lie", //rdunlap
         "May the ground quake as you pass!",
         "<s>WELCOME to Belethor's General Goods!</s>", 
-        /*
         "You. I've seen you. Let me see your face.", 
         "Halt! Halt!", 
         "Hm? Need something?", 
@@ -114,19 +113,7 @@ window.onload = () => {/*
         "<img style=\"max-width: 64px\" src=\"https://cdn.discordapp.com/emojis/934113805670170714.webp?quality=lossless\" alt=\"Nexus Mods Mug\" decoding=\"async\" fetchpriority=\"low\" loading=\"lazy\" />",
         "You. Yes, you. I'm still waiting.",
         "Because it's dull, you twit. It'll hurt more."
-        */
-        "This one's not dead yet",
-        "May the forth be with you!",
-        "May the forth be with you!",
-        "May the forth be with you!",
-        "May the forth be with you!",
-        "May the forth be with you!",
-        "May the forth be with you!",
-        "May the forth be with you!",
-        "May the forth be with you!",
-        "May the forth be with you!",
-        "May the forth be with you!",
-        "May the forth be with you!"
+        "This one's not dead yet"
     ]
 
     // Still in 'window.onload'
