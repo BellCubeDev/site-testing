@@ -11,6 +11,7 @@ window.onload = () => {/*
         [ {random: .01}, "And why not? Imagine how unbearably, how unutterably cold the universe would be if one were all alone." ], // https://www.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html
         [ {random: .075}, "STOP REFRESHING!!!" ],
         [ {time: [[3,00], [11,59]]}, "Good morning!" ],
+        [ {time: [[3,00], [11,59]]}, "Mornin'! Nice day for fishin', ain't it?" ],
         [ {time: [[12,00], [12,00]]}, "Good noon!" ],
         [ {time: [[12,01], [19,00]]}, "Good afternoon!" ],
         [ {time: [[18,30], [24,00]]}, "Good evening!" ],
