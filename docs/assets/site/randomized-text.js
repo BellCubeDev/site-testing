@@ -120,7 +120,9 @@ window.onload = () => {/*
         "I dream of brains exploding.", 
         "You must construct additional pylons.", 
         "That thing must die!",
-        "This one's not dead yet!"
+        "This one's not dead yet!", 
+        "Layne#6549", 
+        "Cthulhu is angry and missing an eye."
     ]
 
     // Still in 'window.onload'
