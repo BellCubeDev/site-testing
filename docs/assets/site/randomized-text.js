@@ -27,7 +27,7 @@ window.onload = () => {/*
         [ {random: .01}, "The Institute liked that."], //rdunlap
         [ {random: .01}, "Do you get to the Cloud District very often?"],
         [ {random: .1}, "By Azura, by Azura, by Azura! It's you! The Grand Champion!"], //Otellino
-        [ {random: .1}, "You should not be here, Mortal! Your life is forfeit. Your flesh is mine."], //Otellino
+        [ {random: .055}, "You should not be here, Mortal! Your life is forfeit. Your flesh is mine."], //Otellino
         [ {random: .1}, "Psst. Hey, I know who you are. Hail Sithis."],
         [ {random: .1}, "You wear the armor of the bear, my friend. A fine choice."],
         [ {time: [[20,00], [24,00]]}, "Only burglars and vampires creep around after dark. So which are you?" ],
@@ -113,8 +113,14 @@ window.onload = () => {/*
         "You know, I was there for that whole sordid affair. Marvelous time! Butterflies, blood, a Fox, a severed head... Oh, and the cheese! To die for.",
         "<img style=\"max-width: 64px\" src=\"https://cdn.discordapp.com/emojis/934113805670170714.webp?quality=lossless\" alt=\"Nexus Mods Mug\" decoding=\"async\" fetchpriority=\"low\" loading=\"lazy\" />",
         "You. Yes, you. I'm still waiting.",
-        "Because it's dull, you twit. It'll hurt more.",
-        "This one's not dead yet"
+        "Because it's dull, you twit! It'll hurt more!", 
+        "Wazzup, nerdz!", 
+        "Aflack. Aflack. AFLACK!!!!!!", 
+        "Clever girl.", 
+        "I dream of brains exploding.", 
+        "You must construct additional pylons.", 
+        "That thing must die!",
+        "This one's not dead yet!"
     ]
 
     // Still in 'window.onload'
