@@ -13,35 +13,32 @@ var info_xml_tags;
 var moduleConfig_file;
 var moduleConfig_xml;
 
-var importantElements = {//*
+// Core
+elm_buttonFolderPicker = document.getElementById(`fomod_FolderPicker`),
 
-    // Core
-    "buttonFolderPicker": HTMLElement.prototype,
+// Info.xml (Metadata)
+elm_inputName = HTMLElement.prototype;
+elm_inputAuthor = HTMLElement.prototype;
+elm_inputID = HTMLElement.prototype;
+elm_inputWebsite = HTMLElement.prototype;
+elm_toggleUseSemVer = HTMLElement.prototype;
+elm_containerVersionFull = HTMLElement.prototype;
+    elm_inputVersionFull = HTMLElement.prototype;
+elm_containerVersionSemVer = HTMLElement.prototype;
+    elm_inputVersionMajor = HTMLElement.prototype;
+    elm_inputVersionMinor = HTMLElement.prototype;
+    elm_inputVersionPatch = HTMLElement.prototype;
 
-    // Info.xml (Metadata)
-    "inputName": HTMLElement.prototype,
-    "inputAuthor": HTMLElement.prototype,
-    "inputID": HTMLElement.prototype,
-    "inputWebsite": HTMLElement.prototype,
-    "containerVersionFull": HTMLElement.prototype,
-    "inputVersionFull": HTMLElement.prototype,
-        "toggleUseSemVer": HTMLElement.prototype,
-    "containerVersionSemVer": HTMLElement.prototype,
-        "inputVersionMajor": HTMLElement.prototype,
-        "inputVersionMinor": HTMLElement.prototype,
-        "inputVersionPatch": HTMLElement.prototype,
+// Config
+elm_toggleAutosave = HTMLElement.prototype;
+elm_toggleConfigInXML = HTMLElement.prototype;
+elm_toggleConfigInCookie = HTMLElement.prototype;
+elm_toggleInfoSchema = HTMLElement.prototype;
+elm_toggleBranding = HTMLElement.prototype;
 
-    // Config
-    "toggleAutosave": HTMLElement.prototype,
-    "toggleConfigInXML": HTMLElement.prototype,
-    "toggleConfigInCookie": HTMLElement.prototype,
-    "toggleInfoSchema": HTMLElement.prototype,
-    "toggleBranding": HTMLElement.prototype,
-
-    // Collapseables
-    "collapseableMetadata": HTMLElement.prototype,
-    "collapseableGeneralAndConfig": HTMLElement.prototype,
-/**/};
+// Collapseables
+elm_collapseableMetadata = HTMLElement.prototype;
+elm_collapseableGeneralAndConfig = HTMLElement.prototype;
 
 // Idea by IllusiveMan
 var fileExtPathAssociations = {
@@ -108,68 +105,66 @@ function parseIntExtremes(intString, relaxed = false){
 async function init() {
     //console.log("[BCD-FomodBuilder] Hello World!");
 
-    importantElements = {
-        // Core
-        "buttonFolderPicker": document.getElementById(`fomod_FolderPicker`),
+    // Core
+    elm_buttonFolderPicker = document.getElementById(`fomod_FolderPicker`),
 
-        // Info.xml (Metadata)
-        "inputName": document.getElementById(`fomod_info_name`),
-        "inputAuthor": document.getElementById(`fomod_info_author`),
-        "inputID": document.getElementById(`fomod_info_ID`),
-        "inputWebsite": document.getElementById(`fomod_info_website`),
-        "toggleUseSemVer": document.getElementById(`fomod_config_toggleUseSemVer`),
-        "containerVersionFull": document.getElementById(`fomod_info_version_cont`),
-            "inputVersionFull": document.getElementById(`fomod_info_version_full`),
-        "containerVersionSemVer": document.getElementById(`fomod_info_version_semver_cont`),
-            "inputVersionMajor": document.getElementById(`fomod_info_version_major`),
-            "inputVersionMinor": document.getElementById(`fomod_info_version_minor`),
-            "inputVersionPatch": document.getElementById(`fomod_info_version_patch`),
+    // Info.xml (Metadata)
+    elm_inputName = document.getElementById(`fomod_info_name`),
+    elm_inputAuthor = document.getElementById(`fomod_info_author`),
+    elm_inputID = document.getElementById(`fomod_info_ID`),
+    elm_inputWebsite = document.getElementById(`fomod_info_website`),
+    elm_toggleUseSemVer = document.getElementById(`fomod_config_toggleUseSemVer`),
+    elm_containerVersionFull = document.getElementById(`fomod_info_version_cont`),
+        elm_inputVersionFull = document.getElementById(`fomod_info_version_full`),
+    elm_containerVersionSemVer = document.getElementById(`fomod_info_version_semver_cont`),
+        elm_inputVersionMajor = document.getElementById(`fomod_info_version_major`),
+        elm_inputVersionMinor = document.getElementById(`fomod_info_version_minor`),
+        elm_inputVersionPatch = document.getElementById(`fomod_info_version_patch`),
 
-        // Config
-        "toggleAutosave": document.getElementById(`fomod_config_toggleAutosave`),
-        "toggleConfigInXML": document.getElementById(`fomod_config_saveConfigXML`),
-        "toggleConfigInCookie": document.getElementById(`fomod_config_saveConfigCookies`),
-        "toggleInfoSchema": document.getElementById(`fomod_config_saveInfoSchema`),
-        "toggleBranding": document.getElementById(`fomod_config_dobranding`),
+    // Config
+    elm_toggleAutosave = document.getElementById(`fomod_config_toggleAutosave`),
+    elm_toggleConfigInXML = document.getElementById(`fomod_config_saveConfigXML`),
+    elm_toggleConfigInCookie = document.getElementById(`fomod_config_saveConfigCookies`),
+    elm_toggleInfoSchema = document.getElementById(`fomod_config_saveInfoSchema`),
+    elm_toggleBranding = document.getElementById(`fomod_config_dobranding`),
 
-        // Collapseables
-        "collapseableMetadata": document.getElementById(`collapseable_Metadata`),
-        "collapseableGeneralAndConfig": document.getElementById(`collapseable_GeneralAndConfig`),
-    };
+    // Collapseables
+    elm_collapseableMetadata = document.getElementById(`collapseable_Metadata`),
+    elm_collapseableGeneralAndConfig = document.getElementById(`collapseable_GeneralAndConfig`),
 
     //console.log("[BCD-FomodBuilder] "+JSON.stringify(importantElements));
 
-    importantElements.buttonFolderPicker.addEventListener('click', async () => {
+    elm_buttonFolderPicker.addEventListener('click', async () => {
         openFomodDirectory()
     });
-    importantElements.toggleUseSemVer.addEventListener('click', async () => {
-        if (checkToggleSwitch(importantElements.toggleUseSemVer)){
-            setVersion(`${inputValue(importantElements.inputVersionMajor, false)}.${inputValue(importantElements.inputVersionMinor, false)}.${inputValue(importantElements.inputVersionPatch, false)}`.replace(/^\.+|\.+$/g, ''), true)
-            importantElements.containerVersionSemVer.setAttribute('hidden', '');
-            importantElements.containerVersionFull.removeAttribute('hidden');
+    elm_toggleUseSemVer.addEventListener('click', async () => {
+        if (checkToggleSwitch(elm_toggleUseSemVer)){
+            setVersion(`${inputValue(elm_inputVersionMajor, false)}.${inputValue(elm_inputVersionMinor, false)}.${inputValue(elm_inputVersionPatch, false)}`.replace(/^\.+|\.+$/g, ''), true)
+            elm_containerVersionSemVer.setAttribute('hidden', '');
+            elm_containerVersionFull.removeAttribute('hidden');
         } else {
-            setVersion(inputValue(importantElements.inputVersionFull, false), true);
-            importantElements.containerVersionSemVer.removeAttribute('hidden');
-            importantElements.containerVersionFull.setAttribute('hidden', '');
+            setVersion(inputValue(elm_inputVersionFull, false), true);
+            elm_containerVersionSemVer.removeAttribute('hidden');
+            elm_containerVersionFull.setAttribute('hidden', '');
         }
     });
 
-    importantElements.inputVersionFull.addEventListener('change', autoSave);
-    importantElements.inputVersionFull.addEventListener('input', autoSave);
-    importantElements.inputVersionMajor.addEventListener('input', autoSave);
-    importantElements.inputVersionMajor.addEventListener('change', autoSave);
-    importantElements.inputVersionMinor.addEventListener('input', autoSave);
-    importantElements.inputVersionMinor.addEventListener('change', autoSave);
-    importantElements.inputVersionPatch.addEventListener('input', autoSave);
-    importantElements.inputVersionPatch.addEventListener('change', autoSave);
-    importantElements.inputName.addEventListener('input', autoSave);
-    importantElements.inputName.addEventListener('change', autoSave);
-    importantElements.inputAuthor.addEventListener('input', autoSave);
-    importantElements.inputAuthor.addEventListener('change', autoSave);
-    importantElements.inputID.addEventListener('input', autoSave);
-    importantElements.inputID.addEventListener('change', autoSave);
-    importantElements.inputWebsite.addEventListener('input', autoSave);
-    importantElements.inputWebsite.addEventListener('change', autoSave);
+    elm_inputVersionFull.addEventListener('change', autoSave);
+    elm_inputVersionFull.addEventListener('input', autoSave);
+    elm_inputVersionMajor.addEventListener('input', autoSave);
+    elm_inputVersionMajor.addEventListener('change', autoSave);
+    elm_inputVersionMinor.addEventListener('input', autoSave);
+    elm_inputVersionMinor.addEventListener('change', autoSave);
+    elm_inputVersionPatch.addEventListener('input', autoSave);
+    elm_inputVersionPatch.addEventListener('change', autoSave);
+    elm_inputName.addEventListener('input', autoSave);
+    elm_inputName.addEventListener('change', autoSave);
+    elm_inputAuthor.addEventListener('input', autoSave);
+    elm_inputAuthor.addEventListener('change', autoSave);
+    elm_inputID.addEventListener('input', autoSave);
+    elm_inputID.addEventListener('change', autoSave);
+    elm_inputWebsite.addEventListener('input', autoSave);
+    elm_inputWebsite.addEventListener('change', autoSave);
 };
 
 /** Function to handle the user selecting and opening a directory for the FOMOD Builder to work out of.
@@ -221,7 +216,7 @@ async function openFomodDirectory(){
 
         rootDirectory = temp_rootDirectory
         fomodDirectory = temp_fomodDirectory
-        importantElements.collapseableMetadata.setAttribute('open', '');
+        elm_collapseableMetadata.setAttribute('open', '');
     
         setTimeout(save, 3000)
     } catch(err) {
@@ -248,12 +243,12 @@ function parseInfoXML(readerEvent) {
     info_xml = XMLParser.parseFromString(readerEvent.target.result, "text/xml");
 
     info_xml_tags = info_xml.getElementsByTagName('fomod')[0];
-    console.log(info_xml_tags);
 
-    importantElements.inputName.value = readXMLTag(info_xml_tags, 'Name');
-    importantElements.inputAuthor.value = readXMLTag(info_xml_tags, 'Author');
-    importantElements.inputID.value = readXMLTag(info_xml_tags, 'Id', true);
-    importantElements.inputWebsite.value = readXMLTag(info_xml_tags, 'Website'); //FIXME - Website always creates a new tag
+    elm_inputName.value = readXMLTag(info_xml_tags, 'Name');
+    elm_inputAuthor.value = readXMLTag(info_xml_tags, 'Author');
+    elm_inputID.value = readXMLTag(info_xml_tags, 'Id', true);
+    elm_inputWebsite.value = readXMLTag(info_xml_tags, 'Website');
+
     // Version is a bit more complicated... as always.
     setVersion(readXMLTag(info_xml_tags, 'Version'));
 
@@ -265,19 +260,19 @@ function parseInfoXML(readerEvent) {
     @returns {nil}
 */
 function setVersion(version, relaxed = false){
-    importantElements.inputVersionFull.value = version;
+    elm_inputVersionFull.value = version;
     try{
         var splitVers = version.split('.');
-        if (splitVers.length > 0){try{importantElements.inputVersionMajor.value = parseIntExtremes(splitVers[0], relaxed)} catch(e){handlePerseError(e)}}else{importantElements.inputVersionMajor.value = ''}
-        if (splitVers.length > 1){try{importantElements.inputVersionMinor.value = parseIntExtremes(splitVers[1], relaxed)} catch(e){handlePerseError(e)}}else{importantElements.inputVersionMinor.value = ''}
-        if (splitVers.length > 2){try{importantElements.inputVersionPatch.value = parseIntExtremes(splitVers[2], relaxed)} catch(e){handlePerseError(e)}}else{importantElements.inputVersionPatch.value = ''}
+        if (splitVers.length > 0){try{elm_inputVersionMajor.value = parseIntExtremes(splitVers[0], relaxed)} catch(e){handlePerseError(e)}}else{elm_inputVersionMajor.value = ''}
+        if (splitVers.length > 1){try{elm_inputVersionMinor.value = parseIntExtremes(splitVers[1], relaxed)} catch(e){handlePerseError(e)}}else{elm_inputVersionMinor.value = ''}
+        if (splitVers.length > 2){try{elm_inputVersionPatch.value = parseIntExtremes(splitVers[2], relaxed)} catch(e){handlePerseError(e)}}else{elm_inputVersionPatch.value = ''}
     } catch(e){handlePerseError(e)}
     function handlePerseError(e){
         console.log(`Error parsing version ${version}: ${e}\n${e.stack}`);
-        importantElements.toggleUseSemVer.removeAttribute('checked');
-        importantElements.toggleUseSemVer.parentElement.classList.remove('is-checked');
-        importantElements.containerVersionSemVer.setAttribute('hidden', '');
-        importantElements.containerVersionFull.removeAttribute('hidden');
+        elm_toggleUseSemVer.removeAttribute('checked');
+        elm_toggleUseSemVer.parentElement.classList.remove('is-checked');
+        elm_containerVersionSemVer.setAttribute('hidden', '');
+        elm_containerVersionFull.removeAttribute('hidden');
     }
 }
 
@@ -314,7 +309,7 @@ function checkToggleSwitch(element){
     @returns {nil}
 */
 async function autoSave() {
-    //if (checkToggleSwitch(importantElements.toggleAutosave)) {save()}
+    //if (checkToggleSwitch(elm_toggleAutosave)) {save()}
 }
 
 /** Function to save the FOMOD.
@@ -323,14 +318,14 @@ async function autoSave() {
 async function save(){
     console.log('Before editing:\n', info_xml.documentElement);
     setTimeout(() => {
-    if (checkToggleSwitch(importantElements.toggleInfoSchema)){
+    if (checkToggleSwitch(elm_toggleInfoSchema)){
         console.log('Adding Schema to Info.xml (disabled by default)');
         // xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd"
         info_xml_tags.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
         info_xml_tags.setAttribute('xsi:noNamespaceSchemaLocation', 'https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd')
 
     }
-    if (checkToggleSwitch(importantElements.toggleBranding) && !info_xml.documentElement.innerHTML.includes('BellCube\'s FOMOD Builder')){
+    if (checkToggleSwitch(elm_toggleBranding) && !info_xml.documentElement.innerHTML.includes('BellCube\'s FOMOD Builder')){
         console.log('Adding Branding to Info.xml (disabled by default)');
         var comment = info_xml.createComment('\n    Created using BellCube\'s FOMOD Builder\n    https://bellcubedev.github.io/site-testing/tools/fomod/\n    The tool is currently in early testing, so any extra testers would be very welcome.\n')
         /*
@@ -345,10 +340,10 @@ async function save(){
 
     console.log('Adding FOMOD Version to Info.xml');
     var versTag = getXMLTag(info_xml, 'Version');
-    if (checkToggleSwitch(importantElements.toggleUseSemVer)){
-        versTag.innerHTML = inputValue(importantElements.inputVersionMajor) + '.' + inputValue(importantElements.inputVersionMinor) + '.' + inputValue(importantElements.inputVersionPatch);
+    if (checkToggleSwitch(elm_toggleUseSemVer)){
+        versTag.innerHTML = inputValue(elm_inputVersionMajor) + '.' + inputValue(elm_inputVersionMinor) + '.' + inputValue(elm_inputVersionPatch);
      }else {
-        versTag.innerHTML = inputValue(importantElements.inputVersionFull);
+        versTag.innerHTML = inputValue(elm_inputVersionFull);
     }
 
     console.log('After editing:\n', info_xml.documentElement);
@@ -402,14 +397,23 @@ function readXMLTag(xml, tagName){
     @returns {HTMLElement} The specified tag, creating it and appending it to the end if it doesn't exist
 */
 function getXMLTag(xml, tagName){
+    
     try{
-        var elem;
+        var elem = HTMLElement.prototype;
+        /* TODO Add case-insensitivity in a reliable way
         if (xml.ownerDocument == null) {elem = xml.documentElement} else {elem = xml}
-        var tagNamePos = elem.innerHTML.toLowerCase().indexOf(tagName.toLowerCase());
-        //console.log( `xml.getElementsByTagName(elem.innerHTML.substring(${tagNamePos}, ${tagNamePos} + ${tagName.length} {${tagNamePos + tagName.length}}}))[0]`);
-        //console.log(elem.innerHTML.substring(tagNamePos, tagNamePos + tagName.length));
+
+        var tagNamePos = elem.innerHTML.toLowerCase().indexOf(`<${tagName.toLowerCase()}`) + 1;
+
+        console.log(`xml.getElementsByTagName(elem.innerHTML.substring(${tagNamePos}, ${tagNamePos} + ${tagName.length} {${tagNamePos + tagName.length}}}))[0]`);
+        console.log(elem.innerHTML.substring(tagNamePos, tagNamePos + tagName.length));
+
         var tempTag = xml.getElementsByTagName(elem.innerHTML.substring(tagNamePos, tagNamePos + tagName.length))[0];
-        //console.log(`getXMLTag(${tagName}):`, tempTag);
+        console.log(`getXMLTag(${tagName}):`, tempTag);
+        */
+
+        var tempTag = xml.getElementsByTagName(tagName)[0];
+
         if (typeof tempTag !== 'undefined'){return tempTag;}
     } catch (e) {
         console.log(`Error "${e.name}" getting the tag '${tagName}'\n${e.stack}`)
@@ -422,7 +426,7 @@ function getXMLTag(xml, tagName){
         newTag = xml.ownerDocument.createElement(tagName);
     }
     xml.appendChild(newTag);
-    return newTag
+    return newTag;
 }
 
 /*

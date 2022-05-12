@@ -19,6 +19,11 @@ html > body {
     text-rendering: optimizeLegibility;
 }
 
+*::selection {
+    background: #60a0ff73;
+    text-shadow: 0px 0px 5px #00000033;
+}
+
 .mdl-layout-title {
     color: #fff;
 }
@@ -226,20 +231,31 @@ a {
     color: #baaf49;
 }
 
-.details-header * {
+.details-header *, .bcd-summary * {
     user-select: none;
+    pointer-events: all;
 }
 
-details[open] > summary > .details-header > .open-icon-90CC {
+details[open] > summary > .details-header > .open-icon-90CC, .bcd-summary.is-open > .open-icon-90CC {
     transform: rotate(0deg);
     animation-name: rotate90CounterClockwiseReverse;
 }
 
-details > summary > .details-header > .open-icon-90CC {
+details > summary > .details-header > .open-icon-90CC, .bcd-summary > .open-icon-90CC {
     transform: rotate(-90deg);
     animation-name: rotate90CounterClockwise;
     animation-delay: 0ms;
     animation-duration: 300ms;
+}
+
+.bcd-summary {
+    padding: 24px;
+    padding-bottom: 0px;
+    color:#fff;
+}
+
+.bcd-summary .material-icons {
+    color:#ffffffbf;
 }
 
 summary {
@@ -258,7 +274,7 @@ img {
     object-fit: contain;
 }
 */
-.details-header {
+.details-header, .bcd-summary {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -271,8 +287,35 @@ img {
     pointer-events: all;
 }
 
-details > summary > .details-container{
+details > summary > .details-container, .bcd-details{
     overflow: hidden;
+}
+
+.bcd-details > .bcd-details_inner {
+    visibility: hidden;
+    transition-property: margin-top;
+    transition-duration: 200ms;
+    transition-timing-function: ease-in-out;
+    transition-delay: 0ms;
+
+    margin-top: -100%;
+
+    animation-name: hideDelay;
+    animation-duration: 300ms;
+    animation-timing-function: steps(1, end);
+}
+
+@keyframes hideDelay{
+    0%{
+        visibility: unset;
+    }
+    100% {
+        visibility: hidden;
+    }
+}
+
+.bcd-details.is-open > .bcd-details_inner {
+    visibility: unset;
 }
 
 details > summary > .details-container > div {
@@ -320,10 +363,6 @@ details[open] > summary > .details-container > div {
         margin-top: -100%;
         visibility: unset;
     }
-}
-
-details > summary > .details-container.padded {
-    padding-left: 16px;
 }
 
 
@@ -480,7 +519,7 @@ body.preload * {
     }
 
     /* Header Size */
-    div.mdl-layout__drawer summary :is(h1, h2, h3){
+    div.mdl-layout__drawer summary :is(h1, h2, h3), div.mdl-layout__drawer .bcd-summary :is(h1, h2, h3){
         margin-top: 0px;
         padding-left: 0px;
     }

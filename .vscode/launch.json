@@ -1,0 +1,25 @@
+{
+    // When launching your browser, make sure to include the argument
+    // --remote-debugging-port=9222
+    "version": "0.2.0",
+    "configurations": [
+        {
+        "type": "pwa-msedge",
+        "request": "attach",
+        "name": "Edge",
+        "port": 9222,
+        "urlFilter": "http://127.0.0.1:4000/*",
+        "cleanUp": "onlyTab",
+        "webRoot": "${workspaceFolder}/docs",
+        "userDataDir": false,
+    }, {
+        "type": "pwa-msedge",
+        "request": "attach",
+        "name": "CLEAN Edge",
+        "port": 9222,
+        "urlFilter": "http://127.0.0.1:4000/*",
+        "cleanUp": "onlyTab",
+        "webRoot": "${workspaceFolder}/docs",
+        "userDataDir": true,
+    }]
+}

@@ -120,9 +120,21 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 </summary></details>
 
 <details id="collapseable_Metadata"><summary>
-    <div class="details-header">
+    <div id="collapseable_Metadata_summary" class="details-header">
         <i class="material-icons open-icon-90CC">expand_more</i><h2 id="fomod_ModName">Metadata</h2>
     </div>
+    <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="collapseable_Metadata_summary"><p>
+        Metadata for the mod, stored in the <code>Info.xml</code> file of the FOMOD (along with certain data in <code>ModuleConfig.xml</code>)
+        <br /><br /><hr /><br />
+        <h3>Used By</h3><ul class="mod-manager-list">
+            <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/Vortex.svg" />
+                Vortex
+            </li>
+            <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2.svg" />
+                Mod Organizer 2
+            </li>
+        </ul>
+    </p></div>
     <div class="details-container"><div>
         <form autocomplete="off" style="pointer-events:none;display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px;"name="Metadata">
             <div id="fomod_info_name_cont" style="pointer-events:all" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
@@ -249,13 +261,12 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     </div></div>
 </summary></details>
 
-<h1>123</h1>
+<h1>Installer Steps</h1>
 
 <!-- To-do list
 
     Needed:
     TODO: Realtime Auditing
-    TODO: 
 
     Wanted:
     TODO: Add preview and output simulation for Vortex's installer window
