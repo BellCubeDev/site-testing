@@ -310,9 +310,11 @@ img {
 @keyframes hideDelay{
     0%{
         visibility: unset;
+        position: unset;
     }
     100% {
         visibility: hidden;
+        position: absolute;
     }
 }
 
