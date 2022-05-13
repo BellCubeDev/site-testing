@@ -120,7 +120,7 @@ BellCubicSummary.prototype.onMouseUp_ = BellCubicSummary.prototype.toggle;
     */
 BellCubicSummary.prototype.reEval = function () {
     console.log('[BCD-SUMMARY] reEval() called on ',this)
-    if (this.for.classList.contains('is-open')) {this.close()} else {this.open()}
+    if (this.for.classList.contains('is-open')) {this.open()} else {this.close()}
 };
 BellCubicSummary.prototype['reEval'] = BellCubicSummary.prototype.reEval;
 
