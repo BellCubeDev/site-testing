@@ -129,8 +129,8 @@ async function init() {
     elm_toggleBranding = document.getElementById(`fomod_config_dobranding`),
 
     // Collapseables
-    elm_collapseableMetadata = document.getElementById(`collapseable_Metadata`),
-    elm_collapseableGeneralAndConfig = document.getElementById(`collapseable_GeneralAndConfig`),
+    elm_collapseableMetadata = document.getElementById(`details_builder_meta`),
+    elm_collapseableGeneralAndConfig = document.getElementById(`details_builder_genConfig`),
 
     //console.log("[BCD-FomodBuilder] "+JSON.stringify(importantElements));
 
@@ -216,8 +216,7 @@ async function openFomodDirectory(){
 
         rootDirectory = temp_rootDirectory
         fomodDirectory = temp_fomodDirectory
-        elm_collapseableMetadata.setAttribute('open', '');
-    
+        Window.BellCubicDetails(elm_collapseableMetadata).open()    
         setTimeout(save, 3000)
     } catch(err) {
         if(err instanceof DOMException && (err.name == 'AbortError')) {
