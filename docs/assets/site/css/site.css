@@ -231,17 +231,17 @@ a {
     color: #baaf49;
 }
 
-.details-header *, .bcd-summary * {
+.bcd-summary * {
     user-select: none;
     pointer-events: all;
 }
 
-details[open] > summary > .details-header > .open-icon-90CC, .bcd-summary.is-open > .open-icon-90CC {
+.bcd-summary.is-open > .open-icon-90CC {
     transform: rotate(0deg);
     animation-name: rotate90CounterClockwiseReverse;
 }
 
-details > summary > .details-header > .open-icon-90CC, .bcd-summary > .open-icon-90CC {
+.bcd-summary > .open-icon-90CC {
     transform: rotate(-90deg);
     animation-name: rotate90CounterClockwise;
     animation-delay: 0ms;
@@ -287,7 +287,7 @@ img {
     pointer-events: all;
 }
 
-details > summary > .details-container, .bcd-details{
+.bcd-details{
     overflow: hidden;
 }
 
@@ -520,7 +520,7 @@ body.preload * {
     }
 
     /* Header Size */
-    div.mdl-layout__drawer summary :is(h1, h2, h3), div.mdl-layout__drawer .bcd-summary :is(h1, h2, h3){
+   div.mdl-layout__drawer .bcd-summary :is(h1, h2, h3){
         margin-top: 0px;
         padding-left: 0px;
     }
