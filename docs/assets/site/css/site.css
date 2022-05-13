@@ -298,7 +298,9 @@ img {
     transition-timing-function: ease-in-out;
     transition-delay: 0ms;
 
-    margin-top: -100%;
+    position: absolute;
+    top: 0px;
+    bottom: 0px;
 
     animation-name: hideDelay;
     animation-duration: 300ms;
@@ -317,6 +319,7 @@ img {
 .bcd-details.is-open > .bcd-details_inner {
     visibility: unset;
     animation-name: none;
+    position: unset;
 }
 
 .bcd-details.contPad01-left > .bcd-details_inner {

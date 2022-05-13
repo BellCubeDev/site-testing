@@ -9,6 +9,11 @@ window.onload = init;
 
 */
 
+var bcd_registeredComponents = {
+    bcdDetails: {},
+    bcdSummary: {}
+}
+
 /**
     * @param {HTMLElement} element
 */
@@ -84,6 +89,7 @@ BellCubicDetails.prototype.init = function () {
         this.header = this.element_.ownerDocument.querySelector(`.bcd-summary[for="${this.element_.id}"`);
         this.element_Child = this.element_.getElementsByClassName('bcd-details_inner')[0];
         this.reEval()
+        bcd_registeredComponents.bcdDetails[this.element_.id] = this;
         this.element_.classList.add('initialized');
     }
 };
@@ -162,9 +168,9 @@ BellCubicSummary.prototype.init = function () {
         this.element_.addEventListener('mouseup', this.boundElementMouseUp);
         this.for = this.element_.ownerDocument.getElementById(this.element_.getAttribute('for'));
         this.forChild = this.for.getElementsByClassName('bcd-details_inner')[0];
-        this.element_.classList.add('initialized');
-
         this.reEval()
+        bcd_registeredComponents.bcdSummary[this.element_.getAttribute('for')] = this;
+        this.element_.classList.add('initialized');
     }
 };
 
@@ -191,7 +197,7 @@ try{registerComponents()}catch(e){console.log(e.stack)}
 
 function init() {
     try{registerComponents()}catch(e){console.log(e.stack)}
-    
+
     /*
     We pull from the Conditionalized array before the Generic array to ensure that we always have some text.
 
