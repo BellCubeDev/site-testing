@@ -316,6 +316,7 @@ details > summary > .details-container, .bcd-details{
 
 .bcd-details.is-open > .bcd-details_inner {
     visibility: unset;
+    animation-name: none;
 }
 
 details > summary > .details-container > div {
