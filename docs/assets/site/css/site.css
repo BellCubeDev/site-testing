@@ -628,6 +628,7 @@ body.preload * {
         word-wrap: normal;
         direction: ltr;
         -webkit-font-smoothing: antialiased;
+        user-select: none;
     }
 
 /* https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en */
