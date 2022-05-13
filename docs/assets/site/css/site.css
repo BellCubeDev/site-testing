@@ -319,53 +319,17 @@ img {
     animation-name: none;
 }
 
-details > summary > .details-container > div {
-    visibility: hidden;
-    opacity: 0;
-    margin-top: -100%;
-
-    animation-name: visibility-transition;
-
-    animation-duration: 400ms;
-    animation-timing-function: cubic-bezier(.66, 0, 0.66, 0);
-    animation-delay: 0ms;
+.bcd-details.contPad01-left > .bcd-details_inner {
+    padding-left: 16px;
 }
 
-details[open] > summary > .details-container > div {
-    visibility: unset;
-    opacity: 1;
-    margin-top: 0%;
-
-    animation-name: visibility-transition-reverse;
-    animation-timing-function: cubic-bezier(.33, 1, 0.33, 1);
+.bcd-details.contPad02-left > .bcd-details_inner {
+    padding-left: 32px;
 }
 
-@keyframes visibility-transition {
-    0% {
-        opacity: 1;
-        margin-top: 0%;
-        visibility: unset;
-    }
-    100% {
-        opacity: 0;
-        margin-top: -100%;
-        visibility: unset;
-    }
+.bcd-details.contPad03-left > .bcd-details_inner {
+    padding-left: 48px;
 }
-
-@keyframes visibility-transition-reverse {
-    100% {
-        opacity: 1;
-        margin-top: 0%;
-        visibility: unset;
-    }
-    0% {
-        opacity: 0;
-        margin-top: -100%;
-        visibility: unset;
-    }
-}
-
 
 .mdl-tooltip * {
     font-size: small;
