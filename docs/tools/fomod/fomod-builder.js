@@ -216,7 +216,7 @@ async function openFomodDirectory(){
 
         rootDirectory = temp_rootDirectory
         fomodDirectory = temp_fomodDirectory
-        Window.BellCubicDetails(elm_collapseableMetadata).open()    
+        bcd_registeredComponents.bcdDetails[elm_collapseableMetadata.id].open()    
         setTimeout(save, 3000)
     } catch(err) {
         if(err instanceof DOMException && (err.name == 'AbortError')) {

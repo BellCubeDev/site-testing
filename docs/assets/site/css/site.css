@@ -231,9 +231,17 @@ a {
     color: #baaf49;
 }
 
+.bcd-summary {
+    pointer-events: all;
+    background-color: #00000000;
+    padding: 16px;
+    padding-bottom: 4px;
+    border: none;
+
+}
+
 .bcd-summary * {
     user-select: none;
-    pointer-events: all;
 }
 
 .bcd-summary.is-open > .open-icon-90CC {
@@ -248,17 +256,11 @@ a {
     animation-duration: 300ms;
 }
 
-.bcd-summary {
-    padding: 24px;
-    padding-bottom: 0px;
-    color:#fff;
-}
-
 .bcd-summary .material-icons {
     color:#ffffffbf;
 }
 
-summary {
+.bcd-summary {
     display: flex;
     width: 100%;
     flex-direction: column;
@@ -268,42 +270,61 @@ summary {
     align-content: flex-start;
     overflow: hidden;
     pointer-events: none;
+    padding: 24px;
+    padding-bottom: 8px;
+    color:#fff;
 }
-/*
-img {
-    object-fit: contain;
+
+.bcd-summary.noTopPad {
+    padding-top: 0px;
 }
-*/
-.details-header, .bcd-summary {
+
+.mdl-layout__drawer {
+    overflow-x: hidden;
+}
+
+.bcd-summary {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     align-content: center;
     justify-content: flex-start;
     align-items: center;
-    gap: 16px;
     height: max-content;
     width: 50000px;
     pointer-events: all;
 }
 
-.bcd-details{
-    overflow: hidden;
+.bcd-summary > .open-icon-90CC + * {
+    padding-left: 16px !important;
 }
 
+.bcd-details{
+    overflow: hidden;
+    display: none;
+}
+
+.bcd-details.initialized {
+    display: block;
+}
 .bcd-details > .bcd-details_inner {
     visibility: hidden;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    margin-top: -100%;
+}
+
+.bcd-details.initialized > .bcd-details_inner {
     transition-property: margin-top;
     transition-duration: 200ms;
     transition-timing-function: ease-in-out;
-    transition-delay: 0ms;
+    transition-delay: 10ms;
 
-    position: absolute;
-    top: 0px;
-    bottom: 0px;
+    position: unset;
 
     animation-name: hideDelay;
-    animation-duration: 300ms;
+    animation-duration: 310ms;
     animation-timing-function: steps(1, end);
 }
 
@@ -325,14 +346,22 @@ img {
 }
 
 .bcd-details.contPad01-left > .bcd-details_inner {
-    padding-left: 16px;
+    padding-left: 12px;
 }
 
 .bcd-details.contPad02-left > .bcd-details_inner {
-    padding-left: 32px;
+    padding-left: 16px;
 }
 
 .bcd-details.contPad03-left > .bcd-details_inner {
+    padding-left: 24px;
+}
+
+.bcd-details.contPad04-left > .bcd-details_inner {
+    padding-left: 32px;
+}
+
+.bcd-details.contPad05-left > .bcd-details_inner {
     padding-left: 48px;
 }
 

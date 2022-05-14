@@ -79,9 +79,9 @@ layout: compress_html
                         <span>Sitemap</span>
                     </a>
 
-                    <a class="bcd-summary is-open" for="details_nav_tools">
+                    <button class="bcd-summary is-open" type="button" for="details_nav_tools">
                         <i class="material-icons open-icon-90CC">expand_more</i><h3>Tools</h3>
-                    </a>
+                    </button>
                     <div class="bcd-details is-open" id="details_nav_tools">
                         <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}/tools/fomod">
                             <i class="material-icons">build_circle</i>
@@ -90,25 +90,23 @@ layout: compress_html
                     </div>
 
                     <!-- Currently testing to see which of these two is broken OR if nesting is perfectly balanced with no exploits-->
-                    <a class="bcd-summary" for="details_nav_docs">
+                    <button class="bcd-summary" type="button" for="details_nav_docs">
                         <i class="material-icons open-icon-90CC">expand_more</i><h3>Documentation</h3>
-                    </a>
-                    <div class="bcd-details contPad03-left" id="details_nav_docs">
-                        hehe testing don't mind me
-                    </div>
-
-                    <a class="bcd-summary" for="details_nav_docs_lsp">
-                        <i class="material-icons open-icon-90CC">expand_more</i>
-                        <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}/docs/linear-spell-progression"><div class="center-vert">
-                            <i class="material-icons">book</i>
-                            <span>Linear Spell<br />Progression</span>
-                        </div></a>
-                    </a>
-                    <div class="bcd-details" id="details_nav_docs_lsp">
-                        <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}/docs/linear-spell-progression/creating-a-plugin"><div class="center-vert">
-                            <i class="material-icons">build</i>
-                            <span>Creating a<br />Plugin</span>
-                        </div></a>
+                    </button>
+                    <div class="bcd-details contPad01-left" id="details_nav_docs">
+                        <button class="bcd-summary noTopPad" type="button" for="details_nav_docs_lsp">
+                            <i class="material-icons open-icon-90CC">expand_more</i>
+                            <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}/docs/linear-spell-progression"><div class="center-vert">
+                                <i class="material-icons" style="padding-left: 0px;">book</i>
+                                <span>Linear Spell<br />Progression</span>
+                            </div></a>
+                        </button>
+                        <div class="bcd-details contPad04-left" id="details_nav_docs_lsp">
+                            <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}/docs/linear-spell-progression/creating-a-plugin"><div class="center-vert">
+                                <i class="material-icons">build</i>
+                                <span>Creating a<br />Plugin</span>
+                            </div></a>
+                        </div>
                     </div>
 
                     <h2>Other Places</h2>

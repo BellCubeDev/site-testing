@@ -3074,8 +3074,20 @@ MaterialTooltip.prototype.handleMouseEnter_ = function (event) {
 
     //console.log(`[BCD-Material.Debug] window.innerWidth: ${window.innerWidth}, use desktop layout: ${window.innerWidth >= 1025}`);
     // Modification by BellCube to adjust for the navigation drawer
-    if (window.innerWidth >= 1025 && left + marginLeft < 256) {
-        marginLeft += Math.abs(256 - (left + marginLeft))
+    if (window.innerWidth >= 1025) {
+        if (left + marginLeft < 256){
+            console.log('Using desktop layout. Adjusting tooltip position.');
+            marginLeft += Math.abs(256 - (left + marginLeft))
+        } else {
+            console.log('Using desktop layout. Not adjusting tooltip position.');
+        }
+    } else {
+        if (left + marginLeft < 16){
+            console.log('Using mobile layout. Adjusting tooltip position.');
+            marginLeft += Math.abs(16 - (left + marginLeft))
+        } else {
+            console.log('Using mobile layout. Not adjusting tooltip position.');
+        }
     }
 
     var marginTop = -1 * (this.element_.offsetHeight / 2);
