@@ -53,7 +53,7 @@ BellCubicDetails.prototype['reEval'] = BellCubicDetails.prototype.reEval;
     */
 BellCubicDetails.prototype.open = function () {
     /*console.log("Setting margin-top to 0px", this.element_Children[0])*/
-    this.element_Children[0].style["margin-top"] = `0px`;
+    this.element_Children[0].style["transition-duration"] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
     this.element_.classList.add('is-open')
     this.header.classList.add('is-open')
 };
@@ -66,6 +66,7 @@ BellCubicDetails.prototype['open'] = BellCubicDetails.prototype.open;
     */
 BellCubicDetails.prototype.close = function () {
     /*console.log("Setting margin-top to -" + this.element_Children[0].offsetHeight + "px", this.element_Children[0])*/
+    this.element_Children[0].style["transition-duration"] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
     this.element_Children[0].style["margin-top"] = `-${this.element_Children[0].offsetHeight}px`;
     this.element_.classList.remove('is-open')
     this.header.classList.remove('is-open')
@@ -141,7 +142,10 @@ BellCubicSummary.prototype['reEval'] = BellCubicSummary.prototype.reEval;
     */
 BellCubicSummary.prototype.open = function () {
     /*console.log("Setting margin-top to 0px", this.for)*/
-    try{this.forChildren[0].style["margin-top"] = `0px`}catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e}};
+    try{
+        this.forChildren[0].style["transition-duration"] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
+        this.forChildren[0].style["margin-top"] = `0px`;
+    }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e}};
     this.for.classList.add('is-open')
     this.element_.classList.add('is-open')
 };
@@ -153,7 +157,10 @@ BellCubicSummary.prototype['open'] = BellCubicSummary.prototype.open;
     */
 BellCubicSummary.prototype.close = function () {
     /*console.log("Setting margin-top to -" + this.for.offsetHeight + "px", this.for)*/
-    try{this.forChildren[0].style["margin-top"] = `-${this.forChildren[0].offsetHeight}px`}catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e}};
+    try{
+        this.forChildren[0].style["transition-duration"] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
+        this.forChildren[0].style["margin-top"] = `-${this.forChildren[0].offsetHeight}px`
+    }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e}};
     this.for.classList.remove('is-open')
     this.element_.classList.remove('is-open')
 };
@@ -182,6 +189,8 @@ BellCubicSummary.prototype.init = function () {
 
 function registerComponents(){
     console.log("[BCD-Components] Registering components...");
+
+    // Tell MDL about our new components
     componentHandler.register({
         constructor: BellCubicDetails,
         classAsString: 'BellCubicDetails',
@@ -198,7 +207,13 @@ function registerComponents(){
     console.log(
         [...document.getElementsByClassName('bcd-details'), ...document.getElementsByClassName('bcd-summary')]
     );
-    componentHandler.upgradeElements([...document.getElementsByClassName('bcd-details'), ...document.getElementsByClassName('bcd-summary')]);
+
+    // Upgrade the elements with the classes we just registered components for
+    componentHandler.upgradeElements([
+        ...document.getElementsByClassName('bcd-details'),
+        ...document.getElementsByClassName('bcd-summary')
+    ]);
+
     console.log("[BCD-Components] Components registered.")
 }
 

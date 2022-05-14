@@ -216,11 +216,11 @@ async function openFomodDirectory(){
 
         rootDirectory = temp_rootDirectory
         fomodDirectory = temp_fomodDirectory
-        bcd_registeredComponents.bcdDetails[elm_collapseableMetadata.id].open()    
+        bcd_registeredComponents.bcdDetails[elm_collapseableMetadata.id].open()
         setTimeout(save, 3000)
     } catch(err) {
         if(err instanceof DOMException && (err.name == 'AbortError')) {
-            console.log(`Intercepted error ${err.name}:\n${err.stack}`);
+            console.log(`Intercepted error ${err.name}:\n`,err.stack);
         }else {
             throw err;
         }
@@ -396,7 +396,7 @@ function readXMLTag(xml, tagName){
     @returns {HTMLElement} The specified tag, creating it and appending it to the end if it doesn't exist
 */
 function getXMLTag(xml, tagName){
-    
+
     try{
         var elem = HTMLElement.prototype;
         /* TODO Add case-insensitivity in a reliable way

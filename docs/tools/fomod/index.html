@@ -5,8 +5,8 @@ extra_head: >
     <script async src="fomod-builder.js"></script>
     <style>.mdl-layout__content {padding-bottom: 224px}</style>
 description: >
-    The FOMOD Builder is a tool for creating FOMOD installers, a popular XML-based format for video game mod installers. It is, at this time, incomplete
-# the first of its kind to feature intuitive tooltips, dark mode, full schema support, Real-time renders, auditing, 
+    The FOMOD Builder is a tool for creating FOMOD installers, a popular XML-based format for video game mod installers. It is, at this time, incomplete.
+# the first of its kind to feature intuitive tooltips, dark mode, full schema support, Real-time renders, auditing
 redirect_from:
   - /tools/fomod/builder/
   - /tools/fomod-builder/
@@ -47,7 +47,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             Pick Directory
         </button>
         <div class="mdl-tooltip" for="fomod_FolderPicker"><p>
-            This is the folder that you will put into an archive to be installed by users. If it is not set up for a FOMOD just yet, no worries! 
+            This is the folder that you will put into an archive to be installed by users. If it is not set up for a FOMOD just yet, no worries!
         </p></div>
 
         <!-- AutoSave Toggle -->
@@ -241,7 +241,8 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
         </p></div>
 
         <div id="fomod_info_website_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
-            <input id="fomod_info_website" class="mdl-textfield__input" type="url" placeholder="https://example.com/">
+            <!-- Pattern regex adapted from https://stackoverflow.com/a/30910/13076790 (changes: fix escaping) -->
+            <input id="fomod_info_website" class="mdl-textfield__input" type="url" pattern="^([a-z0-9+.-]+):(?:\/\/(?:((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*)@)?((?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*)(?::(\d*))?(\/(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?|(\/?(?:[a-z0-9-._~!$&'()*+,;=:@]|%[0-9A-F]{2})+(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?)(?:\?((?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*))?(?:#((?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*))?$" placeholder="https://example.com/">
             <label class="mdl-textfield__label" for="fomod_info_website">Website</label>
         </div>
         <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_website_cont"><p>
