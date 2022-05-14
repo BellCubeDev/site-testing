@@ -3,7 +3,7 @@ window.onload = init;
     This script hooks into Material Design Lite's "Component Design Pattern" API
     (see https://github.com/jasonmayes/mdl-component-design-pattern) to provide:
 
-    * A more animateable alternative to <Details>/<Summary> (bcd-details and bcd-summary)
+    * A more animatable alternative to <Details>/<Summary> (bcd-details and bcd-summary)
         - Provides Open, Close, Toggle, and re-evaluate functions on both the bcd-details and bcd-summary elements.
         - Provides a "for" attribute to the bcd-summary element to specify the ID of the bcd-details element it should toggle.
 
@@ -25,7 +25,7 @@ var BellCubicDetails = function BellCubicDetails(element) {
 window['BellCubicDetails'] = BellCubicDetails;
 
 /**
-    * Toggle the collapseable menu.
+    * Toggle the collapsable menu.
     *
     * @public
     */
@@ -47,26 +47,28 @@ BellCubicDetails.prototype.reEval = function () {
 BellCubicDetails.prototype['reEval'] = BellCubicDetails.prototype.reEval;
 
 /**
-    * Open the collapseable menu.
+    * Open the collapsable menu.
     *
     * @public
     */
 BellCubicDetails.prototype.open = function () {
     /*console.log("Setting margin-top to 0px", this.element_Children[0])*/
     this.element_Children[0].style["transition-duration"] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
+    this.element_Children[0].style["animation-duration"] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
     this.element_.classList.add('is-open')
     this.header.classList.add('is-open')
 };
 BellCubicDetails.prototype['open'] = BellCubicDetails.prototype.open;
 
 /**
-    * Close the collapseable menu.
+    * Close the collapsable menu.
     *
     * @public
     */
 BellCubicDetails.prototype.close = function () {
     /*console.log("Setting margin-top to -" + this.element_Children[0].offsetHeight + "px", this.element_Children[0])*/
     this.element_Children[0].style["transition-duration"] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
+    this.element_Children[0].style["animation-duration"] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
     this.element_Children[0].style["margin-top"] = `-${this.element_Children[0].offsetHeight}px`;
     this.element_.classList.remove('is-open')
     this.header.classList.remove('is-open')
@@ -110,7 +112,7 @@ var BellCubicSummary = function BellCubicSummary(element) {
 window['BellCubicSummary'] = BellCubicSummary;
 
 /**
-    * Toggle the collapseable menu.
+    * Toggle the collapsable menu.
     *
     * @public
     */
@@ -136,7 +138,7 @@ BellCubicSummary.prototype.reEval = function () {
 BellCubicSummary.prototype['reEval'] = BellCubicSummary.prototype.reEval;
 
 /**
-    * Open the collapseable menu.
+    * Open the collapsable menu.
     *
     * @public
     */
@@ -144,6 +146,7 @@ BellCubicSummary.prototype.open = function () {
     /*console.log("Setting margin-top to 0px", this.for)*/
     try{
         this.forChildren[0].style["transition-duration"] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
+        this.forChildren[0].style["animation-duration"] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
         this.forChildren[0].style["margin-top"] = `0px`;
     }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e}};
     this.for.classList.add('is-open')
@@ -151,7 +154,7 @@ BellCubicSummary.prototype.open = function () {
 };
 BellCubicSummary.prototype['open'] = BellCubicSummary.prototype.open;
 /**
-    * Close the collapseable menu.
+    * Close the collapsable menu.
     *
     * @public
     */
@@ -159,6 +162,7 @@ BellCubicSummary.prototype.close = function () {
     /*console.log("Setting margin-top to -" + this.for.offsetHeight + "px", this.for)*/
     try{
         this.forChildren[0].style["transition-duration"] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
+        this.forChildren[0].style["animation-duration"] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
         this.forChildren[0].style["margin-top"] = `-${this.forChildren[0].offsetHeight}px`
     }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e}};
     this.for.classList.remove('is-open')
@@ -242,7 +246,7 @@ function init() {
         [ {time: [[12,00], [12,00]]}, "Good noon!" ],
         [ {time: [[12,01], [19,00]]}, "Good afternoon!" ],
         [ {time: [[18,30], [24,00]]}, "Good evening!" ],
-        [ {time: [[0,00], [5,00]]}, "<s>Friendly reminder that you should probably be sleping right now</s>" ],
+        [ {time: [[0,00], [5,00]]}, "<s>Friendly reminder that you should probably be sleeping right now</s>" ],
         [ {date: [[0,0,0], [11,11,2022]], random: .25}, "Starfield community beta when?"],
         [ {random: .001}, "Well, well, well. You must be perty lucky!" ],
         [ {random: .00001}, "WHAT IN OBLIVION?!!! <b>WHY ARE YOU SO LUCKY?!!</b>" ],
@@ -328,7 +332,7 @@ function init() {
         "Now you. You can call me Ann Marie. But only if you're partial to being flayed alive and having an angry immortal skip rope with your entrails!",
         "Sheogorath, Daedric Prince of Madness. At your service.",
         "I am a part of you, little mortal. I am a shadow in your subconscious, a blemish on your fragile little psyche. You know me. You just don't know it.",
-        "Now that's the real question, isn't it? Because honestly, how much time off could a demented daedra really need?",
+        "Now that's the real question, isn't it? Because honestly, how much time off could a demented Daedra really need?",
         "Let's make sure I'm not forgetting anything. Clothes? Check. Beard? Check! Luggage?<br />Luggage! Now where did I leave my luggage?",
         "Ha! I do love it when the mortals know they're being manipulated. Makes things infinitely more interesting.",
         "The Wabbajack! Huh? Huh? Didn't see that coming, did you?",

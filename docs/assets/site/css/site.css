@@ -231,6 +231,10 @@ a {
     color: #baaf49;
 }
 
+.noBullet > li {
+    display: block;
+}
+
 .bcd-summary {
     pointer-events: all;
     background-color: #00000000;
@@ -309,40 +313,50 @@ a {
 }
 .bcd-details > .bcd-details_inner {
     visibility: hidden;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-    margin-top: -100%;
-}
 
-.bcd-details.initialized > .bcd-details_inner {
     transition-property: margin-top;
-    transition-duration: 200ms;
     transition-timing-function: ease-in-out;
     transition-delay: 10ms;
 
-    position: unset;
+    margin-top: -100%;
 
     animation-name: hideDelay;
-    animation-duration: 310ms;
     animation-timing-function: steps(1, end);
-}
 
-@keyframes hideDelay{
-    0%{
-        visibility: unset;
-        position: unset;
-    }
-    100% {
-        visibility: hidden;
-        position: absolute;
-    }
+    /* Defaults (overridden by universal.js) */
+    animation-duration: 0ms;
+    transition-duration: 0ms;
+    /* animation-duration is 15ms longer than transition-duration when set by JavaScript */
 }
 
 .bcd-details.is-open > .bcd-details_inner {
     visibility: unset;
-    animation-name: none;
+    animation-name: unhideStuff;
     position: unset;
+    pointer-events: unset;
+}
+
+/* Used to change non-transitionable properties after a delay */
+@keyframes hideDelay{
+    0%{
+        visibility: unset;
+        position: unset;
+        pointer-events: none;
+    }
+    100% {
+        visibility: hidden;
+        position: absolute;
+        pointer-events: none;
+    }
+}
+
+@keyframes unhideStuff {
+    0% {
+        pointer-events: none;
+    }
+    100% {
+        pointer-events: all;
+    }
 }
 
 .bcd-details.contPad01-left > .bcd-details_inner {
@@ -369,8 +383,18 @@ a {
     font-size: small;
     line-height: normal;
 }
+.mdl-tooltip h2 {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: normal;
+}
 .mdl-tooltip h3 {
-    font-size: medium;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: normal;
+}
+.mdl-tooltip h4 {
+    font-size: 16px;
     line-height: normal;
 }
 

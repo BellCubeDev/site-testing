@@ -36,9 +36,9 @@ elm_toggleConfigInCookie = HTMLElement.prototype;
 elm_toggleInfoSchema = HTMLElement.prototype;
 elm_toggleBranding = HTMLElement.prototype;
 
-// Collapseables
-elm_collapseableMetadata = HTMLElement.prototype;
-elm_collapseableGeneralAndConfig = HTMLElement.prototype;
+// Collapsables
+elm_collapsableMetadata = HTMLElement.prototype;
+elm_collapsableGeneralAndConfig = HTMLElement.prototype;
 
 // Idea by IllusiveMan
 var fileExtPathAssociations = {
@@ -60,7 +60,7 @@ var fileExtPathAssociations = {
 }
 
 var parseIntErr = new TypeError('Value is not a number.')
-/** Equivilent to `parseInt()`, except it throws an error if the value is not exclusively composed of digits.
+/** Equivalent to `parseInt()`, except it throws an error if the value is not exclusively composed of digits.
     @param {string} intString - The string to parse
     @param {number} radix - The radix to use
     @returns {number} The parsed number
@@ -106,31 +106,31 @@ async function init() {
     //console.log("[BCD-FomodBuilder] Hello World!");
 
     // Core
-    elm_buttonFolderPicker = document.getElementById(`fomod_FolderPicker`),
+    elm_buttonFolderPicker = document.getElementById(`fomod_FolderPicker`)
 
     // Info.xml (Metadata)
-    elm_inputName = document.getElementById(`fomod_info_name`),
-    elm_inputAuthor = document.getElementById(`fomod_info_author`),
-    elm_inputID = document.getElementById(`fomod_info_ID`),
-    elm_inputWebsite = document.getElementById(`fomod_info_website`),
-    elm_toggleUseSemVer = document.getElementById(`fomod_config_toggleUseSemVer`),
-    elm_containerVersionFull = document.getElementById(`fomod_info_version_cont`),
-        elm_inputVersionFull = document.getElementById(`fomod_info_version_full`),
-    elm_containerVersionSemVer = document.getElementById(`fomod_info_version_semver_cont`),
-        elm_inputVersionMajor = document.getElementById(`fomod_info_version_major`),
-        elm_inputVersionMinor = document.getElementById(`fomod_info_version_minor`),
-        elm_inputVersionPatch = document.getElementById(`fomod_info_version_patch`),
+    elm_inputName = document.getElementById(`fomod_info_name`)
+    elm_inputAuthor = document.getElementById(`fomod_info_author`)
+    elm_inputID = document.getElementById(`fomod_info_ID`)
+    elm_inputWebsite = document.getElementById(`fomod_info_website`)
+    elm_toggleUseSemVer = document.getElementById(`fomod_config_toggleUseSemVer`)
+    elm_containerVersionFull = document.getElementById(`fomod_info_version_cont`)
+        elm_inputVersionFull = document.getElementById(`fomod_info_version_full`)
+    elm_containerVersionSemVer = document.getElementById(`fomod_info_version_semver_cont`)
+        elm_inputVersionMajor = document.getElementById(`fomod_info_version_major`)
+        elm_inputVersionMinor = document.getElementById(`fomod_info_version_minor`)
+        elm_inputVersionPatch = document.getElementById(`fomod_info_version_patch`)
 
     // Config
-    elm_toggleAutosave = document.getElementById(`fomod_config_toggleAutosave`),
-    elm_toggleConfigInXML = document.getElementById(`fomod_config_saveConfigXML`),
-    elm_toggleConfigInCookie = document.getElementById(`fomod_config_saveConfigCookies`),
-    elm_toggleInfoSchema = document.getElementById(`fomod_config_saveInfoSchema`),
-    elm_toggleBranding = document.getElementById(`fomod_config_dobranding`),
+    elm_toggleAutosave = document.getElementById(`fomod_config_toggleAutosave`)
+    elm_toggleConfigInXML = document.getElementById(`fomod_config_saveConfigXML`)
+    elm_toggleConfigInCookie = document.getElementById(`fomod_config_saveConfigCookies`)
+    elm_toggleInfoSchema = document.getElementById(`fomod_config_saveInfoSchema`)
+    elm_toggleBranding = document.getElementById(`fomod_config_doBranding`)
 
-    // Collapseables
-    elm_collapseableMetadata = document.getElementById(`details_builder_meta`),
-    elm_collapseableGeneralAndConfig = document.getElementById(`details_builder_genConfig`),
+    // collapsables
+    elm_collapsableMetadata = document.getElementById(`details_builder_meta`)
+    elm_collapsableGeneralAndConfig = document.getElementById(`details_builder_genConfig`)
 
     //console.log("[BCD-FomodBuilder] "+JSON.stringify(importantElements));
 
@@ -139,14 +139,14 @@ async function init() {
     });
     elm_toggleUseSemVer.addEventListener('click', async () => {
         if (checkToggleSwitch(elm_toggleUseSemVer)){
-            setVersion(`${inputValue(elm_inputVersionMajor, false)}.${inputValue(elm_inputVersionMinor, false)}.${inputValue(elm_inputVersionPatch, false)}`.replace(/^\.+|\.+$/g, ''), true)
-            elm_containerVersionSemVer.setAttribute('hidden', '');
-            elm_containerVersionFull.removeAttribute('hidden');
-        } else {
             setVersion(inputValue(elm_inputVersionFull, false), true);
             elm_containerVersionSemVer.removeAttribute('hidden');
             elm_containerVersionFull.setAttribute('hidden', '');
-        }
+        } else {
+            setVersion(`${inputValue(elm_inputVersionMajor, false)}.${inputValue(elm_inputVersionMinor, false)}.${inputValue(elm_inputVersionPatch, false)}`.replace(/^\.+|\.+$/g, ''), true)
+            elm_containerVersionSemVer.setAttribute('hidden', '');
+            elm_containerVersionFull.removeAttribute('hidden');
+        } 
     });
 
     elm_inputVersionFull.addEventListener('change', autoSave);
@@ -216,7 +216,7 @@ async function openFomodDirectory(){
 
         rootDirectory = temp_rootDirectory
         fomodDirectory = temp_fomodDirectory
-        bcd_registeredComponents.bcdDetails[elm_collapseableMetadata.id].open()
+        bcd_registeredComponents.bcdDetails[elm_collapsableMetadata.id].open()
         setTimeout(save, 3000)
     } catch(err) {
         if(err instanceof DOMException && (err.name == 'AbortError')) {
@@ -261,6 +261,10 @@ function parseInfoXML(readerEvent) {
 function setVersion(version, relaxed = false){
     elm_inputVersionFull.value = version;
     try{
+        elm_toggleUseSemVer.removeAttribute('checked');
+        elm_toggleUseSemVer.parentElement.classList.remove('is-checked');
+        elm_containerVersionSemVer.setAttribute('hidden', '');
+        elm_containerVersionFull.removeAttribute('hidden');
         var splitVers = version.split('.');
         if (splitVers.length > 0){try{elm_inputVersionMajor.value = parseIntExtremes(splitVers[0], relaxed)} catch(e){handlePerseError(e)}}else{elm_inputVersionMajor.value = ''}
         if (splitVers.length > 1){try{elm_inputVersionMinor.value = parseIntExtremes(splitVers[1], relaxed)} catch(e){handlePerseError(e)}}else{elm_inputVersionMinor.value = ''}
@@ -268,8 +272,8 @@ function setVersion(version, relaxed = false){
     } catch(e){handlePerseError(e)}
     function handlePerseError(e){
         console.log(`Error parsing version ${version}: ${e}\n${e.stack}`);
-        elm_toggleUseSemVer.removeAttribute('checked');
-        elm_toggleUseSemVer.parentElement.classList.remove('is-checked');
+        elm_toggleUseSemVer.setAttribute('checked', '');
+        elm_toggleUseSemVer.parentElement.classList.add('is-checked');
         elm_containerVersionSemVer.setAttribute('hidden', '');
         elm_containerVersionFull.removeAttribute('hidden');
     }
@@ -296,7 +300,7 @@ function getCookie(cookieName, defaultValue){
     }
 }
 
-/** Conveinence function to get the value of a toggle switch.
+/** Convenience function to get the value of a toggle switch.
     @param {HTMLElement} element - The element to get the value of.
     @returns {boolean} - Whether or not the switch was enabled.
 */
@@ -304,7 +308,7 @@ function checkToggleSwitch(element){
     return element.parentElement.classList.contains('is-checked')
 }
 
-/** Conveinence function to call `save()` if autosaving is enabled. CURRENTLY DISABLED UNTIL SAVING IS PROPERLY IMPLIMENTED.
+/** Convenience function to call `save()` if autosaving is enabled. CURRENTLY DISABLED UNTIL SAVING IS PROPERLY IMPLEMENTED.
     @returns {nil}
 */
 async function autoSave() {
@@ -322,7 +326,6 @@ async function save(){
         // xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd"
         info_xml_tags.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
         info_xml_tags.setAttribute('xsi:noNamespaceSchemaLocation', 'https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd')
-
     }
     if (checkToggleSwitch(elm_toggleBranding) && !info_xml.documentElement.innerHTML.includes('BellCube\'s FOMOD Builder')){
         console.log('Adding Branding to Info.xml (disabled by default)');
@@ -339,17 +342,19 @@ async function save(){
 
     console.log('Adding FOMOD Version to Info.xml');
     var versTag = getXMLTag(info_xml, 'Version');
-    if (checkToggleSwitch(elm_toggleUseSemVer)){
-        versTag.innerHTML = inputValue(elm_inputVersionMajor) + '.' + inputValue(elm_inputVersionMinor) + '.' + inputValue(elm_inputVersionPatch);
-     }else {
+    if (checkToggleSwitch(elm_toggleUseSemVer)) {
         versTag.innerHTML = inputValue(elm_inputVersionFull);
-    }
+    } else {
+        versTag.innerHTML = inputValue(elm_inputVersionMajor) + '.' + inputValue(elm_inputVersionMinor) + '.' + inputValue(elm_inputVersionPatch);
+     }
+
+    writeFile(xml, xml.ownerDocument.documentElement.outerHTML);
 
     console.log('After editing:\n', info_xml.documentElement);
     }, 1000);
 }
 
-/** Conveinence function to get the value of an input element. Will first attempt to get a user-submitted value, then will attempt to fetch a default from `builder_default`, before finally resorting to the `placeholder` attribute.
+/** Convenience function to get the value of an input element. Will first attempt to get a user-submitted value, then will attempt to fetch a default from `builder_default`, before finally resorting to the `placeholder` attribute.
     @param {HTMLElement} element The Input element to get the value of
     @param {boolean} [usePlaceholder=true] Whether to use the `placeholder`. Defaults to True.
     @returns {string|number|boolean} The value of the input element

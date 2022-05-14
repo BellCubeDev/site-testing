@@ -7,6 +7,7 @@ extra_head: >
 description: >
     The FOMOD Builder is a tool for creating FOMOD installers, a popular XML-based format for video game mod installers. It is, at this time, incomplete.
 # the first of its kind to feature intuitive tooltips, dark mode, full schema support, Real-time renders, auditing
+permalink: /tools/fomod/
 redirect_from:
   - /tools/fomod/builder/
   - /tools/fomod-builder/
@@ -104,12 +105,12 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             Include a schema declaration in the <code>Info.xml</code> file? This is especially useful if using external programming tools, such as Visual Studio Code, to write your FOMOD.
         </p></div>
 
-        <!-- Add Reccomendation Comment Toggle -->
-        <label id="fomod_config_dobranding_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="text-align:left" for="fomod_config_dobranding">
-            <input type="checkbox" id="fomod_config_dobranding" class="mdl-switch__input">
-            <span class="mdl-switch__label">Add Reccomendation Comment</span>
+        <!-- Add Recommendation Comment Toggle -->
+        <label id="fomod_config_doBranding_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="text-align:left" for="fomod_config_doBranding">
+            <input type="checkbox" id="fomod_config_doBranding" class="mdl-switch__input">
+            <span class="mdl-switch__label">Add Recommendation Comment</span>
         </label>
-        <div class="mdl-tooltip" for="fomod_config_dobranding_cont"><p>
+        <div class="mdl-tooltip" for="fomod_config_doBranding_cont"><p>
             Saves a comment near the top of <code>Info.xml</code> and <code>ModuleConfig.xml</code>. This is disabled by default for a reason - I hate forced watermarks as much as the next guy!<br />
             <br />
             But hey, if you want it, it's here. I'll use it because it's my own product. But you? You've got no obligation. It's just here for people like me who like giving way more credit than anyone needs.
@@ -172,13 +173,12 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
         <div style="display:inline-flex;align-items:center;gap:16px;flex-direction:row;flex-wrap:nowrap;">
 
             <!-- Version Number - Full -->
-            <div id="fomod_info_version_cont" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" style="width:120px" hidden>
+            <div id="fomod_info_version_cont" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label info-input" style="width:120px" hidden>
                 <input id="fomod_info_version_full" class="mdl-textfield__input" style="pointer-events: all" type="text" placeholder="1.0.0">
                 <label class="mdl-textfield__label" for="fomod_info_version_full" style="pointer-events: all">Version</label>
             </div>
             <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version_cont"><p>
                 Version of the mod. Displayed alongside other metadata in the installer window.
-                I suggest using Semenatic Versioning (SemVer), e.g. <code>2.1.1</code>, where the first number is the second "major" or "breaking" version, the second is the "minor" or non-breaking" version, and the third is the "patch"/"hotfix"/"bugfix" version.
                 <br /><br /><hr /><br />
                 <h3>Used By</h3><ul class="mod-manager-list">
                     <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2.svg" />
@@ -207,7 +207,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                     <label class="mdl-textfield__label" for="fomod_info_version_patch">Patch</label>
                 </div>
             </div>
-            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version_semver_cont"><p>
+            <div class="mdl-tooltip mdl-tooltip--bottom small01" for="fomod_info_version_semver_cont" style="max-width:750px;"><p>
                 Version of the mod. Displayed alongside other metadata in the installer window.
                 <br /><br /><hr /><br />
                 <h3>Used By</h3><ul class="mod-manager-list">
@@ -215,13 +215,33 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                         Mod Organizer 2
                     </li>
                 </ul>
+                <br /><hr /><br />
+                <p>Semantic Versioning (often shortened to "SemVer") is a versioning system that allows for easy and consistent versioning of software. It's broken down into 3 'tiers,' so to speak:</p>
+                <br />
+                <h4>Major</h4>
+                    <p>Incremented when you make changes that break things dependant on your software (or, in this case, mod).</p>
+                <br />
+                <h4>Minor</h4>
+                    <p>Incremented whenever you release a version with new stuff that doesn't break dependant software.</p>
+                <br />
+                <h4>Patch</h4>
+                    <p>Incremented whenever you release a version that doesn't add anything new, but instead makes changes like fixing bugs or improving performance.</p>
+                <br />
+                <h3>Other Info</h3>
+                    <p>When you increment a number, every number after it is set to 0.</p>
+                    <br />
+                    <p>These numbers aren't actual decimals, they're just numbers separated by dots. <code>1.20.3</code> is much newer than <code>1.3.1</code>, for instance.</p>
             </p></div>
 
             <!-- SemVer Toggle -->
-            <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="width:100px;" for="fomod_config_toggleUseSemVer">
-                <input type="checkbox" id="fomod_config_toggleUseSemVer" class="mdl-switch__input" checked>
-                <span class="mdl-switch__label">SemVer</span>
+            <label id="fomod_config_toggleUseSemVer_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="width:100px;" for="fomod_config_toggleUseSemVer">
+                <input type="checkbox" id="fomod_config_toggleUseSemVer" class="mdl-switch__input">
+                <span class="mdl-switch__label">Custom</span>
             </label>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_config_toggleUseSemVer_cont"><p>
+                Enable custom version input?
+                This allows you to enter versions that aren't SemVer compliant OR include suffixes, such as in <code>1.0.0-DEV</code>.
+            </p></div>
         </div>
 
         <div id="fomod_info_ID_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
@@ -270,12 +290,12 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 
     Nice-to-have:
     TODO: Add preview and output simulation for MO2's installer window
-    TODO: Show reccomendation to users adding 3+ files to a single option to use a folder instead
+    TODO: Show recommendation to users adding 3+ files to a single option to use a folder instead
     TODO: Show conflicts between files
     TODO: Show conflicts between files contained within folders
 
     IllusiveMan:
-    TODO: Add Bulk Actions (multiselect?!!)
+    TODO: Add Bulk Actions (multi-select?!!)
     TODO: Group Merging
 
 -->

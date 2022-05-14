@@ -7,7 +7,7 @@ NOTICE!!!
 ======================
 The event handler for `MaterialTooltip.prototype.handleMouseEnter_`
 has been modified to adjust tooltip positioning for the navigation drawer.
-This code consitst of a single IF statement.
+This code consists of a single IF statement.
 */
 
 /**
@@ -43,7 +43,7 @@ var componentHandler = {
    * Searches existing DOM for elements of our component type and upgrades them
    * if they have not already been upgraded.
    *
-   * @param {string=} optJsClass the programatic name of the element class we
+   * @param {string=} optJsClass the programmatic name of the element class we
    * need to create a new instance of.
    * @param {string=} optCssClass the name of the CSS class elements of this
    * type will have.
@@ -178,7 +178,7 @@ componentHandler = (function() {
    * Searches existing DOM for elements of our component type and upgrades them
    * if they have not already been upgraded.
    *
-   * @param {string=} optJsClass the programatic name of the element class we
+   * @param {string=} optJsClass the programmatic name of the element class we
    * need to create a new instance of.
    * @param {string=} optCssClass the name of the CSS class elements of this
    * type will have.
@@ -2220,7 +2220,7 @@ MaterialSnackbar.prototype.checkQueue_ = function () {
     }
 };
 /**
-   * Cleanup the snackbar event listeners and accessiblity attributes.
+   * Cleanup the snackbar event listeners and accessibility attributes.
    *
    * @private
    */
@@ -2704,7 +2704,7 @@ MaterialTabs.prototype.resetTabState_ = function () {
     }
 };
 /**
-   * Reset panel state, droping active classes
+   * Reset panel state, dropping active classes
    *
    * @private
    */
@@ -3373,7 +3373,7 @@ MaterialLayout.prototype.resetTabState_ = function (tabBar) {
     }
 };
 /**
-   * Reset panel state, droping active classes
+   * Reset panel state, dropping active classes
    *
    * @private
    */
