@@ -12,11 +12,12 @@ window.onload = init;
 var bcd_registeredComponents = {
     bcdDetails: {},
     bcdSummary: {}
-}
+};
 
 /**
     * @param {HTMLElement} element
 */
+// eslint-disable-next-line func-style
 var BellCubicDetails = function BellCubicDetails(element) {
     this.element_ = element;
     this.init();
@@ -33,7 +34,6 @@ BellCubicDetails.prototype.toggle = function () {
     /*console.log('[BCD-DETAILS] toggle() called on ',this)*/
     if (this.element_.classList.contains('is-open')) {this.close();} else {this.open();}
 };
-BellCubicDetails.prototype['toggle'] = BellCubicDetails.prototype.toggle;
 
 /**
     * Re-evaluate the toggle menu's current state.
@@ -42,9 +42,8 @@ BellCubicDetails.prototype['toggle'] = BellCubicDetails.prototype.toggle;
     */
 BellCubicDetails.prototype.reEval = function () {
     /*console.log('[BCD-DETAILS] reEval() called on ',this)*/
-    if (this.element_.classList.contains('is-open') || this.header.classList.contains('is-open') ) {this.open()} else {this.close()}
+    if (this.element_.classList.contains('is-open') || this.header.classList.contains('is-open') ) {this.open();} else {this.close();}
 };
-BellCubicDetails.prototype['reEval'] = BellCubicDetails.prototype.reEval;
 
 /**
     * Open the collapsable menu.
@@ -55,10 +54,9 @@ BellCubicDetails.prototype.open = function () {
     /*console.log("Setting margin-top to 0px", this.element_Children[0])*/
     this.element_Children[0].style["transition-duration"] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
     this.element_Children[0].style["animation-duration"] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
-    this.element_.classList.add('is-open')
-    this.header.classList.add('is-open')
+    this.element_.classList.add('is-open');
+    this.header.classList.add('is-open');
 };
-BellCubicDetails.prototype['open'] = BellCubicDetails.prototype.open;
 
 /**
     * Close the collapsable menu.
@@ -70,16 +68,13 @@ BellCubicDetails.prototype.close = function () {
     this.element_Children[0].style["transition-duration"] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
     this.element_Children[0].style["animation-duration"] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
     this.element_Children[0].style["margin-top"] = `-${this.element_Children[0].offsetHeight}px`;
-    this.element_.classList.remove('is-open')
-    this.header.classList.remove('is-open')
+    this.element_.classList.remove('is-open');
+    this.header.classList.remove('is-open');
 };
-BellCubicDetails.prototype['close'] = BellCubicDetails.prototype.close;
 
-BellCubicDetails.prototype.header = null
-BellCubicDetails.prototype['header'] = BellCubicDetails.prototype.header;
+BellCubicDetails.prototype.header = null;
 
-BellCubicDetails.prototype.element_Children = null
-BellCubicDetails.prototype['element_Children'] = BellCubicDetails.prototype.element_Children;
+BellCubicDetails.prototype.element_Children = null;
 
 /**
     * Initialize element.
@@ -90,20 +85,21 @@ BellCubicDetails.prototype.init = function () {
         this.element_Children = this.element_.getElementsByClassName('bcd-details_inner');
 
         this.header = this.element_.ownerDocument.querySelector(`.bcd-summary[for="${this.element_.id}"`);
-        this.reEval()
+        this.reEval();
         bcd_registeredComponents.bcdDetails[this.element_.id] = this;
         this.element_.classList.add('initialized');
 
         setTimeout(()=>{
             bcd_registeredComponents.bcdSummary[this.element_.id].forChildren = this.element_Children;
             this.reEval();
-        }, 100)
+        }, 100);
     }
 };
 
 /**
     * @param {HTMLElement} element
 */
+// eslint-disable-next-line func-style
 var BellCubicSummary = function BellCubicSummary(element) {
     this.element_ = element;
     this.init();
@@ -124,7 +120,6 @@ BellCubicSummary.prototype.toggle = function () {
         this.open();
     }
 };
-BellCubicSummary.prototype['toggle'] = BellCubicSummary.prototype.toggle;
 
 /**
     * Re-evaluate the toggle menu's current state.
@@ -133,9 +128,8 @@ BellCubicSummary.prototype['toggle'] = BellCubicSummary.prototype.toggle;
     */
 BellCubicSummary.prototype.reEval = function () {
     /*console.log('[BCD-SUMMARY] reEval() called on ',this)*/
-    if (this.for.classList.contains('is-open') || this.element_.classList.contains('is-open') ) {this.open()} else {this.close()}
+    if (this.for.classList.contains('is-open') || this.element_.classList.contains('is-open') ) {this.open();} else {this.close();}
 };
-BellCubicSummary.prototype['reEval'] = BellCubicSummary.prototype.reEval;
 
 /**
     * Open the collapsable menu.
@@ -148,11 +142,10 @@ BellCubicSummary.prototype.open = function () {
         this.forChildren[0].style["transition-duration"] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
         this.forChildren[0].style["animation-duration"] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
         this.forChildren[0].style["margin-top"] = `0px`;
-    }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e}};
-    this.for.classList.add('is-open')
-    this.element_.classList.add('is-open')
+    }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e;}}
+    this.for.classList.add('is-open');
+    this.element_.classList.add('is-open');
 };
-BellCubicSummary.prototype['open'] = BellCubicSummary.prototype.open;
 /**
     * Close the collapsable menu.
     *
@@ -163,17 +156,15 @@ BellCubicSummary.prototype.close = function () {
     try{
         this.forChildren[0].style["transition-duration"] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
         this.forChildren[0].style["animation-duration"] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
-        this.forChildren[0].style["margin-top"] = `-${this.forChildren[0].offsetHeight}px`
-    }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e}};
-    this.for.classList.remove('is-open')
-    this.element_.classList.remove('is-open')
+        this.forChildren[0].style["margin-top"] = `-${this.forChildren[0].offsetHeight}px`;
+    }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e;}}
+    this.for.classList.remove('is-open');
+    this.element_.classList.remove('is-open');
 };
 
-BellCubicSummary.prototype.for = null
-BellCubicSummary.prototype['for'] = BellCubicSummary.prototype.for;
+BellCubicSummary.prototype.for = null;
 
-BellCubicSummary.prototype.forChildren = null
-BellCubicSummary.prototype['forChildren'] = BellCubicSummary.prototype.forChildren;
+BellCubicSummary.prototype.forChildren = null;
 
 /**
     * Initialize element.
@@ -183,8 +174,8 @@ BellCubicSummary.prototype.init = function () {
         this.boundElementMouseUp = this.toggle.bind(this);
         this.element_.addEventListener('mouseup', this.boundElementMouseUp);
         this.for = this.element_.ownerDocument.getElementById(this.element_.getAttribute('for'));
-        this.forChildren = this.for.getElementsByClassName('bcd-details_inner')
-        this.reEval()
+        this.forChildren = this.for.getElementsByClassName('bcd-details_inner');
+        this.reEval();
         bcd_registeredComponents.bcdSummary[this.element_.getAttribute('for')] = this;
         /*console.log(`bcd_registeredComponents.bcdSummary[${this.element_.getAttribute('for')}] = this;`)*/
         this.element_.classList.add('initialized');
@@ -195,12 +186,15 @@ function registerComponents(){
     console.log("[BCD-Components] Registering components...");
 
     // Tell MDL about our new components
+
+    // eslint-disable-next-line no-undef
     componentHandler.register({
         constructor: BellCubicDetails,
         classAsString: 'BellCubicDetails',
         cssClass: 'bcd-details',
         widget: false
     });
+    // eslint-disable-next-line no-undef
     componentHandler.register({
         constructor: BellCubicSummary,
         classAsString: 'BellCubicSummary',
@@ -213,27 +207,29 @@ function registerComponents(){
     );
 
     // Upgrade the elements with the classes we just registered components for
+
+    // eslint-disable-next-line no-undef
     componentHandler.upgradeElements([
         ...document.getElementsByClassName('bcd-details'),
         ...document.getElementsByClassName('bcd-summary')
     ]);
 
-    console.log("[BCD-Components] Components registered.")
+    console.log("[BCD-Components] Components registered.");
 }
 
 
 // The component registers itself. It can assume componentHandler is available in the global scope.
 // Either way, I'm trying it now in case onLoad is, for some reason, not called.
-try{registerComponents()}catch(e){/*console.log(e.stack)*/}
+try{registerComponents();}catch(e){/*console.log(e.stack)*/}
 
 function init() {
-    try{registerComponents()}catch(e){/*console.log(e.stack)*/}
+    try{registerComponents();}catch(e){/*console.log(e.stack)*/}
 
     /*
     We pull from the Conditionalized array before the Generic array to ensure that we always have some text.
 
     Possible conditions:
-    time: An array of time bounds in 24hr [H,MM].
+    time: An array of time bounds in 24hr [H,M].
     random: A float between 0 and 1. If the Math.random number is less than this, the condition is met.
     date: An array of date bounds in [M,D,YYYY]. Set either to [0,0,0] to mark it as unbounded.
     */
@@ -241,12 +237,12 @@ function init() {
         [ {random: .01}, "Your firstborn is Sheson's!" ],
         [ {random: .01}, "And why not? Imagine how unbearably, how unutterably cold the universe would be if one were all alone." ], // https://www.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html
         [ {random: .075}, "STOP REFRESHING!!!" ],
-        [ {time: [[3,00], [11,59]]}, "Good morning!" ],
-        [ {time: [[3,00], [11,59]]}, "'Mornin! Nice day for fishin', ain't it?" ],
-        [ {time: [[12,00], [12,00]]}, "Good noon!" ],
-        [ {time: [[12,01], [19,00]]}, "Good afternoon!" ],
-        [ {time: [[18,30], [24,00]]}, "Good evening!" ],
-        [ {time: [[0,00], [5,00]]}, "<s>Friendly reminder that you should probably be sleeping right now</s>" ],
+        [ {time: [[3,0], [11,59]]}, "Good morning!" ],
+        [ {time: [[3,0], [11,59]]}, "'Mornin! Nice day for fishin', ain't it?" ],
+        [ {time: [[12,0], [12,0]]}, "Good noon!" ],
+        [ {time: [[12,1], [19,0]]}, "Good afternoon!" ],
+        [ {time: [[18,30], [24,0]]}, "Good evening!" ],
+        [ {time: [[0,0], [5,0]]}, "<s>Friendly reminder that you should probably be sleeping right now</s>" ],
         [ {date: [[0,0,0], [11,11,2022]], random: .25}, "Starfield community beta when?"],
         [ {random: .001}, "Well, well, well. You must be perty lucky!" ],
         [ {random: .00001}, "WHAT IN OBLIVION?!!! <b>WHY ARE YOU SO LUCKY?!!</b>" ],
@@ -261,8 +257,8 @@ function init() {
         [ {random: .055}, "You should not be here, Mortal! Your life is forfeit. Your flesh is mine."], //Otellino
         [ {random: .1}, "Psst. Hey, I know who you are. Hail Sithis."],
         [ {random: .1}, "You wear the armor of the bear, my friend. A fine choice."],
-        [ {time: [[20,00], [24,00]]}, "Only burglars and vampires creep around after dark. So which are you?" ],
-        [ {time: [[0,00], [5,00]]}, "Only burglars and vampires creep around after dark. So which are you?" ]
+        [ {time: [[20,0], [24,0]]}, "Only burglars and vampires creep around after dark. So which are you?" ],
+        [ {time: [[0,0], [5,0]]}, "Only burglars and vampires creep around after dark. So which are you?" ]
     ];
 
     const possibilities_Generic = [
@@ -410,7 +406,7 @@ function init() {
         "Some say we broke our promises.<br />Some say we betrayed our brothers.<br />Some say we abandoned God.",
         "But it is us, not them that brought us this far.",
         "And those that make sacrifices today, will reap the rewards of tomorrow."
-    ]
+    ];
 
     // Still in 'window.onload'
 
@@ -425,19 +421,17 @@ function init() {
         document.getElementById("randomized-text-field").innerHTML = possibilities_Generic[Math.round(Math.random() * (possibilities_Generic.length - 1))];
         /*console.log(`[BCD-RANDOM-TEXT] Condition failed. Using generic text.`);*/
     }
-};
+}
 
+// This function is not super to understand if you can read comments and collapse blocks of code.
+// eslint-disable-next-line sonarjs/cognitive-complexity
 function checkCondition(condition) {
     try {
 
         // Random
         /*console.log(`[BCD-RANDOM-TEXT] Checking random condition`);*/
-        var rand = Math.random();
-        if (tryForJSON(condition, "random")) {
-            /*console.log(`[BCD-RANDOM-TEXT] Is random ${rand} <= ${condition.random}?`);*/
-            if (rand > parseFloat(condition.random)) {
-                return false;
-            }
+        if (tryForJSON(condition, "random") && Math.random() > parseFloat(condition.random)) {
+            return false;
         }
 
         // Time
@@ -458,41 +452,41 @@ function checkCondition(condition) {
         // Date
         /*console.log(`[BCD-RANDOM-TEXT] Checking date condition`);*/
         if (tryForJSON(condition, "date")) {
+            
+            // Get the current date as the American [month, day, year]
             var date = new Date();
             var currentDate = [date.getMonth() + 1, date.getDate(), date.getFullYear()];
 
-            /*console.log(`[BCD-RANDOM-TEXT] is ${currentDate.join('/')} between ${condition.date[0].join('/')} and ${condition.date[1].join('/')}?`);*/
+            var minDate = condition.date[0];
+            var maxDate = condition.date[1];
 
+            // Are we below the minimum? The condition is not met if so.
             if (!(
-                    (currentDate[2] > condition.date[0][2]) ||
-                    (currentDate[2] == condition.date[0][2] && currentDate[0] > condition.date[0][0]) ||
-                    (currentDate[2] == condition.date[0][2] && currentDate[0] == condition.date[0][0] && currentDate[1] >= condition.date[0][1])
+                    (currentDate[2] > minDate[2]) ||
+                    (currentDate[2] == minDate[2] && currentDate[0] > minDate[0]) ||
+                    (currentDate[2] == minDate[2] && currentDate[0] == minDate[0] && currentDate[1] >= minDate[1])
                 )) {
                 /*console.log(`[BCD-RANDOM-TEXT] Date is not above minimum`);*/
-                return false
+                return false;
             }
 
-            // And...
-            if (condition.date[1] != [0, 0, 0]) {
-                /*console.log(`[BCD-RANDOM-TEXT] Date has a maximum`);*/
-
-                if (!(
-                        (currentDate[2] < condition.date[1][2]) ||
-                        (currentDate[2] == condition.date[1][2] && currentDate[0] < condition.date[1][0]) ||
-                        (currentDate[2] == condition.date[1][2] && currentDate[0] == condition.date[1][0] && currentDate[1] <= condition.date[1][1])
-                    )) {
-                    return false;
-                }
+            // Are we above the maximum? The condition is not met if so.
+            if (maxDate != [0, 0, 0] && !(
+                    (currentDate[2] < maxDate[2]) ||
+                    (currentDate[2] == maxDate[2] && currentDate[0] < maxDate[0]) ||
+                    (currentDate[2] == maxDate[2] && currentDate[0] == maxDate[0] && currentDate[1] <= maxDate[1])
+                )) {
+                return false;
             }
         }
         // And if any of that threw an error,
     } catch (err) {
         /*console.log(`[BCD-RANDOM-TEXT] {checkCondition(${condition})} Error - ${err.name}\n==================\n${err.stack}\n==================`);*/
-        return false
+        return false;
     }
 
     // If we got through ALL OF THAT, we're good!
-    return true
+    return true;
 }
 
 function tryForJSON(aJSON, key) {
@@ -503,7 +497,7 @@ function tryForJSON(aJSON, key) {
         }
     } catch (err) {
         /*console.log(`[BCD-RANDOM-TEXT] {tryForJSON(${aJSON}, ${key})} Error - ${err.name}\n==================\n${err.stack}\n==================`);*/
-        return false
+        return false;
     }
     return true;
 }

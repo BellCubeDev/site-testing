@@ -43,13 +43,24 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     <h2>FOMOD - General and Config</h2><h3 id="fomod_FolderPicker_folderName" style="padding-left:16px">No folder selected...</h3>
 </div>
 <div class="bcd-details" id="details_builder_genConfig">
-    <form autocomplete="off" name="Folder & General Config" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px">
+    <form autocomplete="off" name="File Control" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px">
         <button id="fomod_FolderPicker" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
             Pick Directory
         </button>
-        <div class="mdl-tooltip" for="fomod_FolderPicker"><p>
-            This is the folder that you will put into an archive to be installed by users. If it is not set up for a FOMOD just yet, no worries!
-        </p></div>
+            <div id="fomod_localization_folderPicker_container">
+                <p id="fomod_localization_folderPicker_noFomod">Please select the root folder (the one containing 'fomod') or name your folder something other than 'fomod'.</p>
+                <p id="fomod_localization_folderPicker_needsWriteAccess">The editor requires write permissions to the root folder. Please grant write permissions to the root folder or hit cancel.</p>
+                
+            </div>
+            <div class="mdl-tooltip" for="fomod_FolderPicker"><p>
+                This is the folder that you will put into an archive to be installed by users. If it is not set up for a FOMOD just yet, no worries!
+            </p></div>
+        <button id="fomod_saveButton" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+            Pick Directory
+        </button>
+    </form>
+
+    <form autocomplete="off" name="General Config" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px">
 
         <!-- AutoSave Toggle -->
         <label id="fomod_config_toggleAutosave_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="text-align:left" for="fomod_config_toggleAutosave">
@@ -207,8 +218,8 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                     <label class="mdl-textfield__label" for="fomod_info_version_patch">Patch</label>
                 </div>
             </div>
-            <div class="mdl-tooltip mdl-tooltip--bottom small01" for="fomod_info_version_semver_cont" style="max-width:750px;"><p>
-                Version of the mod. Displayed alongside other metadata in the installer window.
+            <div class="mdl-tooltip mdl-tooltip--bottom small01" for="fomod_info_version_semver_cont" style="max-width:750px;">
+                <p>Version of the mod. Displayed alongside other metadata in the installer window.</p>
                 <br /><br /><hr /><br />
                 <h3>Used By</h3><ul class="mod-manager-list">
                     <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2.svg" />
@@ -216,22 +227,22 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                     </li>
                 </ul>
                 <br /><hr /><br />
-                <p>Semantic Versioning (often shortened to "SemVer") is a versioning system that allows for easy and consistent versioning of software. It's broken down into 3 'tiers,' so to speak:</p>
+                <p>Semantic Versioning (often shortened to "SemVer") is a standard for easy, clear, and expressive versioning of software. It's broken down into 3 'tiers,' so to speak:</p>
                 <br />
                 <h4>Major</h4>
-                    <p>Incremented when you make changes that break things dependant on your software (or, in this case, mod).</p>
+                    <p>Incremented when you make changes that break dependent software (or, in this case, dependent mods).</p>
                 <br />
                 <h4>Minor</h4>
-                    <p>Incremented whenever you release a version with new stuff that doesn't break dependant software.</p>
+                    <p>Incremented whenever you release a version with new features that doesn't break dependent software.</p>
                 <br />
                 <h4>Patch</h4>
-                    <p>Incremented whenever you release a version that doesn't add anything new, but instead makes changes like fixing bugs or improving performance.</p>
+                    <p>Incremented whenever you release a version that adds no new content, instead fixing bugs or making small tweaks to existing features.</p>
                 <br />
                 <h3>Other Info</h3>
                     <p>When you increment a number, every number after it is set to 0.</p>
                     <br />
                     <p>These numbers aren't actual decimals, they're just numbers separated by dots. <code>1.20.3</code> is much newer than <code>1.3.1</code>, for instance.</p>
-            </p></div>
+            </div>
 
             <!-- SemVer Toggle -->
             <label id="fomod_config_toggleUseSemVer_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="width:100px;" for="fomod_config_toggleUseSemVer">
