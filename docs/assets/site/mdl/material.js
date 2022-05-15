@@ -650,11 +650,11 @@ MaterialButton.prototype.init = function () {
             this.rippleElement_.classList.add(this.CssClasses_.RIPPLE);
             rippleContainer.appendChild(this.rippleElement_);
             this.boundRippleBlurHandler = this.blurHandler_.bind(this);
-            this.rippleElement_.addEventListener('mouseup', this.boundRippleBlurHandler);
+            this.rippleElement_.addEventListener('click', this.boundRippleBlurHandler);
             this.element_.appendChild(rippleContainer);
         }
         this.boundButtonBlurHandler = this.blurHandler_.bind(this);
-        this.element_.addEventListener('mouseup', this.boundButtonBlurHandler);
+        this.element_.addEventListener('click', this.boundButtonBlurHandler);
         this.element_.addEventListener('mouseleave', this.boundButtonBlurHandler);
     }
 };
@@ -872,7 +872,7 @@ MaterialCheckbox.prototype.init = function () {
             this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_EFFECT);
             this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_CENTER);
             this.boundRippleMouseUp = this.onMouseUp_.bind(this);
-            this.rippleContainerElement_.addEventListener('mouseup', this.boundRippleMouseUp);
+            this.rippleContainerElement_.addEventListener('click', this.boundRippleMouseUp);
             var ripple = document.createElement('span');
             ripple.classList.add(this.CssClasses_.RIPPLE);
             this.rippleContainerElement_.appendChild(ripple);
@@ -885,7 +885,7 @@ MaterialCheckbox.prototype.init = function () {
         this.inputElement_.addEventListener('change', this.boundInputOnChange);
         this.inputElement_.addEventListener('focus', this.boundInputOnFocus);
         this.inputElement_.addEventListener('blur', this.boundInputOnBlur);
-        this.element_.addEventListener('mouseup', this.boundElementMouseUp);
+        this.element_.addEventListener('click', this.boundElementMouseUp);
         this.updateClasses_();
         this.element_.classList.add(this.CssClasses_.IS_UPGRADED);
     }
@@ -1091,7 +1091,7 @@ MaterialIconToggle.prototype.init = function () {
             this.rippleContainerElement_.classList.add(this.CssClasses_.JS_RIPPLE_EFFECT);
             this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_CENTER);
             this.boundRippleMouseUp = this.onMouseUp_.bind(this);
-            this.rippleContainerElement_.addEventListener('mouseup', this.boundRippleMouseUp);
+            this.rippleContainerElement_.addEventListener('click', this.boundRippleMouseUp);
             var ripple = document.createElement('span');
             ripple.classList.add(this.CssClasses_.RIPPLE);
             this.rippleContainerElement_.appendChild(ripple);
@@ -1104,7 +1104,7 @@ MaterialIconToggle.prototype.init = function () {
         this.inputElement_.addEventListener('change', this.boundInputOnChange);
         this.inputElement_.addEventListener('focus', this.boundInputOnFocus);
         this.inputElement_.addEventListener('blur', this.boundInputOnBlur);
-        this.element_.addEventListener('mouseup', this.boundElementOnMouseUp);
+        this.element_.addEventListener('click', this.boundElementOnMouseUp);
         this.updateClasses_();
         this.element_.classList.add('is-upgraded');
     }
@@ -1357,7 +1357,7 @@ MaterialMenu.prototype.handleItemKeyboardEvent_ = function (evt) {
                 // Send mousedown and mouseup to trigger ripple.
                 var e = new MouseEvent('mousedown');
                 evt.target.dispatchEvent(e);
-                e = new MouseEvent('mouseup');
+                e = new MouseEvent('click');
                 evt.target.dispatchEvent(e);
                 // Send click.
                 evt.target.click();
@@ -1853,7 +1853,7 @@ MaterialRadio.prototype.init = function () {
             rippleContainer.classList.add(this.CssClasses_.RIPPLE_CONTAINER);
             rippleContainer.classList.add(this.CssClasses_.RIPPLE_EFFECT);
             rippleContainer.classList.add(this.CssClasses_.RIPPLE_CENTER);
-            rippleContainer.addEventListener('mouseup', this.boundMouseUpHandler_);
+            rippleContainer.addEventListener('click', this.boundMouseUpHandler_);
             var ripple = document.createElement('span');
             ripple.classList.add(this.CssClasses_.RIPPLE);
             rippleContainer.appendChild(ripple);
@@ -1862,7 +1862,7 @@ MaterialRadio.prototype.init = function () {
         this.btnElement_.addEventListener('change', this.boundChangeHandler_);
         this.btnElement_.addEventListener('focus', this.boundFocusHandler_);
         this.btnElement_.addEventListener('blur', this.boundBlurHandler_);
-        this.element_.addEventListener('mouseup', this.boundMouseUpHandler_);
+        this.element_.addEventListener('click', this.boundMouseUpHandler_);
         this.updateClasses_();
         this.element_.classList.add(this.CssClasses_.IS_UPGRADED);
     }
@@ -2076,7 +2076,7 @@ MaterialSlider.prototype.init = function () {
         this.boundContainerMouseDownHandler = this.onContainerMouseDown_.bind(this);
         this.element_.addEventListener('input', this.boundInputHandler);
         this.element_.addEventListener('change', this.boundChangeHandler);
-        this.element_.addEventListener('mouseup', this.boundMouseUpHandler);
+        this.element_.addEventListener('click', this.boundMouseUpHandler);
         this.element_.parentElement.addEventListener('mousedown', this.boundContainerMouseDownHandler);
         this.updateValueStyles_();
         this.element_.classList.add(this.CssClasses_.IS_UPGRADED);
@@ -2594,7 +2594,7 @@ MaterialSwitch.prototype.init = function () {
             this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_CONTAINER);
             this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_EFFECT);
             this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_CENTER);
-            this.rippleContainerElement_.addEventListener('mouseup', this.boundMouseUpHandler);
+            this.rippleContainerElement_.addEventListener('click', this.boundMouseUpHandler);
             var ripple = document.createElement('span');
             ripple.classList.add(this.CssClasses_.RIPPLE);
             this.rippleContainerElement_.appendChild(ripple);
@@ -2606,7 +2606,7 @@ MaterialSwitch.prototype.init = function () {
         this.inputElement_.addEventListener('change', this.boundChangeHandler);
         this.inputElement_.addEventListener('focus', this.boundFocusHandler);
         this.inputElement_.addEventListener('blur', this.boundBlurHandler);
-        this.element_.addEventListener('mouseup', this.boundMouseUpHandler);
+        this.element_.addEventListener('click', this.boundMouseUpHandler);
         this.updateClasses_();
         this.element_.classList.add('is-upgraded');
     }
@@ -3936,7 +3936,7 @@ MaterialRipple.prototype.init = function () {
             this.element_.addEventListener('mousedown', this.boundDownHandler);
             this.element_.addEventListener('touchstart', this.boundDownHandler);
             this.boundUpHandler = this.upHandler_.bind(this);
-            this.element_.addEventListener('mouseup', this.boundUpHandler);
+            this.element_.addEventListener('click', this.boundUpHandler);
             this.element_.addEventListener('mouseleave', this.boundUpHandler);
             this.element_.addEventListener('touchend', this.boundUpHandler);
             this.element_.addEventListener('blur', this.boundUpHandler);

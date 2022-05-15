@@ -108,7 +108,7 @@ async function init() {
 
     // Core
     elm_buttonFolderPicker = document.getElementById(`fomod_FolderPicker`);
-    elm_buttonFolderPicker = document.getElementById(`fomod_saveButton`);
+    elm_buttonSave = document.getElementById(`fomod_saveButton`);
 
     // Info.xml (Metadata)
     elm_inputName = document.getElementById(`fomod_info_name`);
@@ -136,7 +136,10 @@ async function init() {
 
     //console.log("[BCD-FomodBuilder] "+JSON.stringify(importantElements));
 
-    elm_buttonFolderPicker.addEventListener('click', async () => {
+    elm_buttonFolderPicker.addEventListener('click', openFomodDirectory);
+    elm_buttonFolderPicker.addEventListener('', openFomodDirectory);
+
+    elm_buttonSave.addEventListener('click', async () => {
         openFomodDirectory();
     });
     elm_toggleUseSemVer.addEventListener('click', async () => {

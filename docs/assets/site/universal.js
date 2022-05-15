@@ -172,7 +172,7 @@ BellCubicSummary.prototype.forChildren = null;
 BellCubicSummary.prototype.init = function () {
     if (this.element_) {
         this.boundElementMouseUp = this.toggle.bind(this);
-        this.element_.addEventListener('mouseup', this.boundElementMouseUp);
+        this.element_.addEventListener('click', this.boundElementMouseUp);
         this.for = this.element_.ownerDocument.getElementById(this.element_.getAttribute('for'));
         this.forChildren = this.for.getElementsByClassName('bcd-details_inner');
         this.reEval();

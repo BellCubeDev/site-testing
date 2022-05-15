@@ -44,19 +44,18 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 </div>
 <div class="bcd-details" id="details_builder_genConfig">
     <form autocomplete="off" name="File Control" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px">
-        <button id="fomod_FolderPicker" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+        <button id="fomod_FolderPicker" type="button" style="width:144px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
             Pick Directory
         </button>
-            <div id="fomod_localization_folderPicker_container">
+            <div id="fomod_localization_folderPicker_container" hidden>
                 <p id="fomod_localization_folderPicker_noFomod">Please select the root folder (the one containing 'fomod') or name your folder something other than 'fomod'.</p>
-                <p id="fomod_localization_folderPicker_needsWriteAccess">The editor requires write permissions to the root folder. Please grant write permissions to the root folder or hit cancel.</p>
-                
+                <p id="fomod_localization_folderPicker_needsWriteAccess">The editor requires write permissions to the root folder. Please grant write permissions to the root folder or hit cancel.</p>    
             </div>
             <div class="mdl-tooltip" for="fomod_FolderPicker"><p>
                 This is the folder that you will put into an archive to be installed by users. If it is not set up for a FOMOD just yet, no worries!
             </p></div>
-        <button id="fomod_saveButton" type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
-            Pick Directory
+        <button id="fomod_saveButton" type="button" style="width:144px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+            Save
         </button>
     </form>
 
