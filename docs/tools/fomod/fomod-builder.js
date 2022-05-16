@@ -1,4 +1,5 @@
 const XMLParser = new DOMParser();
+const XMLSerializer = new DOMParser();
 
 window.onload = init;
 
@@ -101,7 +102,7 @@ function parseIntExtremes(intString, relaxed = false){
 
 /** Function called when the DOM is ready for manipulation.
     All code should stem from here in some way.
-    @returns {nil}
+    @returns {nil} nothing
 */
 async function init() {
     //console.log("[BCD-FomodBuilder] Hello World!");
@@ -172,9 +173,10 @@ async function init() {
     elm_inputWebsite.addEventListener('change', autoSave);
 }
 
+
 /** Function to handle the user selecting and opening a directory for the FOMOD Builder to work out of.
     Everything cascades from here.
-    @returns {nil}
+    @returns {nil} nothing
 */
 async function openFomodDirectory(){
     var temp_rootDirectory;
@@ -239,23 +241,130 @@ async function openFomodDirectory(){
     }
 }
 
+/* Example ModuleConfig JSON:
+{
+        conditions: [], // {module > moduleDependencies}
+        meta: {
+            name: "My Mod",
+            image: "fomod/images/Mod.jpg"
+        },
+        steps: [
+            {
+                name: "Texture Sizes",
+                conditions: [],
+                options: [
+                    {
+                        name: "1K (1024x1024)",
+                        description: "Testures of a modest resolution",
+                        image: "fomod/images/sizes/1024.png",
+                        files: [],
+                        flags: {
+                            "texture_size": "1024"
+                        },
+                        defaultType: "Optional",
+                        conditions: []
+                    }
+                    {
+                        name: "2K (2048x2048)",
+                        description: "Testures of a modest resolution",
+                        image: "fomod/images/sizes/2048.png",
+                        files: [],
+                        flags: {
+                            "texture_size": "2048"
+                        },
+                        defaultType: "Optional",
+                        conditions: []
+                    }
+                    {
+                        name: "4K (4096x4096)",
+                        description: "Testures of a modest resolution",
+                        image: "fomod/images/sizes/4096.png",
+                        files: [],
+                        flags: {
+                            "texture_size": "4096"
+                        },
+                        defaultType: "Optional",
+                        conditions: []
+                    }
+                ],
+            }
+        ],
+        installs: [
+            {
+                identifier: "", // Helpful name stored in comments
+                conditions: []
+                files: [
+                    {
+                        folder: false, // {fileList.[?file:folder]} When set to true, will move folders instead of files
+                        source: "", // {fileList.[file|folder].source} File to move, relative to the fomod's root folder
+                        destination: "" //  {fileList.[file|folder].destination} Destination to move the file to, relative to the game Mods folder (Data\ for Bethesda games)
+                    }
+                ]
+            }
+        ]
+    }
+*/
+
 /** Function to handle parsing `ModuleConfig.xml`
     @param {ProgressEvent} readerEvent - The event object
-    @returns {nil}
+    @returns {nil} nothing
 */
 function parseModuleConfigXML(readerEvent) {
-    readerEvent;
+    /*
+        moduleName: string
+        moduleImage: string.image_path
+        moduleDependencies: dependencies
+
+    */
+    var module = {
+        conditions: [], // {module > moduleDependencies}
+        meta: {
+            name: "",
+            image: ""
+        },
+        steps: [
+            /*
+            {
+                name: "", // {installStep.name} Name of the install step
+                conditions: [], // {installStep > visible} Determins whether or not the step should be displayed
+                options: [ //
+                    {
+                        description:
+                    }
+                ],
+            }
+            */
+        ],
+        installs: [
+            /*
+                {
+                    identifier: "", // Helpful name stored in comments
+                    conditions: []
+                    files: [
+                        {
+                            folder: false, // {fileList.[?file:folder]} When set to true, will move folders instead of files
+                            source: "", // {fileList.[file|folder].source} File to move, relative to the fomod's root folder
+                            destination: "" //  {fileList.[file|folder].destination} Destination to move the file to, relative to the game Mods folder (Data\ for Bethesda games)
+                        }
+                    ]
+                }
+            */
+        ]
+    }
+    var moduleMeta = {}
+    var steps = {}
+    var installs = {}
 }
 
 /** Function to handle parsing `Info.xml`
     @param {ProgressEvent} readerEvent - The event object
-    @returns {nil}
+    @returns {nil} nothing
 */
 function parseInfoXML(readerEvent) {
     console.log(`[BCD-FomodBuilder] readerEvent.target.result: ${readerEvent.target.result}`);
-    info_xml = XMLParser.parseFromString(readerEvent.target.result, "text/xml");
+    info_xml = XMLParser.parseFromString(readerEvent.target.result, 'text/xml');
 
-    info_xml_tags = info_xml.getElementsByTagName('fomod')[0];
+    info_xml_tags = getXMLTag(info_xml, 'fomod');
 
     elm_inputName.value = readXMLTag(info_xml_tags, 'Name');
     elm_inputAuthor.value = readXMLTag(info_xml_tags, 'Author');
@@ -270,7 +379,7 @@ function parseInfoXML(readerEvent) {
 /** Set the version fields
     @param {string} version - The version to set
     @param {boolean} relaxed - Use more relaxed parsing (used for going back & forth between SemVer and Full entry methods)
-    @returns {nil}
+    @returns {nil} nothing
 */
 function setVersion(version, relaxed = false){
     elm_inputVersionFull.value = version;
@@ -329,14 +438,14 @@ function checkToggleSwitch(element){
 }
 
 /** Convenience function to call `save()` if autosaving is enabled. CURRENTLY DISABLED UNTIL SAVING IS PROPERLY IMPLEMENTED.
-    @returns {nil}
+    @returns {nil} nothing
 */
 async function autoSave() {
     //if (checkToggleSwitch(elm_toggleAutosave)) {save()}
 }
 
 /** Function to save the FOMOD.
-    @returns {nil}
+    @returns {nil} nothing
 */
 async function save(){
     console.log('Before editing:\n', info_xml.documentElement);
@@ -357,7 +466,7 @@ async function save(){
                 The tool is currently in early testing, so any extra testers would be very welcome!
             -->
         */
-        info_xml.documentElement.appendChild(comment);
+        info_xml.documentElement.innerHTML = comment.toString() + info_xml.documentElement.innerHTML
     }
 
     console.log('Adding FOMOD Version to Info.xml');
@@ -368,10 +477,27 @@ async function save(){
         versTag.innerHTML = `${inputValue(elm_inputVersionMajor)}.${inputValue(elm_inputVersionMinor)}.${inputValue(elm_inputVersionPatch)}`;
      }
 
-    writeFile(info_xml, info_xml.documentElement.outerHTML);
+    writeFile(info_file, XMLSerializer.serializeToString(info_xml));
 
     console.log('After editing:\n', info_xml.documentElement);
     }, 1000);
+}
+
+/*
+ This function was taken from https://developer.mozilla.org/en-US/docs/Web/API/FileSystemFileHandle
+ That code is available under CC-0: http://creativecommons.org/publicdomain/zero/1.0/
+*/
+/** Writes file contents to the file system.
+    @param {FileSystemFileHandle} fileHandle - The file handle to write to.
+    @param {string|BufferSource|Blob} contents - The data to write to the file.
+    @returns {nil} nothing
+*/
+async function writeFile(fileHandle, contents) {
+
+    // Condition for if we're doing an autosave
+    const writable = await fileHandle.createWritable();
+    await writable.write(contents);
+    await writable.close();
 }
 
 /** Convenience function to get the value of an input element. Will first attempt to get a user-submitted value, then will attempt to fetch a default from `builder_default`, before finally resorting to the `placeholder` attribute.
@@ -450,24 +576,6 @@ function getXMLTag(xml, tagName){
     }
     xml.appendChild(newTag);
     return newTag;
-}
-
-/*
- This function was taken from https://developer.mozilla.org/en-US/docs/Web/API/FileSystemFileHandle
- That code is available under CC-0: http://creativecommons.org/publicdomain/zero/1.0/
-*/
-/** Writes file contents to the file system.
-    @param {FileSystemFileHandle} fileHandle - The file handle to write to.
-    @param {string|BufferSource|Blob} contents - The data to write to the file.
-    @param {FileSystemWritableFileStream} writeable
-    @returns {nil}
-*/
-async function writeFile(fileHandle, contents) {
-
-    // Condition for if we're doing an autosave
-    const writable = await fileHandle.createWritable();
-    await writable.write(contents);
-    await writable.close();
 }
 
 /** Requests the specified permission for the specified file.

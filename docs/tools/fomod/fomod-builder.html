@@ -289,6 +289,37 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 </div>
 
 <h1>Installer Steps</h1>
+<p>WARNING! Everything down here is purely for testing purposes. Nothing down here is even remotely final.</p>
+
+<button id="fomod_steps_addStep">
+    Add Step
+</button>
+
+<label>Step Sort Order</label>
+<!-- Doubles as our template to copy-pasta from-->
+<select id="fomod_steps_order" class="bcd-fomod-sortOrder template" required="true">
+    <option>Explicit</option>
+    <option value="Ascending">Alphabetical</option>
+    <option value="Descending">Reverse Alphabetical</option>
+</select>
+
+<!-- Use the 'template' class to prevent the Component Handler from messing with the template -->
+<div id="step_container" class="bcd-fomod-stepContainer template">
+    <!-- Using the power of JavaScript, we can clone this element for each step -->
+    <!-- TODO: Finish the template and add the hidden attribute -->
+    <form id="TEMPLATE.fomod_step_container" class="fomod-step">
+        <label></label>
+        <select class="bcd-fomod-sortOrder" required="true">
+            <option></option>
+        </select>
+    
+        <!-- Using the power of JavaScript, we can fill the Dependency Builder dynamically -->
+        <label>Visibility Conditions</label>
+        <div class="bcd-fomod-dependency template">
+        </div>
+    </form>
+
+</div>
 
 <!-- To-do list
 
