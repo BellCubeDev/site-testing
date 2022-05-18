@@ -248,10 +248,34 @@ async function openFomodDirectory(){
             name: "My Mod",
             image: "fomod/images/Mod.jpg"
         },
+        defaultFlags: {} // Flags to set in an invisible first step "Select All" option, if present
         steps: [
+            // TODO: Add Option Groups (whoops)
+            {
+                name: "Apple",
+                conditions: [],
+                options: [
+                    {
+                        name: "Green",
+                        description: "Testures of a modest resolution",
+                        image: "fomod/images/apples/geen.png",
+                        files: [],
+                        flags: {
+                            "apple_color": "green",
+                            "install_textures": "true"
+                        },
+                        defaultType: "Optional",
+                        conditions: []
+                    }
+                ],
+            },
             {
                 name: "Texture Sizes",
-                conditions: [],
+                conditions: [{
+                    type: "flag", // Flag, File, GameVersion (), ScriptExtenderVerxion (F4SE), ModManagerVersion (FOMM)
+                    flag: "install_textures"
+                    value: "true"
+                }],
                 options: [
                     {
                         name: "1K (1024x1024)",
@@ -263,7 +287,7 @@ async function openFomodDirectory(){
                         },
                         defaultType: "Optional",
                         conditions: []
-                    }
+                    },
                     {
                         name: "2K (2048x2048)",
                         description: "Testures of a modest resolution",
@@ -274,7 +298,7 @@ async function openFomodDirectory(){
                         },
                         defaultType: "Optional",
                         conditions: []
-                    }
+                    },
                     {
                         name: "4K (4096x4096)",
                         description: "Testures of a modest resolution",
@@ -304,6 +328,24 @@ async function openFomodDirectory(){
         ]
     }
 */
+
+/* "Defualt Flags" XML
+<!-- Hidden step to set condition flag defaults for the rest of the FOMOD to tamper with. -->
+<InstallStep name="Default Flags Step"><Visible><Dependencies operator="And"><Flag name="false">true</Flag></Dependencies></Visible><OptionalFileGroups><Group name="_" type="SelectAll"><Plugins><Plugin name="_"><Description>_</Description>
+    <ConditionFlags>
+        <!-- Dynamically fill this spot the same as any other -->
+    </ConditionFlags>
+<TypeDescriptor><Type name="Required"/></TypeDescriptor></Plugin></Plugins></Group></OptionalFileGroups></InstallStep>
+*/
+
+// Translating Dependency types from Builder JSON to XML
+const DependencyTypes = {
+    "Flag":"Flag",
+    "File":"File",
+    "GameVersion":"",
+    "ScriptExtenderVersion":"F4SE",
+    "ModManagerVersion":"FOMM"
+}
 
 /** Function to handle parsing `ModuleConfig.xml`
     @param {ProgressEvent} readerEvent - The event object
