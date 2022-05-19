@@ -3,9 +3,20 @@
     https://patorjk.com/software/taag/#p=display&h=0&v=0&f=Big%20Money-nw
     ...makes this code *so* much easier to maintain... you know, 'cuz I can fund my functions in VSCode's Minimap
 */
-const XMLParser = new DOMParser();
 
-window.onload = init;
+
+/*$$$$$\  $$\           $$\                 $$\       $$\    $$\                               
+$$  __$$\ $$ |          $$ |                $$ |      $$ |   $$ |                              
+$$ /  \__|$$ | $$$$$$\  $$$$$$$\   $$$$$$\  $$ |      $$ |   $$ | $$$$$$\   $$$$$$\   $$$$$$$\ 
+$$ |$$$$\ $$ |$$  __$$\ $$  __$$\  \____$$\ $$ |      \$$\  $$  | \____$$\ $$  __$$\ $$  _____|
+$$ |\_$$ |$$ |$$ /  $$ |$$ |  $$ | $$$$$$$ |$$ |       \$$\$$  /  $$$$$$$ |$$ |  \__|\$$$$$$\  
+$$ |  $$ |$$ |$$ |  $$ |$$ |  $$ |$$  __$$ |$$ |        \$$$  /  $$  __$$ |$$ |       \____$$\ 
+\$$$$$$  |$$ |\$$$$$$  |$$$$$$$  |\$$$$$$$ |$$ |         \$  /   \$$$$$$$ |$$ |      $$$$$$$  |
+ \______/ \__| \______/ \_______/  \_______|\__|          \_/     \_______|\__|      \______*/
+
+
+const XMLParser = new DOMParser();
+const XMLSerializationMaster = new XMLSerializer();
 
 var rootDirectory;
 var fomodDirectory;
@@ -28,7 +39,7 @@ var elm_inputName;
 var elm_inputAuthor;
 var elm_inputID;
 var elm_inputWebsite;
-var elm_toggleUseSemVer;
+var elm_toggleUseCustomVers;
 var elm_containerVersionFull;
     var elm_inputVersionFull;
 var elm_containerVersionSemVer;
@@ -70,7 +81,52 @@ const builder_consts = {
     isOpen: 'is-checked'
 };
 
-/*$$$$$\                                                    $$\       $$\   $$\   $$\     $$\ $$\ 
+
+var parseIntErr = new TypeError('Value is not a number.');
+
+
+
+/*$$$$$\                                      $$$$$$\           $$\   $$\     
+$$  __$$\                                     \_$$  _|          \__|  $$ |    
+$$ |  $$ | $$$$$$\   $$$$$$\   $$$$$$\          $$ |  $$$$$$$\  $$\ $$$$$$\   
+$$$$$$$  | \____$$\ $$  __$$\ $$  __$$\         $$ |  $$  __$$\ $$ |\_$$  _|  
+$$  ____/  $$$$$$$ |$$ /  $$ |$$$$$$$$ |        $$ |  $$ |  $$ |$$ |  $$ |    
+$$ |      $$  __$$ |$$ |  $$ |$$   ____|        $$ |  $$ |  $$ |$$ |  $$ |$$\ 
+$$ |      \$$$$$$$ |\$$$$$$$ |\$$$$$$$\       $$$$$$\ $$ |  $$ |$$ |  \$$$$  |
+\__|       \_______| \____$$ | \_______|      \______|\__|  \__|\__|   \____/ 
+                    $$\   $$ |                                                
+                    \$$$$$$  |                                                
+                     \_____*/
+
+
+
+
+window.onload = init;
+
+/** Function called when the DOM is ready for manipulation.
+    All code should stem from here in some way.
+    @returns {nil} nothing
+*/
+async function init() {
+    // Sets the various element variables found above
+    setElementVars();
+
+    elm_buttonFolderPicker.addEventListener('click', openFomodDirectory);
+
+    elm_buttonSave.addEventListener('click', async () => {
+        save();
+    });
+    elm_toggleUseCustomVers.addEventListener('click', toggleSemVerInput);
+
+    registerAutoSaveEvents();
+}
+
+
+
+
+
+
+/*$$$$$\                                                    $$\       $$\   $$\   $$\     $$\ $$\
 $$  __$$\                                                   $$ |      $$ |  $$ |  $$ |    \__|$$ |
 $$ /  \__| $$$$$$\  $$$$$$$\   $$$$$$\   $$$$$$\   $$$$$$\  $$ |      $$ |  $$ |$$$$$$\   $$\ $$ |
 $$ |$$$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\  \____$$\ $$ |      $$ |  $$ |\_$$  _|  $$ |$$ |
@@ -78,6 +134,8 @@ $$ |\_$$ |$$$$$$$$ |$$ |  $$ |$$$$$$$$ |$$ |  \__| $$$$$$$ |$$ |      $$ |  $$ |
 $$ |  $$ |$$   ____|$$ |  $$ |$$   ____|$$ |      $$  __$$ |$$ |      $$ |  $$ |  $$ |$$\ $$ |$$ |
 \$$$$$$  |\$$$$$$$\ $$ |  $$ |\$$$$$$$\ $$ |      \$$$$$$$ |$$ |      \$$$$$$  |  \$$$$  |$$ |$$ |
  \______/  \_______|\__|  \__| \_______|\__|       \_______|\__|       \______/    \____/ \__|\_*/
+
+
 
 
 
@@ -107,7 +165,6 @@ function getCookie(cookieName, defaultValue){
 
 
 
-var parseIntErr = new TypeError('Value is not a number.');
 /** Equivalent to `parseInt()`, except it throws an error if the value is not exclusively composed of digits.
     @param {string} intString - The string to parse
     @param {number} radix - The radix to use
@@ -122,6 +179,11 @@ function parseIntSuperStrict(intString, radix = 10) {
     }
 }
 
+
+
+
+
+
 /** Returns a concatenation of all digits in a string.
     @param {string} intString - The string to parse
     @returns {number} The parsed number
@@ -132,6 +194,13 @@ function parseIntRelaxed(intString) {
     for (const match of matches) {str = str + match[0];}
     return parseInt(str);
 }
+
+
+
+
+
+
+
 
 /** uses `parseIntSuperStrict()` or, if relaxed==true, `parseIntRelaxed()` to parse a string into an integer.
     @param {string} intString - The string to parse
@@ -147,23 +216,40 @@ function parseIntExtremes(intString, relaxed = false){
 }
 
 
-/** Function called when the DOM is ready for manipulation.
-    All code should stem from here in some way.
+/*$$$$$\                                      $$$$$$$\  $$\           
+$$  __$$\                                     $$  __$$\ \__|          
+$$ /  $$ | $$$$$$\   $$$$$$\  $$$$$$$\        $$ |  $$ |$$\  $$$$$$\  
+$$ |  $$ |$$  __$$\ $$  __$$\ $$  __$$\       $$ |  $$ |$$ |$$  __$$\ 
+$$ |  $$ |$$ /  $$ |$$$$$$$$ |$$ |  $$ |      $$ |  $$ |$$ |$$ |  \__|
+$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |      $$ |  $$ |$$ |$$ |      
+ $$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$$$$$$  |$$ |$$ |      
+ \______/ $$  ____/  \_______|\__|  \__|      \_______/ \__|\__|      
+          $$ |                                                        
+          $$ |                                                        
+          \_*/
+
+
+
+
+
+
+
+/** Verify the specified directory
+    @param {FileSystemDirectoryHandle} dir
+    @throws {DOMException} 'NotAllowedError' if the directory name is any case of 'fomod'
     @returns {nil} nothing
 */
-async function init() {
-    // Sets the various element variables found above
-    setElementVars();
-
-    elm_buttonFolderPicker.addEventListener('click', openFomodDirectory);
-
-    elm_buttonSave.addEventListener('click', async () => {
-        save();
-    });
-    elm_toggleUseSemVer.addEventListener('click', toggleSemVerInput);
-
-    registerAutoSaveEvents();
+async function verifySelectedDirectory(dir) {
+    if (dir.name.toLowerCase() == 'fomod'){
+        window.alert(
+            document.getElementById(`fomod_localization_folderPicker_noFomod`).innerText
+        );
+        throw new DOMException('The user\'s provided directory was named \'fomod\'', 'NotAllowedError');
+    }
 }
+
+
+
 
 
 /** Function to handle the user selecting and opening a directory for the FOMOD Builder to work out of.
@@ -179,6 +265,7 @@ async function openFomodDirectory(){
     try {
         temp_rootDirectory = await window.showDirectoryPicker();
         verifySelectedDirectory(temp_rootDirectory);
+        attainDirPerms(temp_rootDirectory);
     } catch(err) {
         if(err instanceof DOMException && (err.name == 'AbortError' || err.name == 'NotAllowedError')) {
             //console.log(`Intercepted error ${err.name}:\n`,err.stack);
@@ -190,12 +277,12 @@ async function openFomodDirectory(){
     document.getElementById(`fomod_FolderPicker_folderName`).innerHTML = encodeXML(temp_rootDirectory.name);
     temp_fomodDirectory = await temp_rootDirectory.getDirectoryHandle('fomod', {create: true});
 
-    temp_info_file = await temp_fomodDirectory.getFileHandle('ModuleConfig.xml', {create: true});
-    temp_moduleConfig_file = await temp_fomodDirectory.getFileHandle('Info.xml', {create: true});
+    temp_info_file = await temp_fomodDirectory.getFileHandle('Info.xml', {create: true});
+    temp_moduleConfig_file = await temp_fomodDirectory.getFileHandle('ModuleConfig.xml', {create: true});
 
     // Much simpler than what I had before, let me tell you!
-    parseInfoXML(await readFile(temp_info_file));
-    parseModuleConfigXML(await readFile(temp_moduleConfig_file));
+    temp_info_file.getFile().then((file) => {readFile(file).then(parseInfoXML);});
+    temp_moduleConfig_file.getFile().then((file) => {readFile(file).then(parseModuleConfigXML);});
 
     // Finalize setting the variables
     rootDirectory = temp_rootDirectory;
@@ -205,52 +292,166 @@ async function openFomodDirectory(){
 
     // Open the Metadata section
     // eslint-disable-next-line no-undef
-    bcd_registeredComponents.bcdDetails[elm_collapsableMetadata.id].open();
+    bcd_registeredComponents.bcdSummary[elm_collapsableMetadata.id].open();
 }
 
-/** Verify the specified directory
-    @param {FileSystemDirectoryHandle} dir
-    @throws {DOMException} 'AbortError' If the user fails to give permissions for the directory
-    @throws {DOMException} 'NotAllowedError' if the directory name is any case of 'fomod'
-    @returns {nil}
+
+/*$$$$\            $$$$$$\                  $$$$$$$$\ $$\ $$\
+\_$$  _|          $$  __$$\                 $$  _____|\__|$$ |
+  $$ |  $$$$$$$\  $$ /  \__| $$$$$$\        $$ |      $$\ $$ | $$$$$$\
+  $$ |  $$  __$$\ $$$$\     $$  __$$\       $$$$$\    $$ |$$ |$$  __$$\
+  $$ |  $$ |  $$ |$$  _|    $$ /  $$ |      $$  __|   $$ |$$ |$$$$$$$$ |
+  $$ |  $$ |  $$ |$$ |      $$ |  $$ |      $$ |      $$ |$$ |$$   ____|
+$$$$$$\ $$ |  $$ |$$ |      \$$$$$$  |      $$ |      $$ |$$ |\$$$$$$$\
+\______|\__|  \__|\__|       \______/       \__|      \__|\__| \_____*/
+
+
+
+
+
+/** Function to handle parsing `Info.xml`
+    @param {String} xmlString - The event object
+    @returns {nil} nothing
 */
-async function verifySelectedDirectory(dir) {
-    if (dir.name.toLowerCase() == 'fomod'){
-        window.alert(
-            document.getElementById(`fomod_localization_folderPicker_noFomod`).innerText
-        );
-        throw new DOMException('The user\'s provided directory was named \'fomod\'', 'NotAllowedError');
-    }
+function parseInfoXML(xmlString) {
+    info_xml = XMLParser.parseFromString(xmlString, "text/xml");
+    info_xml_tags = getXMLTag(info_xml, 'fomod', false);
 
-    while (!(await tryForPermission(dir, 'readwrite'))){
-        if (!window.confirm(
-            document.getElementById(`fomod_localization_folderPicker_needsWriteAccess`).innerText
-        )){
-            throw new DOMException('User denied directory write access', 'AbortError');
-        }
-    }
+    elm_inputName.value = readXMLTag(info_xml_tags, 'Name');
+    elm_inputAuthor.value = readXMLTag(info_xml_tags, 'Author');
+    elm_inputID.value = readXMLTag(info_xml_tags, 'Id');
+    elm_inputWebsite.value = readXMLTag(info_xml_tags, 'Website');
+
+    // Version is a bit more complicated... as always.
+    setVersion(readXMLTag(info_xml_tags, 'Version'));
+
 }
 
-/** Reads the specified file
-    @param {FileSystemFileHandle} file - The file to read
-    @returns {Promise<string>} - The contents of the file
+
+
+
+
+
+
+/** Set the version fields
+    @param {string} version - The version to set
+    @param {boolean} relaxed - Use more relaxed parsing (used for going back & forth between SemVer and Full entry methods)
+    @returns {nil} nothing
 */
-function readFile(file){
-    // Nice job, Copilot!
-    return new Promise((resolve, reject) => {
-        const temp_fileReader = new FileReader();
-        temp_fileReader.onload = (readerEvent) => {
-            resolve(readerEvent.target.result);
-        };
-        temp_fileReader.onerror = (err) => {
-            reject(err);
-        };
-        temp_fileReader.readAsText(file);
-    });
+function setVersion(version, relaxed = false){
+    elm_inputVersionFull.value = version;
+    try{
+        // Get the version parts. If there's a non-numeric character in there, throw an error.
+        // See the below handleParseError function for that.
+        var splitVers = version.split('.');
+        parseVersComponent(splitVers, 0, elm_inputVersionMajor, relaxed);
+        parseVersComponent(splitVers, 1, elm_inputVersionMinor, relaxed);
+        parseVersComponent(splitVers, 2, elm_inputVersionPatch, relaxed);
+
+        // If we made it this far, use SemVer!
+        openSemVer();
+    } catch {
+        closeSemVer();
+    }
 }
+
+
+
+
+
+
+/**
+@param {Array<String>} versArr Array of version strings to use
+@param {number} pos Array index to pull from
+@param {HTMLElement} element FOrm element to set the Value of
+@param {Boolean} relaxed Whether to use relaxed parsing
+*/
+function parseVersComponent(versArr, pos, element, relaxed){
+    if (!(versArr.length > pos)) {
+        elm_inputVersionPatch.value = '';
+        return;
+    }
+    try{
+        elm_inputVersionPatch.value = parseIntExtremes(versArr[pos], relaxed);
+        openSemVer();
+    } catch {
+        closeSemVer();
+    }
+}
+
+
+
+
+
+
+
+
+
+function openSemVer(){
+    // Turn the MDL checkbox off
+    elm_toggleUseCustomVers.removeAttribute('checked');
+    elm_toggleUseCustomVers.parentElement.classList.remove(builder_consts.isOpen);
+
+    // Show the SemVer input fields
+    elm_containerVersionSemVer.setAttribute('hidden', '');
+    elm_containerVersionFull.removeAttribute('hidden');
+}
+
+
+
+
+
+
+function closeSemVer(){
+    // Turn the MDL checkbox on
+    elm_toggleUseCustomVers.setAttribute('checked', '');
+    elm_toggleUseCustomVers.parentElement.classList.add(builder_consts.isOpen);
+
+    // Hide the SemVer input fields
+    elm_containerVersionSemVer.setAttribute('hidden', '');
+    elm_containerVersionFull.removeAttribute('hidden');
+}
+
+
+
+
+
+
+function toggleSemVerInput() {
+    if (checkToggleSwitch(elm_toggleUseCustomVers)){
+        setVersion(inputValue(elm_inputVersionFull, false), true);
+        elm_containerVersionSemVer.removeAttribute('hidden');
+        elm_containerVersionFull.setAttribute('hidden', '');
+    } else {
+        setVersion(`${inputValue(elm_inputVersionMajor, false)}.${inputValue(elm_inputVersionMinor, false)}.${inputValue(elm_inputVersionPatch, false)}`.replace(/^\.+|\.+$/g, ''), true);
+        elm_containerVersionSemVer.setAttribute('hidden', '');
+        elm_containerVersionFull.removeAttribute('hidden');
+    }
+}
+
+
+
+/*\      $$\                 $$\           $$\            $$$$$$\                       $$$$$$\  $$\
+$$$\    $$$ |                $$ |          $$ |          $$  __$$\                     $$  __$$\ \__|
+$$$$\  $$$$ | $$$$$$\   $$$$$$$ |$$\   $$\ $$ | $$$$$$\  $$ /  \__| $$$$$$\  $$$$$$$\  $$ /  \__|$$\  $$$$$$\
+$$\$$\$$ $$ |$$  __$$\ $$  __$$ |$$ |  $$ |$$ |$$  __$$\ $$ |      $$  __$$\ $$  __$$\ $$$$\     $$ |$$  __$$\
+$$ \$$$  $$ |$$ /  $$ |$$ /  $$ |$$ |  $$ |$$ |$$$$$$$$ |$$ |      $$ /  $$ |$$ |  $$ |$$  _|    $$ |$$ /  $$ |
+$$ |\$  /$$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |$$   ____|$$ |  $$\ $$ |  $$ |$$ |  $$ |$$ |      $$ |$$ |  $$ |
+$$ | \_/ $$ |\$$$$$$  |\$$$$$$$ |\$$$$$$  |$$ |\$$$$$$$\ \$$$$$$  |\$$$$$$  |$$ |  $$ |$$ |      $$ |\$$$$$$$ |
+\__|     \__| \______/  \_______| \______/ \__| \_______| \______/  \______/ \__|  \__|\__|      \__| \____$$ |
+                                                                                                     $$\   $$ |
+                                                                                                     \$$$$$$  |
+                                                                                                      \_____*/
+
+
+
+
+
+
+
 
 var builderJSON = {
-//    conditions: { // config > moduleDependencies
+    conditions: { // config > moduleDependencies
 //        type: '',
 //        dependencies: [
 //            {
@@ -275,12 +476,12 @@ var builderJSON = {
 //                dependencies: [/* Nested Dependencies! */]
 //            }
 //        ]
-//    },
-//    name: "", // config > moduleName
-//    image: "", // config > moduleImage
-//    steps: { // config > installSteps
-//        order: "", // config > installSteps.order
-//        steps: [
+    },
+    moduleName: "", // config > moduleName
+    moduleImage: "", // config > moduleImage
+    steps: { // config > installSteps
+        order: "", // config > installSteps.order
+        steps: [
 //            {
 //                name: "", // config > installSteps > installStep.name
 //                order: "", // config > installSteps > installStep > optionalFileGroups.order
@@ -315,9 +516,9 @@ var builderJSON = {
 //                    }
 //                ]
 //            }
-//        ]
-//    },
-//    installs: [ // config > [requiredInstallFiles, conditionalFileInstalls]
+        ]
+    },
+    installs: [ // config > [requiredInstallFiles, conditionalFileInstalls]
 //        {
 //            identifier: "", // Helpful name stored in comments
 //            /* Example:
@@ -333,7 +534,7 @@ var builderJSON = {
 //                }
 //            ]
 //        }
-//    ],
+    ],
 //    defaultFlags: {/* key-value pairs */} // Custom Wizardry
 };
 
@@ -346,21 +547,12 @@ var builderJSON = {
 <TypeDescriptor><Type name="Required"/></TypeDescriptor></Plugin></Plugins></Group></OptionalFileGroups></InstallStep>
 */
 
-// Translating Dependency types from Builder JSON to XML
-const DependencyTypes = {
-    "file": "fileDependency",
-    "flag": "flagDependency",
-    "modManagerVers": "fommDependency",
-    "scriptExtenderVers": "foseDependency",
-    "gameVers": "gameDependency"
-};
-
 /** Function to handle parsing `ModuleConfig.xml`
     @param {String} xmlString - The event object
     @returns {nil} nothing
 */
 function parseModuleConfigXML(xmlString) {
-    var temp_moduleConfig_xml = XMLParser.parseFromString(xmlString);
+    var temp_moduleConfig_xml = XMLParser.parseFromString(xmlString, 'text/xml');
     var parseErrorElement = temp_moduleConfig_xml.getElementsByTagName("parsererror")[0];
     if (typeof parseErrorElement !== "undefined") {
         moduleConfigError = parseErrorElement.outerHTML; // So we can interpret this elsewhere
@@ -373,130 +565,138 @@ function parseModuleConfigXML(xmlString) {
     }
     */
 
+    var temp_moduleConfig_xml_root = getXMLTag(temp_moduleConfig_xml, 'config');
+
     // Get the module name
-    builderJSON.moduleName = readXMLTag(temp_moduleConfig_xml, "moduleName");
-     XMLParser.parseFromString(temp_moduleConfig_xml.getElementsByTagName("moduleName")[0].innerHTML, 'text/xml').toString();
+    builderJSON.moduleName = readXMLTag(temp_moduleConfig_xml_root, "moduleName");
+
+     // TODO Handle conflicts between Info.xml and ModuleConfig.xml (e.g. with names)
+
     // Get the module image
-    builderJSON.moduleImage = XMLParser.parseFromString(temp_moduleConfig_xml.getElementsByTagName("moduleImage")[0].innerHTML, 'text/xml').toString();
+    builderJSON.moduleImage = getXMLTag(temp_moduleConfig_xml_root, "moduleImage").getAttribute("path");
 
-}
+    // Get Module Conditions
+    builderJSON.conditions = parseConditions(getXMLTag(temp_moduleConfig_xml_root, "moduleDependencies", false));
 
-/*$$$$\            $$$$$$\                  $$$$$$$$\ $$\ $$\
-\_$$  _|          $$  __$$\                 $$  _____|\__|$$ |
-  $$ |  $$$$$$$\  $$ /  \__| $$$$$$\        $$ |      $$\ $$ | $$$$$$\
-  $$ |  $$  __$$\ $$$$\     $$  __$$\       $$$$$\    $$ |$$ |$$  __$$\
-  $$ |  $$ |  $$ |$$  _|    $$ /  $$ |      $$  __|   $$ |$$ |$$$$$$$$ |
-  $$ |  $$ |  $$ |$$ |      $$ |  $$ |      $$ |      $$ |$$ |$$   ____|
-$$$$$$\ $$ |  $$ |$$ |      \$$$$$$  |      $$ |      $$ |$$ |\$$$$$$$\
-\______|\__|  \__|\__|       \______/       \__|      \__|\__| \_____*/
+    // Get base-level installs
+    builderJSON.installs.push(parseFiles(getXMLTag(temp_moduleConfig_xml_root, "requiredInstallFiles", false)));
 
-
-/** Function to handle parsing `Info.xml`
-    @param {String} xmlString - The event object
-    @returns {nil}
-*/
-function parseInfoXML(xmlString) {
-    info_xml = XMLParser.parseFromString(xmlString, "text/xml");
-    info_xml_tags = getXMLTag(info_xml, 'fomod');
-
-    elm_inputName.value = readXMLTag(info_xml_tags, 'Name');
-    elm_inputAuthor.value = readXMLTag(info_xml_tags, 'Author');
-    elm_inputID.value = readXMLTag(info_xml_tags, 'Id');
-    elm_inputWebsite.value = readXMLTag(info_xml_tags, 'Website');
-
-    // Version is a bit more complicated... as always.
-    setVersion(readXMLTag(info_xml_tags, 'Version'));
-
-}
-
-/** Set the version fields
-    @param {string} version - The version to set
-    @param {boolean} relaxed - Use more relaxed parsing (used for going back & forth between SemVer and Full entry methods)
-    @returns {nil} nothing
-*/
-function setVersion(version, relaxed = false){
-    elm_inputVersionFull.value = version;
-    try{
-        // Get the version parts. If there's a non-numeric character in there, throw an error.
-        // See the below handleParseError function for that.
-        var splitVers = version.split('.');
-        parseVersComponent(splitVers, 0, elm_inputVersionMajor, relaxed);
-        parseVersComponent(splitVers, 1, elm_inputVersionMinor, relaxed);
-        parseVersComponent(splitVers, 2, elm_inputVersionPatch, relaxed);
-
-        // If we made it this far, use SemVer!
-        openSemVer();
-    } catch {
-        closeSemVer();
+    for (var element of getXMLTag(getXMLTag(temp_moduleConfig_xml_root, "conditionalFileInstalls", false), "pattern", false).children) {
+        builderJSON.installs.push(parseFiles(getXMLTag(element, 'files', false)));
     }
 }
 
-/**
-@param {Array<String>} versArr Array of version strings to use
-@param {number} pos Array index to pull from
-@param {HTMLElement} element FOrm element to set the Value of
-@param {Boolean} relaxed Whether to use relaxed parsing
+
+/** Parses Dependency conditions from ModuleConfig.xml and adds them to the builderJSON
+    Will return a default Dependency object if no conditions are found
+    @param {HTMLElement} xmlParentElement - The element to parse from
+    @returns {{type: HTMLElement, dependencies: []}} The JSON object
 */
-function parseVersComponent(versArr, pos, element, relaxed){
-    if (!(versArr.length > pos)) {
-        elm_inputVersionPatch.value = '';
-        return;
+function parseConditions(xmlParentElement){
+    if (typeof xmlParentElement === "undefined") {
+        return {type: "And", dependencies: []};
     }
-
-    try{
-        elm_inputVersionPatch.value = parseIntExtremes(versArr[pos], relaxed);
-    } catch {
-        closeSemVer();
+    var conditions = {
+        type: getAttrDefault(xmlParentElement, 'operator', 'And'),
+        dependencies: []
+    };
+    for (var element of xmlParentElement.children) {
+        switch (element.tagName){
+            case "fileDependency": {
+                conditions.dependencies.push({
+                    type: "file",
+                    path: element.getAttribute('file'),
+                    value: element.getAttribute('state')
+                });
+            break;}
+    
+            case "flagDependency": {
+                conditions.dependencies.push({
+                    type: "flag",
+                    name: element.getAttribute('flag'),
+                    value: element.getAttribute('value')
+                });
+            break;}
+    
+            case "gameDependency": {
+                conditions.dependencies.push({
+                    type: "gameVers",
+                    value: element.getAttribute('version')
+                });
+            break;}
+    
+            case "dependencies": {
+                conditions.dependencies.push(parseConditions(element));  // And you thought recursive processing would be hard!
+            break;}
+    
+            case "foseDependency": {
+                conditions.dependencies.push({
+                    type: "scriptExtenderVers",
+                    value: element.getAttribute('version')
+                });
+            break;}
+    
+            case "fommDependency": {
+                conditions.dependencies.push({
+                    type: "modManagerVers",
+                    value: element.getAttribute('version')
+                });
+            break;}
+            }
     }
+    return conditions;
 }
 
-function openSemVer(){
-    // Turn the MDL checkbox off
-    elm_toggleUseSemVer.removeAttribute('checked');
-    elm_toggleUseSemVer.parentElement.classList.remove(builder_consts.isOpen);
-
-    // Show the SemVer input fields
-    elm_containerVersionSemVer.setAttribute('hidden', '');
-    elm_containerVersionFull.removeAttribute('hidden');
-}
-
-function closeSemVer(){
-    // Turn the MDL checkbox on
-    elm_toggleUseSemVer.setAttribute('checked', '');
-    elm_toggleUseSemVer.parentElement.classList.add(builder_consts.isOpen);
-
-    // Hide the SemVer input fields
-    elm_containerVersionSemVer.setAttribute('hidden', '');
-    elm_containerVersionFull.removeAttribute('hidden');
-}
-
-function toggleSemVerInput() {
-    if (checkToggleSwitch(elm_toggleUseSemVer)){
-        setVersion(inputValue(elm_inputVersionFull, false), true);
-        elm_containerVersionSemVer.removeAttribute('hidden');
-        elm_containerVersionFull.setAttribute('hidden', '');
+/** Parses File lists from ModuleConfig.xml and adds them to the builderJSON
+    Will return an empty array if xmlParentElement is undefined
+    @param {HTMLElement} xmlParentElement - The element to parse from
+    @param {Boolean} [addToBaseTags=false] - Whether to add the files to the objects at the base of the builderJSON
+    @returns {{identifier: String, conditions: {}, files: []
+        }} An array of file objects
+*/
+function parseFiles(xmlParentElement, addToBaseTags = false){
+    if (typeof xmlParentElement === "undefined") {
+        return [];
+    }
+    var temp_files = [];
+    var temp_files_unconditioned = [];
+    for (var element of xmlParentElement.children) {
+        console.log('Parsing file/folder element', element);
+        var temp_json = {
+            file: true,
+            source: getAttrDefault(element, 'source', ''),
+            destination: getAttrDefault(element, 'destination', ''),
+            priority: getAttrDefault(element, 'priority', 0)
+        };
+        if (element.tagName === "folder") {
+            temp_json.file = false;
+        }
+        if (getAttrDefault(element, 'alwaysInstall', "false") == "true") {
+            temp_files_unconditioned.push(temp_json);
+        } else {
+            temp_files.push(temp_json);
+        }
+        console.log('Parsed file/folder element', temp_json);
+    }
+    builderJSON.installs.push({
+        identifier: "",
+        conditions: [],
+        files: [...temp_files_unconditioned]
+    });
+    if (addToBaseTags) {
+        builderJSON.installs.push({
+            identifier: "",
+            conditions: xmlParentElement.parentElement.tagName.toLowerCase() == "pattern" ? parseConditions(xmlParentElement.parentElement.getElementsByTagName("dependencies")[0]) : [],
+            files: [...temp_files]
+        });
     } else {
-        setVersion(`${inputValue(elm_inputVersionMajor, false)}.${inputValue(elm_inputVersionMinor, false)}.${inputValue(elm_inputVersionPatch, false)}`.replace(/^\.+|\.+$/g, ''), true);
-        elm_containerVersionSemVer.setAttribute('hidden', '');
-        elm_containerVersionFull.removeAttribute('hidden');
+        return {
+            identifier: "",
+            conditions: xmlParentElement.parentElement.tagName.toLowerCase() == "pattern" ? parseConditions(xmlParentElement.parentElement.getElementsByTagName("dependencies")[0]) : [],
+            files: [...temp_files]
+        };
     }
 }
-
-
-
-/*\      $$\                 $$\           $$\            $$$$$$\                       $$$$$$\  $$\
-$$$\    $$$ |                $$ |          $$ |          $$  __$$\                     $$  __$$\ \__|
-$$$$\  $$$$ | $$$$$$\   $$$$$$$ |$$\   $$\ $$ | $$$$$$\  $$ /  \__| $$$$$$\  $$$$$$$\  $$ /  \__|$$\  $$$$$$\
-$$\$$\$$ $$ |$$  __$$\ $$  __$$ |$$ |  $$ |$$ |$$  __$$\ $$ |      $$  __$$\ $$  __$$\ $$$$\     $$ |$$  __$$\
-$$ \$$$  $$ |$$ /  $$ |$$ /  $$ |$$ |  $$ |$$ |$$$$$$$$ |$$ |      $$ /  $$ |$$ |  $$ |$$  _|    $$ |$$ /  $$ |
-$$ |\$  /$$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |$$   ____|$$ |  $$\ $$ |  $$ |$$ |  $$ |$$ |      $$ |$$ |  $$ |
-$$ | \_/ $$ |\$$$$$$  |\$$$$$$$ |\$$$$$$  |$$ |\$$$$$$$\ \$$$$$$  |\$$$$$$  |$$ |  $$ |$$ |      $$ |\$$$$$$$ |
-\__|     \__| \______/  \_______| \______/ \__| \_______| \______/  \______/ \__|  \__|\__|      \__| \____$$ |
-                                                                                                     $$\   $$ |
-                                                                                                     \$$$$$$  |
-                                                                                                      \_____*/
-
-
 
 
 /*$$$$$\                       $$\
@@ -514,12 +714,18 @@ $$\   $$ |$$  __$$ |  \$$$  /  $$ |$$ |  $$ |$$ |  $$ |
 
 
 
+
+
 /** Convenience function to call `save()` if autosaving is enabled. CURRENTLY DISABLED UNTIL SAVING IS PROPERLY IMPLEMENTED.
     @returns {nil} nothing
 */
 async function autoSave() {
     //if (checkToggleSwitch(elm_toggleAutosave)) {save()}
 }
+
+
+
+
 
 /** Function to save the FOMOD.
     @returns {nil} nothing
@@ -533,7 +739,8 @@ async function save(){
         info_xml_tags.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
         info_xml_tags.setAttribute('xsi:noNamespaceSchemaLocation', 'https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd');
     }
-    if (checkToggleSwitch(elm_toggleBranding) && !info_xml.documentElement.innerHTML.includes('BellCube\'s FOMOD Builder')){
+    info_xml.documentElement.innerHTML = info_xml.documentElement.innerHTML.replace(/<!--.*?BellCube's FOMOD Builder.*?-->\n*/sg, '');
+    if (checkToggleSwitch(elm_toggleBranding)){
         console.log('Adding Branding to Info.xml (disabled by default)');
         var comment = info_xml.createComment('\n    Created using BellCube\'s FOMOD Builder\n    https://bellcubedev.github.io/site-testing/tools/fomod/\n    The tool is currently in early testing, so any extra testers would be very welcome.\n');
         /*
@@ -543,22 +750,30 @@ async function save(){
                 The tool is currently in early testing, so any extra testers would be very welcome!
             -->
         */
-        info_xml.documentElement.innerHTML = comment.toString() + info_xml.documentElement.innerHTML;
+        info_xml.documentElement.prepend('\n', comment);
+        //info_xml.documentElement.innerHTML = `\n${XMLSerializationMaster.serializeToString(comment)}${info_xml.documentElement.innerHTML.replace(/<!--.*?BellCube's FOMOD Builder.*?-->\n*/sg, '')}`;
     }
 
     console.log('Adding FOMOD Version to Info.xml');
     var versTag = getXMLTag(info_xml, 'Version');
-    if (checkToggleSwitch(elm_toggleUseSemVer)) {
+    if (checkToggleSwitch(elm_toggleUseCustomVers)) {
         versTag.innerHTML = encodeXML(inputValue(elm_inputVersionFull));
     } else {
-        versTag.innerHTML = `${inputValue(parseIntRelaxed(elm_inputVersionMajor))}.${inputValue(parseIntRelaxed(elm_inputVersionMinor))}.${inputValue(parseIntRelaxed(elm_inputVersionPatch))}`;
+        versTag.innerHTML = `${parseIntRelaxed(inputValue(elm_inputVersionMajor))}.${parseIntRelaxed(inputValue(elm_inputVersionMinor))}.${parseIntRelaxed(inputValue(elm_inputVersionPatch))}`;
     }
 
-    writeFile(info_file, XMLParser.serializeToString(info_xml));
+    console.log(info_file, XMLSerializationMaster.serializeToString(info_xml));
+    writeFile(info_file, XMLSerializationMaster.serializeToString(info_xml));
 
     console.log('After editing:\n', info_xml.documentElement);
     }, 1000);
 }
+
+
+
+
+
+
 
 function registerAutoSaveEvents(){
     elm_inputVersionFull.addEventListener('change', autoSave);
@@ -610,6 +825,37 @@ async function tryForPermission(object, perm){
     }
 }
 
+
+
+
+
+
+
+/** Reads the specified file
+    @param {FileSystemFileHandle} file - The file to read
+    @returns {Promise<string>} - The contents of the file
+*/
+function readFile(file){
+    // Nice job, Copilot!
+    return new Promise((resolve, reject) => {
+        const temp_fileReader = new FileReader();
+        temp_fileReader.onload = (readerEvent) => {
+            //console.log('readFile Result:\n', readerEvent.target.result)
+            resolve(readerEvent.target.result);
+        };
+        temp_fileReader.onerror = (err) => {
+            reject(err);
+        };
+        temp_fileReader.readAsText(file);
+    });
+}
+
+
+
+
+
+
+
 /*
  This function was taken from https://developer.mozilla.org/en-US/docs/Web/API/FileSystemFileHandle
  That code is available under CC-0: http://creativecommons.org/publicdomain/zero/1.0/
@@ -620,12 +866,40 @@ async function tryForPermission(object, perm){
     @returns {nil} nothing
 */
 async function writeFile(fileHandle, contents) {
-
-    // Condition for if we're doing an autosave
-    const writable = await fileHandle.createWritable();
-    await writable.write(contents);
-    await writable.close();
+    fileHandle.createWritable().then((writable) =>{
+        writable.write(contents);
+        writable.close();
+    });
 }
+
+
+
+
+
+
+
+
+/** Verify the specified directory
+    @param {FileSystemDirectoryHandle} dir
+    @throws {DOMException} 'AbortError' If the user fails to give permissions for the directory
+    @returns {nil} nothing
+*/
+async function attainDirPerms(dir) {
+    while (!(await tryForPermission(dir, 'readwrite'))){
+        if (!window.confirm(
+            document.getElementById(`fomod_localization_folderPicker_needsWriteAccess`).innerText
+        )){
+            throw new DOMException('User denied directory write access', 'AbortError');
+        }
+    }
+}
+
+
+
+
+
+
+
 
 
 /*$$$$$\   $$$$$$\  $$\      $$\       $$\   $$\   $$\     $$\ $$\
@@ -650,9 +924,28 @@ function inputValue(element, usePlaceholder = true){
         if(element.hasAttribute('builder_default')){return element.getAttribute('builder_default');}
 
         if (element.hasAttribute('placeholder') && usePlaceholder){return element.getAttribute('placeholder');}
-    
+
     } finally {} return '';
 }
+
+
+
+/** Convenience function to get the value of an input element. Will first attempt to get a user-submitted value, then will attempt to fetch a default from `builder_default`, before finally resorting to the `placeholder` attribute.
+    @param {HTMLElement} element The Input element to get the value of
+    @param {string} attribute Attribute to read.
+    @param {string} [def=''] Default to return. Defaults to `''`.
+    @returns {string} The value of the input element
+*/
+function getAttrDefault(element, attr, def = ''){
+    
+    if (!element.hasAttribute(attr)){return def;}
+
+    var attrValue = element.getAttribute(attr);
+    if (attrValue != ''){return attrValue;}
+
+    return def;
+}
+
 
 /** Convenience function to get the value of a toggle switch.
     @param {HTMLElement} element - The element to get the value of.
@@ -672,7 +965,7 @@ function setElementVars(){
     elm_inputAuthor = document.getElementById(`fomod_info_author`);
     elm_inputID = document.getElementById(`fomod_info_ID`);
     elm_inputWebsite = document.getElementById(`fomod_info_website`);
-    elm_toggleUseSemVer = document.getElementById(`fomod_config_toggleUseSemVer`);
+    elm_toggleUseCustomVers = document.getElementById(`fomod_config_toggleUseCustomVers`);
     elm_containerVersionFull = document.getElementById(`fomod_info_version_cont`);
         elm_inputVersionFull = document.getElementById(`fomod_info_version_full`);
     elm_containerVersionSemVer = document.getElementById(`fomod_info_version_semver_cont`);

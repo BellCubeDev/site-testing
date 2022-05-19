@@ -124,7 +124,8 @@
 			"consts",
 			"FOMM",
 			"FOSE",
-			"apos"
+			"apos",
+			"parsererror"
 		]
 	}
 }
