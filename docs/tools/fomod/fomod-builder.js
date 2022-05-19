@@ -61,6 +61,10 @@ var fileExtPathAssociations = {
     "xml": "DialogueViews"
 };
 
+const builder_consts = {
+    isOpen: 'is-checked'
+};
+
 var parseIntErr = new TypeError('Value is not a number.');
 /** Equivalent to `parseInt()`, except it throws an error if the value is not exclusively composed of digits.
     @param {string} intString - The string to parse
@@ -181,155 +185,176 @@ async function init() {
 async function openFomodDirectory(){
     var temp_rootDirectory;
     var temp_fomodDirectory;
+
     try {
         temp_rootDirectory = await window.showDirectoryPicker();
-
-        var loc_errorElem_noFomod = document.getElementById(`fomod_localization_folderPicker_noFomod`);
-        if (temp_rootDirectory.name.toLowerCase() == 'fomod'){
-            window.alert(loc_errorElem_noFomod.innerText);
-            return;
-        }
-
-        var loc_errorElem_needsWriteAccess = document.getElementById(`fomod_localization_folderPicker_needsWriteAccess`);
-        while (
-            !(await tryForPermission(temp_rootDirectory, 'readwrite'))
-        ){
-            if (!window.confirm(loc_errorElem_needsWriteAccess.innerText)){
-                return;
-            }
-        }
-        document.getElementById(`fomod_FolderPicker_folderName`).innerHTML = temp_rootDirectory.name;
-
-        console.log(`[BCD-FomodBuilder] Root Folder name: ${temp_rootDirectory.name}`);
-        temp_rootDirectory.getDirectoryHandle('fomod', {create: true}).then(async (dir) => {
-            temp_fomodDirectory = dir;
-
-            console.log(`[BCD-FomodBuilder] FOMOD Directory name: ${dir.name}`);
-
-            dir.getFileHandle('info.xml', {create: true}).then(async function (fileHandle) {
-                console.log(`[BCD-FomodBuilder] fileHandle: ${fileHandle}, name: ${fileHandle.name}`);
-                fileHandle.getFile().then(async function (file) {
-                    const temp_xmlReader = new FileReader();
-                    temp_xmlReader.onload = parseInfoXML;
-                    temp_xmlReader.readAsText(file);
-                });
-            });
-            dir.getFileHandle('ModuleConfig.xml', {create: true}).then(async function (fileHandle) {
-                console.log(`[BCD-FomodBuilder] fileHandle: ${fileHandle}, name: ${fileHandle.name}`);
-                fileHandle.getFile().then(async function (file) {
-                    const temp_xmlReader = new FileReader();
-                    temp_xmlReader.onload = parseModuleConfigXML;
-                    temp_xmlReader.readAsText(file);
-                });
-            });
-        });
-
-        // Finalize setting the variables
-        rootDirectory = temp_rootDirectory;
-        fomodDirectory = temp_fomodDirectory;
-
-        // Open the Metadata section
-        // eslint-disable-next-line no-undef
-        bcd_registeredComponents.bcdDetails[elm_collapsableMetadata.id].open();
-        setTimeout(save, 3000);
+        verifySelectedDirectory(temp_rootDirectory);
     } catch(err) {
-        if(err instanceof DOMException && (err.name == 'AbortError')) {
-            console.log(`Intercepted error ${err.name}:\n`,err.stack);
+        if(err instanceof DOMException && (err.name == 'AbortError' || err.name == 'NotAllowedError')) {
+            //console.log(`Intercepted error ${err.name}:\n`,err.stack);
+            return;
         }else {
             throw err;
         }
     }
+
+    document.getElementById(`fomod_FolderPicker_folderName`).innerHTML = temp_rootDirectory.name;
+    //console.log(`[BCD-FomodBuilder] Root Folder name: ${temp_rootDirectory.name}`);
+
+    
+    temp_rootDirectory.getDirectoryHandle('fomod', {create: true}).then(
+        /**@param {FileSystemDirectoryHandle} dir*/ async(dir) => {
+        temp_fomodDirectory = dir;
+
+        console.log(`[BCD-FomodBuilder] FOMOD Directory name: ${dir.name}`);
+
+        // Much simpler than what I had before, let me tell you!
+        parseInfoXML(await readFile(await dir.getFileHandle('info.xml', {create: true})));
+        parseModuleConfigXML(await readFile(await dir.getFileHandle('config.xml', {create: true})));
+    });
+
+    // Finalize setting the variables
+    rootDirectory = temp_rootDirectory;
+    fomodDirectory = temp_fomodDirectory;
+
+    // Open the Metadata section
+    // eslint-disable-next-line no-undef
+    bcd_registeredComponents.bcdDetails[elm_collapsableMetadata.id].open();
+    
+    // Save after 3 seconds to make it more convenient to test
+    setTimeout(save, 3000);
 }
 
-/* Example ModuleConfig JSON:
-{
-        conditions: [], // {module > moduleDependencies}
-        meta: {
-            name: "My Mod",
-            image: "fomod/images/Mod.jpg"
-        },
-        defaultFlags: {} // Flags to set in an invisible first step "Select All" option, if present
-        steps: [
-            // TODO: Add Option Groups (whoops)
-            {
-                name: "Apple",
-                conditions: [],
-                options: [
-                    {
-                        name: "Green",
-                        description: "Testures of a modest resolution",
-                        image: "fomod/images/apples/geen.png",
-                        files: [],
-                        flags: {
-                            "apple_color": "green",
-                            "install_textures": "true"
-                        },
-                        defaultType: "Optional",
-                        conditions: []
-                    }
-                ],
-            },
-            {
-                name: "Texture Sizes",
-                conditions: [{
-                    type: "flag", // Flag, File, GameVersion (), ScriptExtenderVerxion (F4SE), ModManagerVersion (FOMM)
-                    flag: "install_textures"
-                    value: "true"
-                }],
-                options: [
-                    {
-                        name: "1K (1024x1024)",
-                        description: "Testures of a modest resolution",
-                        image: "fomod/images/sizes/1024.png",
-                        files: [],
-                        flags: {
-                            "texture_size": "1024"
-                        },
-                        defaultType: "Optional",
-                        conditions: []
-                    },
-                    {
-                        name: "2K (2048x2048)",
-                        description: "Testures of a modest resolution",
-                        image: "fomod/images/sizes/2048.png",
-                        files: [],
-                        flags: {
-                            "texture_size": "2048"
-                        },
-                        defaultType: "Optional",
-                        conditions: []
-                    },
-                    {
-                        name: "4K (4096x4096)",
-                        description: "Testures of a modest resolution",
-                        image: "fomod/images/sizes/4096.png",
-                        files: [],
-                        flags: {
-                            "texture_size": "4096"
-                        },
-                        defaultType: "Optional",
-                        conditions: []
-                    }
-                ],
-            }
-        ],
-        installs: [
-            {
-                identifier: "", // Helpful name stored in comments
-                conditions: []
-                files: [
-                    {
-                        folder: false, // {fileList.[?file:folder]} When set to true, will move folders instead of files
-                        source: "", // {fileList.[file|folder].source} File to move, relative to the fomod's root folder
-                        destination: "" //  {fileList.[file|folder].destination} Destination to move the file to, relative to the game Mods folder (Data\ for Bethesda games)
-                    }
-                ]
-            }
-        ]
-    }
+/** Verify the specified directory
+    @param {FileSystemDirectoryHandle} dir
+    @throws {DOMException} 'AbortError' If the user fails to give permissions for the directory
+    @throws {DOMException} 'NotAllowedError' if the directory name is any case of 'fomod'
+    @returns {nil}
 */
+async function verifySelectedDirectory(dir) {
+    if (dir.name.toLowerCase() == 'fomod'){
+        window.alert(
+            document.getElementById(`fomod_localization_folderPicker_noFomod`).innerText
+        );
+        throw new DOMException('The user\'s provided directory was named \'fomod\'', 'NotAllowedError');
+    }
 
-/* "Defualt Flags" XML
+    while (!(await tryForPermission(dir, 'readwrite'))){
+        if (!window.confirm(
+            document.getElementById(`fomod_localization_folderPicker_needsWriteAccess`).innerText
+        )){
+            throw new DOMException('User denied directory write access', 'AbortError');
+        }
+    }
+}
+
+/** Reads the specified file
+    @param {FileSystemFileHandle} file - The file to read
+    @returns {Promise<string>} - The contents of the file
+*/
+function readFile(file){
+    // Nice job, Copilot!
+    return new Promise((resolve, reject) => {
+        const temp_fileReader = new FileReader();
+        temp_fileReader.onload = (readerEvent) => {
+            resolve(readerEvent.target.result);
+        };
+        temp_fileReader.onerror = (err) => {
+            reject(err);
+        };
+        temp_fileReader.readAsText(file);
+    });
+}
+
+var builderJSON = {
+//    conditions: { // config > moduleDependencies
+//        type: '',
+//        dependencies: [
+//            {
+//                type: 'file', // config > moduleDependency > ?
+//                path: '', // config > moduleDependency > fileDependency.file
+//                value: '' // config > moduleDependency > ?.[state, value, version]
+//            },{
+//                type: 'flag', // config > moduleDependency > ?
+//                name: '', // config > moduleDependency > flagDependency.flag]
+//                value: '' // config > moduleDependency > ?.[state, value, version]
+//            },{
+//                type: 'modManagerVers', // config > moduleDependency > ?
+//                value: '' // config > moduleDependency > ?.[state, value, version]
+//            },{
+//                type: 'scriptExtenderVers', // config > moduleDependency > ?
+//                value: '' // config > moduleDependency > ?.[state, value, version]
+//            },{
+//                type: 'gameVers', // config > moduleDependency > ?
+//                value: '' // config > moduleDependency > ?.[state, value, version]
+//            },{
+//                type: '', // config > moduleDependency > dependencies
+//                dependencies: [/* Nested Dependencies! */] 
+//            }
+//        ]
+//    },
+//    name: "", // config > moduleName
+//    image: "", // config > moduleImage
+//    steps: { // config > installSteps
+//        order: "", // config > installSteps.order
+//        steps: [
+//            { 
+//                name: "", // config > installSteps > installStep.name
+//                order: "", // config > installSteps > installStep > optionalFileGroups.order
+//                groups: [
+//                    {
+//                        name: "", // config > installSteps > installStep > optionalFileGroups > group.name
+//                        type: "", // config > installSteps > installStep > optionalFileGroups > group.type
+//                        plugins: [
+//                            {
+//                                name: "", // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin.name
+//                                description: "", // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > description
+//                                flags: {/* key-value pairs */}, // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > conditionFlags
+//                                files: [ // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > files
+//                                    {
+//                                        file: true, // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > files > [file, folder]
+//                                        source: "", // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > files > [file, folder].source
+//                                        destination: "", // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > files > [file, folder].destination
+//                                        priority: 0 // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > files > [file, folder].priority
+//                                    }
+//                                ],
+//                                selectionType: {
+//                                    type: "", // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > typeDescriptor > [type.name, dependencyType > defaultType.name]
+//                                    conditions: [ // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > typeDescriptor > dependencyType > patterns
+//                                        {
+//                                            type: "",  // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > typeDescriptor > dependencyType > patterns > defaultType.name
+//                                            conditions: [/* See 'conditions' at the top */] // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > typeDescriptor > dependencyType > patterns > pattern > dependencies
+//                                        }
+//                                    ]
+//                                }
+//                            }
+//                        ]
+//                    }
+//                ]
+//            }
+//        ]
+//    },
+//    installs: [ // config > [requiredInstallFiles, conditionalFileInstalls]
+//        {
+//            identifier: "", // Helpful name stored in comments
+//            /* Example:
+//                <pattern><!-- name="123" -->
+//            */
+//            conditions: [/* See 'conditions' at the top */], // config > conditionalFileInstalls > patterns > pattern
+//            files: [ // config > [requiredInstallFiles, conditionalFileInstalls > patterns > files]
+//                {
+//                    file: true, // [file, folder]
+//                    source: "", // [file, folder].source
+//                    destination: "", // file, folder].destination
+//                    priority: 0 // [file, folder].priority
+//                }
+//            ]
+//        }
+//    ],
+//    defaultFlags: {/* key-value pairs */} // Custom Wizardry
+};
+
+/* "Default Flags" XML
 <!-- Hidden step to set condition flag defaults for the rest of the FOMOD to tamper with. -->
 <InstallStep name="Default Flags Step"><Visible><Dependencies operator="And"><Flag name="false">true</Flag></Dependencies></Visible><OptionalFileGroups><Group name="_" type="SelectAll"><Plugins><Plugin name="_"><Description>_</Description>
     <ConditionFlags>
@@ -340,71 +365,28 @@ async function openFomodDirectory(){
 
 // Translating Dependency types from Builder JSON to XML
 const DependencyTypes = {
-    "Flag":"Flag",
-    "File":"File",
-    "GameVersion":"",
-    "ScriptExtenderVersion":"F4SE",
-    "ModManagerVersion":"FOMM"
-}
+    "file": "fileDependency",
+    "flag": "flagDependency",
+    "modManagerVers": "fommDependency",
+    "scriptExtenderVers": "foseDependency",
+    "gameVers": "gameDependency"
+};
 
 /** Function to handle parsing `ModuleConfig.xml`
-    @param {ProgressEvent} readerEvent - The event object
+    @param {String} xmlString - The event object
     @returns {nil} nothing
 */
-function parseModuleConfigXML(readerEvent) {
-    /*
-        moduleName: string
-        moduleImage: string.image_path
-        moduleDependencies: dependencies
-
-    */
-    var module = {
-        conditions: [], // {module > moduleDependencies}
-        meta: {
-            name: "",
-            image: ""
-        },
-        steps: [
-            /*
-            {
-                name: "", // {installStep.name} Name of the install step
-                conditions: [], // {installStep > visible} Determins whether or not the step should be displayed
-                options: [ //
-                    {
-                        description:
-                    }
-                ],
-            }
-            */
-        ],
-        installs: [
-            /*
-                {
-                    identifier: "", // Helpful name stored in comments
-                    conditions: []
-                    files: [
-                        {
-                            folder: false, // {fileList.[?file:folder]} When set to true, will move folders instead of files
-                            source: "", // {fileList.[file|folder].source} File to move, relative to the fomod's root folder
-                            destination: "" //  {fileList.[file|folder].destination} Destination to move the file to, relative to the game Mods folder (Data\ for Bethesda games)
-                        }
-                    ]
-                }
-            */
-        ]
-    }
-    var moduleMeta = {}
-    var steps = {}
-    var installs = {}
+function parseModuleConfigXML(xmlString) {
+    return xmlString; // Placeholder so ESLint doesn't want to kill me
 }
 
+
 /** Function to handle parsing `Info.xml`
-    @param {ProgressEvent} readerEvent - The event object
-    @returns {nil} nothing
+    @param {String} xmlString - The event object
+    @returns {nil}
 */
-function parseInfoXML(readerEvent) {
-    console.log(`[BCD-FomodBuilder] readerEvent.target.result: ${readerEvent.target.result}`);
-    info_xml = XMLParser.parseFromString(readerEvent.target.result, 'text/xml');
+function parseInfoXML(xmlString) {
+    info_xml = XMLParser.parseFromString(xmlString, "text/xml");
 
     info_xml_tags = getXMLTag(info_xml, 'fomod');
 
@@ -426,28 +408,58 @@ function parseInfoXML(readerEvent) {
 function setVersion(version, relaxed = false){
     elm_inputVersionFull.value = version;
     try{
-        // Turn the Custom checkbox off
-        elm_toggleUseSemVer.removeAttribute('checked');
-        elm_toggleUseSemVer.parentElement.classList.remove('is-checked');
-
-        // Show the SemVer input fields
-        elm_containerVersionSemVer.setAttribute('hidden', '');
-        elm_containerVersionFull.removeAttribute('hidden');
-
         // Get the version parts. If there's a non-numeric character in there, throw an error.
         // See the below handleParseError function for that.
         var splitVers = version.split('.');
-        if (splitVers.length > 0){try{elm_inputVersionMajor.value = parseIntExtremes(splitVers[0], relaxed);} catch(e){handlePerseError(e);}}else{elm_inputVersionMajor.value = '';}
-        if (splitVers.length > 1){try{elm_inputVersionMinor.value = parseIntExtremes(splitVers[1], relaxed);} catch(e){handlePerseError(e);}}else{elm_inputVersionMinor.value = '';}
-        if (splitVers.length > 2){try{elm_inputVersionPatch.value = parseIntExtremes(splitVers[2], relaxed);} catch(e){handlePerseError(e);}}else{elm_inputVersionPatch.value = '';}
-    } catch(e){handlePerseError(e);}
-    function handlePerseError(e){
-        console.log(`Error parsing version ${version}: ${e}\n${e.stack}`);
-        elm_toggleUseSemVer.setAttribute('checked', '');
-        elm_toggleUseSemVer.parentElement.classList.add('is-checked');
-        elm_containerVersionSemVer.setAttribute('hidden', '');
-        elm_containerVersionFull.removeAttribute('hidden');
+        parseVersComponent(splitVers, 0, elm_inputVersionMajor, relaxed);
+        parseVersComponent(splitVers, 1, elm_inputVersionMinor, relaxed);
+        parseVersComponent(splitVers, 2, elm_inputVersionPatch, relaxed);
+
+        // If we made it this far, use SemVer!
+        openSemVer();
+    } catch {
+        closeSemVer();
     }
+}
+
+/**
+@param {Array<String>} versArr Array of version strings to use
+@param {number} pos Array index to pull from
+@param {HTMLElement} element FOrm element to set the Value of
+@param {Boolean} relaxed Whether to use relaxed parsing
+*/
+function parseVersComponent(versArr, pos, element, relaxed){
+    if (!(versArr.length > pos)) {
+        elm_inputVersionPatch.value = '';
+        return;
+    }
+
+    try{
+        elm_inputVersionPatch.value = parseIntExtremes(versArr[pos], relaxed);
+    } catch {
+        closeSemVer();
+    }
+}
+
+
+function openSemVer(){
+    // Turn the MDL checkbox off
+    elm_toggleUseSemVer.removeAttribute('checked');
+    elm_toggleUseSemVer.parentElement.classList.remove(builder_consts.isOpen);
+
+    // Show the SemVer input fields
+    elm_containerVersionSemVer.setAttribute('hidden', '');
+    elm_containerVersionFull.removeAttribute('hidden');
+}
+
+function closeSemVer(){
+    // Turn the MDL checkbox on
+    elm_toggleUseSemVer.setAttribute('checked', '');
+    elm_toggleUseSemVer.parentElement.classList.add(builder_consts.isOpen);
+
+    // Hide the SemVer input fields
+    elm_containerVersionSemVer.setAttribute('hidden', '');
+    elm_containerVersionFull.removeAttribute('hidden');
 }
 
 /*
@@ -476,7 +488,7 @@ function getCookie(cookieName, defaultValue){
     @returns {boolean} - Whether or not the switch was enabled.
 */
 function checkToggleSwitch(element){
-    return element.parentElement.classList.contains('is-checked');
+    return element.parentElement.classList.contains(builder_consts.isOpen);
 }
 
 /** Convenience function to call `save()` if autosaving is enabled. CURRENTLY DISABLED UNTIL SAVING IS PROPERLY IMPLEMENTED.
@@ -491,7 +503,7 @@ async function autoSave() {
 */
 async function save(){
     console.log('Before editing:\n', info_xml.documentElement);
-    setTimeout(() => {
+    setTimeout(/* 1000ms */ () => {
     if (checkToggleSwitch(elm_toggleInfoSchema)){
         console.log('Adding Schema to Info.xml (disabled by default)');
         // xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd"
@@ -508,7 +520,7 @@ async function save(){
                 The tool is currently in early testing, so any extra testers would be very welcome!
             -->
         */
-        info_xml.documentElement.innerHTML = comment.toString() + info_xml.documentElement.innerHTML
+        info_xml.documentElement.innerHTML = comment.toString() + info_xml.documentElement.innerHTML;
     }
 
     console.log('Adding FOMOD Version to Info.xml');

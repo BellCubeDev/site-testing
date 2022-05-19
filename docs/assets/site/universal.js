@@ -14,6 +14,14 @@ var bcd_registeredComponents = {
     bcdSummary: {}
 };
 
+var site_consts = {
+    transitionDur: "transition-duration",
+    animDur: "animation-duration",
+    marginTop: "margin-top",
+    classSummary: "bcd-summary",
+    classDetails: "bcd-details"
+};
+
 /**
     * @param {HTMLElement} element
 */
@@ -52,8 +60,8 @@ BellCubicDetails.prototype.reEval = function () {
     */
 BellCubicDetails.prototype.open = function () {
     /*console.log("Setting margin-top to 0px", this.element_Children[0])*/
-    this.element_Children[0].style["transition-duration"] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
-    this.element_Children[0].style["animation-duration"] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
+    this.element_Children[0].style[site_consts.transitionDur] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
+    this.element_Children[0].style[site_consts.animDur] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
     this.element_.classList.add('is-open');
     this.header.classList.add('is-open');
 };
@@ -65,9 +73,9 @@ BellCubicDetails.prototype.open = function () {
     */
 BellCubicDetails.prototype.close = function () {
     /*console.log("Setting margin-top to -" + this.element_Children[0].offsetHeight + "px", this.element_Children[0])*/
-    this.element_Children[0].style["transition-duration"] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
-    this.element_Children[0].style["animation-duration"] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
-    this.element_Children[0].style["margin-top"] = `-${this.element_Children[0].offsetHeight}px`;
+    this.element_Children[0].style[site_consts.transitionDur] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
+    this.element_Children[0].style[site_consts.animDur] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
+    this.element_Children[0].style[site_consts.marginTop] = `-${this.element_Children[0].offsetHeight}px`;
     this.element_.classList.remove('is-open');
     this.header.classList.remove('is-open');
 };
@@ -139,9 +147,9 @@ BellCubicSummary.prototype.reEval = function () {
 BellCubicSummary.prototype.open = function () {
     /*console.log("Setting margin-top to 0px", this.for)*/
     try{
-        this.forChildren[0].style["transition-duration"] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
-        this.forChildren[0].style["animation-duration"] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
-        this.forChildren[0].style["margin-top"] = `0px`;
+        this.forChildren[0].style[site_consts.transitionDur] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
+        this.forChildren[0].style[site_consts.animDur] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
+        this.forChildren[0].style[site_consts.marginTop] = `0px`;
     }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e;}}
     this.for.classList.add('is-open');
     this.element_.classList.add('is-open');
@@ -154,9 +162,9 @@ BellCubicSummary.prototype.open = function () {
 BellCubicSummary.prototype.close = function () {
     /*console.log("Setting margin-top to -" + this.for.offsetHeight + "px", this.for)*/
     try{
-        this.forChildren[0].style["transition-duration"] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
-        this.forChildren[0].style["animation-duration"] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
-        this.forChildren[0].style["margin-top"] = `-${this.forChildren[0].offsetHeight}px`;
+        this.forChildren[0].style[site_consts.transitionDur] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
+        this.forChildren[0].style[site_consts.animDur] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
+        this.forChildren[0].style[site_consts.marginTop] = `-${this.forChildren[0].offsetHeight}px`;
     }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e;}}
     this.for.classList.remove('is-open');
     this.element_.classList.remove('is-open');
@@ -191,27 +199,27 @@ function registerComponents(){
     componentHandler.register({
         constructor: BellCubicDetails,
         classAsString: 'BellCubicDetails',
-        cssClass: 'bcd-details',
+        cssClass: site_consts.classDetails,
         widget: false
     });
     // eslint-disable-next-line no-undef
     componentHandler.register({
         constructor: BellCubicSummary,
         classAsString: 'BellCubicSummary',
-        cssClass: 'bcd-summary',
+        cssClass: site_consts.classSummary,
         widget: false
     });
     console.log("[BCD-Components] Components registered, upgrading...");
     console.log(
-        [...document.getElementsByClassName('bcd-details'), ...document.getElementsByClassName('bcd-summary')]
+        [...document.getElementsByClassName(site_consts.classDetails), ...document.getElementsByClassName(site_consts.classSummary)]
     );
 
     // Upgrade the elements with the classes we just registered components for
 
     // eslint-disable-next-line no-undef
     componentHandler.upgradeElements([
-        ...document.getElementsByClassName('bcd-details'),
-        ...document.getElementsByClassName('bcd-summary')
+        ...document.getElementsByClassName(site_consts.classDetails),
+        ...document.getElementsByClassName(site_consts.classSummary)
     ]);
 
     console.log("[BCD-Components] Components registered.");
@@ -489,6 +497,10 @@ function checkCondition(condition) {
     return true;
 }
 
+/** Checks for the specified key in the specified JSON object.
+    @param {{}} aJSON - The JSON object to check.
+    @param {string} key - The key to check for.
+*/
 function tryForJSON(aJSON, key) {
     /*console.log(`[BCD-RANDOM-TEXT] Checking ${JSON.stringify(aJSON)} for ${key}`);*/
     try {
