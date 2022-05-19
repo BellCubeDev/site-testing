@@ -1,5 +1,9 @@
+/*
+    Thanks to Patrick Gillespie for the great ASCII art generator!
+    https://patorjk.com/software/taag/#p=display&h=0&v=0&f=Big%20Money-nw
+    ...makes this code *so* much easier to maintain... you know, 'cuz I can fund my functions in VSCode's Minimap
+*/
 const XMLParser = new DOMParser();
-const XMLSerializer = new DOMParser();
 
 window.onload = init;
 
@@ -12,6 +16,7 @@ var info_xml_tags;
 
 var moduleConfig_file;
 var moduleConfig_xml;
+var moduleConfigError = null;
 
 // Core
 
@@ -65,6 +70,43 @@ const builder_consts = {
     isOpen: 'is-checked'
 };
 
+/*$$$$$\                                                    $$\       $$\   $$\   $$\     $$\ $$\ 
+$$  __$$\                                                   $$ |      $$ |  $$ |  $$ |    \__|$$ |
+$$ /  \__| $$$$$$\  $$$$$$$\   $$$$$$\   $$$$$$\   $$$$$$\  $$ |      $$ |  $$ |$$$$$$\   $$\ $$ |
+$$ |$$$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\  \____$$\ $$ |      $$ |  $$ |\_$$  _|  $$ |$$ |
+$$ |\_$$ |$$$$$$$$ |$$ |  $$ |$$$$$$$$ |$$ |  \__| $$$$$$$ |$$ |      $$ |  $$ |  $$ |    $$ |$$ |
+$$ |  $$ |$$   ____|$$ |  $$ |$$   ____|$$ |      $$  __$$ |$$ |      $$ |  $$ |  $$ |$$\ $$ |$$ |
+\$$$$$$  |\$$$$$$$\ $$ |  $$ |\$$$$$$$\ $$ |      \$$$$$$$ |$$ |      \$$$$$$  |  \$$$$  |$$ |$$ |
+ \______/  \_______|\__|  \__| \_______|\__|       \_______|\__|       \______/    \____/ \__|\_*/
+
+
+
+/*
+ This function was taken from https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
+ That code is available under CC-0: http://creativecommons.org/publicdomain/zero/1.0/
+*/
+/** Gets the value of the specified cookie.
+    @param {string} cookieName The name of the cookie to get.
+    @param {any} defaultValue Value to return should an error occur. Defaults to `''`
+    @returns {string} The value of the cookie.
+*/
+function getCookie(cookieName, defaultValue){
+    try {
+        // Get the value of the cookie, if it exists
+        return document.cookie.split('; ')
+          .find(row => row.startsWith(`${cookieName}=`))
+          .split('=')[1];
+    } catch(error){
+        console.log(`[BCD-FomodBuilder] Error "${error.name}" getting the value of cookie '${cookieName}' - it may not exist.`);
+        if (typeof defaultValue !== 'undefined'){return defaultValue;}else{return '';}
+    }
+}
+
+
+
+
+
+
 var parseIntErr = new TypeError('Value is not a number.');
 /** Equivalent to `parseInt()`, except it throws an error if the value is not exclusively composed of digits.
     @param {string} intString - The string to parse
@@ -104,77 +146,23 @@ function parseIntExtremes(intString, relaxed = false){
     }
 }
 
+
 /** Function called when the DOM is ready for manipulation.
     All code should stem from here in some way.
     @returns {nil} nothing
 */
 async function init() {
-    //console.log("[BCD-FomodBuilder] Hello World!");
-
-    // Core
-    elm_buttonFolderPicker = document.getElementById(`fomod_FolderPicker`);
-    elm_buttonSave = document.getElementById(`fomod_saveButton`);
-
-    // Info.xml (Metadata)
-    elm_inputName = document.getElementById(`fomod_info_name`);
-    elm_inputAuthor = document.getElementById(`fomod_info_author`);
-    elm_inputID = document.getElementById(`fomod_info_ID`);
-    elm_inputWebsite = document.getElementById(`fomod_info_website`);
-    elm_toggleUseSemVer = document.getElementById(`fomod_config_toggleUseSemVer`);
-    elm_containerVersionFull = document.getElementById(`fomod_info_version_cont`);
-        elm_inputVersionFull = document.getElementById(`fomod_info_version_full`);
-    elm_containerVersionSemVer = document.getElementById(`fomod_info_version_semver_cont`);
-        elm_inputVersionMajor = document.getElementById(`fomod_info_version_major`);
-        elm_inputVersionMinor = document.getElementById(`fomod_info_version_minor`);
-        elm_inputVersionPatch = document.getElementById(`fomod_info_version_patch`);
-
-    // Config
-    elm_toggleAutosave = document.getElementById(`fomod_config_toggleAutosave`);
-    elm_toggleConfigInXML = document.getElementById(`fomod_config_saveConfigXML`);
-    elm_toggleConfigInCookie = document.getElementById(`fomod_config_saveConfigCookies`);
-    elm_toggleInfoSchema = document.getElementById(`fomod_config_saveInfoSchema`);
-    elm_toggleBranding = document.getElementById(`fomod_config_doBranding`);
-
-    // collapsables
-    elm_collapsableMetadata = document.getElementById(`details_builder_meta`);
-    elm_collapsableGeneralAndConfig = document.getElementById(`details_builder_genConfig`);
-
-    //console.log("[BCD-FomodBuilder] "+JSON.stringify(importantElements));
+    // Sets the various element variables found above
+    setElementVars();
 
     elm_buttonFolderPicker.addEventListener('click', openFomodDirectory);
-    elm_buttonFolderPicker.addEventListener('', openFomodDirectory);
 
     elm_buttonSave.addEventListener('click', async () => {
-        openFomodDirectory();
+        save();
     });
-    elm_toggleUseSemVer.addEventListener('click', async () => {
-        if (checkToggleSwitch(elm_toggleUseSemVer)){
-            setVersion(inputValue(elm_inputVersionFull, false), true);
-            elm_containerVersionSemVer.removeAttribute('hidden');
-            elm_containerVersionFull.setAttribute('hidden', '');
-        } else {
-            setVersion(`${inputValue(elm_inputVersionMajor, false)}.${inputValue(elm_inputVersionMinor, false)}.${inputValue(elm_inputVersionPatch, false)}`.replace(/^\.+|\.+$/g, ''), true);
-            elm_containerVersionSemVer.setAttribute('hidden', '');
-            elm_containerVersionFull.removeAttribute('hidden');
-        } 
-    });
+    elm_toggleUseSemVer.addEventListener('click', toggleSemVerInput);
 
-    elm_inputVersionFull.addEventListener('change', autoSave);
-    elm_inputVersionFull.addEventListener('input', autoSave);
-    elm_inputVersionMajor.addEventListener('input', autoSave);
-    elm_inputVersionMajor.addEventListener('change', autoSave);
-    elm_inputVersionMinor.addEventListener('input', autoSave);
-    elm_inputVersionMinor.addEventListener('change', autoSave);
-    elm_inputVersionPatch.addEventListener('input', autoSave);
-    elm_inputVersionPatch.addEventListener('change', autoSave);
-    elm_inputName.addEventListener('input', autoSave);
-    elm_inputName.addEventListener('change', autoSave);
-    elm_inputAuthor.addEventListener('input', autoSave);
-    elm_inputAuthor.addEventListener('change', autoSave);
-    elm_inputID.addEventListener('input', autoSave);
-    elm_inputID.addEventListener('change', autoSave);
-    elm_inputWebsite.addEventListener('input', autoSave);
-    elm_inputWebsite.addEventListener('change', autoSave);
+    registerAutoSaveEvents();
 }
 
 
@@ -185,6 +173,8 @@ async function init() {
 async function openFomodDirectory(){
     var temp_rootDirectory;
     var temp_fomodDirectory;
+    var temp_moduleConfig_file;
+    var temp_info_file;
 
     try {
         temp_rootDirectory = await window.showDirectoryPicker();
@@ -193,36 +183,29 @@ async function openFomodDirectory(){
         if(err instanceof DOMException && (err.name == 'AbortError' || err.name == 'NotAllowedError')) {
             //console.log(`Intercepted error ${err.name}:\n`,err.stack);
             return;
-        }else {
-            throw err;
         }
+        throw err;
     }
 
-    document.getElementById(`fomod_FolderPicker_folderName`).innerHTML = temp_rootDirectory.name;
-    //console.log(`[BCD-FomodBuilder] Root Folder name: ${temp_rootDirectory.name}`);
+    document.getElementById(`fomod_FolderPicker_folderName`).innerHTML = encodeXML(temp_rootDirectory.name);
+    temp_fomodDirectory = await temp_rootDirectory.getDirectoryHandle('fomod', {create: true});
 
-    
-    temp_rootDirectory.getDirectoryHandle('fomod', {create: true}).then(
-        /**@param {FileSystemDirectoryHandle} dir*/ async(dir) => {
-        temp_fomodDirectory = dir;
+    temp_info_file = await temp_fomodDirectory.getFileHandle('ModuleConfig.xml', {create: true});
+    temp_moduleConfig_file = await temp_fomodDirectory.getFileHandle('Info.xml', {create: true});
 
-        console.log(`[BCD-FomodBuilder] FOMOD Directory name: ${dir.name}`);
-
-        // Much simpler than what I had before, let me tell you!
-        parseInfoXML(await readFile(await dir.getFileHandle('info.xml', {create: true})));
-        parseModuleConfigXML(await readFile(await dir.getFileHandle('config.xml', {create: true})));
-    });
+    // Much simpler than what I had before, let me tell you!
+    parseInfoXML(await readFile(temp_info_file));
+    parseModuleConfigXML(await readFile(temp_moduleConfig_file));
 
     // Finalize setting the variables
     rootDirectory = temp_rootDirectory;
     fomodDirectory = temp_fomodDirectory;
+    info_file = temp_info_file;
+    moduleConfig_file = temp_moduleConfig_file;
 
     // Open the Metadata section
     // eslint-disable-next-line no-undef
     bcd_registeredComponents.bcdDetails[elm_collapsableMetadata.id].open();
-    
-    // Save after 3 seconds to make it more convenient to test
-    setTimeout(save, 3000);
 }
 
 /** Verify the specified directory
@@ -289,7 +272,7 @@ var builderJSON = {
 //                value: '' // config > moduleDependency > ?.[state, value, version]
 //            },{
 //                type: '', // config > moduleDependency > dependencies
-//                dependencies: [/* Nested Dependencies! */] 
+//                dependencies: [/* Nested Dependencies! */]
 //            }
 //        ]
 //    },
@@ -298,7 +281,7 @@ var builderJSON = {
 //    steps: { // config > installSteps
 //        order: "", // config > installSteps.order
 //        steps: [
-//            { 
+//            {
 //                name: "", // config > installSteps > installStep.name
 //                order: "", // config > installSteps > installStep > optionalFileGroups.order
 //                groups: [
@@ -377,8 +360,35 @@ const DependencyTypes = {
     @returns {nil} nothing
 */
 function parseModuleConfigXML(xmlString) {
-    return xmlString; // Placeholder so ESLint doesn't want to kill me
+    var temp_moduleConfig_xml = XMLParser.parseFromString(xmlString);
+    var parseErrorElement = temp_moduleConfig_xml.getElementsByTagName("parsererror")[0];
+    if (typeof parseErrorElement !== "undefined") {
+        moduleConfigError = parseErrorElement.outerHTML; // So we can interpret this elsewhere
+        throw new SyntaxError('Invalid XML');
+    }
+    /* TODO: Validate against schema and throw error if invalid
+    if (isValid) {
+        moduleConfigError = validatorErrorMessage;
+        throw new SyntaxError('Invalid ModuleConfig XML');
+    }
+    */
+
+    // Get the module name
+    builderJSON.moduleName = readXMLTag(temp_moduleConfig_xml, "moduleName");
+     XMLParser.parseFromString(temp_moduleConfig_xml.getElementsByTagName("moduleName")[0].innerHTML, 'text/xml').toString();
+    // Get the module image
+    builderJSON.moduleImage = XMLParser.parseFromString(temp_moduleConfig_xml.getElementsByTagName("moduleImage")[0].innerHTML, 'text/xml').toString();
+
 }
+
+/*$$$$\            $$$$$$\                  $$$$$$$$\ $$\ $$\
+\_$$  _|          $$  __$$\                 $$  _____|\__|$$ |
+  $$ |  $$$$$$$\  $$ /  \__| $$$$$$\        $$ |      $$\ $$ | $$$$$$\
+  $$ |  $$  __$$\ $$$$\     $$  __$$\       $$$$$\    $$ |$$ |$$  __$$\
+  $$ |  $$ |  $$ |$$  _|    $$ /  $$ |      $$  __|   $$ |$$ |$$$$$$$$ |
+  $$ |  $$ |  $$ |$$ |      $$ |  $$ |      $$ |      $$ |$$ |$$   ____|
+$$$$$$\ $$ |  $$ |$$ |      \$$$$$$  |      $$ |      $$ |$$ |\$$$$$$$\
+\______|\__|  \__|\__|       \______/       \__|      \__|\__| \_____*/
 
 
 /** Function to handle parsing `Info.xml`
@@ -387,7 +397,6 @@ function parseModuleConfigXML(xmlString) {
 */
 function parseInfoXML(xmlString) {
     info_xml = XMLParser.parseFromString(xmlString, "text/xml");
-
     info_xml_tags = getXMLTag(info_xml, 'fomod');
 
     elm_inputName.value = readXMLTag(info_xml_tags, 'Name');
@@ -441,7 +450,6 @@ function parseVersComponent(versArr, pos, element, relaxed){
     }
 }
 
-
 function openSemVer(){
     // Turn the MDL checkbox off
     elm_toggleUseSemVer.removeAttribute('checked');
@@ -462,34 +470,49 @@ function closeSemVer(){
     elm_containerVersionFull.removeAttribute('hidden');
 }
 
-/*
- This function was taken from https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
- That code is available under CC-0: http://creativecommons.org/publicdomain/zero/1.0/
-*/
-/** Gets the value of the specified cookie.
-    @param {string} cookieName The name of the cookie to get.
-    @param {any} defaultValue Value to return should an error occur. Defaults to `''`
-    @returns {string} The value of the cookie.
-*/
-function getCookie(cookieName, defaultValue){
-    try {
-        // Get the value of the cookie, if it exists
-        return document.cookie.split('; ')
-          .find(row => row.startsWith(`${cookieName}=`))
-          .split('=')[1];
-    } catch(error){
-        console.log(`[BCD-FomodBuilder] Error "${error.name}" getting the value of cookie '${cookieName}' - it may not exist.`);
-        if (typeof defaultValue !== 'undefined'){return defaultValue;}else{return '';}
+function toggleSemVerInput() {
+    if (checkToggleSwitch(elm_toggleUseSemVer)){
+        setVersion(inputValue(elm_inputVersionFull, false), true);
+        elm_containerVersionSemVer.removeAttribute('hidden');
+        elm_containerVersionFull.setAttribute('hidden', '');
+    } else {
+        setVersion(`${inputValue(elm_inputVersionMajor, false)}.${inputValue(elm_inputVersionMinor, false)}.${inputValue(elm_inputVersionPatch, false)}`.replace(/^\.+|\.+$/g, ''), true);
+        elm_containerVersionSemVer.setAttribute('hidden', '');
+        elm_containerVersionFull.removeAttribute('hidden');
     }
 }
 
-/** Convenience function to get the value of a toggle switch.
-    @param {HTMLElement} element - The element to get the value of.
-    @returns {boolean} - Whether or not the switch was enabled.
-*/
-function checkToggleSwitch(element){
-    return element.parentElement.classList.contains(builder_consts.isOpen);
-}
+
+
+/*\      $$\                 $$\           $$\            $$$$$$\                       $$$$$$\  $$\
+$$$\    $$$ |                $$ |          $$ |          $$  __$$\                     $$  __$$\ \__|
+$$$$\  $$$$ | $$$$$$\   $$$$$$$ |$$\   $$\ $$ | $$$$$$\  $$ /  \__| $$$$$$\  $$$$$$$\  $$ /  \__|$$\  $$$$$$\
+$$\$$\$$ $$ |$$  __$$\ $$  __$$ |$$ |  $$ |$$ |$$  __$$\ $$ |      $$  __$$\ $$  __$$\ $$$$\     $$ |$$  __$$\
+$$ \$$$  $$ |$$ /  $$ |$$ /  $$ |$$ |  $$ |$$ |$$$$$$$$ |$$ |      $$ /  $$ |$$ |  $$ |$$  _|    $$ |$$ /  $$ |
+$$ |\$  /$$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |$$   ____|$$ |  $$\ $$ |  $$ |$$ |  $$ |$$ |      $$ |$$ |  $$ |
+$$ | \_/ $$ |\$$$$$$  |\$$$$$$$ |\$$$$$$  |$$ |\$$$$$$$\ \$$$$$$  |\$$$$$$  |$$ |  $$ |$$ |      $$ |\$$$$$$$ |
+\__|     \__| \______/  \_______| \______/ \__| \_______| \______/  \______/ \__|  \__|\__|      \__| \____$$ |
+                                                                                                     $$\   $$ |
+                                                                                                     \$$$$$$  |
+                                                                                                      \_____*/
+
+
+
+
+/*$$$$$\                       $$\
+$$  __$$\                      \__|
+$$ /  \__| $$$$$$\  $$\    $$\ $$\ $$$$$$$\   $$$$$$\
+\$$$$$$\   \____$$\ \$$\  $$  |$$ |$$  __$$\ $$  __$$\
+ \____$$\  $$$$$$$ | \$$\$$  / $$ |$$ |  $$ |$$ /  $$ |
+$$\   $$ |$$  __$$ |  \$$$  /  $$ |$$ |  $$ |$$ |  $$ |
+\$$$$$$  |\$$$$$$$ |   \$  /   $$ |$$ |  $$ |\$$$$$$$ |
+ \______/  \_______|    \_/    \__|\__|  \__| \____$$ |
+                                             $$\   $$ |
+                                             \$$$$$$  |
+                                              \_____*/
+
+
+
 
 /** Convenience function to call `save()` if autosaving is enabled. CURRENTLY DISABLED UNTIL SAVING IS PROPERLY IMPLEMENTED.
     @returns {nil} nothing
@@ -526,15 +549,65 @@ async function save(){
     console.log('Adding FOMOD Version to Info.xml');
     var versTag = getXMLTag(info_xml, 'Version');
     if (checkToggleSwitch(elm_toggleUseSemVer)) {
-        versTag.innerHTML = inputValue(elm_inputVersionFull);
+        versTag.innerHTML = encodeXML(inputValue(elm_inputVersionFull));
     } else {
-        versTag.innerHTML = `${inputValue(elm_inputVersionMajor)}.${inputValue(elm_inputVersionMinor)}.${inputValue(elm_inputVersionPatch)}`;
-     }
+        versTag.innerHTML = `${inputValue(parseIntRelaxed(elm_inputVersionMajor))}.${inputValue(parseIntRelaxed(elm_inputVersionMinor))}.${inputValue(parseIntRelaxed(elm_inputVersionPatch))}`;
+    }
 
-    writeFile(info_file, XMLSerializer.serializeToString(info_xml));
+    writeFile(info_file, XMLParser.serializeToString(info_xml));
 
     console.log('After editing:\n', info_xml.documentElement);
     }, 1000);
+}
+
+function registerAutoSaveEvents(){
+    elm_inputVersionFull.addEventListener('change', autoSave);
+    elm_inputVersionFull.addEventListener('input', autoSave);
+    elm_inputVersionMajor.addEventListener('input', autoSave);
+    elm_inputVersionMajor.addEventListener('change', autoSave);
+    elm_inputVersionMinor.addEventListener('input', autoSave);
+    elm_inputVersionMinor.addEventListener('change', autoSave);
+    elm_inputVersionPatch.addEventListener('input', autoSave);
+    elm_inputVersionPatch.addEventListener('change', autoSave);
+    elm_inputName.addEventListener('input', autoSave);
+    elm_inputName.addEventListener('change', autoSave);
+    elm_inputAuthor.addEventListener('input', autoSave);
+    elm_inputAuthor.addEventListener('change', autoSave);
+    elm_inputID.addEventListener('input', autoSave);
+    elm_inputID.addEventListener('change', autoSave);
+    elm_inputWebsite.addEventListener('input', autoSave);
+    elm_inputWebsite.addEventListener('change', autoSave);
+}
+
+
+
+/*$$$$$$\ $$\ $$\                  $$$$$$\                        $$\
+$$  _____|\__|$$ |                $$  __$$\                       $$ |
+$$ |      $$\ $$ | $$$$$$\        $$ /  \__|$$\   $$\  $$$$$$$\ $$$$$$\    $$$$$$\  $$$$$$\$$$$\
+$$$$$\    $$ |$$ |$$  __$$\       \$$$$$$\  $$ |  $$ |$$  _____|\_$$  _|  $$  __$$\ $$  _$$  _$$\
+$$  __|   $$ |$$ |$$$$$$$$ |       \____$$\ $$ |  $$ |\$$$$$$\    $$ |    $$$$$$$$ |$$ / $$ / $$ |
+$$ |      $$ |$$ |$$   ____|      $$\   $$ |$$ |  $$ | \____$$\   $$ |$$\ $$   ____|$$ | $$ | $$ |
+$$ |      $$ |$$ |\$$$$$$$\       \$$$$$$  |\$$$$$$$ |$$$$$$$  |  \$$$$  |\$$$$$$$\ $$ | $$ | $$ |
+\__|      \__|\__| \_______|       \______/  \____$$ |\_______/    \____/  \_______|\__| \__| \__|
+                                            $$\   $$ |
+                                            \$$$$$$  |
+                                             \_____*/
+
+
+
+
+/** Requests the specified permission for the specified file.
+    @param {FileSystemHandle} object The file or directory to request permission for
+    @param {string} perm The permission to request
+*/
+async function tryForPermission(object, perm){
+    try{
+        return await object.requestPermission({'mode': perm}) == 'granted';
+    } catch(e) {
+        if (e.prototype.name == 'AbortError'){
+            return false;
+        }
+    }
 }
 
 /*
@@ -554,6 +627,16 @@ async function writeFile(fileHandle, contents) {
     await writable.close();
 }
 
+
+/*$$$$$\   $$$$$$\  $$\      $$\       $$\   $$\   $$\     $$\ $$\
+$$  __$$\ $$  __$$\ $$$\    $$$ |      $$ |  $$ |  $$ |    \__|$$ |
+$$ |  $$ |$$ /  $$ |$$$$\  $$$$ |      $$ |  $$ |$$$$$$\   $$\ $$ | $$$$$$$\
+$$ |  $$ |$$ |  $$ |$$\$$\$$ $$ |      $$ |  $$ |\_$$  _|  $$ |$$ |$$  _____|
+$$ |  $$ |$$ |  $$ |$$ \$$$  $$ |      $$ |  $$ |  $$ |    $$ |$$ |\$$$$$$\
+$$ |  $$ |$$ |  $$ |$$ |\$  /$$ |      $$ |  $$ |  $$ |$$\ $$ |$$ | \____$$\
+$$$$$$$  | $$$$$$  |$$ | \_/ $$ |      \$$$$$$  |  \$$$$  |$$ |$$ |$$$$$$$  |
+\_______/  \______/ \__|     \__|       \______/    \____/ \__|\__|\______*/
+
 /** Convenience function to get the value of an input element. Will first attempt to get a user-submitted value, then will attempt to fetch a default from `builder_default`, before finally resorting to the `placeholder` attribute.
     @param {HTMLElement} element The Input element to get the value of
     @param {boolean} [usePlaceholder=true] Whether to use the `placeholder`. Defaults to True.
@@ -562,34 +645,101 @@ async function writeFile(fileHandle, contents) {
 function inputValue(element, usePlaceholder = true){
     try{
         //console.log(`inputValue(${element.id}): ${element.value}, ${element.getAttribute('builder_default')}, ${element.getAttribute('placeholder')}`);
-        if (element.value != ''){
-            return element.value;
-        }else if(element.hasAttribute('builder_default')){
-            return element.getAttribute('builder_default');
-        }else if (element.hasAttribute('placeholder') && usePlaceholder){
-            return element.getAttribute('placeholder');
-        }
-    } catch {}
-    return '';
+        if (element.value != ''){return element.value;}
+
+        if(element.hasAttribute('builder_default')){return element.getAttribute('builder_default');}
+
+        if (element.hasAttribute('placeholder') && usePlaceholder){return element.getAttribute('placeholder');}
+    
+    } finally {} return '';
+}
+
+/** Convenience function to get the value of a toggle switch.
+    @param {HTMLElement} element - The element to get the value of.
+    @returns {boolean} - Whether or not the switch was enabled.
+*/
+function checkToggleSwitch(element){
+    return element.parentElement.classList.contains(builder_consts.isOpen);
+}
+
+function setElementVars(){
+    // Core
+    elm_buttonFolderPicker = document.getElementById(`fomod_FolderPicker`);
+    elm_buttonSave = document.getElementById(`fomod_saveButton`);
+
+    // Info.xml (Metadata)
+    elm_inputName = document.getElementById(`fomod_info_name`);
+    elm_inputAuthor = document.getElementById(`fomod_info_author`);
+    elm_inputID = document.getElementById(`fomod_info_ID`);
+    elm_inputWebsite = document.getElementById(`fomod_info_website`);
+    elm_toggleUseSemVer = document.getElementById(`fomod_config_toggleUseSemVer`);
+    elm_containerVersionFull = document.getElementById(`fomod_info_version_cont`);
+        elm_inputVersionFull = document.getElementById(`fomod_info_version_full`);
+    elm_containerVersionSemVer = document.getElementById(`fomod_info_version_semver_cont`);
+        elm_inputVersionMajor = document.getElementById(`fomod_info_version_major`);
+        elm_inputVersionMinor = document.getElementById(`fomod_info_version_minor`);
+        elm_inputVersionPatch = document.getElementById(`fomod_info_version_patch`);
+
+    // Config
+    elm_toggleAutosave = document.getElementById(`fomod_config_toggleAutosave`);
+    elm_toggleConfigInXML = document.getElementById(`fomod_config_saveConfigXML`);
+    elm_toggleConfigInCookie = document.getElementById(`fomod_config_saveConfigCookies`);
+    elm_toggleInfoSchema = document.getElementById(`fomod_config_saveInfoSchema`);
+    elm_toggleBranding = document.getElementById(`fomod_config_doBranding`);
+
+    // collapsables
+    elm_collapsableMetadata = document.getElementById(`details_builder_meta`);
+    elm_collapsableGeneralAndConfig = document.getElementById(`details_builder_genConfig`);
 }
 
 
 
+/*\   /$\ $$\      $$\ $$\             $$\   $$\   $$\     $$\ $$\
+$$ |  $$ |$$$\    $$$ |$$ |            $$ |  $$ |  $$ |    \__|$$ |
+\$$\ $$  |$$$$\  $$$$ |$$ |            $$ |  $$ |$$$$$$\   $$\ $$ | $$$$$$$\
+ \$$$$  / $$\$$\$$ $$ |$$ |            $$ |  $$ |\_$$  _|  $$ |$$ |$$  _____|
+ $$  $$<  $$ \$$$  $$ |$$ |            $$ |  $$ |  $$ |    $$ |$$ |\$$$$$$\
+$$  /\$$\ $$ |\$  /$$ |$$ |            $$ |  $$ |  $$ |$$\ $$ |$$ | \____$$\
+$$ /  $$ |$$ | \_/ $$ |$$$$$$$$\       \$$$$$$  |  \$$$$  |$$ |$$ |$$$$$$$  |
+\_/   \_/ \__|     \__|\________|       \______/    \____/ \__|\__|\______*/
+
+
+
+/** Encodes the specified string in XML formatting
+    @param {string} str The string to encode
+*/
+function encodeXML (str) {
+    return str.replace(/&/g, '&amp;')
+               .replace(/</g, '&lt;')
+               .replace(/>/g, '&gt;')
+               .replace(/"/g, '&quot;')
+               .replace(/'/g, '&apos;');
+}
+
+/** Decodes the specified string in XML formatting
+    @param {string} str The string to decode
+*/
+function decodeXML (str) {
+    return str.replace(/&amp;/g, '&')
+               .replace(/&lt;/g, '<')
+               .replace(/&gt;/g, '>')
+               .replace(/&quot;/g, '"')
+               .replace(/&apos;/g, '\'');
+}
+
 /** Error-resilient function to read the value of the specified XML tag
     @param {Document|HTMLElement} The XML document to read from
     @param {String} tagName The name of the tag to read
+    @param {Boolean} create  If the tag doesn't exist, should we create it?
     @returns {String} The value of the tag (`innerHTML` or `innerText` based on `doText`), or `''` if the tag doesn't exist
 */
-function readXMLTag(xml, tagName){
+function readXMLTag(xml, tagName, create = true){
     try{
-        var tag = getXMLTag(xml, tagName);
-        console.log(`readXMLTag(${tagName}):`, tag);
+        var tag = getXMLTag(xml, tagName, create);
 
-        if (typeof tag === 'undefined') {
-            console.log(`readXMLTag(${tagName}): tag not found`);
-            return '';           }
-        console.log(`readXMLTag(${tagName}): returning innerHTML`);
-            return tag.innerHTML;
+        if (typeof tag === 'undefined') {return '';}
+
+        return decodeXML(tag.innerHTML);
     } catch (e) {console.log(`Error "${e.name}" reading the value of tag '${tagName}'\n${e.stack}`);}
     return '';
 }
@@ -597,9 +747,10 @@ function readXMLTag(xml, tagName){
 /** Get the specified XML tag
     @param {Document|HTMLElement} xml The HTMLElement or Document to get the child of
     @param {String} tagName The name of the tag to read
+    @param {Boolean} create If the tag doesn't exist, should we create it?
     @returns {HTMLElement} The specified tag, creating it and appending it to the end if it doesn't exist
 */
-function getXMLTag(xml, tagName){
+function getXMLTag(xml, tagName, create = true){
 
     try{
         /* TODO Add case-insensitivity in a reliable way
@@ -621,6 +772,9 @@ function getXMLTag(xml, tagName){
     } catch (e) {
         console.log(`Error "${e.name}" getting the tag '${tagName}'\n${e.stack}`);
     }
+
+    if (!create){return undefined;}
+
     console.log(`getXMLTag(${tagName}): tag not found. Creating a new one...`);
     var newTag;
     if (xml.ownerDocument == null){
@@ -632,16 +786,3 @@ function getXMLTag(xml, tagName){
     return newTag;
 }
 
-/** Requests the specified permission for the specified file.
-    @param {FileSystemHandle} object The file or directory to request permission for
-    @param {string} perm The permission to request
-*/
-async function tryForPermission(object, perm){
-    try{
-        return await object.requestPermission({'mode': perm}) == 'granted';
-    } catch(e) {
-        if (e.prototype.name == 'AbortError'){
-            return false;
-        }
-    }
-}
