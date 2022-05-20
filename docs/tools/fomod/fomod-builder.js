@@ -35,6 +35,7 @@ var elm_buttonFolderPicker;
 var elm_buttonSave;
 
 // Info.xml (Metadata)
+var elm_displayFolderName;
 var elm_inputName;
 var elm_inputAuthor;
 var elm_inputID;
@@ -116,9 +117,44 @@ async function init() {
     elm_buttonSave.addEventListener('click', async () => {
         save();
     });
-    elm_toggleUseCustomVers.addEventListener('click', toggleSemVerInput);
+    elm_toggleUseCustomVers.addEventListener('input', reEvalCustomVersionSwitch_Delayed);
 
     registerAutoSaveEvents();
+}
+
+
+
+
+
+function setElementVars(){
+    // Core
+    elm_buttonFolderPicker = document.getElementById(`fomod_FolderPicker`);
+    elm_buttonSave = document.getElementById(`fomod_saveButton`);
+
+    // Info.xml (Metadata)
+    elm_displayFolderName = document.getElementById(`fomod_FolderPicker_folderName`);
+    elm_inputName = document.getElementById(`fomod_info_name`);
+    elm_inputAuthor = document.getElementById(`fomod_info_author`);
+    elm_inputID = document.getElementById(`fomod_info_ID`);
+    elm_inputWebsite = document.getElementById(`fomod_info_website`);
+    elm_toggleUseCustomVers = document.getElementById(`fomod_config_toggleUseCustomVers`);
+    elm_containerVersionFull = document.getElementById(`fomod_info_version_cont`);
+        elm_inputVersionFull = document.getElementById(`fomod_info_version_full`);
+    elm_containerVersionSemVer = document.getElementById(`fomod_info_version_semver_cont`);
+        elm_inputVersionMajor = document.getElementById(`fomod_info_version_major`);
+        elm_inputVersionMinor = document.getElementById(`fomod_info_version_minor`);
+        elm_inputVersionPatch = document.getElementById(`fomod_info_version_patch`);
+
+    // Config
+    elm_toggleAutosave = document.getElementById(`fomod_config_toggleAutosave`);
+    elm_toggleConfigInXML = document.getElementById(`fomod_config_saveConfigXML`);
+    elm_toggleConfigInCookie = document.getElementById(`fomod_config_saveConfigCookies`);
+    elm_toggleInfoSchema = document.getElementById(`fomod_config_saveInfoSchema`);
+    elm_toggleBranding = document.getElementById(`fomod_config_doBranding`);
+
+    // collapsables
+    elm_collapsableMetadata = document.getElementById(`details_builder_meta`);
+    elm_collapsableGeneralAndConfig = document.getElementById(`details_builder_genConfig`);
 }
 
 
@@ -162,6 +198,13 @@ function getCookie(cookieName, defaultValue){
 
 
 
+/** Basic function to call setTimeout, but with delay FIRST and the callback SECOND---i.e. the more LOGICAL way to do it.
+    @param {number} delay The delay in milliseconds.
+    @param {function} callback The function to call.
+*/
+function delayFirst_SetTimeout(delay, callback) {
+    setTimeout(callback, delay);
+}
 
 
 
@@ -257,11 +300,9 @@ async function verifySelectedDirectory(dir) {
     @returns {nil} nothing
 */
 async function openFomodDirectory(){
+    
     var temp_rootDirectory;
-    var temp_fomodDirectory;
-    var temp_moduleConfig_file;
-    var temp_info_file;
-
+    // Pick the directory
     try {
         temp_rootDirectory = await window.showDirectoryPicker();
         verifySelectedDirectory(temp_rootDirectory);
@@ -274,24 +315,28 @@ async function openFomodDirectory(){
         throw err;
     }
 
-    document.getElementById(`fomod_FolderPicker_folderName`).innerHTML = encodeXML(temp_rootDirectory.name);
-    temp_fomodDirectory = await temp_rootDirectory.getDirectoryHandle('fomod', {create: true});
+    elm_displayFolderName.innerHTML = encodeXML(temp_rootDirectory.name);
 
-    temp_info_file = await temp_fomodDirectory.getFileHandle('Info.xml', {create: true});
-    temp_moduleConfig_file = await temp_fomodDirectory.getFileHandle('ModuleConfig.xml', {create: true});
+    var temp_fomodDirectory = await temp_rootDirectory.getDirectoryHandle('fomod', {create: true});
 
-    // Much simpler than what I had before, let me tell you!
+    // Get Info.xml and ModuleConfig.xml
+
+    // Parse Info.xml
+    var temp_info_file = await temp_fomodDirectory.getFileHandle('Info.xml', {create: true});
     temp_info_file.getFile().then((file) => {readFile(file).then(parseInfoXML);});
+
+    // Parse ModuleConfig.xml
+    var temp_moduleConfig_file = await temp_fomodDirectory.getFileHandle('ModuleConfig.xml', {create: true});
     temp_moduleConfig_file.getFile().then((file) => {readFile(file).then(parseModuleConfigXML);});
 
     // Finalize setting the variables
     rootDirectory = temp_rootDirectory;
     fomodDirectory = temp_fomodDirectory;
-    info_file = temp_info_file;
-    moduleConfig_file = temp_moduleConfig_file;
+    //info_file = temp_info_file;                     <--   These variable setters
+    //moduleConfig_file = temp_moduleConfig_file;     <--   are called in the respective parsers
 
     // Open the Metadata section
-    // eslint-disable-next-line no-undef
+                                    // eslint-disable-next-line no-undef
     bcd_registeredComponents.bcdSummary[elm_collapsableMetadata.id].open();
 }
 
@@ -339,6 +384,7 @@ function parseInfoXML(xmlString) {
     @returns {nil} nothing
 */
 function setVersion(version, relaxed = false){
+    console.log(`setVersion('${version}', ${relaxed})`);
     elm_inputVersionFull.value = version;
     try{
         // Get the version parts. If there's a non-numeric character in there, throw an error.
@@ -351,6 +397,7 @@ function setVersion(version, relaxed = false){
         // If we made it this far, use SemVer!
         openSemVer();
     } catch {
+        // If we didn't, use the Full Version.
         closeSemVer();
     }
 }
@@ -363,16 +410,16 @@ function setVersion(version, relaxed = false){
 /**
 @param {Array<String>} versArr Array of version strings to use
 @param {number} pos Array index to pull from
-@param {HTMLElement} element FOrm element to set the Value of
+@param {HTMLElement} element Form element to set the Value of
 @param {Boolean} relaxed Whether to use relaxed parsing
 */
 function parseVersComponent(versArr, pos, element, relaxed){
     if (!(versArr.length > pos)) {
-        elm_inputVersionPatch.value = '';
+        element.value = '';
         return;
     }
     try{
-        elm_inputVersionPatch.value = parseIntExtremes(versArr[pos], relaxed);
+        element.value = parseIntExtremes(versArr[pos], relaxed);
         openSemVer();
     } catch {
         closeSemVer();
@@ -393,8 +440,8 @@ function openSemVer(){
     elm_toggleUseCustomVers.parentElement.classList.remove(builder_consts.isOpen);
 
     // Show the SemVer input fields
-    elm_containerVersionSemVer.setAttribute('hidden', '');
-    elm_containerVersionFull.removeAttribute('hidden');
+    elm_containerVersionSemVer.removeAttribute('hidden');
+    elm_containerVersionFull.setAttribute('hidden', '');
 }
 
 
@@ -417,15 +464,13 @@ function closeSemVer(){
 
 
 
-function toggleSemVerInput() {
-    if (checkToggleSwitch(elm_toggleUseCustomVers)){
+async function reEvalCustomVersionSwitch_Delayed() {
+    if (await checkToggleSwitch_Delayed(50, elm_toggleUseCustomVers)){
         setVersion(inputValue(elm_inputVersionFull, false), true);
-        elm_containerVersionSemVer.removeAttribute('hidden');
-        elm_containerVersionFull.setAttribute('hidden', '');
+        closeSemVer();
     } else {
         setVersion(`${inputValue(elm_inputVersionMajor, false)}.${inputValue(elm_inputVersionMinor, false)}.${inputValue(elm_inputVersionPatch, false)}`.replace(/^\.+|\.+$/g, ''), true);
-        elm_containerVersionSemVer.setAttribute('hidden', '');
-        elm_containerVersionFull.removeAttribute('hidden');
+        openSemVer();
     }
 }
 
@@ -642,7 +687,7 @@ function parseConditions(xmlParentElement){
                     value: element.getAttribute('version')
                 });
             break;}
-            }
+        }
     }
     return conditions;
 }
@@ -661,7 +706,6 @@ function parseFiles(xmlParentElement, addToBaseTags = false){
     var temp_files = [];
     var temp_files_unconditioned = [];
     for (var element of xmlParentElement.children) {
-        console.log('Parsing file/folder element', element);
         var temp_json = {
             file: true,
             source: getAttrDefault(element, 'source', ''),
@@ -676,7 +720,6 @@ function parseFiles(xmlParentElement, addToBaseTags = false){
         } else {
             temp_files.push(temp_json);
         }
-        console.log('Parsed file/folder element', temp_json);
     }
     builderJSON.installs.push({
         identifier: "",
@@ -732,7 +775,7 @@ async function autoSave() {
 */
 async function save(){
     console.log('Before editing:\n', info_xml.documentElement);
-    setTimeout(/* 1000ms */ () => {
+    delayFirst_SetTimeout(1000, () => {
     if (checkToggleSwitch(elm_toggleInfoSchema)){
         console.log('Adding Schema to Info.xml (disabled by default)');
         // xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd"
@@ -766,7 +809,7 @@ async function save(){
     writeFile(info_file, XMLSerializationMaster.serializeToString(info_xml));
 
     console.log('After editing:\n', info_xml.documentElement);
-    }, 1000);
+    });
 }
 
 
@@ -918,7 +961,6 @@ $$$$$$$  | $$$$$$  |$$ | \_/ $$ |      \$$$$$$  |  \$$$$  |$$ |$$ |$$$$$$$  |
 */
 function inputValue(element, usePlaceholder = true){
     try{
-        //console.log(`inputValue(${element.id}): ${element.value}, ${element.getAttribute('builder_default')}, ${element.getAttribute('placeholder')}`);
         if (element.value != ''){return element.value;}
 
         if(element.hasAttribute('builder_default')){return element.getAttribute('builder_default');}
@@ -952,38 +994,20 @@ function getAttrDefault(element, attr, def = ''){
     @returns {boolean} - Whether or not the switch was enabled.
 */
 function checkToggleSwitch(element){
+    console.log(`checkToggleSwitch(${element.id}): ${element.parentElement.classList.contains(builder_consts.isOpen)}`);
     return element.parentElement.classList.contains(builder_consts.isOpen);
 }
 
-function setElementVars(){
-    // Core
-    elm_buttonFolderPicker = document.getElementById(`fomod_FolderPicker`);
-    elm_buttonSave = document.getElementById(`fomod_saveButton`);
-
-    // Info.xml (Metadata)
-    elm_inputName = document.getElementById(`fomod_info_name`);
-    elm_inputAuthor = document.getElementById(`fomod_info_author`);
-    elm_inputID = document.getElementById(`fomod_info_ID`);
-    elm_inputWebsite = document.getElementById(`fomod_info_website`);
-    elm_toggleUseCustomVers = document.getElementById(`fomod_config_toggleUseCustomVers`);
-    elm_containerVersionFull = document.getElementById(`fomod_info_version_cont`);
-        elm_inputVersionFull = document.getElementById(`fomod_info_version_full`);
-    elm_containerVersionSemVer = document.getElementById(`fomod_info_version_semver_cont`);
-        elm_inputVersionMajor = document.getElementById(`fomod_info_version_major`);
-        elm_inputVersionMinor = document.getElementById(`fomod_info_version_minor`);
-        elm_inputVersionPatch = document.getElementById(`fomod_info_version_patch`);
-
-    // Config
-    elm_toggleAutosave = document.getElementById(`fomod_config_toggleAutosave`);
-    elm_toggleConfigInXML = document.getElementById(`fomod_config_saveConfigXML`);
-    elm_toggleConfigInCookie = document.getElementById(`fomod_config_saveConfigCookies`);
-    elm_toggleInfoSchema = document.getElementById(`fomod_config_saveInfoSchema`);
-    elm_toggleBranding = document.getElementById(`fomod_config_doBranding`);
-
-    // collapsables
-    elm_collapsableMetadata = document.getElementById(`details_builder_meta`);
-    elm_collapsableGeneralAndConfig = document.getElementById(`details_builder_genConfig`);
+function checkToggleSwitch_Delayed(delay, element){
+    return new Promise((resolve) => {
+        delayFirst_SetTimeout(delay, () => {
+            resolve(checkToggleSwitch(element));
+        });
+    });
 }
+
+
+
 
 
 
