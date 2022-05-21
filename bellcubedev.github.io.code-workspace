@@ -62,7 +62,8 @@
 			"bufferbar",
 			"auxbar",
 			"Textfield",
-			"tabindex"
+			"tabindex",
+			"Darkwood"
 		],
 		"cSpell.ignoreWords": [
 			"4uthor",

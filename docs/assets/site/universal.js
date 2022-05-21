@@ -402,7 +402,6 @@ function init() {
         "The Eldest always was pahlok - arrogant in his power. He took domination as his birthright.",
         "You can trust me, I would not have helped you otherwise.",
         "Some would say that all things must end, so that the next can come to pass. ",
-
         "The ox, not wishing to be anybody's dinner, prayed very vocally to Ius. This came out as a loud Moo, of course.",
         "The best techniques are passed on by the survivors...",
         "Each event is preceded by Prophecy. But without the hero, there is no Event.",
@@ -413,7 +412,13 @@ function init() {
         "We fed our children.",
         "Some say we broke our promises.<br />Some say we betrayed our brothers.<br />Some say we abandoned God.",
         "But it is us, not them that brought us this far.",
-        "And those that make sacrifices today, will reap the rewards of tomorrow."
+        "And those that make sacrifices today, will reap the rewards of tomorrow.",
+        "If you don't eat yer meat, you can't have any pudding.",
+        "I'm not sure what I'm doing here, but I'm sure I'm doing something.",
+        "Darkwood's a dangerous place, Hero.",
+        "Farm-boy!",
+        "My helmet, my armour, my sword and my shield. Bring these to me and the path I shall yield.",
+        "Hero, your health is low. Do you have any potions&mdash;or food?" // &mdash; = Em Dash
     ];
 
     // Still in 'window.onload'
