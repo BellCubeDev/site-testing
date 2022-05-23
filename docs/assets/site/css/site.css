@@ -303,12 +303,12 @@ a {
 
 .bcd-details{
     overflow: hidden;
-    
     display: none;
 }
 
-.bcd-details.initialized {
+.bcd-details.initialized, .bcd-details.is-open {
     display: block;
+    visibility: unset;
 }
 
 .bcd-details > .bcd-details_inner {
