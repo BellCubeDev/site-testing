@@ -236,12 +236,25 @@ a {
 }
 
 .bcd-summary {
-    pointer-events: all;
-    background-color: #00000000;
-    padding: 16px;
-    padding-bottom: 4px;
+    color: #fff;
+    background: none;
     border: none;
 
+    height: max-content;
+    width: 100%;
+
+    pointer-events: all;
+    overflow: hidden;
+
+    padding: 24px;
+    padding-bottom: 8px;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 .bcd-summary * {
@@ -262,21 +275,6 @@ a {
 
 .bcd-summary .material-icons {
     color:#ffffffbf;
-}
-
-.bcd-summary {
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: flex-start;
-    justify-content: flex-start;
-    align-content: flex-start;
-    overflow: hidden;
-    pointer-events: none;
-    padding: 24px;
-    padding-bottom: 8px;
-    color:#fff;
 }
 
 .bcd-summary.noTopPad {
@@ -305,12 +303,14 @@ a {
 
 .bcd-details{
     overflow: hidden;
+    
     display: none;
 }
 
 .bcd-details.initialized {
     display: block;
 }
+
 .bcd-details > .bcd-details_inner {
     visibility: hidden;
 

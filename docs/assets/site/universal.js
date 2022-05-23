@@ -1,4 +1,5 @@
 window.onload = init;
+var initRan = false;
 /*
     This script hooks into Material Design Lite's "Component Design Pattern" API
     (see https://github.com/jasonmayes/mdl-component-design-pattern) to provide:
@@ -50,7 +51,9 @@ BellCubicDetails.prototype.toggle = function () {
     */
 BellCubicDetails.prototype.reEval = function () {
     /*console.log('[BCD-DETAILS] reEval() called on ',this)*/
-    if (this.element_.classList.contains('is-open') || this.header.classList.contains('is-open') ) {this.open();} else {this.close();}
+    
+    // All the SetTimeout does here is diver processing to the next processing cycle. This prevents some of the layout shift oddities I've observed.
+    setTimeout(() => {if (this.element_.classList.contains('is-open') || this.header.classList.contains('is-open') ) {this.open();} else {this.close();}});
 };
 
 /**
@@ -84,6 +87,17 @@ BellCubicDetails.prototype.header = null;
 
 BellCubicDetails.prototype.element_Children = null;
 
+/*
+function dumpCSSText(element){
+    var arr = [];
+    var style = getComputedStyle(element);
+    for(var i = 0; i < style.length; i++){
+      arr.push(`${style[i]}: ${style.getPropertyValue(style[i])}; `);
+    }
+    return arr;
+  }
+*/
+
 /**
     * Initialize element.
 */
@@ -92,12 +106,16 @@ BellCubicDetails.prototype.init = function () {
         this.element_.innerHTML = `<div class="bcd-details_inner">${this.element_.innerHTML}</div>`;
         this.element_Children = this.element_.getElementsByClassName('bcd-details_inner');
 
+        //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
+
         this.header = this.element_.ownerDocument.querySelector(`.bcd-summary[for="${this.element_.id}"`);
         this.reEval();
         bcd_registeredComponents.bcdDetails[this.element_.id] = this;
         this.element_.classList.add('initialized');
+        //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
 
         setTimeout(()=>{
+            //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
             bcd_registeredComponents.bcdSummary[this.element_.id].forChildren = this.element_Children;
             this.reEval();
         }, 100);
@@ -177,6 +195,7 @@ BellCubicSummary.prototype.forChildren = null;
 /**
     * Initialize element.
     */
+
 BellCubicSummary.prototype.init = function () {
     if (this.element_) {
         this.boundElementMouseUp = this.toggle.bind(this);
@@ -231,6 +250,11 @@ function registerComponents(){
 try{registerComponents();}catch(e){/*console.log(e.stack)*/}
 
 function init() {
+    if (initRan){
+        return;
+    } // We only need to init once!
+
+    initRan = true;
     try{registerComponents();}catch(e){/*console.log(e.stack)*/}
 
     /*
@@ -518,3 +542,9 @@ function tryForJSON(aJSON, key) {
     }
     return true;
 }
+
+// Just in case the script is loaded after the page loads - an issue I've had during testing and doing occasional page loads in the wild.
+window.init;
+setTimeout(window.init, 50);
+setTimeout(window.init, 150);
+setTimeout(window.init, 500);

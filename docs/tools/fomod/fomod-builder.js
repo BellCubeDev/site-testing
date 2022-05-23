@@ -5,12 +5,12 @@
 */
 
 
-/*$$$$$\  $$\           $$\                 $$\       $$\    $$\                               
-$$  __$$\ $$ |          $$ |                $$ |      $$ |   $$ |                              
-$$ /  \__|$$ | $$$$$$\  $$$$$$$\   $$$$$$\  $$ |      $$ |   $$ | $$$$$$\   $$$$$$\   $$$$$$$\ 
+/*$$$$$\  $$\           $$\                 $$\       $$\    $$\
+$$  __$$\ $$ |          $$ |                $$ |      $$ |   $$ |
+$$ /  \__|$$ | $$$$$$\  $$$$$$$\   $$$$$$\  $$ |      $$ |   $$ | $$$$$$\   $$$$$$\   $$$$$$$\
 $$ |$$$$\ $$ |$$  __$$\ $$  __$$\  \____$$\ $$ |      \$$\  $$  | \____$$\ $$  __$$\ $$  _____|
-$$ |\_$$ |$$ |$$ /  $$ |$$ |  $$ | $$$$$$$ |$$ |       \$$\$$  /  $$$$$$$ |$$ |  \__|\$$$$$$\  
-$$ |  $$ |$$ |$$ |  $$ |$$ |  $$ |$$  __$$ |$$ |        \$$$  /  $$  __$$ |$$ |       \____$$\ 
+$$ |\_$$ |$$ |$$ /  $$ |$$ |  $$ | $$$$$$$ |$$ |       \$$\$$  /  $$$$$$$ |$$ |  \__|\$$$$$$\
+$$ |  $$ |$$ |$$ |  $$ |$$ |  $$ |$$  __$$ |$$ |        \$$$  /  $$  __$$ |$$ |       \____$$\
 \$$$$$$  |$$ |\$$$$$$  |$$$$$$$  |\$$$$$$$ |$$ |         \$  /   \$$$$$$$ |$$ |      $$$$$$$  |
  \______/ \__| \______/ \_______/  \_______|\__|          \_/     \_______|\__|      \______*/
 
@@ -87,16 +87,16 @@ var parseIntErr = new TypeError('Value is not a number.');
 
 
 
-/*$$$$$\                                      $$$$$$\           $$\   $$\     
-$$  __$$\                                     \_$$  _|          \__|  $$ |    
-$$ |  $$ | $$$$$$\   $$$$$$\   $$$$$$\          $$ |  $$$$$$$\  $$\ $$$$$$\   
-$$$$$$$  | \____$$\ $$  __$$\ $$  __$$\         $$ |  $$  __$$\ $$ |\_$$  _|  
-$$  ____/  $$$$$$$ |$$ /  $$ |$$$$$$$$ |        $$ |  $$ |  $$ |$$ |  $$ |    
-$$ |      $$  __$$ |$$ |  $$ |$$   ____|        $$ |  $$ |  $$ |$$ |  $$ |$$\ 
+/*$$$$$\                                      $$$$$$\           $$\   $$\
+$$  __$$\                                     \_$$  _|          \__|  $$ |
+$$ |  $$ | $$$$$$\   $$$$$$\   $$$$$$\          $$ |  $$$$$$$\  $$\ $$$$$$\
+$$$$$$$  | \____$$\ $$  __$$\ $$  __$$\         $$ |  $$  __$$\ $$ |\_$$  _|
+$$  ____/  $$$$$$$ |$$ /  $$ |$$$$$$$$ |        $$ |  $$ |  $$ |$$ |  $$ |
+$$ |      $$  __$$ |$$ |  $$ |$$   ____|        $$ |  $$ |  $$ |$$ |  $$ |$$\
 $$ |      \$$$$$$$ |\$$$$$$$ |\$$$$$$$\       $$$$$$\ $$ |  $$ |$$ |  \$$$$  |
-\__|       \_______| \____$$ | \_______|      \______|\__|  \__|\__|   \____/ 
-                    $$\   $$ |                                                
-                    \$$$$$$  |                                                
+\__|       \_______| \____$$ | \_______|      \______|\__|  \__|\__|   \____/
+                    $$\   $$ |
+                    \$$$$$$  |
                      \_____*/
 
 
@@ -259,16 +259,16 @@ function parseIntExtremes(intString, relaxed = false){
 }
 
 
-/*$$$$$\                                      $$$$$$$\  $$\           
-$$  __$$\                                     $$  __$$\ \__|          
-$$ /  $$ | $$$$$$\   $$$$$$\  $$$$$$$\        $$ |  $$ |$$\  $$$$$$\  
-$$ |  $$ |$$  __$$\ $$  __$$\ $$  __$$\       $$ |  $$ |$$ |$$  __$$\ 
+/*$$$$$\                                      $$$$$$$\  $$\
+$$  __$$\                                     $$  __$$\ \__|
+$$ /  $$ | $$$$$$\   $$$$$$\  $$$$$$$\        $$ |  $$ |$$\  $$$$$$\
+$$ |  $$ |$$  __$$\ $$  __$$\ $$  __$$\       $$ |  $$ |$$ |$$  __$$\
 $$ |  $$ |$$ /  $$ |$$$$$$$$ |$$ |  $$ |      $$ |  $$ |$$ |$$ |  \__|
-$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |      $$ |  $$ |$$ |$$ |      
- $$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$$$$$$  |$$ |$$ |      
- \______/ $$  ____/  \_______|\__|  \__|      \_______/ \__|\__|      
-          $$ |                                                        
-          $$ |                                                        
+$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |      $$ |  $$ |$$ |$$ |
+ $$$$$$  |$$$$$$$  |\$$$$$$$\ $$ |  $$ |      $$$$$$$  |$$ |$$ |
+ \______/ $$  ____/  \_______|\__|  \__|      \_______/ \__|\__|
+          $$ |
+          $$ |
           \_*/
 
 
@@ -300,7 +300,7 @@ async function verifySelectedDirectory(dir) {
     @returns {nil} nothing
 */
 async function openFomodDirectory(){
-    
+
     var temp_rootDirectory;
     // Pick the directory
     try {
@@ -332,6 +332,8 @@ async function openFomodDirectory(){
     // Finalize setting the variables
     rootDirectory = temp_rootDirectory;
     fomodDirectory = temp_fomodDirectory;
+    newBuilderJSONInstance();
+
     //info_file = temp_info_file;                     <--   These variable setters
     //moduleConfig_file = temp_moduleConfig_file;     <--   are called in the respective parsers
 
@@ -583,6 +585,12 @@ var builderJSON = {
 //    defaultFlags: {/* key-value pairs */} // Custom Wizardry
 };
 
+var builderJSON_Instance = Object.create(builderJSON);
+/** Wipe the previous BuilderJSON instance, creating a new one in its stead. */
+function newBuilderJSONInstance() {
+    builderJSON_Instance = Object.create(builderJSON_Instance);
+}
+
 /* "Default Flags" XML
 <!-- Hidden step to set condition flag defaults for the rest of the FOMOD to tamper with. -->
 <InstallStep name="Default Flags Step"><Visible><Dependencies operator="And"><Flag name="false">true</Flag></Dependencies></Visible><OptionalFileGroups><Group name="_" type="SelectAll"><Plugins><Plugin name="_"><Description>_</Description>
@@ -613,31 +621,31 @@ function parseModuleConfigXML(xmlString) {
     var temp_moduleConfig_xml_root = getXMLTag(temp_moduleConfig_xml, 'config');
 
     // Get the module name
-    builderJSON.moduleName = readXMLTag(temp_moduleConfig_xml_root, "moduleName");
+    builderJSON_Instance.moduleName = readXMLTag(temp_moduleConfig_xml_root, "moduleName");
 
      // TODO Handle conflicts between Info.xml and ModuleConfig.xml (e.g. with names)
 
     // Get the module image
-    builderJSON.moduleImage = getXMLTag(temp_moduleConfig_xml_root, "moduleImage").getAttribute("path");
+    builderJSON_Instance.moduleImage = getXMLTag(temp_moduleConfig_xml_root, "moduleImage").getAttribute("path");
 
     // Get Module Conditions
-    builderJSON.conditions = parseConditions(getXMLTag(temp_moduleConfig_xml_root, "moduleDependencies", false));
+    builderJSON_Instance.conditions = parseModuleConditions(getXMLTag(temp_moduleConfig_xml_root, "moduleDependencies", false));
 
     // Get base-level installs
-    builderJSON.installs.push(parseFiles(getXMLTag(temp_moduleConfig_xml_root, "requiredInstallFiles", false)));
+    builderJSON_Instance.installs.push(parseModuleFiles(getXMLTag(temp_moduleConfig_xml_root, "requiredInstallFiles", false)));
 
     for (var element of getXMLTag(getXMLTag(temp_moduleConfig_xml_root, "conditionalFileInstalls", false), "pattern", false).children) {
-        builderJSON.installs.push(parseFiles(getXMLTag(element, 'files', false)));
+        builderJSON_Instance.installs.push(parseModuleFiles(getXMLTag(element, 'files', false)));
     }
 }
 
 
-/** Parses Dependency conditions from ModuleConfig.xml and adds them to the builderJSON
+/** Parses Dependency conditions in ModuleConfig.xml's format
     Will return a default Dependency object if no conditions are found
     @param {HTMLElement} xmlParentElement - The element to parse from
     @returns {{type: HTMLElement, dependencies: []}} The JSON object
 */
-function parseConditions(xmlParentElement){
+function parseModuleConditions(xmlParentElement){
     if (typeof xmlParentElement === "undefined") {
         return {type: "And", dependencies: []};
     }
@@ -653,40 +661,46 @@ function parseConditions(xmlParentElement){
                     path: element.getAttribute('file'),
                     value: element.getAttribute('state')
                 });
-            break;}
-    
+                break;
+            }
+
             case "flagDependency": {
                 conditions.dependencies.push({
                     type: "flag",
                     name: element.getAttribute('flag'),
                     value: element.getAttribute('value')
                 });
-            break;}
-    
+                break;
+            }
+
             case "gameDependency": {
                 conditions.dependencies.push({
                     type: "gameVers",
                     value: element.getAttribute('version')
                 });
-            break;}
-    
+                break;
+            }
+
             case "dependencies": {
-                conditions.dependencies.push(parseConditions(element));  // And you thought recursive processing would be hard!
-            break;}
-    
+                conditions.dependencies.push(parseModuleConditions(element));  // And you thought recursive processing would be hard! Now for displaying it... :D
+                break;
+            }
+
             case "foseDependency": {
                 conditions.dependencies.push({
                     type: "scriptExtenderVers",
                     value: element.getAttribute('version')
                 });
-            break;}
-    
+                break;
+            }
+
             case "fommDependency": {
                 conditions.dependencies.push({
                     type: "modManagerVers",
                     value: element.getAttribute('version')
                 });
-            break;}
+                break;
+            }
         }
     }
     return conditions;
@@ -699,7 +713,7 @@ function parseConditions(xmlParentElement){
     @returns {{identifier: String, conditions: {}, files: []
         }} An array of file objects
 */
-function parseFiles(xmlParentElement, addToBaseTags = false){
+function parseModuleFiles(xmlParentElement, addToBaseTags = false){
     if (typeof xmlParentElement === "undefined") {
         return [];
     }
@@ -729,13 +743,13 @@ function parseFiles(xmlParentElement, addToBaseTags = false){
     if (addToBaseTags) {
         builderJSON.installs.push({
             identifier: "",
-            conditions: xmlParentElement.parentElement.tagName.toLowerCase() == "pattern" ? parseConditions(xmlParentElement.parentElement.getElementsByTagName("dependencies")[0]) : [],
+            conditions: xmlParentElement.parentElement.tagName.toLowerCase() == "pattern" ? parseModuleConditions(xmlParentElement.parentElement.getElementsByTagName("dependencies")[0]) : [],
             files: [...temp_files]
         });
     } else {
         return {
             identifier: "",
-            conditions: xmlParentElement.parentElement.tagName.toLowerCase() == "pattern" ? parseConditions(xmlParentElement.parentElement.getElementsByTagName("dependencies")[0]) : [],
+            conditions: xmlParentElement.parentElement.tagName.toLowerCase() == "pattern" ? parseModuleConditions(xmlParentElement.parentElement.getElementsByTagName("dependencies")[0]) : [],
             files: [...temp_files]
         };
     }
@@ -979,7 +993,7 @@ function inputValue(element, usePlaceholder = true){
     @returns {string} The value of the input element
 */
 function getAttrDefault(element, attr, def = ''){
-    
+
     if (!element.hasAttribute(attr)){return def;}
 
     var attrValue = element.getAttribute(attr);
@@ -1103,3 +1117,25 @@ function getXMLTag(xml, tagName, create = true){
     return newTag;
 }
 
+
+   /*$$$\  $$$$$$\   $$$$$$\  $$\   $$\       $$\   $$\   $$\     $$\ $$\
+   \__$$ |$$  __$$\ $$  __$$\ $$$\  $$ |      $$ |  $$ |  $$ |    \__|$$ |
+      $$ |$$ /  \__|$$ /  $$ |$$$$\ $$ |      $$ |  $$ |$$$$$$\   $$\ $$ | $$$$$$$\
+      $$ |\$$$$$$\  $$ |  $$ |$$ $$\$$ |      $$ |  $$ |\_$$  _|  $$ |$$ |$$  _____|
+$$\   $$ | \____$$\ $$ |  $$ |$$ \$$$$ |      $$ |  $$ |  $$ |    $$ |$$ |\$$$$$$\
+$$ |  $$ |$$\   $$ |$$ |  $$ |$$ |\$$$ |      $$ |  $$ |  $$ |$$\ $$ |$$ | \____$$\
+\$$$$$$  |\$$$$$$  | $$$$$$  |$$ | \$$ |      \$$$$$$  |  \$$$$  |$$ |$$ |$$$$$$$  |
+ \______/  \______/  \______/ \__|  \__|       \______/    \____/ \__|\__|\______*/
+
+
+/** Renames the specified JSON key in-place
+    @param {String} oldKeyName The name of the key to rename
+    @param {String} newKeyName The new name for the key
+    @returns {nil} nothing
+*/
+Object.prototype.renameKey = function (oldKeyName, newKeyName){
+    this[newKeyName] = this[oldKeyName];
+
+    // Delete the key, if it exists (the function doesn't care)
+    delete this[oldKeyName];
+};
