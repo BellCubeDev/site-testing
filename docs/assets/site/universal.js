@@ -154,7 +154,9 @@ BellCubicSummary.prototype.toggle = function () {
     */
 BellCubicSummary.prototype.reEval = function () {
     /*console.log('[BCD-SUMMARY] reEval() called on ',this)*/
-    if (this.for.classList.contains('is-open') || this.element_.classList.contains('is-open') ) {this.open();} else {this.close();}
+    
+    // All the SetTimeout does here is diver processing to the next processing cycle. This prevents some of the layout shift oddities I've observed.
+    setTimeout(() => {if (this.for.classList.contains('is-open') || this.element_.classList.contains('is-open') ) {this.open();} else {this.close();}});
 };
 
 /**
