@@ -38,14 +38,6 @@ defaults:
       path: "assets/site/misc/Info.xsd"
     values:
       layout: compress_html
-  - scope:
-      path: "assets/site/css"
-    values:
-      layout: stylesheet
-  - scope:
-      path: "assets/site/mdl/css"
-    values:
-      layout: stylesheet
 social:
   name: BellCube's Site
 description: >
@@ -108,6 +100,8 @@ liquid:
 
 # Compress CSS
 sass:
+  sass_dir: assets
+  sourcemap: 'always'
   style: compressed
 
 # Compress HTML Settings

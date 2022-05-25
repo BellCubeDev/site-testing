@@ -282,7 +282,7 @@ function init() {
     initRan = true;
     try{registerComponents();}catch(e){/*console.log(e.stack)*/}
 
-    /*
+    /* (these variables are defined here so they aren't kept in memory the whole time)
     We pull from the Conditionalized array before the Generic array to ensure that we always have some text.
 
     Possible conditions:

@@ -44,7 +44,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 </div>
 <div class="bcd-details" id="details_builder_genConfig">
     <form autocomplete="off" name="File Control" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px">
-        <button id="fomod_FolderPicker" type="button" style="width:144px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+        <button id="fomod_FolderPicker" type="button" style="width:144px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
             Pick Directory
         </button>
             <div id="fomod_localization_folderPicker_container" hidden>
@@ -54,7 +54,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             <div class="mdl-tooltip" for="fomod_FolderPicker"><p>
                 This is the folder that you will put into an archive to be installed by users. If it is not set up for a FOMOD just yet, no worries!
             </p></div>
-        <button id="fomod_saveButton" type="button" style="width:144px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored">
+        <button id="fomod_saveButton" type="button" style="width:144px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
             Save
         </button>
     </form>
@@ -291,17 +291,17 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 <h1>Installer Steps</h1>
 <p>WARNING! Everything down here is purely for testing purposes. Nothing down here is even remotely final.</p>
 
-<button id="fomod_steps_addStep">
-    Add Step
-</button>
-
-<label>Step Sort Order</label>
+<h4 style="margin-bottom: 4px;">Step Sort Order</h4>
 <!-- Doubles as our template to copy-pasta from-->
 <select id="fomod_steps_order" class="bcd-fomod-sortOrder template" required="true">
     <option>Explicit</option>
     <option value="Ascending">Alphabetical</option>
     <option value="Descending">Reverse Alphabetical</option>
 </select>
+
+<button id="fomod_steps_addStep" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+    <i class="material-icons">add</i>
+</button>
 
 <!-- Use the 'template' class to prevent the Component Handler from messing with the template -->
 <div id="step_container" class="bcd-fomod-stepContainer template">

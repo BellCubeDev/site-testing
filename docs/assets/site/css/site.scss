@@ -1,7 +1,4 @@
 ---
-#/*
-layout: stylesheet
-#*/apple{text-align:center;}/* <-- That makes the CSS built-in extension not hate me as much
 ---
 /*  Typography
     The font sizes and line heights have been calculated assuming a body font
@@ -646,7 +643,7 @@ body.preload * {
 }
 
 .mdl-button{
-    user-select: text;
+    user-select: none;
 }
 
 .mdl-switch {
