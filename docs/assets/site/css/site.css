@@ -316,7 +316,6 @@ a {
 
     transition-property: margin-top;
     transition-timing-function: ease-in-out;
-    transition-delay: 10ms;
 
     margin-top: -100%;
 

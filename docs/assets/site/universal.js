@@ -20,7 +20,8 @@ var site_consts = {
     animDur: "animation-duration",
     marginTop: "margin-top",
     classSummary: "bcd-summary",
-    classDetails: "bcd-details"
+    classDetails: "bcd-details",
+    classIsOpen: "is-open"
 };
 
 /**
@@ -41,7 +42,7 @@ window['BellCubicDetails'] = BellCubicDetails;
     */
 BellCubicDetails.prototype.toggle = function () {
     /*console.log('[BCD-DETAILS] toggle() called on ',this)*/
-    if (this.element_.classList.contains('is-open')) {this.close();} else {this.open();}
+    if (this.element_.classList.contains(site_consts.classIsOpen) || this.header.classList.contains(site_consts.classIsOpen)) {this.close();} else {this.open();}
 };
 
 /**
@@ -49,11 +50,11 @@ BellCubicDetails.prototype.toggle = function () {
     *
     * @public
     */
-BellCubicDetails.prototype.reEval = function () {
+BellCubicDetails.prototype.reEval = function (doSetDuration = true) {
     /*console.log('[BCD-DETAILS] reEval() called on ',this)*/
     
     // All the SetTimeout does here is diver processing to the next processing cycle. This prevents some of the layout shift oddities I've observed.
-    setTimeout(() => {if (this.element_.classList.contains('is-open') || this.header.classList.contains('is-open') ) {this.open();} else {this.close();}});
+    setTimeout(() => {if (this.element_.classList.contains(site_consts.classIsOpen) || this.header.classList.contains(site_consts.classIsOpen) ) {this.open(doSetDuration);} else {this.close(doSetDuration);}});
 };
 
 /**
@@ -61,12 +62,14 @@ BellCubicDetails.prototype.reEval = function () {
     *
     * @public
     */
-BellCubicDetails.prototype.open = function () {
-    /*console.log("Setting margin-top to 0px", this.element_Children[0])*/
-    this.element_Children[0].style[site_consts.transitionDur] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
-    this.element_Children[0].style[site_consts.animDur] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
-    this.element_.classList.add('is-open');
-    this.header.classList.add('is-open');
+BellCubicDetails.prototype.open = function (doSetDuration = true) {
+    if (doSetDuration){
+        this.element_Children[0].style[site_consts.transitionDur] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
+        this.element_Children[0].style[site_consts.animDur] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
+    }
+    this.element_Children[0].style[site_consts.marginTop] = `0px`;
+    this.element_.classList.add(site_consts.classIsOpen);
+    this.header.classList.add(site_consts.classIsOpen);
 };
 
 /**
@@ -74,13 +77,17 @@ BellCubicDetails.prototype.open = function () {
     *
     * @public
     */
-BellCubicDetails.prototype.close = function () {
+BellCubicDetails.prototype.close = function (doSetDuration = true) {
     /*console.log("Setting margin-top to -" + this.element_Children[0].offsetHeight + "px", this.element_Children[0])*/
-    this.element_Children[0].style[site_consts.transitionDur] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
-    this.element_Children[0].style[site_consts.animDur] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
+    if (doSetDuration){
+        this.element_Children[0].style[site_consts.transitionDur] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
+        this.element_Children[0].style[site_consts.animDur] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
+    }
+
     this.element_Children[0].style[site_consts.marginTop] = `-${this.element_Children[0].offsetHeight}px`;
-    this.element_.classList.remove('is-open');
-    this.header.classList.remove('is-open');
+
+    this.element_.classList.remove(site_consts.classIsOpen);
+    this.header.classList.remove(site_consts.classIsOpen);
 };
 
 BellCubicDetails.prototype.header = null;
@@ -109,16 +116,18 @@ BellCubicDetails.prototype.init = function () {
         //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
 
         this.header = this.element_.ownerDocument.querySelector(`.bcd-summary[for="${this.element_.id}"`);
-        this.reEval();
-        bcd_registeredComponents.bcdDetails[this.element_.id] = this;
-        this.element_.classList.add('initialized');
         //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
 
         setTimeout(()=>{
+            bcd_registeredComponents.bcdDetails[this.element_.id] = this;
+            this.reEval(false);
+            this.reEval();
+            this.element_.classList.add('initialized');
             //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
             bcd_registeredComponents.bcdSummary[this.element_.id].forChildren = this.element_Children;
+            this.reEval(false);
             this.reEval();
-        }, 100);
+        });
     }
 };
 
@@ -140,7 +149,7 @@ window['BellCubicSummary'] = BellCubicSummary;
     */
 BellCubicSummary.prototype.toggle = function () {
     /*console.log('[BCD-SUMMARY] toggle() called on ',this)*/
-    if (this.for.classList.contains('is-open')) {
+    if (this.for.classList.contains(site_consts.classIsOpen)) {
         this.close();
     } else {
         this.open();
@@ -152,11 +161,11 @@ BellCubicSummary.prototype.toggle = function () {
     *
     * @public
     */
-BellCubicSummary.prototype.reEval = function () {
+BellCubicSummary.prototype.reEval = function (doSetDuration = true) {
     /*console.log('[BCD-SUMMARY] reEval() called on ',this)*/
     
     // All the SetTimeout does here is diver processing to the next processing cycle. This prevents some of the layout shift oddities I've observed.
-    setTimeout(() => {if (this.for.classList.contains('is-open') || this.element_.classList.contains('is-open') ) {this.open();} else {this.close();}});
+    if (this.for.classList.contains(site_consts.classIsOpen) || this.element_.classList.contains(site_consts.classIsOpen) ) {this.open(doSetDuration);} else {this.close(doSetDuration);}
 };
 
 /**
@@ -164,30 +173,40 @@ BellCubicSummary.prototype.reEval = function () {
     *
     * @public
     */
-BellCubicSummary.prototype.open = function () {
+BellCubicSummary.prototype.open =  function (doSetDuration = true) {
     /*console.log("Setting margin-top to 0px", this.for)*/
     try{
-        this.forChildren[0].style[site_consts.transitionDur] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
-        this.forChildren[0].style[site_consts.animDur] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
+        if (doSetDuration){
+            this.forChildren[0].style[site_consts.transitionDur] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
+            this.forChildren[0].style[site_consts.animDur] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
+        }
+
         this.forChildren[0].style[site_consts.marginTop] = `0px`;
+
     }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e;}}
-    this.for.classList.add('is-open');
-    this.element_.classList.add('is-open');
+
+    this.for.classList.add(site_consts.classIsOpen);
+    this.element_.classList.add(site_consts.classIsOpen);
 };
 /**
     * Close the collapsable menu.
     *
     * @public
     */
-BellCubicSummary.prototype.close = function () {
+BellCubicSummary.prototype.close = function (doSetDuration = true) {
     /*console.log("Setting margin-top to -" + this.for.offsetHeight + "px", this.for)*/
     try{
-        this.forChildren[0].style[site_consts.transitionDur] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
-        this.forChildren[0].style[site_consts.animDur] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
+        if (doSetDuration){
+            this.forChildren[0].style[site_consts.transitionDur] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
+            this.forChildren[0].style[site_consts.animDur] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
+        }
+
         this.forChildren[0].style[site_consts.marginTop] = `-${this.forChildren[0].offsetHeight}px`;
+
     }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e;}}
-    this.for.classList.remove('is-open');
-    this.element_.classList.remove('is-open');
+
+    this.for.classList.remove(site_consts.classIsOpen);
+    this.element_.classList.remove(site_consts.classIsOpen);
 };
 
 BellCubicSummary.prototype.for = null;
@@ -204,10 +223,14 @@ BellCubicSummary.prototype.init = function () {
         this.element_.addEventListener('click', this.boundElementMouseUp);
         this.for = this.element_.ownerDocument.getElementById(this.element_.getAttribute('for'));
         this.forChildren = this.for.getElementsByClassName('bcd-details_inner');
-        this.reEval();
         bcd_registeredComponents.bcdSummary[this.element_.getAttribute('for')] = this;
         /*console.log(`bcd_registeredComponents.bcdSummary[${this.element_.getAttribute('for')}] = this;`)*/
-        this.element_.classList.add('initialized');
+
+        setTimeout(()=>{
+            this.reEval(false);
+            this.reEval();
+            this.element_.classList.add('initialized');
+        });
     }
 };
 
@@ -441,10 +464,17 @@ function init() {
         "And those that make sacrifices today, will reap the rewards of tomorrow.",
         "If you don't eat yer meat, you can't have any pudding.",
         "I'm not sure what I'm doing here, but I'm sure I'm doing something.",
+
+        // Fable 1 was a bit fun
         "Darkwood's a dangerous place, Hero.",
         "Farm-boy!",
         "My helmet, my armour, my sword and my shield. Bring these to me and the path I shall yield.",
-        "Hero, your health is low. Do you have any potions&mdash;or food?" // &mdash; = Em Dash
+        "Hero, your health is low. Do you have any potions&mdash;or food?", // &mdash; = Em Dash
+        "Deep in the forest of Albion lay the small town of Oakvale, unchanged by time and untouched by the sword. Here lived a boy and his family; a boy dreaming of greatness. Of one day being a Hero.",
+        "They're all dead. You don't want to join them, do you?",
+        "You might not realize it, but I just saved your life.",
+        "So you finally pried yourself from your pillow I see.",
+        "Hook coast? Nobody goes there. Nobody comes from there."
     ];
 
     // Still in 'window.onload'
