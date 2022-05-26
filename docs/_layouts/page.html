@@ -140,10 +140,17 @@ layout: compress_html
         <main class="mdl-layout__content">
             {{ content }}
         </main>
-        <footer class="mdl-layout__content"><p>
-            ©&nbsp;{% if site.first_publication_year != site.latest_publication_year %}{{ site.first_publication_year }}–{{ site.latest_publication_year }}{% else %}{{ site.latest_publication_year }}{% endif %}&nbsp;BellCube&nbsp;Dev,
-            <a href="{{ site.repourl }}/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">GNU&nbsp;General&nbsp;Public&nbsp;License v3.0</a>.
-            <a href="{{ site.repourl }}/" target="_blank" rel="noopener noreferrer">Source&nbsp;available&nbsp;on&nbsp;GitHub</a>
+        <footer class="mdl-layout__content">
+            <div style="margin-right:auto;margin-left:auto;">
+                <p>©&nbsp;{% if site.first_publication_year != site.latest_publication_year %}{{ site.first_publication_year }}–{{ site.latest_publication_year }}{% else %}{{ site.latest_publication_year }}{% endif %}&nbsp;BellCube&nbsp;Dev,
+                <a href="{{ site.repourl }}/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">GNU&nbsp;General&nbsp;Public&nbsp;License v3.0</a>.
+                <a href="{{ site.repourl }}/" target="_blank" rel="noopener noreferrer">Source&nbsp;available&nbsp;on&nbsp;GitHub</a>
+            </div>
+            <!-- I'm thinking of something... you'll have to wait.
+                <button type="button" style="margin-right:0px;margin-left:0px;width:24px;min-width:24px;height:24px;" class="bcd_debugButton mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                    <i class="material-icons" style="font-size:75%">code</i>
+                </button>
+            -->
         </footer>
 </body>
 </html>
