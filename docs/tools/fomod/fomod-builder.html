@@ -293,11 +293,20 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 
 <h4 style="margin-bottom: 4px;">Step Sort Order</h4>
 <!-- Doubles as our template to copy-pasta from-->
-<select id="fomod_steps_order" class="bcd-fomod-sortOrder template" required="true">
+<select id="old-fomod_steps_order" class="bcd-fomod-sortOrder template" required="true">
     <option>Explicit</option>
     <option value="Ascending">Alphabetical</option>
     <option value="Descending">Reverse Alphabetical</option>
 </select>
+
+<button id="fomod_steps_order" class="bcd_stepOrder mdl-button mdl-js-button mdl-button--icon">
+  Step Order: <i class="bcd_stepOrderValue">Explicit</i>
+</button>
+<ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="fomod_steps_order">
+    <li class="mdl-menu__item mdl-menu__item--full-bleed-divider">Explicit</li>
+    <li class="mdl-menu__item">Ascending</li>
+    <li class="mdl-menu__item">Decending</li>
+</ul>
 
 <button id="fomod_steps_addStep" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
     <i class="material-icons">add</i>

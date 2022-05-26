@@ -11,6 +11,7 @@ var initRan = false;
 */
 
 var bcd_registeredComponents = {
+    ...bcd_registeredComponents,
     bcdDetails: {},
     bcdSummary: {}
 };
@@ -253,10 +254,10 @@ function registerComponents(){
         cssClass: site_consts.classSummary,
         widget: false
     });
-    console.log("[BCD-Components] Components registered, upgrading...");
-    console.log(
-        [...document.getElementsByClassName(site_consts.classDetails), ...document.getElementsByClassName(site_consts.classSummary)]
-    );
+    //console.log("[BCD-Components] Components registered, upgrading...");
+    //console.log(
+    //    [...document.getElementsByClassName(site_consts.classDetails), ...document.getElementsByClassName(site_consts.classSummary)]
+    //);
 
     // Upgrade the elements with the classes we just registered components for
 

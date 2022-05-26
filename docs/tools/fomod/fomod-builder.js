@@ -4,6 +4,9 @@
     ...makes this code *so* much easier to maintain... you know, 'cuz I can fund my functions in VSCode's Minimap
 */
 
+//import {componentHandler} from 'assets/site/mdl/material.js'
+
+
 
 /*$$$$$\  $$\           $$\                 $$\       $$\    $$\
 $$  __$$\ $$ |          $$ |                $$ |      $$ |   $$ |
@@ -85,6 +88,52 @@ const builder_consts = {
 
 var parseIntErr = new TypeError('Value is not a number.');
 
+// Look at this rough template for the DOM!
+var bcd_registeredComponents = {
+    ...bcd_registeredComponents, // Include other definitions of bcd_registeredComponents
+    bcdBuilder: {
+        image_div: {},
+
+        order_dpd: {},
+
+        step_div: {},
+             // order_dpd
+             // dependencies_div
+             // name
+            group_div: {},
+                 // order_dpd
+                 // name
+                groupType_dpd: {},
+                plugin_div: {},
+                     // name
+                     // description
+                    pluginTypeDescriptor_div: {},
+                        result_dpd: {},
+                         // dependencies_div
+                     // flagsList_div
+                     // installs_div
+
+        flagsList_div: {},
+            flag: {},
+
+        files_div: {},
+            file: {},
+            folder: {},
+
+        dependencies_div: {},
+            dependencyFOSE_div: {},
+            dependencyGame_div: {},
+            dependencyModM_div: {},
+            dependencyFlag_div: {},
+            dependencyFile_div: {},
+
+        installs_div: {},
+            files_group: {}
+                 // files_div
+                 // dependencies_div
+    }
+};
+
 
 
 /*$$$$$\                                      $$$$$$\           $$\   $$\
@@ -102,7 +151,6 @@ $$ |      \$$$$$$$ |\$$$$$$$ |\$$$$$$$\       $$$$$$\ $$ |  $$ |$$ |  \$$$$  |
 
 
 
-window.onload = init;
 
 /** Function called when the DOM is ready for manipulation.
     All code should stem from here in some way.
@@ -121,9 +169,6 @@ async function init() {
 
     registerAutoSaveEvents();
 }
-
-
-
 
 
 function setElementVars(){
@@ -1117,6 +1162,28 @@ function getXMLTag(xml, tagName, create = true){
     return newTag;
 }
 
+// Function from https://stackoverflow.com/questions/6027830/25388984
+function getComments(context) {
+    var foundComments = [];
+    var elementPath = [context];
+    while (elementPath.length > 0) {
+        var el = elementPath.pop();
+        for (var i = 0; i < el.childNodes.length; i++) {
+            var node = el.childNodes[i];
+            if (node.nodeType === Node.COMMENT_NODE) {
+                foundComments.push(node);
+            } else {
+                elementPath.push(node);
+            }
+        }
+    }
+
+    return foundComments;
+}
+
+// NOTE: Check out https://developer.mozilla.org/en-US/docs/Web/API/Document/createNodeIterator
+
+
 
    /*$$$\  $$$$$$\   $$$$$$\  $$\   $$\       $$\   $$\   $$\     $$\ $$\
    \__$$ |$$  __$$\ $$  __$$\ $$$\  $$ |      $$ |  $$ |  $$ |    \__|$$ |
@@ -1139,3 +1206,18 @@ Object.prototype.renameKey = function (oldKeyName, newKeyName){
     // Delete the key, if it exists (the function doesn't care)
     delete this[oldKeyName];
 };
+
+
+
+
+
+
+
+
+
+
+
+window.init;
+setTimeout(window.init, 50);
+setTimeout(window.init, 150);
+setTimeout(window.init, 500);
