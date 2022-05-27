@@ -5,8 +5,8 @@ extra_head: >
     <script async src="fomod-builder.js"></script>
     <style>.mdl-layout__content {padding-bottom: 224px}</style>
 description: >
-    The FOMOD Builder is a tool for creating FOMOD installers, a popular XML-based format for video game mod installers. It is, at this time, incomplete.
-# the first of its kind to feature intuitive tooltips, dark mode, full schema support, Real-time renders, auditing
+    The FOMOD Builder is a tool for creating FOMOD installers, a popular XML-based format for video game mod installers. It is the first of its kind to feature intuitive tooltips, dark mode, and eventually more. It is, at this time, incomplete.
+# , full schema support, Real-time renders, auditing
 permalink: /tools/fomod/
 redirect_from:
   - /tools/fomod/builder/
@@ -38,11 +38,11 @@ redirect_from:
 NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full schema support! My real-time previews! My automatic auditing!</s> you'll have to wait for all of that.
 </p>
 
-<div class="bcd-summary" for="details_builder_genConfig" >
-    <i class="material-icons open-icon-90CC">expand_more</i>
-    <h2>FOMOD - General and Config</h2><h3 id="fomod_FolderPicker_folderName" style="padding-left:16px">No folder selected...</h3>
-</div>
-<div class="bcd-details" id="details_builder_genConfig">
+<!-- File & Settings (General and Config) -->
+<div class="bcd-summary" for="details_builder_genConfig" ><i class="material-icons open-icon-90CC">expand_more</i>
+    <h2>FOMOD - General and Config</h2>
+    <h3 id="fomod_FolderPicker_folderName" style="padding-left:16px">No folder selected...</h3>
+</div><div class="bcd-details" id="details_builder_genConfig">
     <form autocomplete="off" name="File Control" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px">
         <button id="fomod_FolderPicker" type="button" style="width:144px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
             Pick Directory
@@ -128,10 +128,10 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     </form>
 </div>
 
-<div class="bcd-summary" for="details_builder_meta" id="details_builder_meta_summary">
-    <i class="material-icons open-icon-90CC">expand_more</i><h2 id="fomod_ModName">Metadata</h2>
-</div>
-    <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_builder_meta_summary"><p>
+<!-- Metadata -->
+<div class="bcd-summary" for="details_builder_meta" id="details_builder_meta_summary"><i class="material-icons open-icon-90CC">expand_more</i>
+    <h2 id="fomod_ModName">Metadata</h2>
+</div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_builder_meta_summary"><p>
         Metadata for the mod, stored in the <code>Info.xml</code> file of the FOMOD (along with certain data in <code>ModuleConfig.xml</code>)
         <br /><br /><hr /><br />
         <h3>Used By</h3><ul class="mod-manager-list">
@@ -317,22 +317,40 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     <!-- Using the power of JavaScript, we can clone this element for each step -->
     <!-- TODO: Finish the template and add the hidden attribute -->
     <form id="TEMPLATE.fomod_step_container" class="bcd_fomodStep">
-        <label></label>
-        <select class="bcd-fomod-sortOrder" required="true">
-            <option></option>
-        </select>
+        <div class="bcd-fomod-sortOrder">Step Order: <i class="bcd_stepOrderValue"></i></div>
     
-        <!-- Using the power of JavaScript, we can fill the Dependency Builder dynamically -->
-        <label>Visibility Conditions</label>
-        <div class="bcd-fomod-dependency template">
+        <!-- Group Editor -->
+        <div class="bcd-summary" for="details_groups_step_01" id="details_groups_step_summary_01"><i class="material-icons open-icon-90CC">expand_more</i>
+            <h3>Groups</h3>
+        </div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_groups_step_summary_01"><p>
+                Groups can either group options with similar functions together or, alternatively, allow for mutually-exclusive options without complex conditioning (which MO2 does not yet fully support).
+        </p></div>
+        <div class="bcd-details" id="details_groups_step_01">
+            <button id="fomod_steps_addStep" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                <i class="material-icons">add</i>
+            </button>
+            <div class="bcd-fomod-group">group-placeholder</div>
+        </div>
+    
+        <!-- Step Dependencies Editor -->
+        <div class="bcd-summary" for="details_dependencies_step_01" id="details_dependencies_step_summary_01"><i class="material-icons open-icon-90CC">expand_more</i>
+            <h3>Visibility Conditions</h3>
+        </div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_dependencies_step_summary_01"><p>
+                Conditions that determine whether or not the step shouls be shown to the user.
+        </p></div>
+        <div class="bcd-details" id="details_dependencies_step_01">
+            <div class="bcd-fomod-dependencies">dependencies-editor-placeholder</div>
         </div>
     </form>
 </div>
+
+
 
 <!-- To-do list
 
     Needed:
     TODO: Realtime Auditing
+    TODO: Ctrl + Z support
 
     Wanted:
     TODO: Add preview and output simulation for Vortex's installer window

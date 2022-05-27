@@ -362,6 +362,9 @@ async function openFomodDirectory(){
 
     var temp_fomodDirectory = await temp_rootDirectory.getDirectoryHandle('fomod', {create: true});
 
+    // Delete the history now that the user has opened a new file
+    builderJSON_NewDocument()
+
     // Get Info.xml and ModuleConfig.xml
 
     // Parse Info.xml
@@ -567,8 +570,15 @@ var builderJSON = {
 //            }
 //        ]
     },
-    moduleName: "", // config > moduleName
-    moduleImage: "", // config > moduleImage
+    meta: { // TODO: Incorporate this into the already-existing builder stuff
+        name: String,
+        image: String,
+        author: String,
+        version: String,
+        id: Number,
+        url: String
+
+    },
     steps: { // config > installSteps
         order: "", // config > installSteps.order
         steps: [
@@ -624,14 +634,35 @@ var builderJSON = {
 //                }
 //            ]
 //        }
-    ],
+    ]
 //    defaultFlags: {/* key-value pairs */} // Custom Wizardry
 };
 
-var builderJSON_Instance = Object.create(builderJSON);
+// Max history states: 4095 + current state (4096 total, or index 4095)
+var builderJSON_Instance = [Object.create(builderJSON)];
+
+/** Add an empty Builder JSON to the history states */
+function builderJSON_NewInstance() {
+    builderJSON_Instance.unshift(Object.create(builderJSON))
+}
+
+/** Add a new history state in preperation for undoable edits */
+function builderJSON_NewHistoryState(){
+    builderJSON_Instance.unshift(Object.create(builderJSON_Instance[0]))
+
+    // Trim the previous version count down to 4096
+    if (builderJSON_Instance.length > 4096){
+        builderJSON_Instance.slice(0, 4096); // Slice's End index is non-inclusive, so we're pulling 0 to 4095 (4096 items)
+    }
+}
+
 /** Wipe the previous BuilderJSON instance, creating a new one in its stead. */
-function newBuilderJSONInstance() {
-    builderJSON_Instance = Object.create(builderJSON_Instance);
+function builderJSON_NewDocument(){
+    builderJSON_Instance = [Object.create(builderJSON)];
+}
+
+function builderJSON_Parse(){
+    // TODO: Add Builder JSON Parse function (for loading history states)
 }
 
 /* "Default Flags" XML
@@ -664,21 +695,21 @@ function parseModuleConfigXML(xmlString) {
     var temp_moduleConfig_xml_root = getXMLTag(temp_moduleConfig_xml, 'config');
 
     // Get the module name
-    builderJSON_Instance.moduleName = readXMLTag(temp_moduleConfig_xml_root, "moduleName");
+    builderJSON_Instance[0].moduleName = readXMLTag(temp_moduleConfig_xml_root, "moduleName");
 
      // TODO Handle conflicts between Info.xml and ModuleConfig.xml (e.g. with names)
 
     // Get the module image
-    builderJSON_Instance.moduleImage = getXMLTag(temp_moduleConfig_xml_root, "moduleImage").getAttribute("path");
+    builderJSON_Instance[0].moduleImage = getXMLTag(temp_moduleConfig_xml_root, "moduleImage").getAttribute("path");
 
     // Get Module Conditions
-    builderJSON_Instance.conditions = parseModuleConditions(getXMLTag(temp_moduleConfig_xml_root, "moduleDependencies", false));
+    builderJSON_Instance[0].conditions = parseModuleConditions(getXMLTag(temp_moduleConfig_xml_root, "moduleDependencies", false));
 
     // Get base-level installs
-    builderJSON_Instance.installs.push(parseModuleFiles(getXMLTag(temp_moduleConfig_xml_root, "requiredInstallFiles", false)));
+    builderJSON_Instance[0].installs.push(parseModuleFiles(getXMLTag(temp_moduleConfig_xml_root, "requiredInstallFiles", false)));
 
     for (var element of getXMLTag(getXMLTag(temp_moduleConfig_xml_root, "conditionalFileInstalls", false), "pattern", false).children) {
-        builderJSON_Instance.installs.push(parseModuleFiles(getXMLTag(element, 'files', false)));
+        builderJSON_Instance[0].installs.push(parseModuleFiles(getXMLTag(element, 'files', false)));
     }
 }
 
