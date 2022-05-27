@@ -576,6 +576,7 @@ body.preload * {
 
 .bcd_fomodStep{
     margin: 12px 6px;
+    padding: 16px, 12px;
 
     background-color: #0002;
 
@@ -583,7 +584,6 @@ body.preload * {
     border: #fff4;
     border-width: 6px;
 
-    padding-left: 4px;
     border-left: #49ba56; /* This will be randomized by JavaScript later - this is a default. */
     border-radius: 4px;
     border-left-style: groove;
