@@ -299,7 +299,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     <option value="Descending">Reverse Alphabetical</option>
 </select>
 
-<button id="fomod_steps_order" class="bcd_stepOrder mdl-button mdl-js-button mdl-button--icon">
+<button id="fomod_steps_order" type="button" class="bcd_stepOrder mdl-button mdl-js-button mdl-button--icon">
   Step Order: <i class="bcd_stepOrderValue">Explicit</i>
 </button>
 <ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="fomod_steps_order">
@@ -316,32 +316,30 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 <div id="step_container" class="bcd-fomod-stepContainer template">
     <!-- Using the power of JavaScript, we can clone this element for each step -->
     <!-- TODO: Finish the template and add the hidden attribute -->
-    <form id="TEMPLATE.fomod_step_container" class="bcd_fomodStep">
-        <div class="bcd-fomod-sortOrder">Step Order: <i class="bcd_stepOrderValue"></i></div>
-    
-        <!-- Group Editor -->
-        <div class="bcd-summary" for="details_groups_step_01" id="details_groups_step_summary_01"><i class="material-icons open-icon-90CC">expand_more</i>
-            <h3>Groups</h3>
-        </div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_groups_step_summary_01"><p>
-                Groups can either group options with similar functions together or, alternatively, allow for mutually-exclusive options without complex conditioning (which MO2 does not yet fully support).
-        </p></div>
-        <div class="bcd-details" id="details_groups_step_01">
-            <button id="fomod_steps_addStep" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
-                <i class="material-icons">add</i>
-            </button>
-            <div class="bcd-fomod-group">group-placeholder</div>
-        </div>
-    
-        <!-- Step Dependencies Editor -->
-        <div class="bcd-summary" for="details_dependencies_step_01" id="details_dependencies_step_summary_01"><i class="material-icons open-icon-90CC">expand_more</i>
-            <h3>Visibility Conditions</h3>
-        </div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_dependencies_step_summary_01"><p>
-                Conditions that determine whether or not the step shouls be shown to the user.
-        </p></div>
-        <div class="bcd-details" id="details_dependencies_step_01">
-            <div class="bcd-fomod-dependencies">dependencies-editor-placeholder</div>
-        </div>
-    </form>
+    <div class="bcd-fomod-sortOrder">Step Order: <i class="bcd_stepOrderValue"></i></div>
+
+    <!-- Group Editor -->
+    <div class="bcd-summary" for="details_groups_step_01" id="details_groups_step_summary_01"><i class="material-icons open-icon-90CC">expand_more</i>
+        <h3>Groups</h3>
+    </div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_groups_step_summary_01"><p>
+            Groups can either group options with similar functions together or, alternatively, allow for mutually-exclusive options without complex conditioning (which MO2 does not yet fully support).
+    </p></div>
+    <div class="bcd-details" id="details_groups_step_01">
+        <button type="button" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+            <i class="material-icons">add</i>
+        </button>
+        <div class="bcd-fomod-group">group-placeholder</div>
+    </div>
+
+    <!-- Step Dependencies Editor -->
+    <div class="bcd-summary" for="details_dependencies_step_01" id="details_dependencies_step_summary_01"><i class="material-icons open-icon-90CC">expand_more</i>
+        <h3>Visibility Conditions</h3>
+    </div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_dependencies_step_summary_01"><p>
+            Conditions that determine whether or not the step shouls be shown to the user.
+    </p></div>
+    <div class="bcd-details" id="details_dependencies_step_01">
+        <div class="bcd-fomod-dependencies">dependencies-editor-placeholder</div>
+    </div>
 </div>
 
 
