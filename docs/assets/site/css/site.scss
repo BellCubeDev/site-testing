@@ -576,15 +576,17 @@ body.preload * {
 
 .bcd_fomodStep{
     margin: 12px 6px;
+
+    background-color: #0002;
+
     border-style: inset;
     border: #fff4;
-    background-color: #0004;
+    border-width: 6px;
 
     padding-left: 4px;
     border-left: #49ba56; /* This will be randomized by JavaScript later - this is a default. */
     border-radius: 4px;
     border-left-style: groove;
-    border-width: 2px
 }
 
 .mdl-tooltip * {
