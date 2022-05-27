@@ -286,10 +286,6 @@ function parseIntRelaxed(intString) {
 
 
 
-
-
-
-
 /** uses `parseIntSuperStrict()` or, if relaxed==true, `parseIntRelaxed()` to parse a string into an integer.
     @param {string} intString - The string to parse
     @param {boolean} relaxed - Use `parseIntRelaxed()` instead of `parseIntSuperStrict()`
@@ -302,6 +298,8 @@ function parseIntExtremes(intString, relaxed = false){
         return parseIntSuperStrict(intString);
     }
 }
+
+
 
 
 /*$$$$$\                                      $$$$$$$\  $$\
@@ -1206,14 +1204,6 @@ Object.prototype.renameKey = function (oldKeyName, newKeyName){
     // Delete the key, if it exists (the function doesn't care)
     delete this[oldKeyName];
 };
-
-
-
-
-
-
-
-
 
 
 
