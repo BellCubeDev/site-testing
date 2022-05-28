@@ -14,7 +14,6 @@ redirect_from:
 ---
 
 
-
 <!--
     MO2 - Info.xml
     https://github.com/Holt59/mo2-merge/blob/master/plugins/installer_fomod/src/fomodinstallerdialog.cpp#L626-L639
@@ -28,7 +27,7 @@ redirect_from:
     https://github.com/Nexus-Mods/Vortex/blob/master/src/extensions/installer_fomod/index.ts#L144-L167
 
     Vortex - ModuleConfig.xml
-
+    ???
 -->
 
 
@@ -299,14 +298,16 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     <option value="Descending">Reverse Alphabetical</option>
 </select>
 
-<button id="fomod_steps_order" type="button" class="bcd_stepOrder mdl-button mdl-js-button mdl-button--icon">
-  Step Order: <i class="bcd_stepOrderValue">Explicit</i>
-</button>
-<ul class="mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="fomod_steps_order">
-    <li class="mdl-menu__item mdl-menu__item--full-bleed-divider">Explicit</li>
-    <li class="mdl-menu__item">Ascending</li>
-    <li class="mdl-menu__item">Decending</li>
-</ul>
+<div class="bcd_orderDropdown template">
+    <button id="fomod_orderOptionsBtn" type="button" class="bcd_stepOrderBtn mdl-button mdl-js-button">
+    Step Order: <i class="bcd_stepOrderValue">Explicit</i>
+    </button>
+    <ul class="fomod_orderOptions mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="fomod_steps_order">
+        <li pos="0" class="mdl-menu__item mdl-menu__item--full-bleed-divider">Explicit</li>
+        <li pos="1" class="mdl-menu__item">Ascending</li>
+        <li pos="2" class="mdl-menu__item">Descending</li>
+    </ul>
+</div>
 
 <button id="fomod_steps_addStep" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
     <i class="material-icons">add</i>
@@ -316,6 +317,8 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 <div id="step_container" class="bcd-fomod-stepContainer template">
     <!-- Using the power of JavaScript, we can clone this element for each step -->
     <!-- TODO: Finish the template and add the hidden attribute -->
+
+    <!-- TODO: Turn this into a menu via JS -->
     <div class="bcd-fomod-sortOrder">Step Order: <i class="bcd_stepOrderValue"></i></div>
 
     <!-- Group Editor -->
@@ -355,9 +358,10 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 
     Nice-to-have:
     TODO: Add preview and output simulation for MO2's installer window
-    TODO: Show recommendation to users adding 3+ files to a single option to use a folder instead
+    TODO: Show recommendation to users adding multiple files within a single directory to a single option to use a folder instead
     TODO: Show conflicts between files
     TODO: Show conflicts between files contained within folders
+    TODO: Conflict editor
 
     IllusiveMan:
     TODO: Add Bulk Actions (multi-select?!!)

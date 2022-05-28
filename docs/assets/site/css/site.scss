@@ -576,17 +576,13 @@ body.preload * {
 
 .bcd-fomod-stepContainer{
     margin: 12px 6px;
-    padding: 160px, 120px; /* Testing! */
+    padding: 12px; /* Testing! */
 
     background-color: #0002;
-
-    border-style: inset;
-    border: #fff4;
     border-width: 6px;
-
-    border-left: #49ba56; /* This will be randomized by JavaScript later - this is a default. */
-    border-radius: 4px;
-    border-left-style: groove;
+    border-radius: 6px;
+    border-left-style: solid;
+    border-left-color: #49ba56; /* This will be randomized by JavaScript later - this is a default. */
 }
 
 .mdl-tooltip * {
@@ -618,7 +614,7 @@ body.preload * {
         -webkit-transform: scale(0);
         transform: scale(0);
         opacity: 0;
-        visibility: hidden
+        visibility: hidden;
     }
 
     50% {

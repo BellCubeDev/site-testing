@@ -111,7 +111,13 @@ function dumpCSSText(element){
 */
 BellCubicDetails.prototype.init = function () {
     if (this.element_) {
-        this.element_.innerHTML = `<div class="bcd-details_inner">${this.element_.innerHTML}</div>`;
+
+        // Create a container element to make animation go brrr
+        // Slightly over-complicated because, uh, DOM didn't want to cooperate.
+        var tempInnerHTML = this.element_.innerHTML;
+        this.element_.innerHTML = "";
+        this.element_.innerHTML = `<div class="bcd-details_inner">${tempInnerHTML}</div>`;
+        
         this.element_Children = this.element_.getElementsByClassName('bcd-details_inner');
 
         //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});

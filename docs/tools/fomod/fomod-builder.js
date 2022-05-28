@@ -4,9 +4,6 @@
     ...makes this code *so* much easier to maintain... you know, 'cuz I can fund my functions in VSCode's Minimap
 */
 
-//import {componentHandler} from 'assets/site/mdl/material.js'
-
-
 
 /*$$$$$\  $$\           $$\                 $$\       $$\    $$\
 $$  __$$\ $$ |          $$ |                $$ |      $$ |   $$ |
@@ -156,7 +153,11 @@ $$ |      \$$$$$$$ |\$$$$$$$ |\$$$$$$$\       $$$$$$\ $$ |  $$ |$$ |  \$$$$  |
     All code should stem from here in some way.
     @returns {nil} nothing
 */
+var initRan = false;
 async function init() {
+    if (initRan) { return; }
+    initRan = true;
+
     // Sets the various element variables found above
     setElementVars();
 
@@ -384,7 +385,6 @@ async function openFomodDirectory(){
     //moduleConfig_file = temp_moduleConfig_file;     <--   are called in the respective parsers
 
     // Open the Metadata section
-                                    // eslint-disable-next-line no-undef
     bcd_registeredComponents.bcdSummary[elm_collapsableMetadata.id].open();
 }
 
@@ -829,6 +829,92 @@ function parseModuleFiles(xmlParentElement, addToBaseTags = false){
     }
 }
 
+/*$$$$$\                                                                              $$\
+$$  __$$\                                                                             $$ |
+$$ /  \__| $$$$$$\  $$$$$$\$$$$\   $$$$$$\   $$$$$$\  $$$$$$$\   $$$$$$\  $$$$$$$\  $$$$$$\    $$$$$$$\
+$$ |      $$  __$$\ $$  _$$  _$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ \_$$  _|  $$  _____|
+$$ |      $$ /  $$ |$$ / $$ / $$ |$$ /  $$ |$$ /  $$ |$$ |  $$ |$$$$$$$$ |$$ |  $$ |  $$ |    \$$$$$$\
+$$ |  $$\ $$ |  $$ |$$ | $$ | $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |  $$ |$$\  \____$$\
+\$$$$$$  |\$$$$$$  |$$ | $$ | $$ |$$$$$$$  |\$$$$$$  |$$ |  $$ |\$$$$$$$\ $$ |  $$ |  \$$$$  |$$$$$$$  |
+ \______/  \______/ \__| \__| \__|$$  ____/  \______/ \__|  \__| \_______|\__|  \__|   \____/ \_______/
+                                  $$ |
+                                  $$ |
+                                  \_*/
+
+
+/** Creates an element of the specified type
+    @param {String} tagName - The type of element to create
+    @param {class} componentType - The class of the element to create
+    @param {Object} [attrs = {}] - The attributes to set on the element
+    @param {Object} [properties = {}] - The properties to set on the element
+*/
+function createComponent(tagName, componentType, attrs = {}, properties = {}){
+    var elem = document.createElement(tagName);
+    
+    // Nice one, Copilot! I had to manually verify it.
+    for (var attr in attrs) {
+        elem.setAttribute(attr, attrs[attr]);
+    }
+    for (var prop in properties) {
+        elem[prop] = properties[prop];
+    }
+
+    // eslint-disable-next-line no-undef
+    componentHandler.upgradeElement(elem);
+    bcd_registeredComponents.bcdBuilder[componentType.builderJSName].push(elem);
+}
+
+
+
+/**
+    * @param {HTMLElement} element
+*/
+// eslint-disable-next-line func-style
+var builder_SortOrderDropdown = function BellCubicDetails(element) {
+    this.element_ = element;
+    this.init();
+};
+window['BellCubicDetails'] = builder_SortOrderDropdown;
+
+builder_SortOrderDropdown.builderJSName = 'order_dpd'; // Used for dynamically storing the registered component
+
+/**
+    * @param {MouseEvent} event The element that was clicked
+*/
+builder_SortOrderDropdown.prototype.clickHandler = function (event) {
+    if (event.target.hasAttribute('builder_dropdownValue')) {
+        this.value = event.target.getAttribute('builder_dropdownValue');
+    } else {
+        this.value = event.target.innerHTML;
+    }
+    event.target.innerHTML;
+};
+
+builder_SortOrderDropdown.prototype.button = null;
+builder_SortOrderDropdown.prototype.btnChangeText = null;
+builder_SortOrderDropdown.prototype.options = null;
+builder_SortOrderDropdown.prototype.value = null;
+
+/**
+    * Initialize element.
+*/
+builder_SortOrderDropdown.prototype.init = function () {
+    if (this.element_) {
+        this.element_.innerHTML += document.querySelector('.bcd_orderDropdown.template').innerHTML;
+        this.button = this.element_.querySelector('.fomod_orderOptionsBtn');
+        this.btnChangeText = this.element_.querySelector('.bcd_stepOrderValue');
+        this.options = this.element_.querySelector(`.fomod_orderOptions`);
+        for (var option of this.options.children) {
+            option.addEventListener('click', this.clickHandler.bind(this));
+        }
+    }
+};
+
+
+
+
+
+
 
 /*$$$$$\                       $$\
 $$  __$$\                      \__|
@@ -1094,6 +1180,44 @@ function checkToggleSwitch_Delayed(delay, element){
     });
 }
 
+
+/** Reorders the children of the specified element.
+    @param {HTMLElement} parent - The element to reorder the children of. The children must have the `pos` attribute, or will otherwise be sent to the bottom.
+    @returns {Array<HTMLElement>} - The children of the parent element, in the order requested by the elements' `pos` attributes.
+*/
+function gerReorderChildrenArr(parent){
+    var children = parent.children;
+    var children_arr = [];
+
+    // Fill the array up with empty elements, up to the length of Children
+    children_arr.fill(null, 0, children.length);
+
+    // Give the elements their desired positions
+    for (var elem in children){
+        if (elem.hasAttribute('pos')){
+            children_arr[elem.getAttribute('pos')] = elem;
+        } else {
+            children_arr.push(elem);
+        }
+    }
+
+    // And now to chop out the nulls
+    children_arr = children_arr.filter(element => {
+        return element == null? false : true;
+    });
+
+    return children_arr;
+}
+
+/** Sets the parent of elements in the array in the order of the array
+    @param {HTMLElement} parent - The parent element to set the children of.
+    @param {Array<HTMLElement>} elements - The children to set.
+*/
+function applyReorderByArray(parent, elements){
+    for (var element in elements){
+        parent.appendChild(element);
+    }
+}
 
 
 
