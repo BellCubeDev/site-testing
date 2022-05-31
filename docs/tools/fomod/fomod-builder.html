@@ -290,14 +290,6 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 <h1>Installer Steps</h1>
 <p>WARNING! Everything down here is purely for testing purposes. Nothing down here is even remotely final.</p>
 
-<h4 style="margin-bottom: 4px;">Step Sort Order</h4>
-<!-- Doubles as our template to copy-pasta from-->
-<select id="old-fomod_steps_order" class="bcd-fomod-sortOrder template" required="true">
-    <option>Explicit</option>
-    <option value="Ascending">Alphabetical</option>
-    <option value="Descending">Reverse Alphabetical</option>
-</select>
-
 <div class="bcd_orderDropdown template">
     <button id="fomod_orderOptionsBtn" type="button" class="bcd_stepOrderBtn mdl-button mdl-js-button">
     Step Order: <i class="bcd_stepOrderValue">Explicit</i>
@@ -309,7 +301,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     </ul>
 </div>
 
-<button id="fomod_steps_addStep" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+<button id="fomod_steps_addStep" type="button" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
     <i class="material-icons">add</i>
 </button>
 
@@ -322,8 +314,8 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     <div class="bcd-fomod-sortOrder">Step Order: <i class="bcd_stepOrderValue"></i></div>
 
     <!-- Group Editor -->
-    <div class="bcd-summary" for="details_groups_step_01" id="details_groups_step_summary_01"><i class="material-icons open-icon-90CC">expand_more</i>
-        <h3>Groups</h3>
+    <div class="bcd-summary min-padding" for="details_groups_step_01"><i class="material-icons open-icon-90CC">expand_more</i>
+        <h3 id="details_groups_step_summary_01">Groups</h3>
     </div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_groups_step_summary_01"><p>
             Groups can either group options with similar functions together or, alternatively, allow for mutually-exclusive options without complex conditioning (which MO2 does not yet fully support).
     </p></div>
@@ -331,11 +323,70 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
         <button type="button" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
             <i class="material-icons">add</i>
         </button>
-        <div class="bcd-fomod-group">group-placeholder</div>
+        <div class="bcd-fomod-groups">
+            <div id="group_container" class="bcd-fomod-groupContainer template">
+                <div class="bcd_selectionType template">
+                    <button id="fomod_selectionTypeOptionsBtn" type="button" class="bcd_stepSelectionTypeBtn mdl-button mdl-js-button">
+                        Selection Type: <i class="bcd_stepSelectionTypeValue">SelectAny</i>
+                    </button>
+                    <ul class="fomod_selectionTypeOptions mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="fomod_steps_order">                        
+                        <li pos="0" class="mdl-menu__item mdl-menu__item--full-bleed-divider">SelectAny</li>
+                        <li pos="1" class="mdl-menu__item">SelectExactlyOne</li>
+                        <li pos="2" class="mdl-menu__item">SelectAtMostOne</li>
+                        <li pos="3" class="mdl-menu__item">SelectAtLeastOne</li>
+                        <li pos="4" class="mdl-menu__item">SelectAll</li>
+                    </ul>
+                </div>
+            
+                <!-- Option Editor -->
+                <div class="bcd-summary" for="details_options_step_01"><i class="material-icons open-icon-90CC">expand_more</i>
+                    <h3 id="details_options_step_summary_01">Options</h3>
+                </div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_options_step_summary_01"><p>
+                        Options are the checkboxes and radio buttons you actually interact with in the installer window. They can set flags, install files directly, and even completely disable themselves based on various conditions.
+                </p></div>
+                <div class="bcd-details" id="details_options_step_01">
+                    <button type="button" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                        <i class="material-icons">add</i>
+                    </button>
+                    <div class="bcd-fomod-options">                    
+                        <!-- Option Editor -->
+                        <div class="bcd-summary" for="details_options_step_01"><i class="material-icons open-icon-90CC">expand_more</i>
+                            <h4 class="bcd_optionName">Options</h4>
+                        </div>
+                        <div class="bcd-details" id="details_options_step_01">
+                            <div class="bcd_selectionType template">
+                                <button id="fomod_selectionTypeOptionsBtn" type="button" class="bcd_stepSelectionTypeBtn mdl-button mdl-js-button">
+                                    Default Selection Type: <i class="bcd_stepSelectionTypeValue">Optional</i>
+                                </button>
+                                <ul class="fomod_selectionTypeOptions mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="fomod_steps_order">                        
+                                    <li pos="0" class="mdl-menu__item mdl-menu__item--full-bleed-divider">Optional</li>
+                                    <li pos="1" class="mdl-menu__item">Reccomended</li>   <!-- Pre-selected             -->
+                                    <li pos="3" class="mdl-menu__item">Required</li>      <!-- Force-enabled            -->
+                                    <li pos="4" class="mdl-menu__item">NotUseable</li>    <!-- Disabled                 -->
+                                    <li pos="2" class="mdl-menu__item">CouldBeUsable</li> <!-- (Supposedledly useless)  -->
+                                </ul>
+                            </div>
+                            <div id="fomod_option_name_cont_01" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+                                <input id="fomod_option_name_01" class="mdl-textfield__input" type="text" placeholder="Option Name">
+                                <label class="mdl-textfield__label" for="fomod_option_name_01">Option Name</label>
+                            </div>
+                            <div id="fomod_option_desc_cont_01" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+                                <input id="fomod_option_desc_01" class="mdl-textfield__input" type="text" placeholder="Option Description">
+                                <label class="mdl-textfield__label" for="fomod_option_desc_01">Option Description</label>
+                            </div>
+                            <div class="bcd_imagePicker"></div>
+                            <div class="bcd_flags-editor"></div>
+                            <div class="bcd_files-editor"></div>
+                            <div class="bcd_option-conditions-editor"></div>
+                        </div>            
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Step Dependencies Editor -->
-    <div class="bcd-summary" for="details_dependencies_step_01" id="details_dependencies_step_summary_01"><i class="material-icons open-icon-90CC">expand_more</i>
+    <div class="bcd-summary min-padding" for="details_dependencies_step_01" id="details_dependencies_step_summary_01"><i class="material-icons open-icon-90CC">expand_more</i>
         <h3>Visibility Conditions</h3>
     </div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_dependencies_step_summary_01"><p>
             Conditions that determine whether or not the step shouls be shown to the user.

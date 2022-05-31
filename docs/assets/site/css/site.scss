@@ -254,6 +254,11 @@ a {
     align-items: center;
 }
 
+.bcd-summary.min-padding {
+    padding: 6px;
+    padding-bottom: 4px;
+}
+
 .bcd-summary * {
     user-select: none;
 }
