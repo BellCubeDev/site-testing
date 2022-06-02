@@ -312,6 +312,7 @@ function init() {
         [ {random: .00001}, "WHAT IN OBLIVION?!!! <b>WHY ARE YOU SO LUCKY?!!</b>" ],
         [ {random: .05}, "Known Troublemakers:<ul><li>Lively</li><li>Lively's Cat</li><li>Lively Again</li></ul>- BigBizkit" ],
         [ {random: .33}, "Nexus Mods is the best!"],
+        [ {random: .05}, "And then I... I would be named... <i><b>TIM!</b></i><br />The horrorrs would never cease!" ],
         [ {random: .02}, "Greetings, Dragonborn."], //rdunlap
         [ {random: .1}, "Welcome, Dovahkiin."], //rdunlap
         [ {random: .05}, "War. War never changes."], //rdunlap
@@ -481,7 +482,9 @@ function init() {
         "They're all dead. You don't want to join them, do you?",
         "You might not realize it, but I just saved your life.",
         "So you finally pried yourself from your pillow I see.",
-        "Hook coast? Nobody goes there. Nobody comes from there."
+        "Hook coast? Nobody goes there. Nobody comes from there.", 
+
+        "What we've got here is failure to communicate."
     ];
 
     // Still in 'window.onload'
