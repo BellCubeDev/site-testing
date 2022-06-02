@@ -3,6 +3,22 @@
     https://patorjk.com/software/taag/#p=display&h=0&v=0&f=Big%20Money-nw
     ...makes this code *so* much easier to maintain... you know, 'cuz I can fund my functions in VSCode's Minimap
 */
+var elem_papy_docs_libName;
+var elem_papy_docs_libLink;
+var elem_papy_docs_mdOutput;
+var elem_papy_docs_filePicker;
+var elem_papy_docs_folderPicker;
+
+window.onload = function(){
+    elem_papy_docs_libName = document.getElementById('papy_docs_lib-Name');
+    elem_papy_docs_libLink = document.getElementById('papy_docs_lib-Link');
+    elem_papy_docs_mdOutput = document.getElementById('papy_docs_md-output');
+    elem_papy_docs_filePicker = document.getElementById('papy_docs_file-picker');
+    elem_papy_docs_filePicker.onclick = generateDocs_file;
+    elem_papy_docs_folderPicker = document.getElementById('papy_docs_folder-picker');
+    elem_papy_docs_folderPicker.onclick = generateDocs_folder;
+};
+window.onload(); // Just in case we load late
 
 /*$$$$$\
 $$  __$$\
@@ -38,15 +54,6 @@ var regex_Functions =
     papy_docs_libLink
 */
 
-var elem_papy_docs_libName;
-var elem_papy_docs_libLink;
-var elem_papy_docs_mdOutput;
-function builder_init(){
-    elem_papy_docs_libName = document.getElementById('papy_docs_lib-Name');
-    elem_papy_docs_libLink = document.getElementById('papy_docs_lib-Link');
-    elem_papy_docs_mdOutput = document.getElementById('papy_docs_md-output');
-}
-
 function setMarkdownOutput(str){
     // eslint-disable-next-line no-undef
     elem_papy_docs_mdOutput.innerHTML = hljs.highlight(str.replace(/^\s+/s, '').replace(/\s+$/, ''), {language: 'md'}).value;
@@ -69,7 +76,6 @@ Regex Components:
 
 
 
-// eslint-disable-next-line no-unused-vars
 async function generateDocs_file(){
     var file;
     try{
@@ -87,14 +93,11 @@ async function generateDocs_file(){
     if (!tryForPermission(file, 'read')) return;
 
     console.log(file);
+    console.log(await file.getFile());
 
-    var realFile = await file.prototype.getFile();
-    console.log(realFile);
-
-    console.log(parseScript(readFile(realFile)));
+    setMarkdownOutput(parseScript(await readFile(await file.getFile())));
 }
 
-// eslint-disable-next-line no-unused-vars
 async function generateDocs_folder(){
     var folder;
     try{
@@ -238,9 +241,9 @@ function parseScript(scriptStr) {
     var scriptname = parseScriptName(scriptStr);
     return `# ${scriptname.name}
 | :-: | :-- |
-| Engine-Bound Type | ============================== |
+| Engine-Bound Type | <!-- USER-INPUTTED --> |
 | [Parent](/skyrim/developers/papyrus/concepts/scripts#parents) | ${scriptname.parent} |
-| [Library](/skyrim/developers/papyrus/concepts/libraries) | [Vanilla](/skyrim/developers/papyrus/vanilla) |
+| [Library](/skyrim/developers/papyrus/concepts/libraries) | [${inputValue(elem_papy_docs_libName)}](${inputValue(elem_papy_docs_libLink)}) |
 
 
 
@@ -334,6 +337,8 @@ $$$$$$$  | $$$$$$  |$$ | \_/ $$ |      \$$$$$$  |  \$$$$  |$$ |$$ |$$$$$$$  |
 
 
 function inputValue(element, usePlaceholder = true){
+    console.log(element);
+    if (typeof element === 'undefined') return '';
     try{
         if (element.value != ''){return element.value;}
 
@@ -343,6 +348,3 @@ function inputValue(element, usePlaceholder = true){
 
     } finally {} return '';
 }
-
-
-
