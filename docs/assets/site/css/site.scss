@@ -172,12 +172,21 @@ h5 {
     margin: 21px 0 14px;
 }
 
-code {
+:not(pre) > code {
     background-color: #333333f0;
     padding: 5px;
     color: #fff;
     border: 1px solid #eeeeee0f;
     border-radius: 3px;
+}
+
+pre {
+    display: block;
+    background-color: #333333f0;
+    padding: 12px;
+    color: #fff;
+    border: 1px solid #eeeeee0f;
+    border-radius: 6px;
 }
 
 /* Remove extra margin above the first heading of a page. */

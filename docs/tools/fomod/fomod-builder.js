@@ -379,7 +379,6 @@ async function openFomodDirectory(){
     // Finalize setting the variables
     rootDirectory = temp_rootDirectory;
     fomodDirectory = temp_fomodDirectory;
-    newBuilderJSONInstance();
 
     //info_file = temp_info_file;                     <--   These variable setters
     //moduleConfig_file = temp_moduleConfig_file;     <--   are called in the respective parsers
