@@ -5,6 +5,7 @@
 */
 var elem_papy_docs_libName;
 var elem_papy_docs_libLink;
+var elem_papy_docs_registerPattern;
 var elem_papy_docs_mdOutput;
 var elem_papy_docs_filePicker;
 var elem_papy_docs_folderPicker;
@@ -12,6 +13,7 @@ var elem_papy_docs_folderPicker;
 window.onload = function(){
     elem_papy_docs_libName = document.getElementById('papy_docs_lib-Name');
     elem_papy_docs_libLink = document.getElementById('papy_docs_lib-Link');
+    elem_papy_docs_registerPattern = document.getElementById('papy_docs_register-pattern_cont');
     elem_papy_docs_mdOutput = document.getElementById('papy_docs_md-output');
     elem_papy_docs_filePicker = document.getElementById('papy_docs_file-picker');
     elem_papy_docs_filePicker.onclick = generateDocs_file;
@@ -33,21 +35,17 @@ $$ |  $$ |\$$$$$$$\ \$$$$$$$ |\$$$$$$$\ $$  /\$$\ \$$$$$$$\ $$$$$$$  |
                      \_____*/
 
 
-var regex_Scriptname =
-/^^Scriptname ([\w\d]+)(?:\s+extends ([\w\d]+))?(?:\s+(hidden))?(\s+(?:conditional))?(?:\s+(native))?(?:\n\{(.*?)\})?/is
-;
+const regex_Scriptname =
+/^Scriptname ([\w\d]+)(?:\s+extends ([\w\d]+))?(?:\s+(hidden))?(\s+(?:conditional))?(?:\s+(native))?(?:\n\{(.*?)\})?/is;
 
-var regex_Events =
-/((?:^\s*;.*\n)+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*Event(?:\s|;\/(?:\s|\S)*?\/;|\\)+([\w\d]+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*\((?:\s|;\/(?:\s|\S)*?\/;|\\)*((?:[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)=(?:\s|;\/(?:\s|\S)*?\/;|\\)(?:[\w\d]+|".+(?<!\\)"))?(?:(?:\s|;\/(?:\s|\S)*?\/;|\\))*,(?:\s|;\/(?:\s|\S)*?\/;|\\)+)*[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+|".+(?<!\\))?")?))?(?:\s|;\/(?:\s|\S)*?\/;|\\)*\)([\s\S]+?)^(?:\s|;\/(?:\s|\S)*?\/;|\\)*EndEvent/gmi
-;
+const regex_Events =
+/\n*((?:^\s*;.*\n)+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*Event(?:\s|;\/(?:\s|\S)*?\/;|\\)+([\w\d]+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*\((?:\s|;\/(?:\s|\S)*?\/;|\\)*((?:[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)*=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+|".*?(?<!\\)"))?(?:(?:\s|;\/(?:\s|\S)*?\/;|\\))*,(?:\s|;\/(?:\s|\S)*?\/;|\\)+)*[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+|".*?(?<!\\)"))?))?(?:\s|;\/(?:\s|\S)*?\/;|\\)*\)([\s\S]+?)^(?:\s|;\/(?:\s|\S)*?\/;|\\)*EndEvent/gim;
 
-var regex_EventParams =
-/(?:\s|;\/.*?\/;|\\)*([\w\d]+)(?:\s|;\/.*?\/;|\\)+([\w\d]+)(?:\s|;\/.*?\/;|\\)*(?:=(?:\s|;\/.*?\/;|\\)*(".+(?<!\\)"|[\w\d]+))?/gsi
-;
+const regex_EventParams =
+/(?:\s|;\/.*?\/;|\\)*([\w\d]+)(?:\s|;\/.*?\/;|\\)+([\w\d]+)(?:\s|;\/.*?\/;|\\)*(?:=(?:\s|;\/.*?\/;|\\)*(".+(?<!\\)"|[\w\d]+))?/gsi;
 
-var regex_Functions =
-/((?:^\s*;.*\n)+)(?:[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)+)?Function(?:\s|;\/(?:\s|\S)*?\/;|\\)+([\w\d]+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*\((?:\s|;\/(?:\s|\S)*?\/;|\\)*((?:[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)=(?:\s|;\/(?:\s|\S)*?\/;|\\)(?:[\w\d]+|".+(?<!\\)"))?,(?:\s|;\/(?:\s|\S)*?\/;|\\)+)*[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)=(?:\s|;\/(?:\s|\S)*?\/;|\\))?(?:[\w\d]+|".+(?<!\\)"))?(?:\s|;\/(?:\s|\S)*?\/;|\\)*\)(?:\s|;\/(?:\s|\S)*?\/;|\\)+(native|(?:([\s\S]+?)^(?:\s|;\/(?:\s|\S)*?\/;|\\)*EndFunction))/gmi
-;
+const regex_Functions =
+/\n*((?:^\s*;.*\n)+)?(?:[\w\d]+(\[.*?\])?(?:\s|;\/(?:\s|\S)*?\/;|\\)+)?Function(?:\s|;\/(?:\s|\S)*?\/;|\\)+([\w\d]+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*\((?:\s|;\/(?:\s|\S)*?\/;|\\)*((?:[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)*=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+|".*?(?<!\\)"))?(?:(?:\s|;\/(?:\s|\S)*?\/;|\\))*,(?:\s|;\/(?:\s|\S)*?\/;|\\)+)*[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+|".*?(?<!\\)"))?))?(?:\s|;\/(?:\s|\S)*?\/;|\\)*\)(?:\s|;\/(?:\s|\S)*?\/;|\\)+(?:(global)(?:\s|;\/(?:\s|\S)*?\/;|\\)+)?(native(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+(global))?|(?:([\s\S]+?)^(?:\s|;\/(?:\s|\S)*?\/;|\\)*EndFunction))/gmi;
 
 /*
     papy_docs_libName
@@ -92,8 +90,8 @@ async function generateDocs_file(){
 
     if (!tryForPermission(file, 'read')) return;
 
-    console.log(file);
-    console.log(await file.getFile());
+    //console.log(file);
+    //console.log(await file.getFile());
 
     setMarkdownOutput(parseScript(await readFile(await file.getFile())));
 }
@@ -239,14 +237,66 @@ $$\   $$ |$$ |      $$ |      $$ |$$ |  $$ |  $$ |$$\ $$ |      $$  __$$ |$$ |  
 */
 function parseScript(scriptStr) {
     var scriptname = parseScriptName(scriptStr);
+    //var functions = parseFunctions(scriptStr);
+    var functionTable = '';
+
+    var events = parseEvents(scriptStr).sort();
+    var eventTable = '';
+    /* Example:
+    |   Event   |                    Description                    | [Registration](https://modding.wiki/en/skyrim/developers/papyrus/concepts/functions#registration) |                Parameters                |
+    |    :--    |                        :-:                        |                                                :-:                                                |                   :--                    |
+    | OnLostLOS | Sent when an actor cannot see the target anymore. |                                                Yes                                                | Actor akViewer, ObjectReference akTarget |
+    */
+    /**
+        @param {{name: string,description: string,parameters: {type: string,name: string,default: string,}[],body: string;}} event
+    */
+    for (var event of events) {
+        var eventTableRow = `| ${event.name} | ${event.description}`;
+        if (scriptStr.toLowerCase().includes(inputValue(elem_papy_docs_registerPattern).toLowerCase().replace(/%e%/g, event.name))) {
+            eventTableRow += ' | Yes | ';
+        } else {
+            eventTableRow += ' | No | ';
+        }
+        // eslint-disable-next-line prefer-template
+        eventTableRow += event.parameters.map(param => `${param.type} ${param.name}`).join(', ').replace(/, $/, '') + ' |\n';
+        eventTable += eventTableRow;
+    }
+    
     return `# ${scriptname.name}
 | :-: | :-- |
-| Engine-Bound Type | <!-- USER-INPUTTED --> |
+| Engine-Bound Type | <!-- **USER-INPUTTED** --> | <!-- e.g. \`_NPC\` (Actor) -->
 | [Parent](/skyrim/developers/papyrus/concepts/scripts#parents) | ${scriptname.parent} |
 | [Library](/skyrim/developers/papyrus/concepts/libraries) | [${inputValue(elem_papy_docs_libName)}](${inputValue(elem_papy_docs_libLink)}) |
 
+${scriptname.included_documentation.replace(/^(?=.)/gm, '> ')}
 
+<!-- **Add extra description HERE** -->
 
+## [Native Functions](/skyrim/developers/papyrus/concepts/functions#native-flag)
+
+| Return Type | Function | Description | Parameters | [Global](/en/skyrim/developers/papyrus/concepts/functions/global_flag)? |
+| --: | :-: | :-: | :-: | :-: |
+${functionTable}
+
+## [Events](https://modding.wiki/en/skyrim/developers/papyrus/concepts/events)
+${eventTable}
+
+# Returning [Native Functions](https://modding.wiki/en/skyrim/developers/papyrus/concepts/functions#native-flag)
+
+[Native Functions](https://modding.wiki/en/skyrim/developers/papyrus/concepts/functions#native-flag) from any script or library that return an instance of this script
+
+<!-- **MUST BE CREATED MANUALLY** -->
+| Function | Description | [Array](/skyrim/developers/papyrus/concepts/arrays) | Script  | Library |
+| :-: | :-: | :-: | :-: | :-: |
+|     |     |     |     |     |
+
+# [Children](/skyrim/developers/papyrus/concepts/scripts#children)
+
+Scripts extending this script
+
+<!-- **MUST BE CREATED MANUALLY** -->
+| Script Name | Has Engine-Bound Type? |
+| :-: | :-: |
 
 `;
 }
@@ -294,10 +344,14 @@ function parseScriptName(scriptStr) {
     }>} - An array of event objects
 */
 function parseEvents(scriptStr) {
+    console.log('Parsing events...');
+    console.log(regex_Events);
+    console.log(scriptStr);
     var events = [];
     var parsed = scriptStr.matchAll(regex_Events);
+    console.log('Events Parsed:', parsed);
     for (var _event of parsed){
-
+        console.log(`Current Event:`, _event);
         // Parse Event Parameters
         if (typeof _event[3] !== 'undefined'){
             var params_formatted = [];
@@ -318,6 +372,7 @@ function parseEvents(scriptStr) {
             body: typeof _event[4] === 'undefined' ? '' : _event[4].replace(/^\s/, '').replace(/\s$/, '').replace(/\s$/m, '')
         });
     }
+    console.log('parseEvents(): ', events);
     return events;
 }
 
@@ -336,15 +391,20 @@ $$$$$$$  | $$$$$$  |$$ | \_/ $$ |      \$$$$$$  |  \$$$$  |$$ |$$ |$$$$$$$  |
 
 
 
+/** Convenience function to get the value of an input element. Will first attempt to get a user-submitted value, then will attempt to fetch a default from `builder_default`, before finally resorting to the `placeholder` attribute.
+    @param {HTMLElement} element The Input element to get the value of
+    @param {boolean} [usePlaceholder=true] Whether to use the `placeholder`. Defaults to True.
+    @returns {string} The value of the input element
+*/
 function inputValue(element, usePlaceholder = true){
-    console.log(element);
+    //console.log(element);
     if (typeof element === 'undefined') return '';
     try{
-        if (element.value != ''){return element.value;}
+        if (typeof element.value !== 'undefined' && element.value != '') return element.value.toString();
 
-        if(element.hasAttribute('builder_default')){return element.getAttribute('builder_default');}
+        if(element.hasAttribute('builder_default')) return element.getAttribute('builder_default').toString();
 
-        if (element.hasAttribute('placeholder') && usePlaceholder){return element.getAttribute('placeholder');}
+        if (element.hasAttribute('placeholder') && usePlaceholder) return element.getAttribute('placeholder').toString();
 
     } finally {} return '';
 }

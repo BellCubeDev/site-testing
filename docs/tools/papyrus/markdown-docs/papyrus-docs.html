@@ -77,6 +77,16 @@ THIS TOOL IS CURRENTLY ONLY INTENDED FOR USE WITH Skyrim PAPYRUS!!! Fallout 4 Pa
     modding.wiki-relative URL to the library's folder page.
 </p></div>
 
+<div id="papy_docs_register-pattern_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+                                                                      <!-- Pattern regex adapted from https://stackoverflow.com/a/30910/13076790 (changes: fix escaping, require starting with '/') -->
+    <input id="papy_docs_register-pattern" class="mdl-textfield__input" type="text" 
+        placeholder="RegisterFor%e%"> <!-- pattern="^.*?%e%.*$" -->
+    <label class="mdl-textfield__label" for="papy_docs_register-pattern">Register Function Scheme</label>
+</div>
+<div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="papy_docs_register-pattern_cont"><p>
+    Case-insensitive scheme to look for when trying to detect Event Registration functions. <code>%e%</code> is substituted for the event's name.
+</p></div>
+
 <pre><code class="language-html" id="papy_docs_md-output" onclick=""><span class="hljs-section"># Markdown Output</span>
 
 Here, you'll find the <span class="hljs-code">`Markdown`</span> that you generate from <span class="hljs-strong">**<span class="hljs-emphasis">*single*</span>**</span> files above.

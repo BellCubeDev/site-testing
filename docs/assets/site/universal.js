@@ -1,5 +1,5 @@
-window.onload = init;
-var initRan = false;
+window.onload = bcd_universalJS_init;
+var bcd_universal_initRan = false;
 /*
     This script hooks into Material Design Lite's "Component Design Pattern" API
     (see https://github.com/jasonmayes/mdl-component-design-pattern) to provide:
@@ -41,9 +41,9 @@ window['BellCubicDetails'] = BellCubicDetails;
     *
     * @public
     */
-BellCubicDetails.prototype.toggle = function () {
+BellCubicDetails.prototype.toggle = function (doSetDuration = true) {
     /*console.log('[BCD-DETAILS] toggle() called on ',this)*/
-    if (this.element_.classList.contains(site_consts.classIsOpen) || this.header.classList.contains(site_consts.classIsOpen)) {this.close();} else {this.open();}
+    if (this.element_.classList.contains(site_consts.classIsOpen) || this.header.classList.contains(site_consts.classIsOpen)) {this.close(doSetDuration);} else {this.open(doSetDuration);}
 };
 
 /**
@@ -64,10 +64,8 @@ BellCubicDetails.prototype.reEval = function (doSetDuration = true) {
     * @public
     */
 BellCubicDetails.prototype.open = function (doSetDuration = true) {
-    if (doSetDuration){
-        this.element_Children[0].style[site_consts.transitionDur] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
-        this.element_Children[0].style[site_consts.animDur] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
-    }
+    this.evaluateDuration(doSetDuration);
+
     this.element_Children[0].style[site_consts.marginTop] = `0px`;
     this.element_.classList.add(site_consts.classIsOpen);
     this.header.classList.add(site_consts.classIsOpen);
@@ -80,15 +78,21 @@ BellCubicDetails.prototype.open = function (doSetDuration = true) {
     */
 BellCubicDetails.prototype.close = function (doSetDuration = true) {
     /*console.log("Setting margin-top to -" + this.element_Children[0].offsetHeight + "px", this.element_Children[0])*/
-    if (doSetDuration){
-        this.element_Children[0].style[site_consts.transitionDur] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
-        this.element_Children[0].style[site_consts.animDur] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
-    }
+    this.evaluateDuration(doSetDuration);
 
     this.element_Children[0].style[site_consts.marginTop] = `-${this.element_Children[0].offsetHeight}px`;
 
     this.element_.classList.remove(site_consts.classIsOpen);
     this.header.classList.remove(site_consts.classIsOpen);
+};
+
+
+BellCubicDetails.prototype.evaluateDuration = function (doRun = true) {
+    if (doRun){
+        this.element_Children[0].style[site_consts.transitionDur] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
+        this.element_Children[0].style[site_consts.animDur] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
+        for (var icon of this.openIcons90deg) {icon.style[site_consts.animDur] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;}
+    }
 };
 
 BellCubicDetails.prototype.header = null;
@@ -123,6 +127,7 @@ BellCubicDetails.prototype.init = function () {
         //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
 
         this.header = this.element_.ownerDocument.querySelector(`.bcd-summary[for="${this.element_.id}"`);
+        this.openIcons90deg = this.header.getElementsByClassName('open-icon-90CC');
         //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
 
         setTimeout(()=>{
@@ -154,12 +159,12 @@ window['BellCubicSummary'] = BellCubicSummary;
     *
     * @public
     */
-BellCubicSummary.prototype.toggle = function () {
+BellCubicSummary.prototype.toggle = function (doSetDuration = true) {
     /*console.log('[BCD-SUMMARY] toggle() called on ',this)*/
     if (this.for.classList.contains(site_consts.classIsOpen)) {
-        this.close();
+        this.close(doSetDuration);
     } else {
-        this.open();
+        this.open(doSetDuration);
     }
 };
 
@@ -183,10 +188,7 @@ BellCubicSummary.prototype.reEval = function (doSetDuration = true) {
 BellCubicSummary.prototype.open =  function (doSetDuration = true) {
     /*console.log("Setting margin-top to 0px", this.for)*/
     try{
-        if (doSetDuration){
-            this.forChildren[0].style[site_consts.transitionDur] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
-            this.forChildren[0].style[site_consts.animDur] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
-        }
+        this.evaluateDuration(doSetDuration);
 
         this.forChildren[0].style[site_consts.marginTop] = `0px`;
 
@@ -203,10 +205,7 @@ BellCubicSummary.prototype.open =  function (doSetDuration = true) {
 BellCubicSummary.prototype.close = function (doSetDuration = true) {
     /*console.log("Setting margin-top to -" + this.for.offsetHeight + "px", this.for)*/
     try{
-        if (doSetDuration){
-            this.forChildren[0].style[site_consts.transitionDur] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
-            this.forChildren[0].style[site_consts.animDur] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
-        }
+        this.evaluateDuration(doSetDuration);
 
         this.forChildren[0].style[site_consts.marginTop] = `-${this.forChildren[0].offsetHeight}px`;
 
@@ -216,9 +215,19 @@ BellCubicSummary.prototype.close = function (doSetDuration = true) {
     this.element_.classList.remove(site_consts.classIsOpen);
 };
 
-BellCubicSummary.prototype.for = null;
+BellCubicSummary.prototype.evaluateDuration = function (doRun = true) {
+    try{
+        if (doRun){
+            this.forChildren[0].style[site_consts.transitionDur] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
+            this.forChildren[0].style[site_consts.animDur] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
+            for (var icon of this.openIcons90deg) {icon.style[site_consts.animDur] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;}
+        }
+    }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e;}}
+};
 
+BellCubicSummary.prototype.for = null;
 BellCubicSummary.prototype.forChildren = null;
+BellCubicSummary.prototype.openIcons90deg = null;
 
 /**
     * Initialize element.
@@ -230,6 +239,7 @@ BellCubicSummary.prototype.init = function () {
         this.element_.addEventListener('click', this.boundElementMouseUp);
         this.for = this.element_.ownerDocument.getElementById(this.element_.getAttribute('for'));
         this.forChildren = this.for.getElementsByClassName('bcd-details_inner');
+        this.openIcons90deg = this.element_.getElementsByClassName('open-icon-90CC');
         bcd_registeredComponents.bcdSummary[this.element_.getAttribute('for')] = this;
         /*console.log(`bcd_registeredComponents.bcdSummary[${this.element_.getAttribute('for')}] = this;`)*/
 
@@ -242,24 +252,33 @@ BellCubicSummary.prototype.init = function () {
 };
 
 function registerComponents(){
+    console.log('[BCD-Components] Queuing component registration...');
+    try{throw new Error('Stack Finder - Register');}catch(e){console.log('', e.stack);}
+
+    if (typeof componentHandler === 'undefined') {
+        setTimeout(registerComponents, 100);
+        return;
+    }
+
     console.log("[BCD-Components] Registering components...");
 
     // Tell MDL about our new components
 
     // eslint-disable-next-line no-undef
-    componentHandler.register({
+    try{componentHandler.register({
         constructor: BellCubicDetails,
         classAsString: 'BellCubicDetails',
         cssClass: site_consts.classDetails,
         widget: false
-    });
+    });}catch{}
     // eslint-disable-next-line no-undef
-    componentHandler.register({
+    try{componentHandler.register({
         constructor: BellCubicSummary,
         classAsString: 'BellCubicSummary',
         cssClass: site_consts.classSummary,
         widget: false
-    });
+    });}catch{}
+
     //console.log("[BCD-Components] Components registered, upgrading...");
     //console.log(
     //    [...document.getElementsByClassName(site_consts.classDetails), ...document.getElementsByClassName(site_consts.classSummary)]
@@ -277,17 +296,16 @@ function registerComponents(){
 }
 
 
-// The component registers itself. It can assume componentHandler is available in the global scope.
-// Either way, I'm trying it now in case onLoad is, for some reason, not called.
-try{registerComponents();}catch(e){/*console.log(e.stack)*/}
-
-function init() {
-    if (initRan){
+function bcd_universalJS_init() {
+    if (bcd_universal_initRan === true){
         return;
     } // We only need to init once!
 
-    initRan = true;
-    try{registerComponents();}catch(e){/*console.log(e.stack)*/}
+    try{throw new Error(`Stack Finder - Init (ran? ${bcd_universal_initRan}, uuid: ${Math.random()})`);}catch(e){console.log('', e.stack);}
+    bcd_universal_initRan = true;
+
+    // The component registers itself. It can assume componentHandler is available in the global scope.
+    registerComponents();
 
     /* (these variables are defined here so they aren't kept in memory the whole time)
     We pull from the Conditionalized array before the Generic array to ensure that we always have some text.
@@ -498,6 +516,9 @@ function init() {
         /*console.log(`[BCD-RANDOM-TEXT] Condition failed. Using generic text.`);*/
     }
 }
+// Just in case the script is loaded after the page loads - an issue I've had during testing and doing occasional page loads in the wild.
+console.log('[BCD-Universal] Running bcd_universalJS_init()...');
+window.onload();
 
 // This function is not super to understand if you can read comments and collapse blocks of code.
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -581,9 +602,3 @@ function tryForJSON(aJSON, key) {
     }
     return true;
 }
-
-// Just in case the script is loaded after the page loads - an issue I've had during testing and doing occasional page loads in the wild.
-window.init;
-setTimeout(window.init, 50);
-setTimeout(window.init, 150);
-setTimeout(window.init, 500);

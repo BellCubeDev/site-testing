@@ -153,10 +153,10 @@ $$ |      \$$$$$$$ |\$$$$$$$ |\$$$$$$$\       $$$$$$\ $$ |  $$ |$$ |  \$$$$  |
     All code should stem from here in some way.
     @returns {nil} nothing
 */
-var initRan = false;
-async function init() {
-    if (initRan) { return; }
-    initRan = true;
+var bcd_universal_initRan = false;
+async function bcd_universalJS_init() {
+    if (bcd_universal_initRan) { return; }
+    bcd_universal_initRan = true;
 
     // Sets the various element variables found above
     setElementVars();
@@ -868,46 +868,50 @@ function createComponent(tagName, componentType, attrs = {}, properties = {}){
 /**
     * @param {HTMLElement} element
 */
-// eslint-disable-next-line func-style
-var builder_SortOrderDropdown = function BellCubicDetails(element) {
-    this.element_ = element;
-    this.init();
-};
-window['BellCubicDetails'] = builder_SortOrderDropdown;
+class builder_SortOrderDropdown {
+    constructor(element) {
+        this.element_ = element;
+        this.init();
+    }
+    
+    /**
+        * @param {MouseEvent} event The element that was clicked
+    */
+    clickHandler(event) {
+        if (event.target.hasAttribute('builder_dropdownValue')) {
+            this.value = event.target.getAttribute('builder_dropdownValue');
+        } else {
+            this.value = event.target.innerHTML;
+        }
+        event.target.innerHTML;
+    }
+
+    button = null;
+    btnChangeText = null;
+    options = null;
+    value = null;
+
+    /**
+        * Initialize element.
+    */
+    init() {
+        if (this.element_) {
+            this.element_.innerHTML += document.querySelector('.bcd_orderDropdown.template').innerHTML;
+            this.button = this.element_.querySelector('.fomod_orderOptionsBtn');
+            this.btnChangeText = this.element_.querySelector('.bcd_stepOrderValue');
+            this.options = this.element_.querySelector(`.fomod_orderOptions`);
+            for (var option of this.options.children) {
+                option.addEventListener('click', this.clickHandler.bind(this));
+            }
+        }
+    }
+}
+window['builder_SortOrderDropdown'] = builder_SortOrderDropdown;
 
 builder_SortOrderDropdown.builderJSName = 'order_dpd'; // Used for dynamically storing the registered component
 
-/**
-    * @param {MouseEvent} event The element that was clicked
-*/
-builder_SortOrderDropdown.prototype.clickHandler = function (event) {
-    if (event.target.hasAttribute('builder_dropdownValue')) {
-        this.value = event.target.getAttribute('builder_dropdownValue');
-    } else {
-        this.value = event.target.innerHTML;
-    }
-    event.target.innerHTML;
-};
 
-builder_SortOrderDropdown.prototype.button = null;
-builder_SortOrderDropdown.prototype.btnChangeText = null;
-builder_SortOrderDropdown.prototype.options = null;
-builder_SortOrderDropdown.prototype.value = null;
 
-/**
-    * Initialize element.
-*/
-builder_SortOrderDropdown.prototype.init = function () {
-    if (this.element_) {
-        this.element_.innerHTML += document.querySelector('.bcd_orderDropdown.template').innerHTML;
-        this.button = this.element_.querySelector('.fomod_orderOptionsBtn');
-        this.btnChangeText = this.element_.querySelector('.bcd_stepOrderValue');
-        this.options = this.element_.querySelector(`.fomod_orderOptions`);
-        for (var option of this.options.children) {
-            option.addEventListener('click', this.clickHandler.bind(this));
-        }
-    }
-};
 
 
 
@@ -1130,7 +1134,7 @@ $$$$$$$  | $$$$$$  |$$ | \_/ $$ |      \$$$$$$  |  \$$$$  |$$ |$$ |$$$$$$$  |
 /** Convenience function to get the value of an input element. Will first attempt to get a user-submitted value, then will attempt to fetch a default from `builder_default`, before finally resorting to the `placeholder` attribute.
     @param {HTMLElement} element The Input element to get the value of
     @param {boolean} [usePlaceholder=true] Whether to use the `placeholder`. Defaults to True.
-    @returns {string|number|boolean} The value of the input element
+    @returns {string} The value of the input element
 */
 function inputValue(element, usePlaceholder = true){
     try{
@@ -1142,7 +1146,6 @@ function inputValue(element, usePlaceholder = true){
 
     } finally {} return '';
 }
-
 
 
 /** Convenience function to get the value of an input element. Will first attempt to get a user-submitted value, then will attempt to fetch a default from `builder_default`, before finally resorting to the `placeholder` attribute.
@@ -1361,7 +1364,7 @@ Object.prototype.renameKey = function (oldKeyName, newKeyName){
 
 
 
-window.init;
-setTimeout(window.init, 50);
-setTimeout(window.init, 150);
-setTimeout(window.init, 500);
+window.bcd_universalJS_init;
+setTimeout(window.bcd_universalJS_init, 50);
+setTimeout(window.bcd_universalJS_init, 150);
+setTimeout(window.bcd_universalJS_init, 500);
