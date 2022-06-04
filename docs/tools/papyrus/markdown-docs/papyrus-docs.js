@@ -36,7 +36,7 @@ $$ |  $$ |\$$$$$$$\ \$$$$$$$ |\$$$$$$$\ $$  /\$$\ \$$$$$$$\ $$$$$$$  |
 
 
 const regex_Scriptname =
-/^Scriptname ([\w\d]+)(?:\s+extends ([\w\d]+))?(?:\s+(hidden))?(\s+(?:conditional))?(?:\s+(native))?(?:\n\{(.*?)\})?/is;
+/^Scriptname ([\w\d]+)(?:\s+extends ([\w\d]+))?(?:\s+(hidden))?(\s+(?:conditional))?(?:\s+(native))?(?:[\n\s]+\{([^}]+)\})?/is;
 
 const regex_Events =
 /\n*((?:^\s*;.*\n)+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*Event(?:\s|;\/(?:\s|\S)*?\/;|\\)+([\w\d]+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*\((?:\s|;\/(?:\s|\S)*?\/;|\\)*((?:[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)*=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+|".*?(?<!\\)"))?(?:(?:\s|;\/(?:\s|\S)*?\/;|\\))*,(?:\s|;\/(?:\s|\S)*?\/;|\\)+)*[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+|".*?(?<!\\)"))?))?(?:\s|;\/(?:\s|\S)*?\/;|\\)*\)([\s\S]+?)^(?:\s|;\/(?:\s|\S)*?\/;|\\)*EndEvent/gim;
@@ -268,18 +268,25 @@ function parseScript(scriptStr) {
 | [Parent](/skyrim/developers/papyrus/concepts/scripts#parents) | ${scriptname.parent} |
 | [Library](/skyrim/developers/papyrus/concepts/libraries) | [${inputValue(elem_papy_docs_libName)}](${inputValue(elem_papy_docs_libLink)}) |
 
-${scriptname.included_documentation.replace(/^(?=.)/gm, '> ')}
+${scriptname.included_documentation.replace(/^/gsm, '> ').replace(/^> $/g, '')}
 
 <!-- **Add extra description HERE** -->
 
-## [Native Functions](/skyrim/developers/papyrus/concepts/functions#native-flag)
 
+
+## [Native Functions](/skyrim/developers/papyrus/concepts/functions#native-flag)
 | Return Type | Function | Description | Parameters | [Global](/en/skyrim/developers/papyrus/concepts/functions/global_flag)? |
 | --: | :-: | :-: | :-: | :-: |
 ${functionTable}
 
+
+
 ## [Events](https://modding.wiki/en/skyrim/developers/papyrus/concepts/events)
+| Event | Description | [Registration](https://modding.wiki/en/skyrim/developers/papyrus/concepts/functions#registration) | Parameters |
+| :-- | :-: | :-: | :-- |
 ${eventTable}
+
+
 
 # Returning [Native Functions](https://modding.wiki/en/skyrim/developers/papyrus/concepts/functions#native-flag)
 
@@ -289,6 +296,8 @@ ${eventTable}
 | Function | Description | [Array](/skyrim/developers/papyrus/concepts/arrays) | Script  | Library |
 | :-: | :-: | :-: | :-: | :-: |
 |     |     |     |     |     |
+
+
 
 # [Children](/skyrim/developers/papyrus/concepts/scripts#children)
 
@@ -316,11 +325,10 @@ Scripts extending this script
 */
 function parseScriptName(scriptStr) {
     var parsed = regex_Scriptname.exec(scriptStr);
-
     return {
         name: parsed[1],
 
-        included_documentation: typeof parsed[6] === 'undefined' ? '' : parsed[6],
+        included_documentation: typeof parsed[6] === 'undefined' ? '' : parsed[6].replace(/\r(?=\n)/g, ''),
 
         parent: typeof parsed[2] === 'undefined' ? '[Top-Level](/skyrim/developers/papyrus/top-level-index)' : parsed[2],
 
