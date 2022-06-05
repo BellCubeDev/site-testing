@@ -13,7 +13,7 @@ var elem_papy_docs_folderPicker;
 window.onload = function(){
     elem_papy_docs_libName = document.getElementById('papy_docs_lib-Name');
     elem_papy_docs_libLink = document.getElementById('papy_docs_lib-Link');
-    elem_papy_docs_registerPattern = document.getElementById('papy_docs_register-pattern_cont');
+    elem_papy_docs_registerPattern = document.getElementById('papy_docs_register-pattern');
     elem_papy_docs_mdOutput = document.getElementById('papy_docs_md-output');
     elem_papy_docs_filePicker = document.getElementById('papy_docs_file-picker');
     elem_papy_docs_filePicker.onclick = generateDocs_file;
@@ -21,6 +21,19 @@ window.onload = function(){
     elem_papy_docs_folderPicker.onclick = generateDocs_folder;
 };
 window.onload(); // Just in case we load late
+
+/** Removes whitespace at the beginning and end of a string and at the end of every included line
+    @returns {string}
+*/String.prototype.capitalizeFirstLetter = function(){
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
+/** Removes whitespace at the beginning and end of a string and at the end of every included line
+    @returns {string}
+*/
+String.prototype.trimWhitespace = function(){
+    return this.trimStart().trimEnd().replace(/[^\S\n]*$/gm, '');
+};
 
 /*$$$$$\
 $$  __$$\
@@ -42,19 +55,23 @@ const regex_Events =
 /\n*((?:^\s*;.*\n)+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*Event(?:\s|;\/(?:\s|\S)*?\/;|\\)+([\w\d]+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*\((?:\s|;\/(?:\s|\S)*?\/;|\\)*((?:[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)*=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+|".*?(?<!\\)"))?(?:(?:\s|;\/(?:\s|\S)*?\/;|\\))*,(?:\s|;\/(?:\s|\S)*?\/;|\\)+)*[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+|".*?(?<!\\)"))?))?(?:\s|;\/(?:\s|\S)*?\/;|\\)*\)([\s\S]+?)^(?:\s|;\/(?:\s|\S)*?\/;|\\)*EndEvent/gim;
 
 const regex_EventParams =
-/(?:\s|;\/.*?\/;|\\)*([\w\d]+)(?:\s|;\/.*?\/;|\\)+([\w\d]+)(?:\s|;\/.*?\/;|\\)*(?:=(?:\s|;\/.*?\/;|\\)*(".+(?<!\\)"|[\w\d]+))?/gsi;
+/(?:\s|;\/.*?\/;|\\)*([\w\d]+)(\[])?(?:\s|;\/.*?\/;|\\)+([\w\d]+)(?:\s|;\/.*?\/;|\\)*(?:=(?:\s|;\/.*?\/;|\\)*(".+(?<!\\)"|[\w\d]+))?/gsi;
 
 const regex_Functions =
-/\n*((?:^\s*;.*\n)+)?(?:[\w\d]+(\[.*?\])?(?:\s|;\/(?:\s|\S)*?\/;|\\)+)?Function(?:\s|;\/(?:\s|\S)*?\/;|\\)+([\w\d]+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*\((?:\s|;\/(?:\s|\S)*?\/;|\\)*((?:[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)*=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+|".*?(?<!\\)"))?(?:(?:\s|;\/(?:\s|\S)*?\/;|\\))*,(?:\s|;\/(?:\s|\S)*?\/;|\\)+)*[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+|".*?(?<!\\)"))?))?(?:\s|;\/(?:\s|\S)*?\/;|\\)*\)(?:\s|;\/(?:\s|\S)*?\/;|\\)+(?:(global)(?:\s|;\/(?:\s|\S)*?\/;|\\)+)?(native(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+(global))?|(?:([\s\S]+?)^(?:\s|;\/(?:\s|\S)*?\/;|\\)*EndFunction))/gmi;
+/\n*((?:^\s*;.*\n)+)?(?:([\w\d]+)(\[.*?\])?(?:\s|;\/(?:\s|\S)*?\/;|\\)+)?Function(?:\s|;\/(?:\s|\S)*?\/;|\\)+([\w\d]+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*\((?:\s|;\/(?:\s|\S)*?\/;|\\)*((?:[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)*=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+(?:\.\d+)?|".*?(?<!\\)"))?(?:(?:\s|;\/(?:\s|\S)*?\/;|\\))*,(?:\s|;\/(?:\s|\S)*?\/;|\\)+)*[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+(?:\.\d+)?|".*?(?<!\\)"))?))?(?:\s|;\/(?:\s|\S)*?\/;|\\)*\)(?:\s|;\/(?:\s|\S)*?\/;|\\)+(?:(global)(?:\s|;\/(?:\s|\S)*?\/;|\\)+)?(?:(native)(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+(global))?|(?:([\s\S]+?)^(?:\s|;\/(?:\s|\S)*?\/;|\\)*EndFunction))/gmi;
 
 /*
     papy_docs_libName
     papy_docs_libLink
 */
 
+/** Sets the output area's text with syntax highlighting
+    @param {string} str - The text to set the output area to
+*/
 function setMarkdownOutput(str){
+    //console.log(str);
     // eslint-disable-next-line no-undef
-    elem_papy_docs_mdOutput.innerHTML = hljs.highlight(str.replace(/^\s+/s, '').replace(/\s+$/, ''), {language: 'md'}).value;
+    elem_papy_docs_mdOutput.innerHTML = hljs.highlight(str.trimWhitespace(), {language: 'md'}).value;
 }
 
 /*
@@ -79,7 +96,7 @@ async function generateDocs_file(){
     try{
         file = (await window.showOpenFilePicker())[0];
     }catch(e){
-        console.log(e);
+        //console.log(e);
         if (e.name === 'AbortError') {
             // No file selected. Aborting
             return;
@@ -96,13 +113,15 @@ async function generateDocs_file(){
     setMarkdownOutput(parseScript(await readFile(await file.getFile())));
 }
 
+var outputs = [];
 async function generateDocs_folder(){
+    outputs = [];
     var folder;
     try{
         folder = await window.showDirectoryPicker();
         await attainDirPerms(folder);
     }catch(e){
-        console.log(e);
+        //console.log(e);
         if (e.name === 'AbortError') {
             // No file selected. Aborting
             return;
@@ -110,13 +129,38 @@ async function generateDocs_folder(){
             throw e;
         }
     }
-    console.log(folder);
-    for (var [name, file] of folder.entries()) {
-        console.log(name, file);
-        if (file.kind === 'file') {
-            writeFile(folder.getFileHandle(`${file.name}.md`, {create: true}), parseScript(readFile(file.file)));
+    //console.log(folder, folder.entries());
+    //var entries = folder.entries();
+    //console.log(await entries.next());
+    await forEachFile(folder, iterationFunction, -1, () => {setMarkdownOutput(outputs[outputs.length - 1]);outputs = [];});
+    
+    /** @param {string} name @param {FileSystemHandle} file */
+    async function iterationFunction(name, file){
+        //console.log(name, file);
+        if (file.kind === 'file' && name.endsWith('.psc')) {
+            var tempOut = parseScript(await readFile(await file.getFile()));
+            //outputs.push(tempOut);
+            writeFile(await folder.getFileHandle(`${name}.md`, {create: true}), tempOut);
+            //console.log(outputs);
         }
     }
+}
+
+/** Executes a callback for each file in the specified directory, recursing as requested.
+    @param {FileSystemDirectoryHandle} dir The directory to iterate over
+    @param {function(string, FileSystemHandle)} callback The function to execute for each file
+    @param {number} [recursion = 0] The number of levels to recurse into subdirectories. Negative numbers will recurse indefinitely.
+    @param {function} finalCallback The function to execute when the iteration is complete
+*/
+async function forEachFile(dir, callback = (name, file) => {console.log('No callback for forEachFile: ', name, file);}, recursion = 0, finalCallback = () => {}){
+    for await (const [name, file] of dir.entries()) {
+        if (file.kind === 'file') {
+            callback(name, file);
+        } else if (file.kind === 'directory' && recursion != 0) {
+            forEachFile(file, callback, recursion - 1);
+        }
+    }
+    finalCallback();
 }
 
 
@@ -141,12 +185,8 @@ $$ |      $$ |$$ |\$$$$$$$\       \$$$$$$  |\$$$$$$$ |$$$$$$$  |  \$$$$  |\$$$$$
     @param {string} perm The permission to request
 */
 async function tryForPermission(object, perm){
-    try{
-        return await object.queryPermission({'mode': perm}) === 'granted' || await object.requestPermission({'mode': perm}) === 'granted';
-    } catch(e) {
-        if (e.name != 'AbortError') throw e;
-    }
-    return false;
+    return await object.queryPermission({'mode': perm}) === 'granted' || await object.requestPermission({'mode': perm}) === 'granted';
+    //return false;
 }
 
 
@@ -163,7 +203,7 @@ function readFile(file){
     return new Promise((resolve, reject) => {
         const temp_fileReader = new FileReader();
         temp_fileReader.onload = (readerEvent) => {
-            resolve(readerEvent.target.result);
+            resolve(readerEvent.target.result.replace(/\r\n?/g, '\n'));
         };
         temp_fileReader.onerror = (err) => {
             reject(err);
@@ -186,8 +226,9 @@ function readFile(file){
     @returns {nil} nothing
 */
 async function writeFile(fileHandle, contents) {
-    fileHandle.createWritable().then((writable) =>{
-        writable.write(contents);
+    //console.log(fileHandle);
+    fileHandle.createWritable().then(async (writable) =>{
+        await writable.write(contents);
         writable.close();
     });
 }
@@ -196,7 +237,7 @@ async function writeFile(fileHandle, contents) {
 
 
 
-/** Verify the specified directory
+/** Attain permissions for the specified directory
     @param {FileSystemDirectoryHandle} dir
     @throws {DOMException} 'AbortError' If the user fails to give permissions for the directory
     @returns {nil} nothing
@@ -230,6 +271,15 @@ $$\   $$ |$$ |      $$ |      $$ |$$ |  $$ |  $$ |$$\ $$ |      $$  __$$ |$$ |  
 
 
 
+function sortArrayOfObjectAlphaByKey(obj, key){
+    return obj.sort(function(a, b) {
+        var textA = a[key].toUpperCase();
+        var textB = b[key].toUpperCase();
+        return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
+    });
+}
+
+
 
 /** Parses the specified script into Markdown documentation
     @param {string} scriptStr - The script to parse
@@ -237,32 +287,46 @@ $$\   $$ |$$ |      $$ |      $$ |$$ |  $$ |  $$ |$$\ $$ |      $$  __$$ |$$ |  
 */
 function parseScript(scriptStr) {
     var scriptname = parseScriptName(scriptStr);
-    //var functions = parseFunctions(scriptStr);
+    var functions = sortArrayOfObjectAlphaByKey(parseFunctions(scriptStr), 'name');
     var functionTable = '';
 
-    var events = parseEvents(scriptStr).sort();
+    var events = sortArrayOfObjectAlphaByKey(parseEvents(scriptStr), 'name');
     var eventTable = '';
     /* Example:
     |   Event   |                    Description                    | [Registration](https://modding.wiki/en/skyrim/developers/papyrus/concepts/functions#registration) |                Parameters                |
     |    :--    |                        :-:                        |                                                :-:                                                |                   :--                    |
     | OnLostLOS | Sent when an actor cannot see the target anymore. |                                                Yes                                                | Actor akViewer, ObjectReference akTarget |
     */
-    /**
-        @param {{name: string,description: string,parameters: {type: string,name: string,default: string,}[],body: string;}} event
-    */
     for (var event of events) {
-        var eventTableRow = `| ${event.name} | ${event.description}`;
-        if (scriptStr.toLowerCase().includes(inputValue(elem_papy_docs_registerPattern).toLowerCase().replace(/%e%/g, event.name))) {
-            eventTableRow += ' | Yes | ';
-        } else {
-            eventTableRow += ' | No | ';
-        }
         // eslint-disable-next-line prefer-template
-        eventTableRow += event.parameters.map(param => `${param.type} ${param.name}`).join(', ').replace(/, $/, '') + ' |\n';
+        var eventTableRow = `| [${event.name}](${inputValue(elem_papy_docs_libLink).replace(/\/?$/, '/')}${scriptname.name}/${event.name}) | ${event.description.replace(/\n/g, '<br />')}${
+            scriptStr.toLowerCase().includes(
+                inputValue(elem_papy_docs_registerPattern).replace(/%e%/ig,
+                    event.name.replace(/^on/i, '').replace(/(?:event)?(?:unregister(?:ed)?)?$/i, '').replace(/start|stop/i, '')
+                ).toLowerCase()
+            ) ? ' | Registered | ' : ' | Unregistered | '}` +
+            event.parameters.map(param => `\`${param.type}\` *${param.name}*`).join(', <br />').replace(/, <br \/>$/, '') +
+        ' |\n';
         eventTable += eventTableRow;
+    }
+
+    /* Example:
+        | Return Type | Function | Description | Parameters | [Global](/en/skyrim/developers/papyrus/concepts/functions#global_flag)? | [Native](/skyrim/developers/papyrus/concepts/functions#native-flag)?
+        | --: | :-: | :-: | :-: | :-: | :-: |
+        | Int | GetFormID | Returns the form of of the form you run this on |     | No | Yes |
+    */
+    for (var func of functions) {
+        // eslint-disable-next-line prefer-template
+        var funcTableRow = `| ${func.returns.type}${func.returns.is_array ? '[]' : ''} | ${func.name} | ${func.description.replace(/\n/g, '<br />')} | ` +
+
+        func.parameters.map(param => `\`${param.type}\` *${param.name}*`).join(', <br />').replace(/, <br \/>$/, '') +
+
+        `| ${func.global ? 'Global' : 'Member'} | ${func.native ? 'Native' : 'Scripted'} |\n`;
+        functionTable += funcTableRow;
     }
     
     return `# ${scriptname.name}
+
 | :-: | :-- |
 | Engine-Bound Type | <!-- **USER-INPUTTED** --> | <!-- e.g. \`_NPC\` (Actor) -->
 | [Parent](/skyrim/developers/papyrus/concepts/scripts#parents) | ${scriptname.parent} |
@@ -274,16 +338,16 @@ ${scriptname.included_documentation.replace(/^/gsm, '> ').replace(/^> $/g, '')}
 
 
 
-## [Native Functions](/skyrim/developers/papyrus/concepts/functions#native-flag)
-| Return Type | Function | Description | Parameters | [Global](/en/skyrim/developers/papyrus/concepts/functions/global_flag)? |
-| --: | :-: | :-: | :-: | :-: |
+${functionTable.length > 0 ? `## [Native Functions](/skyrim/developers/papyrus/concepts/functions#native-flag)
+| Return Type | Function | Description | Parameters | [Global](/en/skyrim/developers/papyrus/concepts/functions#global_flag)? | [Native](/skyrim/developers/papyrus/concepts/functions#native-flag)?
+| --: | :-: | :-: | :-: | :-: | :-: |` : ''}
 ${functionTable}
 
 
 
-## [Events](https://modding.wiki/en/skyrim/developers/papyrus/concepts/events)
+${eventTable.length > 0 ? `## [Events](https://modding.wiki/en/skyrim/developers/papyrus/concepts/events)
 | Event | Description | [Registration](https://modding.wiki/en/skyrim/developers/papyrus/concepts/functions#registration) | Parameters |
-| :-- | :-: | :-: | :-- |
+| :-- | :-: | :-: | :-- |` : ''}
 ${eventTable}
 
 
@@ -294,8 +358,7 @@ ${eventTable}
 
 <!-- **MUST BE CREATED MANUALLY** -->
 | Function | Description | [Array](/skyrim/developers/papyrus/concepts/arrays) | Script  | Library |
-| :-: | :-: | :-: | :-: | :-: |
-|     |     |     |     |     |
+|    :-:   |     :-:     |                         :-:                         |   :-:   |   :-:   |
 
 
 
@@ -304,8 +367,8 @@ ${eventTable}
 Scripts extending this script
 
 <!-- **MUST BE CREATED MANUALLY** -->
-| Script Name | Has Engine-Bound Type? |
-| :-: | :-: |
+| Script Name | Has Engine-Bound Type? | <!-- Scripts with engine-bound types should come first -->
+|     :-:     |          :-:           |
 
 `;
 }
@@ -328,7 +391,7 @@ function parseScriptName(scriptStr) {
     return {
         name: parsed[1],
 
-        included_documentation: typeof parsed[6] === 'undefined' ? '' : parsed[6].replace(/\r(?=\n)/g, ''),
+        included_documentation: typeof parsed[6] === 'undefined' ? '' : parsed[6],
 
         parent: typeof parsed[2] === 'undefined' ? '[Top-Level](/skyrim/developers/papyrus/top-level-index)' : parsed[2],
 
@@ -345,6 +408,7 @@ function parseScriptName(scriptStr) {
         description: string,
         parameters: Array<{
             type: string,
+            is_array: boolean,
             name: string,
             default: string
         }>,
@@ -352,38 +416,82 @@ function parseScriptName(scriptStr) {
     }>} - An array of event objects
 */
 function parseEvents(scriptStr) {
-    console.log('Parsing events...');
-    console.log(regex_Events);
-    console.log(scriptStr);
+    //console.log('Parsing events...');
+    //console.log(regex_Events);
+    //console.log(scriptStr);
     var events = [];
     var parsed = scriptStr.matchAll(regex_Events);
-    console.log('Events Parsed:', parsed);
+    //console.log('Events Parsed:', parsed);
     for (var _event of parsed){
-        console.log(`Current Event:`, _event);
+        //console.log(`Current Event:`, _event);
         // Parse Event Parameters
-        if (typeof _event[3] !== 'undefined'){
-            var params_formatted = [];
-            var params = _event[3].matchAll(regex_EventParams);
-            for (var _param of params){
-                params_formatted.push({
-                    type: _param[1],
-                    name: _param[2],
-                    default: typeof _param[3] === 'undefined' ? '' : _param[3]
-                });
-            }
-        }
 
         events.push({
             name: _event[2],
-            description: _event[1].replace(/^\s/, '').replace(/\s$/, '').replace(/\s$/m, '').replace(/^\s*;\s*/m, ''),
-            parameters: params_formatted,
-            body: typeof _event[4] === 'undefined' ? '' : _event[4].replace(/^\s/, '').replace(/\s$/, '').replace(/\s$/m, '')
+            description: _event[1].trimWhitespace().replace(/^\s*;\s*/gm, ''),
+            parameters: parseParameters(_event[3]),
+            body: typeof _event[4] === 'undefined' ? '' : _event[4].trimWhitespace()
         });
     }
-    console.log('parseEvents(): ', events);
+    //console.log('parseEvents(): ', events);
     return events;
 }
 
+/** Parses a string of parameters
+    @param {string} paramStr - The string to parse
+    @returns {Array<{type: string, is_array: boolean, name: string, default: string}>} - An array of parameter objects
+*/
+function parseParameters(paramStr) {
+    if (typeof paramStr !== 'string') return [];
+    
+    var result_arr = [];
+    var params = paramStr.matchAll(regex_EventParams);
+
+    for (var _param of params){
+        result_arr.push({
+            type: _param[1].capitalizeFirstLetter(),
+            is_array: _param[2] !== undefined,
+            name: _param[3],
+            default: typeof _param[4] === 'undefined' ? '' : _param[3]
+        });
+    }
+
+    return result_arr;
+}
+
+/** Parses the Events in the script
+    @param {string} scriptStr - The script to parse
+    @returns {Array<{
+        name: string,
+        returns: {type: string, is_array: boolean},
+        description: string,
+        parameters: Array<{
+            type: string,
+            is_array: boolean,
+            name: string,
+            default: string
+        }>,
+        global: boolean,
+        native: boolean,
+        body: string
+    }>} - An array of event objects
+*/
+function parseFunctions(scriptStr) {
+    var functions = [];
+    var parsed = scriptStr.matchAll(regex_Functions);
+    for (var _function of parsed){
+        functions.push({
+            returns: {type: typeof _function[2] === 'undefined' ? '' :_function[2].capitalizeFirstLetter(), is_array: typeof _function[3] !== 'undefined'},
+            name: _function[4],
+            description: typeof _function[1] === 'undefined' ? '' : _function[1].trimWhitespace().replace(/^\s*;\s*/gm, ''),
+            parameters: parseParameters(_function[5]),
+            global: typeof _function[6] !== 'undefined' || typeof _function[8] !== 'undefined',
+            native: typeof _function[7] !== 'undefined',
+            body: _function[9] === 'string' ? _function[9].trimWhitespace() : ''
+        });
+    }
+    return functions;
+}
 
 
 
@@ -408,11 +516,9 @@ function inputValue(element, usePlaceholder = true){
     //console.log(element);
     if (typeof element === 'undefined') return '';
     try{
-        if (typeof element.value !== 'undefined' && element.value != '') return element.value.toString();
+        if (typeof element.value !== 'undefined' && element.value != '') return element.value;
 
-        if(element.hasAttribute('builder_default')) return element.getAttribute('builder_default').toString();
-
-        if (element.hasAttribute('placeholder') && usePlaceholder) return element.getAttribute('placeholder').toString();
+        if (element.hasAttribute('placeholder') && usePlaceholder) return element.getAttribute('placeholder');
 
     } finally {} return '';
 }

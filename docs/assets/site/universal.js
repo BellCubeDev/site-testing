@@ -1,5 +1,6 @@
 window.onload = bcd_universalJS_init;
 var bcd_universal_initRan = false;
+console.log("%cHello and welcome to the JavaScript console! This is where wizards do their magic! As for me? I'm the wizard you don't want to anger.", "color: #2d6");
 /*
     This script hooks into Material Design Lite's "Component Design Pattern" API
     (see https://github.com/jasonmayes/mdl-component-design-pattern) to provide:
@@ -252,15 +253,14 @@ BellCubicSummary.prototype.init = function () {
 };
 
 function registerComponents(){
-    console.log('[BCD-Components] Queuing component registration...');
-    try{throw new Error('Stack Finder - Register');}catch(e){console.log('', e.stack);}
+    //console.log('[BCD-Components] Queuing component registration...');
 
     if (typeof componentHandler === 'undefined') {
         setTimeout(registerComponents, 100);
         return;
     }
 
-    console.log("[BCD-Components] Registering components...");
+    //console.log("[BCD-Components] Registering components...");
 
     // Tell MDL about our new components
 
@@ -292,7 +292,7 @@ function registerComponents(){
         ...document.getElementsByClassName(site_consts.classSummary)
     ]);
 
-    console.log("[BCD-Components] Components registered.");
+    //console.log("[BCD-Components] Components registered.");
 }
 
 
@@ -301,7 +301,6 @@ function bcd_universalJS_init() {
         return;
     } // We only need to init once!
 
-    try{throw new Error(`Stack Finder - Init (ran? ${bcd_universal_initRan}, uuid: ${Math.random()})`);}catch(e){console.log('', e.stack);}
     bcd_universal_initRan = true;
 
     // The component registers itself. It can assume componentHandler is available in the global scope.
@@ -520,7 +519,6 @@ function bcd_universalJS_init() {
     }
 }
 // Just in case the script is loaded after the page loads - an issue I've had during testing and doing occasional page loads in the wild.
-console.log('[BCD-Universal] Running bcd_universalJS_init()...');
 window.onload();
 
 // This function is not super to understand if you can read comments and collapse blocks of code.

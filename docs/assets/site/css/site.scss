@@ -409,6 +409,34 @@ a {
     line-height: normal;
 }
 
+.danger-block, .warning-block, .notice-block {
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    color: #ddd
+}
+
+.danger-block {
+    background-color: #f003;
+}
+
+.warning-block {
+    background-color: #ff04;
+}
+
+.notice-block {
+    background-color: #0cf3;
+}
+
+.danger-block :first-child, .warning-block :first-child, .notice-block :first-child {
+    color: #fff;
+    margin-top: 0px;
+}
+
+.danger-block :last-child, .warning-block :last-child, .notice-block :last-child {
+    margin-bottom: 0;
+}
+
 .wide01 {
     max-width: 128px;
 }
@@ -673,6 +701,7 @@ body.preload * {
 }
 
 .mdl-switch {
+    width: -moz-fit-content;
     width: fit-content;
     margin-right: 64px;
 }
