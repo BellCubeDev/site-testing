@@ -368,7 +368,6 @@ Scripts extending this script
 <!-- **MUST BE CREATED MANUALLY** -->
 | Script Name | Has Engine-Bound Type? | <!-- Scripts with engine-bound types should come first -->
 |     :-:     |          :-:           |
-
 `;
 }
 
