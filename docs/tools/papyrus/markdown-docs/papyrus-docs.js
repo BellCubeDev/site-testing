@@ -139,9 +139,8 @@ async function generateDocs_folder(){
         //console.log(name, file);
         if (file.kind === 'file' && name.endsWith('.psc')) {
             var tempOut = parseScript(await readFile(await file.getFile()));
-            //outputs.push(tempOut);
             writeFile(await folder.getFileHandle(`${name}.md`, {create: true}), tempOut);
-            //console.log(outputs);
+            setMarkdownOutput(tempOut);
         }
     }
 }
@@ -334,18 +333,18 @@ function parseScript(scriptStr) {
 
 ${scriptname.included_documentation.replace(/^/gsm, '> ').replace(/^> $/g, '')}
 
-<!-- **Add extra description HERE** -->
+<!-- **Add extra description HERE** -->${functionTable.length > 0 ? `
 
 
 
-${functionTable.length > 0 ? `## [Native Functions](/skyrim/developers/papyrus/concepts/functions#native-flag)
+## [Native Functions](/skyrim/developers/papyrus/concepts/functions#native-flag)
 | Return Type | Function | Description | Parameters | [Global](/en/skyrim/developers/papyrus/concepts/functions#global_flag)? | [Native](/skyrim/developers/papyrus/concepts/functions#native-flag)?
 | --: | :-: | :-: | :-: | :-: | :-: |` : ''}
-${functionTable}
+${functionTable}${eventTable.length > 0 ? `
 
 
 
-${eventTable.length > 0 ? `## [Events](https://modding.wiki/en/skyrim/developers/papyrus/concepts/events)
+## [Events](https://modding.wiki/en/skyrim/developers/papyrus/concepts/events)
 | Event | Description | [Registration](https://modding.wiki/en/skyrim/developers/papyrus/concepts/functions#registration) | Parameters |
 | :-- | :-: | :-: | :-- |` : ''}
 ${eventTable}
