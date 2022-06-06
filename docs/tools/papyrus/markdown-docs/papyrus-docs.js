@@ -132,14 +132,14 @@ async function generateDocs_folder(){
     //console.log(folder, folder.entries());
     //var entries = folder.entries();
     //console.log(await entries.next());
-    await forEachFile(folder, iterationFunction, -1, () => {setMarkdownOutput(outputs[outputs.length - 1]);outputs = [];});
+    await forEachFile(folder, iterationFunction, -1);
     
     /** @param {string} name @param {FileSystemHandle} file */
-    async function iterationFunction(name, file){
+    async function iterationFunction(name, file, directory){
         //console.log(name, file);
         if (file.kind === 'file' && name.endsWith('.psc')) {
             var tempOut = parseScript(await readFile(await file.getFile()));
-            writeFile(await folder.getFileHandle(`${name}.md`, {create: true}), tempOut);
+            writeFile(await directory.getFileHandle(`${name}.md`, {create: true}), tempOut);
             setMarkdownOutput(tempOut);
         }
     }
@@ -147,19 +147,20 @@ async function generateDocs_folder(){
 
 /** Executes a callback for each file in the specified directory, recursing as requested.
     @param {FileSystemDirectoryHandle} dir The directory to iterate over
-    @param {function(string, FileSystemHandle)} callback The function to execute for each file
+    @param {async function(string, FileSystemFileHandle, FileSystemDirectoryHandle)} callback The function to execute for each file
     @param {number} [recursion = 0] The number of levels to recurse into subdirectories. Negative numbers will recurse indefinitely.
     @param {function} finalCallback The function to execute when the iteration is complete
 */
-async function forEachFile(dir, callback = (name, file) => {console.log('No callback for forEachFile: ', name, file);}, recursion = 0, finalCallback = () => {}){
+async function forEachFile(dir, callback, recursion = 0){
+    var promises = [];
     for await (const [name, file] of dir.entries()) {
         if (file.kind === 'file') {
-            callback(name, file);
+            promises.push(callback(name, file, dir));
         } else if (file.kind === 'directory' && recursion != 0) {
-            forEachFile(file, callback, recursion - 1);
+            promises.push(forEachFile(file, callback, recursion - 1));
         }
     }
-    finalCallback();
+    return await Promise.all(promises);
 }
 
 
