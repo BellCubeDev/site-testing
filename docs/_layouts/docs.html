@@ -10,10 +10,10 @@ layout: page
             {% case item.type %}
             
                 {% when "header" %}
-                    {% render "docs___side_header" with item %}
+                    {% include "docs___side_header" %}
 
                 {% when "link" %}
-                    {% render "docs___side_link" with item %}
+                    {% include "docs___side_link" %}
 
             {% endcase %}
         {% endfor %}
