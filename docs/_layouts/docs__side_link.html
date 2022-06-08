@@ -1,0 +1,15 @@
+---
+# This layout is used as a sort of "function" to handle recursive processing
+# Or, more accurately, to eliminate some of the wasteful copy-paste
+# A nice template, really.
+---
+<a  href="{% if item.url | slice: 0 == "/"}{{ site.baseurl }}{% endif %}{{item.url}}"
+    target="{%if item.newtab %}_blank{% else %}_self{% endif %}"
+    rel="{%if item.newtab %}noopener noreferrer{% endif %}"
+    class="docs sideBar link {% if item.icon %}mdl-navigation__link--icon{% endif %} {{ item.classes }}"
+>
+    {% if item.icon %}
+        <i class="material-icons">{{ item.icon }}</i>
+    {% endif %}
+    <span>{{ item.name }}</span>
+</a>

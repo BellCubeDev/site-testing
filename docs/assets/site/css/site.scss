@@ -437,6 +437,16 @@ a {
     margin-bottom: 0;
 }
 
+.docs.sideBar_cont {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.docs.sideBar_cont > :not(.docs.sideBar){
+    width: auto;
+    display: block;
+}
+
 .wide01 {
     max-width: 128px;
 }
