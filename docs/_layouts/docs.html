@@ -6,9 +6,10 @@ layout: page
 
 <div class="docs sideBar_cont">
     <div class="docs sideBar">
+        {% comment %}
         {% for item in page.docsPage %}
             {% case item.type %}
-            
+
                 {% when "header" %}
                     {% include docs__side_header.html item=item %}
 
@@ -17,6 +18,27 @@ layout: page
 
             {% endcase %}
         {% endfor %}
+        <!--
+        <a href="{{ site.baseurl }}/documentation/linear-spell-progression/creatng-a-plugin" class="docs sideBar link mdl-navigation__link--icon">
+            <i class="material-icons">home</i>
+            <span>Linear Spell Progression</span>
+        </a>
+
+        <div class="bcd-adjacent-details">
+            <div class="bcd-summary_ docs sideBar_header">
+                <h1>Users</h1>
+            </div>
+            <div class="bcd-details_ adjacent">
+
+            </div>
+        </div
+
+        <h1>Developers</h1>
+            <a href="{{ site.baseurl }}/documentation/linear-spell-progression/creatng-a-plugin" class="docs sideBar link mdl-navigation__link--icon">
+                <i class="material-icons">build</i>
+                <span>Creating a Plugin</span>
+            </a>
+        -->
     </div>
     <div class="docs content">
         {{ content }}

@@ -4,8 +4,12 @@
 # A nice template, really.
 ---
 <a  href="{% if item.url | slice: 0 == "/"}{{ site.baseurl }}{% endif %}{{item.url}}"
-    target="{%if item.newtab %}_blank{% else %}_self{% endif %}"
-    rel="{%if item.newtab %}noopener noreferrer{% endif %}"
+
+    {%if item.newtab %}
+        target="_blank"
+        rel="noopener noreferrer"
+    {% endif %}
+
     class="docs sideBar link {% if item.icon %}mdl-navigation__link--icon{% endif %} {{ item.classes }}"
 >
     {% if item.icon %}
