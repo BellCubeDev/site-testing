@@ -1,8 +1,8 @@
 <div class="bcd-adjacent-details">
     <div class="bcd-summary_ docs sideBar_header">
-        <h{{item.level}}>Users</h{{item.level}}>
+        <h{{item.level}}>{{item.name}}</h{{item.level}}>
     </div>
     <div class="bcd-details_ adjacent">
-        {% include docs__side__item.liquid input=item.children %}
+        {% include docs__side__item.html input=item.children %}
     </div>
 </div>
