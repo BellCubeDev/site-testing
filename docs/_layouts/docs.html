@@ -6,17 +6,7 @@ layout: page
 
 <div class="docs sideBar_cont">
     <div class="docs sideBar">
-        {% for item in page.docsPage %}
-            {% case item.type %}
-
-                {% when "header" %}
-                    {% include docs__side_header.html item=item %}
-
-                {% when "link" %}
-                    {% include docs__side_link.html item=item %}
-
-            {% endcase %}
-        {% endfor %}
+        {% include docs__side__item.liquid input=page.docsPage %}
         <!--
         <a href="{{ site.baseurl }}/documentation/linear-spell-progression/creatng-a-plugin" class="docs sideBar link mdl-navigation__link--icon">
             <i class="material-icons">home</i>
@@ -30,7 +20,7 @@ layout: page
             <div class="bcd-details_ adjacent">
 
             </div>
-        </div
+        </div>
 
         <h1>Developers</h1>
             <a href="{{ site.baseurl }}/documentation/linear-spell-progression/creatng-a-plugin" class="docs sideBar link mdl-navigation__link--icon">

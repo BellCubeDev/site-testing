@@ -1,8 +1,3 @@
----
-# This layout is used as a sort of "function" to handle recursive processing
-# Or, more accurately, to eliminate some of the wasteful copy-paste
-# A nice template, really.
----
 <a  href="{% if item.url | slice: 0 == "/" %}{{ site.baseurl }}{% endif %}{{ item.url }}"
 
     {% if item.newtab %}
