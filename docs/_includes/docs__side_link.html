@@ -3,9 +3,9 @@
 # Or, more accurately, to eliminate some of the wasteful copy-paste
 # A nice template, really.
 ---
-<a  href="{% if item.url | slice: 0 == "/"}{{ site.baseurl }}{% endif %}{{item.url}}"
+<a  href="{% if item.url | slice: 0 == "/"}{{ site.baseurl }}{% endif %}{{ item.url }}"
 
-    {%if item.newtab %}
+    {% if item.newtab %}
         target="_blank"
         rel="noopener noreferrer"
     {% endif %}
