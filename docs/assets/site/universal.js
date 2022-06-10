@@ -501,7 +501,8 @@ function bcd_universalJS_init() {
         "So you finally pried yourself from your pillow I see.",
         "Hook coast? Nobody goes there. Nobody comes from there.", 
 
-        "What we've got here is failure to communicate."
+        "What we've got here is failure to communicate.", 
+        "It's a good day for doom"
     ];
 
     // Still in 'window.onload'
