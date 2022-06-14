@@ -428,13 +428,23 @@ a {
     background-color: #0cf3;
 }
 
-.danger-block :first-child, .warning-block :first-child, .notice-block :first-child {
+:is(.danger-block, .warning-block, .notice-block) :first-child {
     color: #fff;
     margin-top: 0px;
 }
 
-.danger-block :last-child, .warning-block :last-child, .notice-block :last-child {
+:is(.danger-block, .warning-block, .notice-block) :last-child {
     margin-bottom: 0;
+}
+
+.docs.sideBar_cont {
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.docs.sideBar_cont > :not(.docs.sideBar){
+    width: auto;
+    display: block;
 }
 
 .wide01 {
@@ -494,7 +504,7 @@ body.preload * {
         vertical-align: middle;
     }
 
-    [class^=nexus-SVG-]{
+    .nexus-SVG-primary, .nexus-SVG-secondary {
         /* VISH DID IT TO ME */
         transition-property: fill;
         transition-timing-function: cubic-bezier(0, 0, 1, 0.2);
@@ -505,13 +515,13 @@ body.preload * {
     .nexus-SVG-primary{
         fill: #222;
     }
-    .icon--nexus:hover .nexus-SVG-primary, .icon--nexus:focus .nexus-SVG-primary{
+    .icon--nexus:is(:hover, :focus) .nexus-SVG-primary {
         fill: #da8e35;
     }
     .nexus-SVG-secondary{
         fill: #000;
     }
-    .icon--nexus:hover .nexus-SVG-secondary, .icon--nexus:focus .nexus-SVG-secondary{
+    .icon--nexus:is(:hover, :focus) .nexus-SVG-secondary {
         fill: #b4762c;
     }
 

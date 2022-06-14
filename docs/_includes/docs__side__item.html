@@ -1,0 +1,11 @@
+{% for item in input %}
+    {% case item.type %}
+
+        {% when "header" %}
+            {% include docs__side_header.html item=item %}
+
+        {% when "link" %}
+            {% include docs__side_link.html item=item %}
+
+    {% endcase %}
+{% endfor %}

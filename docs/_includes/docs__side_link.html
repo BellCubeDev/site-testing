@@ -1,0 +1,14 @@
+<a  href="{% if item.url | slice: 0 == "/" %}{{ site.baseurl }}{% endif %}{{ item.url }}"
+
+    {% if item.newtab %}
+        target="_blank"
+        rel="noopener noreferrer"
+    {% endif %}
+
+    class="docs sideBar link {% if item.icon %}mdl-navigation__link--icon{% endif %} {{ item.classes }}"
+>
+    {% if item.icon %}
+        <i class="material-icons">{{ item.icon }}</i>
+    {% endif %}
+    <span>{{ item.name }}</span>
+</a>

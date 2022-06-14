@@ -1,0 +1,43 @@
+---
+layout: page
+---
+
+{% if page.docsPage[0] %}
+
+<div class="docs sideBar_cont">
+    <div class="docs sideBar">
+        {% include docs__side__item.html input=page.docsPage %}
+        <!--
+        <a href="{{ site.baseurl }}/documentation/linear-spell-progression/creatng-a-plugin" class="docs sideBar link mdl-navigation__link--icon">
+            <i class="material-icons">home</i>
+            <span>Linear Spell Progression</span>
+        </a>
+
+        <div class="bcd-adjacent-details">
+            <div class="bcd-summary_ docs sideBar_header">
+                <h1>Users</h1>
+            </div>
+            <div class="bcd-details_ adjacent">
+
+            </div>
+        </div>
+
+        <h1>Developers</h1>
+            <a href="{{ site.baseurl }}/documentation/linear-spell-progression/creatng-a-plugin" class="docs sideBar link mdl-navigation__link--icon">
+                <i class="material-icons">build</i>
+                <span>Creating a Plugin</span>
+            </a>
+        -->
+    </div>
+    <div class="docs content">
+        {{ content }}
+    </div>
+</div>
+
+{% else %}
+
+<div class="docs content">
+    {{ content }}
+</div>
+
+{% endif %}
