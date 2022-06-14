@@ -49,7 +49,7 @@ description: >
 # ============================
 # Actual Jekyll Configuration
 # ============================
-open_url: true
+open_url: false
 
 livereload_min_delay: 100
 livereload: false

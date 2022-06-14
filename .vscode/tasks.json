@@ -6,10 +6,7 @@
         {
             "label": "Serve Site",
             "type": "shell",
-            "command": "cd docs && set JEKYLL_ENV\"=production\" && jekyll",
-            "args": [
-                "serve"
-            ],
+            "command": "cd docs && start http://127.0.0.1:4000/site-testing/ && jekyll serve --host 0.0.0.0",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
