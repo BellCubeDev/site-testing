@@ -13,6 +13,13 @@ redirect_from:
   - /tools/fomod-builder/
 ---
 
+{% capture vortexSVG %}
+     {{site.baseurl}}{% link assets/site/images/third-party-icons/Vortex.svg %}
+{% endcapture %}
+
+{% capture mo2SVG %}
+    {{site.baseurl}}{% link assets/site/images/third-party-icons/MO2.svg %}
+{% endcapture %}
 
 <!--
     MO2 - Info.xml
@@ -134,10 +141,10 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
         Metadata for the mod, stored in the <code>Info.xml</code> file of the FOMOD (along with certain data in <code>ModuleConfig.xml</code>)
         <br /><br /><hr /><br />
         <h3>Used By</h3><ul class="mod-manager-list">
-            <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/Vortex.svg" />
+            <li><img src="{{vortexSVG}}" />
                 Vortex
             </li>
-            <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2.svg" />
+            <li><img src="{{mo2SVG}}" />
                 Mod Organizer 2
             </li>
         </ul>
@@ -153,10 +160,10 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             Mod Organizer 2 also uses this data to update whatever mod name it pulls from its metadata guessing.
             <br /><br /><hr /><br />
             <h3>Used By</h3><ul class="mod-manager-list">
-                <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/Vortex.svg" />
+                <li><img src="{{vortexSVG}}" />
                     Vortex
                 </li>
-                <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2.svg" />
+                <li><img src="{{mo2SVG}}" />
                     Mod Organizer 2
                 </li>
             </ul>
@@ -172,7 +179,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             Author of the mod. Displayed alongside other metadata in the installer window.
             <br /><br /><hr /><br />
             <h3>Used By</h3><ul class="mod-manager-list">
-                <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2.svg" />
+                <li><img src="{{mo2SVG}}" />
                     Mod Organizer 2
                 </li>
             </ul>
@@ -190,7 +197,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 Version of the mod. Displayed alongside other metadata in the installer window.
                 <br /><br /><hr /><br />
                 <h3>Used By</h3><ul class="mod-manager-list">
-                    <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2.svg" />
+                    <li><img src="{{mo2SVG}}" />
                         Mod Organizer 2
                     </li>
                 </ul>
@@ -220,7 +227,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 <p>Version of the mod. Displayed alongside other metadata in the installer window.</p>
                 <br /><br /><hr /><br />
                 <h3>Used By</h3><ul class="mod-manager-list">
-                    <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2.svg" />
+                    <li><img src="{{mo2SVG}}" />
                         Mod Organizer 2
                     </li>
                 </ul>
@@ -263,7 +270,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             MO2 runs the value through <code>toInt()</code>, I've therefore limited the input of this field to an integer.
             <br /><br /><hr /><br />
             <h3>Used By</h3><ul class="mod-manager-list">
-                <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2.svg" />
+                <li><img src="{{mo2SVG}}" />
                     Mod Organizer 2
                 </li>
             </ul>
@@ -279,7 +286,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             MO2 displays the text "Link" as a hyperlink to the URL specified.
             <br /><br /><hr /><br />
             <h3>Used By</h3><ul class="mod-manager-list">
-                <li><img src="{{site.baseurl}}/assets/site/images/third-party-icons/MO2.svg" />
+                <li><img src="{{mo2SVG}}" />
                     Mod Organizer 2
                 </li>
             </ul>
@@ -314,12 +321,10 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     <div class="bcd-fomod-sortOrder">Step Order: <i class="bcd_stepOrderValue"></i></div>
 
     <!-- Group Editor -->
-    <div class="bcd-summary min-padding" for="details_groups_step_01"><i class="material-icons open-icon-90CC">expand_more</i>
+    <div class="bcd-summary adjacent min-padding"><i class="material-icons open-icon-90CC">expand_more</i>
         <h3 id="details_groups_step_summary_01">Groups</h3>
-    </div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_groups_step_summary_01"><p>
-            Groups can either group options with similar functions together or, alternatively, allow for mutually-exclusive options without complex conditioning (which MO2 does not yet fully support).
-    </p></div>
-    <div class="bcd-details" id="details_groups_step_01">
+    </div>
+    <div class="bcd-details adjacent">
         <button type="button" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
             <i class="material-icons">add</i>
         </button>
@@ -339,31 +344,32 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 </div>
             
                 <!-- Option Editor -->
-                <div class="bcd-summary" for="details_options_step_01"><i class="material-icons open-icon-90CC">expand_more</i>
+                <div class="bcd-summary adjacent"><i class="material-icons open-icon-90CC">expand_more</i>
                     <h3 id="details_options_step_summary_01">Options</h3>
-                </div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_options_step_summary_01"><p>
+                    <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_options_step_summary_01"><p>
                         Options are the checkboxes and radio buttons you actually interact with in the installer window. They can set flags, install files directly, and even completely disable themselves based on various conditions.
-                </p></div>
-                <div class="bcd-details" id="details_options_step_01">
+                    </p></div>
+                </div>
+                <div class="bcd-details adjacent" id="details_options_step_01">
                     <button type="button" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
                         <i class="material-icons">add</i>
                     </button>
                     <div class="bcd-fomod-options">                    
                         <!-- Option Editor -->
-                        <div class="bcd-summary" for="details_option_01"><i class="material-icons open-icon-90CC">expand_more</i>
+                        <div class="bcd-summary adjacent"><i class="material-icons open-icon-90CC">expand_more</i>
                             <h4 class="bcd_optionName">My Option 132</h4>
                         </div>
-                        <div class="bcd-details" id="details_option_01">
+                        <div class="bcd-details adjacent">
                             <div class="bcd_selectionType template">
                                 <button type="button" class="bcd_stepSelectionTypeBtn mdl-button mdl-js-button">
                                     Default Selection Type: <i class="bcd_stepSelectionTypeValue">Optional</i>
                                 </button>
                                 <ul class="fomod_selectionTypeOptions mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="fomod_steps_order">                        
                                     <li pos="0" class="mdl-menu__item mdl-menu__item--full-bleed-divider">Optional</li>
-                                    <li pos="1" class="mdl-menu__item">Reccomended</li>   <!-- Pre-selected            -->
+                                    <li pos="1" class="mdl-menu__item">Recommended</li>   <!-- Pre-selected            -->
                                     <li pos="3" class="mdl-menu__item">Required</li>      <!-- Force-enabled           -->
                                     <li pos="4" class="mdl-menu__item">NotUseable</li>    <!-- Disabled                -->
-                                    <li pos="2" class="mdl-menu__item">CouldBeUsable</li> <!-- (Supposedledly useless) -->
+                                    <li pos="2" class="mdl-menu__item">CouldBeUsable</li> <!-- (Supposedly useless) -->
                                 </ul>
                             </div>
                             <div id="fomod_option_name_cont_01" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
@@ -386,12 +392,13 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     </div>
 
     <!-- Step Dependencies Editor -->
-    <div class="bcd-summary min-padding" for="details_dependencies_step_01" id="details_dependencies_step_summary_01"><i class="material-icons open-icon-90CC">expand_more</i>
-        <h3>Visibility Conditions</h3>
-    </div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_dependencies_step_summary_01"><p>
-            Conditions that determine whether or not the step shouls be shown to the user.
-    </p></div>
-    <div class="bcd-details" id="details_dependencies_step_01">
+    <div class="bcd-summary adjacent min-padding"><i class="material-icons open-icon-90CC">expand_more</i>
+        <h3 id="details_dependencies_step_summary_01">Visibility Conditions</h3>
+        <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_dependencies_step_summary_01"><p>
+            Conditions that determine whether or not the step should be shown to the user.
+        </p></div>
+    </div>
+    <div class="bcd-details adjacent">
         <div class="bcd-fomod-dependencies">dependencies-editor-placeholder</div>
     </div>
 </div>

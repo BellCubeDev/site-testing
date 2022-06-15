@@ -36,11 +36,11 @@ The plugin is made of a Package and at least 4 FormLists, arranged in a tree str
     <img src="https://raw.githubusercontent.com/BellCubeDev/LinearSpellProgression/main/Images/LSP%20Master%20List%20Format.svg"
         loading="lazy" alt="an image-based diagram of the Linear Spell Progression plugin format" />
 </div>
-<div class="bcd-summary" for="docs_lsp_createPlugin_diagram_img">
+<div class="bcd-summary" for="docs_lsp_createPlugin_diagram_txt">
     <i class="material-icons open-icon-90CC">expand_more</i>
     <h3>Text Representation</h3>
 </div>
-<div class="bcd-details" id="docs_lsp_createPlugin_diagram_img">
+<div class="bcd-details" id="docs_lsp_createPlugin_diagram_txt">
     <ul class="docs_textDiagram">
         <li>Master List (in LinearSpellProgression.esl)<ul type="disc">
             <ul>
@@ -125,7 +125,7 @@ The plugin is made of a Package and at least 4 FormLists, arranged in a tree str
     <ol>
         <li>Rename the plugin file. Don't want a bunch of plugins all called <code>LinearSpellProgression Plugin Template.esp</code>, now do we?</li>
         <li>Open the Plugin Template, alongside any plugins you want to add spell prerequisites to, in either <a href="https://www.nexusmods.com/skyrimspecialedition/mods/164/">SSEEdit</a> (Recommended) or the Creation Kit.</li>
-        <li>Navigate to the FormLists. If you're doing this in the Creation Kit, you can search by `LSP_`</li>
+        <li>Navigate to the FormLists. If you're doing this in the Creation Kit, you can search by <code>LSP_</code></li>
         <li>Rename the FormLists using the <a href="#editorid-scheme">EditorID Scheme</a> below</li>
         <li>Balance to your heart's content! Here's how:
             <ol type="1">
@@ -143,21 +143,38 @@ The plugin is made of a Package and at least 4 FormLists, arranged in a tree str
 <h1>EditorID Scheme</h1>
 
 It's a (relatively) simple system.
+{% raw %}
+<ul>
 
-* Universal Ending: <code>[DLC/CC/MOD]<code>&#95;</code>{{3-letter abbreviation for author, such as BGS}}<code>&#95;</code>{{2-Digit Number}}{{Human-readable name}}</code><br />
-Example: `DLC_BGS_00Skyrim`
+<li>
+    Universal Ending: <span class=nested_code><code>[DLC/CC/MOD]</code>{{3-letter abbreviation for author, such as BGS}}<code>_</code>{{2-Digit Number}}{{Human-readable name}}</span><br />
+    <i>Example: <code>DLC_BGS_00Skyrim</code></i>
+</li>
+<br />
+<li>
+    Plugin-Level: <span class=nested_code><code>LSP_Main_</code> + Universal Ending</span><br />
+    <i>Example: <code>LSP_0Tomes_DLC_BGS_00Skyrim</code></i>
+</li>
+<br />
+<li>
+    Tome: <span class=nested_code><code>LSP_0Tomes_</code> + Universal Ending</span><br />
+    <i>Example: <code>LSP_0Tomes_DLC_BGS_00Skyrim</code></i>
+</li>
+<br />
+<li>
+    * Spells: <span class=nested_code><code>LSP_1Spells_</code> + Universal Ending</span><br />
+    <i>Example: <code>LSP_1Spells_DLC_BGS_00Skyrim</code></i>
+</li>
+<br />
+<li>
+    Prerequisites: <span class=nested_code><code>LSP_2Pre_</code> + Universal Ending</span><br />
+    <i>Example: <code>LSP_2Pre_DLC_BGS_00Skyrim</code></i>
+</li>
+<br />
+<li>
+    List of a single spell's prerequisites: <span class=nested_code><code>LSP_</code>{{Spell Name}}<code>_</code> + Universal Ending</span><br />
+    <i>Example: <code>LSP_FlameCloak_DLC_BGS_00Skyrim</code></i>
+</li>
+</ul>
+{% endraw %}
 
-* Plugin-Level: `LSP_Main_` + Universal Ending<br />
-Example: `LSP_0Tomes_DLC_BGS_00Skyrim`
-
-* Tome: `LSP_0Tomes_` + Universal Ending<br />
-Example: `LSP_0Tomes_DLC_BGS_00Skyrim`
-
-* Spells: `LSP_1Spells_` + Universal Ending<br />
-Example: `LSP_1Spells_DLC_BGS_00Skyrim`
-
-* Prerequisites: `LSP_2Pre_` + Universal Ending<br />
-Example: `LSP_2Pre_DLC_BGS_00Skyrim`
-
-* List of a single spell's prerequisites: <code><code>LSP&#95;</code>{{Spell Name}}<code>&#95;</code></code>  + Universal Ending<br />
-Example: `LSP_FlameCloak_DLC_BGS_00Skyrim`

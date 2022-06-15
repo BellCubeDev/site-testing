@@ -1,5 +1,6 @@
 window.onload = bcd_universalJS_init;
 var bcd_universal_initRan = false;
+
 console.log("%cHello and welcome to the JavaScript console! This is where wizards do their magic! As for me? I'm the wizard you don't want to anger.", "color: #2d6");
 /*
     This script hooks into Material Design Lite's "Component Design Pattern" API
@@ -17,240 +18,243 @@ var bcd_registeredComponents = {
     bcdSummary: {}
 };
 
-var site_consts = {
+const site_consts = {
     transitionDur: "transition-duration",
     animDur: "animation-duration",
     marginTop: "margin-top",
     classSummary: "bcd-summary",
     classDetails: "bcd-details",
-    classIsOpen: "is-open"
+    classIsOpen: "is-open",
+    classAdjacent: "adjacent"
 };
 
-/**
-    * @param {HTMLElement} element
-*/
-// eslint-disable-next-line func-style
-var BellCubicDetails = function BellCubicDetails(element) {
-    this.element_ = element;
-    this.init();
-    /*console.log("[BCD-DETAILS] Registered component: ", this)*/
-};
+function randomNumber(min = 0, max = 1, places = 0){
+    const placesMult = Math.pow(10, places);
+    return (
+        (
+            Math.round(
+                Math.random() * (max - min) + min
+            ) * placesMult
+        ) / placesMult
+    );
+}
+
+
+class BellCubicDetails {
+    constructor(element) {
+        this.element_ = element;
+        this.init();
+        /*console.log("[BCD-DETAILS] Registered component: ", this)*/
+    }
+    /**
+        * Toggle the collapsable menu.
+        *
+        * @public
+        */
+    toggle(doSetDuration = true) {
+        /*console.log('[BCD-DETAILS] toggle() called on ',this)*/
+        if (this.element_.classList.contains(site_consts.classIsOpen) || this.header.classList.contains(site_consts.classIsOpen)) { this.close(doSetDuration); } else { this.open(doSetDuration); }
+    }
+    /**
+        * Re-evaluate the toggle menu's current state.
+        *
+        * @public
+        */
+    reEval(doSetDuration = true) {
+        /*console.log('[BCD-DETAILS] reEval() called on ',this)*/
+        // All the SetTimeout does here is diver processing to the next processing cycle. This prevents some of the layout shift oddities I've observed.
+        setTimeout(() => { if (this.element_.classList.contains(site_consts.classIsOpen) || this.header.classList.contains(site_consts.classIsOpen)) { this.open(doSetDuration); } else { this.close(doSetDuration); } });
+    }
+    /**
+        * Open the collapsable menu.
+        *
+        * @public
+        */
+    open(doSetDuration = true) {
+        this.evaluateDuration(doSetDuration);
+
+        this.element_Children[0].style[site_consts.marginTop] = `0px`;
+        this.element_.classList.add(site_consts.classIsOpen);
+        this.header.classList.add(site_consts.classIsOpen);
+    }
+    /**
+        * Close the collapsable menu.
+        *
+        * @public
+        */
+    close(doSetDuration = true) {
+        /*console.log("Setting margin-top to -" + this.element_Children[0].offsetHeight + "px", this.element_Children[0])*/
+        this.evaluateDuration(doSetDuration);
+
+        this.element_Children[0].style[site_consts.marginTop] = `-${this.element_Children[0].offsetHeight * 1.04}px`;
+
+        this.element_.classList.remove(site_consts.classIsOpen);
+        this.header.classList.remove(site_consts.classIsOpen);
+    }
+    evaluateDuration(doRun = true) {
+        if (doRun) {
+            this.element_Children[0].style[site_consts.transitionDur] = `${200 + 1.25 * this.element_Children[0].offsetHeight * 1.04}ms`;
+            this.element_Children[0].style[site_consts.animDur] = `${215 + 1.25 * this.element_Children[0].offsetHeight * 1.04}ms`;
+            for (const icon of this.openIcons90deg) { icon.style[site_consts.animDur] = `${215 + 1.25 * this.element_Children[0].offsetHeight * 1.04}ms`; }
+        }
+    }
+
+
+    header = null;
+    element_Children = null;
+
+    init() {
+        if (this.element_) {
+
+            // Create a container element to make animation go brrr
+            // Slightly over-complicated because, uh, DOM didn't want to cooperate.
+            const tempInnerHTML = this.element_.innerHTML;
+            this.element_.innerHTML = "";
+            this.element_.innerHTML = `<div class="bcd-details_inner">${tempInnerHTML}</div>`;
+
+            this.element_Children = this.element_.getElementsByClassName('bcd-details_inner');
+
+            //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
+            if (this.element_.classList.contains(site_consts.classAdjacent)) {
+                this.header = this.element_.previousElementSibling;
+                if (!this.header.classList.contains(site_consts.classSummary)) {
+                    console.trace("error element:");console.dir(this.element_);
+                    throw new TypeError("[BCD-SUMMARY] Error: Adjacent details element must be preceded by a summary element.");
+                }
+            } else {
+                this.header = this.element_.ownerDocument.querySelector(`.bcd-summary[for="${this.element_.id}"`);
+            }
+            this.openIcons90deg = this.header.getElementsByClassName('open-icon-90CC');
+            //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
+            setTimeout(() => {
+                bcd_registeredComponents.bcdDetails[this.element_.id] = this;
+                this.reEval(false);
+                this.reEval();
+                this.element_.classList.add('initialized');
+                //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
+                this.reEval(false);
+                this.reEval();
+            });
+        }
+    }
+}
 window['BellCubicDetails'] = BellCubicDetails;
 
-/**
-    * Toggle the collapsable menu.
-    *
-    * @public
-    */
-BellCubicDetails.prototype.toggle = function (doSetDuration = true) {
-    /*console.log('[BCD-DETAILS] toggle() called on ',this)*/
-    if (this.element_.classList.contains(site_consts.classIsOpen) || this.header.classList.contains(site_consts.classIsOpen)) {this.close(doSetDuration);} else {this.open(doSetDuration);}
-};
-
-/**
-    * Re-evaluate the toggle menu's current state.
-    *
-    * @public
-    */
-BellCubicDetails.prototype.reEval = function (doSetDuration = true) {
-    /*console.log('[BCD-DETAILS] reEval() called on ',this)*/
-    
-    // All the SetTimeout does here is diver processing to the next processing cycle. This prevents some of the layout shift oddities I've observed.
-    setTimeout(() => {if (this.element_.classList.contains(site_consts.classIsOpen) || this.header.classList.contains(site_consts.classIsOpen) ) {this.open(doSetDuration);} else {this.close(doSetDuration);}});
-};
-
-/**
-    * Open the collapsable menu.
-    *
-    * @public
-    */
-BellCubicDetails.prototype.open = function (doSetDuration = true) {
-    this.evaluateDuration(doSetDuration);
-
-    this.element_Children[0].style[site_consts.marginTop] = `0px`;
-    this.element_.classList.add(site_consts.classIsOpen);
-    this.header.classList.add(site_consts.classIsOpen);
-};
-
-/**
-    * Close the collapsable menu.
-    *
-    * @public
-    */
-BellCubicDetails.prototype.close = function (doSetDuration = true) {
-    /*console.log("Setting margin-top to -" + this.element_Children[0].offsetHeight + "px", this.element_Children[0])*/
-    this.evaluateDuration(doSetDuration);
-
-    this.element_Children[0].style[site_consts.marginTop] = `-${this.element_Children[0].offsetHeight}px`;
-
-    this.element_.classList.remove(site_consts.classIsOpen);
-    this.header.classList.remove(site_consts.classIsOpen);
-};
-
-
-BellCubicDetails.prototype.evaluateDuration = function (doRun = true) {
-    if (doRun){
-        this.element_Children[0].style[site_consts.transitionDur] = `${150 + 1.25*this.element_Children[0].offsetHeight}ms`;
-        this.element_Children[0].style[site_consts.animDur] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;
-        for (var icon of this.openIcons90deg) {icon.style[site_consts.animDur] = `${165 + 1.25*this.element_Children[0].offsetHeight}ms`;}
+class BellCubicSummary {
+    constructor(element) {
+        this.element_ = element;
+        this.init();
+        /*console.log("[BCD-SUMMARY] Registered component: ", this)*/
     }
-};
 
-BellCubicDetails.prototype.header = null;
-
-BellCubicDetails.prototype.element_Children = null;
-
-/*
-function dumpCSSText(element){
-    var arr = [];
-    var style = getComputedStyle(element);
-    for(var i = 0; i < style.length; i++){
-      arr.push(`${style[i]}: ${style.getPropertyValue(style[i])}; `);
+    /**
+        * Toggle the collapsable menu.
+        *
+        * @public
+        */
+    toggle(doSetDuration = true) {
+        /*console.log('[BCD-SUMMARY] toggle() called on ',this)*/
+        if (this.for.classList.contains(site_consts.classIsOpen)) {
+            this.close(doSetDuration);
+        } else {
+            this.open(doSetDuration);
+        }
     }
-    return arr;
-  }
-*/
 
-/**
-    * Initialize element.
-*/
-BellCubicDetails.prototype.init = function () {
-    if (this.element_) {
-
-        // Create a container element to make animation go brrr
-        // Slightly over-complicated because, uh, DOM didn't want to cooperate.
-        var tempInnerHTML = this.element_.innerHTML;
-        this.element_.innerHTML = "";
-        this.element_.innerHTML = `<div class="bcd-details_inner">${tempInnerHTML}</div>`;
-        
-        this.element_Children = this.element_.getElementsByClassName('bcd-details_inner');
-
-        //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
-
-        this.header = this.element_.ownerDocument.querySelector(`.bcd-summary[for="${this.element_.id}"`);
-        this.openIcons90deg = this.header.getElementsByClassName('open-icon-90CC');
-        //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
-
-        setTimeout(()=>{
-            bcd_registeredComponents.bcdDetails[this.element_.id] = this;
-            this.reEval(false);
-            this.reEval();
-            this.element_.classList.add('initialized');
-            //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.element_Children[0])});
-            bcd_registeredComponents.bcdSummary[this.element_.id].forChildren = this.element_Children;
-            this.reEval(false);
-            this.reEval();
-        });
+    /**
+        * Re-evaluate the toggle menu's current state.
+        *
+        * @public
+    */
+    reEval(doSetDuration = true) {
+        /*console.log('[BCD-SUMMARY] reEval() called on ',this)*/
+        // All the SetTimeout does here is diver processing to the next processing cycle. This prevents some of the layout shift oddities I've observed.
+        if (this.for.classList.contains(site_consts.classIsOpen) || this.element_.classList.contains(site_consts.classIsOpen)) { this.open(doSetDuration); } else { this.close(doSetDuration); }
     }
-};
 
-/**
-    * @param {HTMLElement} element
-*/
-// eslint-disable-next-line func-style
-var BellCubicSummary = function BellCubicSummary(element) {
-    this.element_ = element;
-    this.init();
-    /*console.log("[BCD-SUMMARY] Registered component: ", this)*/
-};
+    /**
+        * Open the collapsable menu.
+        *
+        * @public
+    */
+    open(doSetDuration = true) {
+        /*console.log("Setting margin-top to 0px", this.for)*/
+        try {
+            this.evaluateDuration(doSetDuration);
+
+            this.forChildren[0].style[site_consts.marginTop] = `0px`;
+
+        } catch (e) { if (e instanceof TypeError) { /*console.log("[BCD-SUMMARY] Error: ", e)*/ } else { throw e; } }
+
+        this.for.classList.add(site_consts.classIsOpen);
+        this.element_.classList.add(site_consts.classIsOpen);
+    }
+
+    /**
+        * Close the collapsable menu.
+        *
+        * @public
+    */
+    close(doSetDuration = true) {
+        /*console.log("Setting margin-top to -" + this.for.offsetHeight + "px", this.for)*/
+        try {
+            this.evaluateDuration(doSetDuration);
+
+            this.forChildren[0].style[site_consts.marginTop] = `-${this.forChildren[0].offsetHeight * 1.04}px`;
+
+        } catch (e) { if (e instanceof TypeError) { /*console.log("[BCD-SUMMARY] Error: ", e)*/ } else { throw e; } }
+
+        this.for.classList.remove(site_consts.classIsOpen);
+        this.element_.classList.remove(site_consts.classIsOpen);
+    }
+
+    evaluateDuration(doRun = true) {
+        try {
+            if (doRun) {
+                this.forChildren[0].style[site_consts.transitionDur] = `${200 + 1.25 * this.forChildren[0].offsetHeight * 1.04}ms`;
+                this.forChildren[0].style[site_consts.animDur] = `${215 + 1.25 * this.forChildren[0].offsetHeight * 1.04}ms`;
+                for (const icon of this.openIcons90deg) { icon.style[site_consts.animDur] = `${215 + 1.25 * this.forChildren[0].offsetHeight * 1.04}ms`; }
+            }
+        } catch (e) { if (e instanceof TypeError) { /*console.log("[BCD-SUMMARY] Error: ", e)*/ } else { throw e; } }
+    }
+
+    for = null;
+    forChildren = null;
+    openIcons90deg = null;
+
+    /**
+        * Initialize element.
+    */
+    init() {
+        if (this.element_) {
+            this.boundElementMouseUp = this.toggle.bind(this);
+            this.element_.addEventListener('click', this.boundElementMouseUp);
+
+            if (this.element_.classList.contains(site_consts.classAdjacent)) {
+                this.for = this.element_.nextElementSibling;
+                if (!this.for.classList.contains(site_consts.classDetails)) {
+                    console.trace("error element:");console.dir(this.element_);
+                    throw new TypeError("[BCD-SUMMARY] Error: Adjacent summary element must be followed by a details element.");
+                }
+            } else {
+                this.for = this.element_.ownerDocument.getElementById(this.element_.getAttribute('for'));
+            }
+
+            this.forChildren = this.for.getElementsByClassName('bcd-details_inner');
+
+            this.openIcons90deg = this.element_.getElementsByClassName('open-icon-90CC');
+            bcd_registeredComponents.bcdSummary[this.element_.getAttribute('for')] = this;
+            /*console.log(`bcd_registeredComponents.bcdSummary[${this.element_.getAttribute('for')}] = this;`)*/
+            setTimeout(() => {
+                this.reEval(false);
+                this.reEval();
+                this.element_.classList.add('initialized');
+            });
+        }
+    }
+}
 window['BellCubicSummary'] = BellCubicSummary;
 
-/**
-    * Toggle the collapsable menu.
-    *
-    * @public
-    */
-BellCubicSummary.prototype.toggle = function (doSetDuration = true) {
-    /*console.log('[BCD-SUMMARY] toggle() called on ',this)*/
-    if (this.for.classList.contains(site_consts.classIsOpen)) {
-        this.close(doSetDuration);
-    } else {
-        this.open(doSetDuration);
-    }
-};
-
-/**
-    * Re-evaluate the toggle menu's current state.
-    *
-    * @public
-    */
-BellCubicSummary.prototype.reEval = function (doSetDuration = true) {
-    /*console.log('[BCD-SUMMARY] reEval() called on ',this)*/
-    
-    // All the SetTimeout does here is diver processing to the next processing cycle. This prevents some of the layout shift oddities I've observed.
-    if (this.for.classList.contains(site_consts.classIsOpen) || this.element_.classList.contains(site_consts.classIsOpen) ) {this.open(doSetDuration);} else {this.close(doSetDuration);}
-};
-
-/**
-    * Open the collapsable menu.
-    *
-    * @public
-    */
-BellCubicSummary.prototype.open =  function (doSetDuration = true) {
-    /*console.log("Setting margin-top to 0px", this.for)*/
-    try{
-        this.evaluateDuration(doSetDuration);
-
-        this.forChildren[0].style[site_consts.marginTop] = `0px`;
-
-    }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e;}}
-
-    this.for.classList.add(site_consts.classIsOpen);
-    this.element_.classList.add(site_consts.classIsOpen);
-};
-/**
-    * Close the collapsable menu.
-    *
-    * @public
-    */
-BellCubicSummary.prototype.close = function (doSetDuration = true) {
-    /*console.log("Setting margin-top to -" + this.for.offsetHeight + "px", this.for)*/
-    try{
-        this.evaluateDuration(doSetDuration);
-
-        this.forChildren[0].style[site_consts.marginTop] = `-${this.forChildren[0].offsetHeight}px`;
-
-    }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e;}}
-
-    this.for.classList.remove(site_consts.classIsOpen);
-    this.element_.classList.remove(site_consts.classIsOpen);
-};
-
-BellCubicSummary.prototype.evaluateDuration = function (doRun = true) {
-    try{
-        if (doRun){
-            this.forChildren[0].style[site_consts.transitionDur] = `${150 + 1.25*this.forChildren[0].offsetHeight}ms`;
-            this.forChildren[0].style[site_consts.animDur] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;
-            for (var icon of this.openIcons90deg) {icon.style[site_consts.animDur] = `${165 + 1.25*this.forChildren[0].offsetHeight}ms`;}
-        }
-    }catch(e){if (e instanceof TypeError) {/*console.log("[BCD-SUMMARY] Error: ", e)*/} else {throw e;}}
-};
-
-BellCubicSummary.prototype.for = null;
-BellCubicSummary.prototype.forChildren = null;
-BellCubicSummary.prototype.openIcons90deg = null;
-
-/**
-    * Initialize element.
-    */
-
-BellCubicSummary.prototype.init = function () {
-    if (this.element_) {
-        this.boundElementMouseUp = this.toggle.bind(this);
-        this.element_.addEventListener('click', this.boundElementMouseUp);
-        this.for = this.element_.ownerDocument.getElementById(this.element_.getAttribute('for'));
-        this.forChildren = this.for.getElementsByClassName('bcd-details_inner');
-        this.openIcons90deg = this.element_.getElementsByClassName('open-icon-90CC');
-        bcd_registeredComponents.bcdSummary[this.element_.getAttribute('for')] = this;
-        /*console.log(`bcd_registeredComponents.bcdSummary[${this.element_.getAttribute('for')}] = this;`)*/
-
-        setTimeout(()=>{
-            this.reEval(false);
-            this.reEval();
-            this.element_.classList.add('initialized');
-        });
-    }
-};
 
 function registerComponents(){
     //console.log('[BCD-Components] Queuing component registration...');
@@ -329,7 +333,7 @@ function bcd_universalJS_init() {
         [ {random: .00001}, "WHAT IN OBLIVION?!!! <b>WHY ARE YOU SO LUCKY?!!</b>" ],
         [ {random: .05}, "Known Troublemakers:<ul><li>Lively</li><li>Lively's Cat</li><li>Lively Again</li></ul>- BigBizkit" ],
         [ {random: .33}, "Nexus Mods is the best!"],
-        [ {random: .05}, "And then I... I would be named... <i><b>TIM!</b></i><br />The horrorrs would never cease!" ],
+        [ {random: .05}, "And then I... I would be named... <i><b>TIM!</b></i><br />The horrors would never cease!" ],
         [ {random: .02}, "Greetings, Dragonborn."], //rdunlap
         [ {random: .1}, "Welcome, Dovahkiin."], //rdunlap
         [ {random: .05}, "War. War never changes."], //rdunlap
@@ -508,7 +512,7 @@ function bcd_universalJS_init() {
 
     // Still in 'window.onload'
 
-    var toSetText = possibilities_conditionalized[Math.round(Math.random() * (possibilities_conditionalized.length - 1))];
+    const toSetText = possibilities_conditionalized[randomNumber(0, possibilities_conditionalized.length - 1)];
     /*console.log(`[BCD-RANDOM-TEXT] Text to set: ${JSON.stringify(toSetText)}`);*/
 
     // Check condition
@@ -516,7 +520,7 @@ function bcd_universalJS_init() {
         document.getElementById("randomized-text-field").innerHTML = toSetText[1];
         /*console.log(`[BCD-RANDOM-TEXT] Condition passed. Using conditionalized text.`);*/
     } else {
-        document.getElementById("randomized-text-field").innerHTML = possibilities_Generic[Math.round(Math.random() * (possibilities_Generic.length - 1))];
+        document.getElementById("randomized-text-field").innerHTML = possibilities_Generic[randomNumber(0, possibilities_Generic.length - 1)];
         /*console.log(`[BCD-RANDOM-TEXT] Condition failed. Using generic text.`);*/
     }
 }
@@ -537,10 +541,10 @@ function checkCondition(condition) {
         // Time
         /*console.log(`[BCD-RANDOM-TEXT] Checking time condition`);*/
         if (tryForJSON(condition, "time")) {
-            var time = new Date();
+            const time = new Date();
 
-            var currentTime = time.getHours() * 60 + time.getMinutes();
-            var conditionTime = [condition.time[0][0] * 60 + condition.time[0][1], condition.time[1][0] * 60 + condition.time[1][1]];
+            const currentTime = time.getHours() * 60 + time.getMinutes();
+            const conditionTime = [condition.time[0][0] * 60 + condition.time[0][1], condition.time[1][0] * 60 + condition.time[1][1]];
 
             /*console.log(`[BCD-RANDOM-TEXT] is ${currentTime} between ${conditionTime[0]} and ${conditionTime[1]}?`);*/
 
@@ -554,11 +558,11 @@ function checkCondition(condition) {
         if (tryForJSON(condition, "date")) {
             
             // Get the current date as the American [month, day, year]
-            var date = new Date();
-            var currentDate = [date.getMonth() + 1, date.getDate(), date.getFullYear()];
+            const date = new Date();
+            const currentDate = [date.getMonth() + 1, date.getDate(), date.getFullYear()];
 
-            var minDate = condition.date[0];
-            var maxDate = condition.date[1];
+            const minDate = condition.date[0];
+            const maxDate = condition.date[1];
 
             // Are we below the minimum? The condition is not met if so.
             if (!(

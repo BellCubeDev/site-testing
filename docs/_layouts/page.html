@@ -9,7 +9,7 @@ layout: compress_html
     <meta property="og:title" content="{{ page.title }}">
 
 
-    <link rel="shortcut icon" type="image/ico" href="{{ site.baseurl }}/favicon.ico">
+    <link rel="shortcut icon" type="image/ico" href="{{ site.baseurl }}{% link /favicon.ico %}">
 
     <meta property="og:site_name" content="BellCubeDev.GitHub.IO">
     <link rel="canonical" href="{{site.mainurl}}{{page.url}}">
@@ -34,8 +34,8 @@ layout: compress_html
     <meta name="theme-color" content="#1b1b1b" /><meta name="color-scheme" content="dark" />
     <meta name="charset" content="utf-8" />
 
-    <script async src="{{ site.baseurl }}/assets/site/mdl/material.min.js"></script>
-    <script async src="{{ site.baseurl }}/assets/site/universal.js"></script>
+    <script async src="{{ site.baseurl }}{% link assets/site/mdl/material.min.js %}"></script>
+    <script async src="{{ site.baseurl }}{% link assets/site/universal.js %}"></script>
 
     <!-- taken from https://stackoverflow.com/a/38296629/13076790 -->
     <script>
@@ -44,9 +44,10 @@ layout: compress_html
         },1000);
     </script>
 
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/site/mdl/css/material-blue.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/mdl/css/material-blue.scss %}">
 
-    <link rel="stylesheet" href="{{ site.baseurl }}/assets/site/css/site.css">
+    <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/css/site.scss %}">
+    {% if page.use_docs_CSS or true %}<link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/css/docs.scss %}" />{% endif %}
 
     <!--
         Appended to the bottom of site.css
@@ -60,8 +61,8 @@ layout: compress_html
         <div class="mdl-layout__drawer">
             <span class="mdl-layout-title">
                 <picture>
-                    <source srcset="{{ site.baseurl }}/assets/site/images/icon.avif" type="image/avif" />
-                    <img loading=lazy style="height:48px;" src="{{ site.baseurl }}/assets/site/images/icon.png" alt="" />
+                    <source srcset="{{ site.baseurl }}{% link assets/site/images/icon.avif %}" type="image/avif" />
+                    <img loading=lazy style="height:48px;" src="{{ site.baseurl }}{% link assets/site/images/icon.png %}" alt="" />
                 </picture>
                 <span>BellCube Dev</span>
             </span>
@@ -70,11 +71,11 @@ layout: compress_html
                 <div class="nav-content" style="height:max-content;display:flex;flex-direction:column;flex-wrap:nowrap;align-content:center;align-items:stretch;">
                     <!-- https://fonts.google.com/icons -->
                     <h2>Site</h2>
-                    <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}/">
+                    <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link index.html %}">
                         <i class="material-icons">home</i>
                         <span>Homepage</span>
                     </a>
-                    <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}/sitemap/">
+                    <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link sitemap/Sitemap.html %}">
                         <i class="material-icons">map</i>
                         <span>Sitemap</span>
                     </a>
@@ -83,11 +84,11 @@ layout: compress_html
                         <i class="material-icons open-icon-90CC">expand_more</i><h3>Tools</h3>
                     </button>
                     <div class="bcd-details is-open" id="details_nav_tools">
-                        <a class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}/tools/fomod/">
+                        <a class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}{% link tools/fomod/fomod-builder.html %}">
                             <i class="material-icons">build_circle</i>
                             <span>FOMOD Builder</span>
                         </a>
-                        <a class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}/tools/papyrus/markdown-docs/">
+                        <a class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}{% link tools/papyrus/markdown-docs/papyrus-docs.html %}">
                             <i class="material-icons">code</i>
                             <span>Auto Papyrus Docs</span>
                         </a>
@@ -100,13 +101,13 @@ layout: compress_html
                     <div class="bcd-details contPad01-left" id="details_nav_docs">
                         <button class="bcd-summary noTopPad" type="button" for="details_nav_docs_lsp">
                             <i class="material-icons open-icon-90CC">expand_more</i>
-                            <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}/documentation/linear-spell-progression/"><div class="center-vert">
+                            <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link documentation/linear-spell-progression/linear-spell-progression.html %}"><div class="center-vert">
                                 <i class="material-icons" style="padding-left: 0px;">book</i>
                                 <span>Linear Spell<br />Progression</span>
                             </div></a>
                         </button>
                         <div class="bcd-details contPad04-left" id="details_nav_docs_lsp">
-                            <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}/documentation/linear-spell-progression/creating-a-plugin/"><div class="center-vert">
+                            <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link documentation/linear-spell-progression/creating-a-plugin.html %}"><div class="center-vert">
                                 <i class="material-icons">build</i>
                                 <span>Creating a<br />Plugin</span>
                             </div></a>
@@ -128,7 +129,7 @@ layout: compress_html
                     </a>
                     <a class="mdl-navigation__link mdl-navigation__link--icon" target="_blank" rel="noopener noreferrer"
                         href="https://github.com/BellCubeDev">
-                        <img style="padding-left:0px;max-width: 24px;" src="{{site.baseurl}}/assets/site/images/third-party-icons/GitHub.svg">
+                        <img style="padding-left:0px;max-width: 24px;" src="{{ site.baseurl }}{% link assets/site/images/third-party-icons/GitHub.svg %}">
                         <span>GitHub Page</span>
                     </a>
                 </div>
@@ -155,6 +156,7 @@ layout: compress_html
                     <i class="material-icons" style="font-size:75%">code</i>
                 </button>
             -->
+            Use Docs CSS? <code>{{ page.use_docs_CSS }}</code>
         </footer>
 </body>
 </html>

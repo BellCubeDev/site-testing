@@ -1,5 +1,10 @@
 ---
 ---
+
+img {
+    max-width: 100%;
+}
+
 /*  Typography
     The font sizes and line heights have been calculated assuming a body font
     size of 14sp and a subhead font size of 16sp, which are the MD values for
@@ -48,7 +53,10 @@ html > body {
     padding-left: 24px;
 }
 
-/* Misc */
+.noOverflow {
+    overflow: hidden;
+}
+
 a {
     text-decoration: none;
 }
@@ -176,10 +184,11 @@ h5 {
 }
 
 :not(pre) > code {
-    background-color: #333333f0;
-    padding: 5px;
+    background-color: #333c;
+    padding: 2px 3px;
+    margin: 1px;
     color: #fff;
-    border: 1px solid #eeeeee0f;
+    border: 1px solid #eeeeee08;
     border-radius: 3px;
 }
 
@@ -305,7 +314,7 @@ a {
     justify-content: flex-start;
     align-items: center;
     height: max-content;
-    width: 50000px;
+    width: 100%;
     pointer-events: all;
 }
 
@@ -394,6 +403,11 @@ a {
     font-size: small;
     line-height: normal;
 }
+.mdl-tooltip > * {
+    padding: 0px;
+    margin: 0px;
+}
+
 .mdl-tooltip h2 {
     font-size: 24px;
     font-weight: bold;
@@ -435,16 +449,6 @@ a {
 
 :is(.danger-block, .warning-block, .notice-block) :last-child {
     margin-bottom: 0;
-}
-
-.docs.sideBar_cont {
-    display: flex;
-    flex-direction: column-reverse;
-}
-
-.docs.sideBar_cont > :not(.docs.sideBar){
-    width: auto;
-    display: block;
 }
 
 .wide01 {
@@ -531,7 +535,7 @@ body.preload * {
         border-right-color: #ffffff;
     }
 
-    .mdl-layout__drawer .mdl-navigation .mdl-navigation__link {
+    .mdl-layout__drawer .mdl-navigation .mdl-navigation__link, .mdl-navigation__link {
         color: #fffffff2;
         display: block;
         -webkit-flex-shrink: 0;
@@ -539,16 +543,12 @@ body.preload * {
         flex-shrink: 0;
         padding: 16px 40px;
         margin: 0;
-    }
-
-    .mdl-layout__drawer .mdl-navigation .mdl-navigation__link:hover {
-        background-color: #ffffff40;
-    }
-
-    /* Don't allow navigation text to wrap. */
-    .mdl-navigation__link {
         white-space: nowrap;
-        padding-right: 500px;
+        width: 100%;
+    }
+
+    .mdl-layout__drawer .mdl-navigation .mdl-navigation__link:hover, .mdl-navigation__link:hover {
+        background-color: #ffffff40;
     }
 
     .mdl-navigation__link--icon {
@@ -636,11 +636,6 @@ body.preload * {
     border-radius: 6px;
     border-left-style: solid;
     border-left-color: #49ba56; /* This will be randomized by JavaScript later - this is a default. */
-}
-
-.mdl-tooltip * {
-    padding: 0px;
-    margin: 0px;
 }
 
 .mdl-textfield__input {

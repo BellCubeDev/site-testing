@@ -1,13 +1,10 @@
-{% for item in input %}
+{% for item in include.input %}
     {% case item.type %}
 
         {% when "header" %}
             {% include docs__side_header.html item=item %}
-            <a href="example.com"> test link - header </a>
 
         {% when "link" %}
             {% include docs__side_link.html item=item %}
-            <a href="example.com"> test link (hyperlink) </a>
-
     {% endcase %}
 {% endfor %}

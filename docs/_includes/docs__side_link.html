@@ -1,14 +1,14 @@
-<a  href="{% if item.url | slice: 0 == "/" %}{{ site.baseurl }}{% endif %}{{ item.url }}"
+<a  href="{% if include.item.url | slice: 0 == "/" %}{{ site.baseurl }}{% endif %}{{ include.item.url }}"
 
-    {% if item.newtab %}
+    {% if include.item.newTab %}
         target="_blank"
         rel="noopener noreferrer"
     {% endif %}
 
-    class="docs sideBar link {% if item.icon %}mdl-navigation__link--icon{% endif %} {{ item.classes }}"
+    class="docs sideBar link mdl-navigation__link no-left-padding {% if include.item.icon %}mdl-navigation__link--icon{% endif %} {{ include.item.classes }}"
 >
-    {% if item.icon %}
-        <i class="material-icons">{{ item.icon }}</i>
+    {% if include.item.icon %}
+        <i class="material-icons">{{ include.item.icon }}</i>
     {% endif %}
-    <span>{{ item.name }}</span>
+    <span>{{ include.item.name }}</span>
 </a>
