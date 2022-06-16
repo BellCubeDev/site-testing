@@ -18,6 +18,12 @@ docsPage:
         name: 'Creating a Plugin'
         url: '/documentation/linear-spell-progression/creating-a-plugin/'
         icon: 'book'
+description: >
+    This page describes how to create a plugin for the Linear Spell Progression framework mod.
+    It runs through the basics, such as the structure, all the way down to the standard Editor IDs.
+
+    Linear Spell Progression is a Skyrim Special Edition framework mod that allows you to add prerequisites to spells
+    without creating compatibility issues.
 ---
 
 <h1>The Format</h1>
@@ -149,32 +155,31 @@ It's a (relatively) simple system.
 <li>
     Universal Ending: <span class=nested_code><code>[DLC/CC/MOD]</code>{{3-letter abbreviation for author, such as BGS}}<code>_</code>{{2-Digit Number}}{{Human-readable name}}</span><br />
     <i>Example: <code>DLC_BGS_00Skyrim</code></i>
+    <br /><br />
 </li>
-<br />
 <li>
     Plugin-Level: <span class=nested_code><code>LSP_Main_</code> + Universal Ending</span><br />
     <i>Example: <code>LSP_0Tomes_DLC_BGS_00Skyrim</code></i>
+    <br /><br />
 </li>
-<br />
 <li>
     Tome: <span class=nested_code><code>LSP_0Tomes_</code> + Universal Ending</span><br />
     <i>Example: <code>LSP_0Tomes_DLC_BGS_00Skyrim</code></i>
+    <br /><br />
 </li>
-<br />
 <li>
     * Spells: <span class=nested_code><code>LSP_1Spells_</code> + Universal Ending</span><br />
     <i>Example: <code>LSP_1Spells_DLC_BGS_00Skyrim</code></i>
+    <br /><br />
 </li>
-<br />
 <li>
     Prerequisites: <span class=nested_code><code>LSP_2Pre_</code> + Universal Ending</span><br />
     <i>Example: <code>LSP_2Pre_DLC_BGS_00Skyrim</code></i>
+    <br /><br />
 </li>
-<br />
 <li>
     List of a single spell's prerequisites: <span class=nested_code><code>LSP_</code>{{Spell Name}}<code>_</code> + Universal Ending</span><br />
     <i>Example: <code>LSP_FlameCloak_DLC_BGS_00Skyrim</code></i>
 </li>
 </ul>
 {% endraw %}
-
