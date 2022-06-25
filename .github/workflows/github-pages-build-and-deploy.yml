@@ -1,0 +1,116 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/github-workflow.json
+name: Build & Deploy GitHub Pages Site
+
+on: # Run when the `main` branch is pushed to or when manually requested
+#  push:
+#    branches: [ "main" ]
+  workflow_dispatch:
+
+
+
+
+jobs:
+  build:
+    name: "Build Site"
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Setup Work
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Install NPM
+        uses: actions/setup-node@v3.3.0
+        
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3.7
+
+      - name: Install Dependencies (Node & Ruby)
+        # Output dir: [in-place]
+        run: |
+          cd $GITHUB_WORKSPACE/site
+          npm install --production
+          bundle install
+
+          # Some minifiers
+          npm install minify-all-js -g
+          npm install html-minifier-terser -g
+
+
+
+      - name: Compile Typescript
+        # Output dir: _prep-for-jekyll
+        run: |
+          cd $GITHUB_WORKSPACE/site
+          npx tsc --build tsconfig.json
+
+          # Move everything else to the correct folder, except Typescript files (since they were compiled above)
+          rm -f src/**/*.ts
+          mv -n src/* _prep-for-jekyll/
+
+
+      - name: Minify JavaScript and JSON
+        # Output dir: [in-place]
+        run: |
+          cd $GITHUB_WORKSPACE/site
+          minify-all-js _prep-for-jekyll -j
+
+
+      - name: Build with Jekyll
+        # Output dir: _jekyll-out
+        run: |
+          cd $GITHUB_WORKSPACE/site/
+          jekyll build --destination _jekyll-out --source _prep-for-jekyll --verbose --safe --trace
+
+      - name: Minify HTML (etc.)
+        # Output dir: _minify-HTML-out
+        run: |
+          cd $GITHUB_WORKSPACE/site/_prep-for-jekyll
+          
+          # HTML
+          html-minifier-terser --collapse-boolean-attributes --collapse-whitespace --conservative-collapse --decode-entities --minify-urls true --no-newlines-before-tag-close --process-conditional-comments --quote-character " --remove-attribute-quotes --remove-comments --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --sort-attributes --sort-class-name \
+              --input-dir _jekyll-out --output-dir _minify-HTML-out --file-ext html
+          
+          # SVGs
+          html-minifier-terser --case-sensitive --collapse-boolean-attributes --collapse-whitespace --conservative-collapse --decode-entities --minify-urls true --no-newlines-before-tag-close --process-conditional-comments --quote-character " --remove-attribute-quotes --remove-comments --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --sort-attributes --sort-class-name \
+              --input-dir _jekyll-out --output-dir _minify-HTML-out --file-ext svg
+          
+          # XML
+          html-minifier-terser --case-sensitive --collapse-boolean-attributes --collapse-whitespace --conservative-collapse --decode-entities --minify-urls true --no-newlines-before-tag-close --process-conditional-comments --quote-character " --remove-attribute-quotes --remove-comments --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --sort-attributes --sort-class-name \
+              --input-dir _jekyll-out --output-dir _minify-HTML-out --file-ext xml
+
+          # Move Everything Else
+          rm -f _jekyll-out/**/*.html
+          rm -f _jekyll-out/**/*.svg
+          rm -f _jekyll-out/**/*.xml
+          mv -n _jekyll-out/* _minify-HTML-out/
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: Built-Pages
+          path: $GITHUB_WORKSPACE/_minify-HTML-out
+
+  deploy:
+    name: "Deploy to the GitHub Pages branch"
+    runs-on: ubuntu-latest
+    needs:
+      - build
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: Built-Pages
+          path: artifacts/built-pages
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        with:
+          branch: deployment
+          folder: artifacts/built-pages
