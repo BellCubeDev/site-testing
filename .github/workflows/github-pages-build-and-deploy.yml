@@ -74,7 +74,7 @@ jobs:
           printenv
 
           mkdir $GITHUB_WORKSPACE/_generated/_jekyll-out
-          bundle execute jekyll build --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out --source $GITHUB_WORKSPACE/_generated/_prep-for-jekyll --verbose --safe --trace
+          bundle exec jekyll build --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out --source $GITHUB_WORKSPACE/_generated/_prep-for-jekyll --verbose --safe --trace
 
       - name: Minify HTML (etc.)
         # Output dir: _minify-HTML-out
