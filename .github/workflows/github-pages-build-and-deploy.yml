@@ -30,7 +30,7 @@ jobs:
         with:
           ruby-version: '3.1'
           bundler-cache: true # Should be equivalent to `bundle install' (but faster)
-          working-directory: $GITHUB_WORKSPACE/site
+          working-directory: site
 
       - name: Install Dependencies (Node & Ruby)
         # Output dir: [in-place]
