@@ -6,7 +6,7 @@
         {
             "label": "Serve Site",
             "type": "shell",
-            "command": "cd docs && start http://127.0.0.1:4000/site-testing/ && jekyll serve --host 0.0.0.0",
+            "command": "start http://127.0.0.1:4000/site-testing/ && .vscode\\build.bat serve testing",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -16,7 +16,7 @@
             "presentation": {
                 "echo": true,
                 "reveal": "silent",
-                "focus": false,
+                "focus": true,
                 "panel": "new",
                 "showReuseMessage": false,
                 "clear": true,
