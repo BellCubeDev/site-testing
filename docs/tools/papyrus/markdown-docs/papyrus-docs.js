@@ -58,7 +58,7 @@ const regex_EventParams =
 /(?:\s|;\/.*?\/;|\\)*([\w\d]+)(\[])?(?:\s|;\/.*?\/;|\\)+([\w\d]+)(?:\s|;\/.*?\/;|\\)*(?:=(?:\s|;\/.*?\/;|\\)*(".+(?<!\\)"|[\w\d]+))?/gsi;
 
 const regex_Functions =
-/\n*((?:^\s*;.*\n)+)?(?:([\w\d]+)(\[.*?\])?(?:\s|;\/(?:\s|\S)*?\/;|\\)+)?Function(?:\s|;\/(?:\s|\S)*?\/;|\\)+([\w\d]+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*\((?:\s|;\/(?:\s|\S)*?\/;|\\)*((?:[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)*=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+(?:\.\d+)?|".*?(?<!\\)"))?(?:(?:\s|;\/(?:\s|\S)*?\/;|\\))*,(?:\s|;\/(?:\s|\S)*?\/;|\\)+)*[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+(?:\.\d+)?|".*?(?<!\\)"))?))?(?:\s|;\/(?:\s|\S)*?\/;|\\)*\)(?:\s|;\/(?:\s|\S)*?\/;|\\)+(?:(global)(?:\s|;\/(?:\s|\S)*?\/;|\\)+)?(?:(native)(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+(global))?|(?:([\s\S]+?)^(?:\s|;\/(?:\s|\S)*?\/;|\\)*EndFunction))/gmi;
+/\n*((?:^\s*;.*\n)+)?(?:([\w\d]+)(\[.*?\])?(?:\s|;\/(?:\s|\S)*?\/;|\\)+)?Function(?:\s|;\/(?:\s|\S)*?\/;|\\)+([\w\d]+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*\((?:\s|;\/(?:\s|\S)*?\/;|\\)*((?:[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)*=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+(?:\.\d+)?|".*?(?<!\\)"))?(?:(?:\s|;\/(?:\s|\S)*?\/;|\\))*,(?:\s|;\/(?:\s|\S)*?\/;|\\)+)*[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+(?:\.\d+)?|".*?(?<!\\)"))?))?(?:\s|;\/(?:\s|\S)*?\/;|\\)*\)(?:\s|;\/(?:\s|\S)*?\/;|\\)+(?:(global)(?:\s|;\/(?:\s|\S)*?\/;|\\)+)?(?:(native)(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+(global))?(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+\{(.*?)\})?|(?:(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+\{(.*?)\})?([\s\S]+?)^(?:\s|;\/(?:\s|\S)*?\/;|\\)*EndFunction))/gmi;
 
 /*
     papy_docs_libName
@@ -133,7 +133,7 @@ async function generateDocs_folder(){
     //var entries = folder.entries();
     //console.log(await entries.next());
     await forEachFile(folder, iterationFunction, -1);
-    
+
     /** @param {string} name @param {FileSystemHandle} file */
     async function iterationFunction(name, file, directory){
         //console.log(name, file);
@@ -324,7 +324,7 @@ function parseScript(scriptStr) {
         `| ${func.global ? 'Global' : 'Member'} | ${func.native ? 'Native' : 'Scripted'} |\n`;
         functionTable += funcTableRow;
     }
-    
+
     return `# ${scriptname.name}
 
 | :-: | :-- |
@@ -442,7 +442,7 @@ function parseEvents(scriptStr) {
 */
 function parseParameters(paramStr) {
     if (typeof paramStr !== 'string') return [];
-    
+
     var result_arr = [];
     var params = paramStr.matchAll(regex_EventParams);
 
@@ -482,11 +482,16 @@ function parseFunctions(scriptStr) {
         functions.push({
             returns: {type: typeof _function[2] === 'undefined' ? '' :_function[2].capitalizeFirstLetter(), is_array: typeof _function[3] !== 'undefined'},
             name: _function[4],
-            description: typeof _function[1] === 'undefined' ? '' : _function[1].trimWhitespace().replace(/^\s*;\s*/gm, ''),
+            description:
+                typeof _function[1] === 'undefined' ? '' : _function[1].trimWhitespace().replace(/^\s*;\s*/gm, '') +
+                    typeof _function[1] === 'undefined' || typeof _function[8] === 'undefined' ? '' : '\n\n' +
+                typeof _function[8] === 'undefined' ? '' : _function[1].trimWhitespace().replace(/^\s*;\s*/gm, '') +
+                    typeof _function[8] === 'undefined' || typeof _function[9] === 'undefined' ? '' : '\n\n' +
+                typeof _function[9] === 'undefined' ? '' : _function[9].trimWhitespace().replace(/^\s*;\s*/gm, ''),
             parameters: parseParameters(_function[5]),
             global: typeof _function[6] !== 'undefined' || typeof _function[8] !== 'undefined',
             native: typeof _function[7] !== 'undefined',
-            body: _function[9] === 'string' ? _function[9].trimWhitespace() : ''
+            body: _function[11] === 'string' ? _function[9].trimWhitespace() : ''
         });
     }
     return functions;

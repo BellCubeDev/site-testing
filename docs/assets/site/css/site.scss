@@ -203,6 +203,11 @@ pre {
     scrollbar-gutter: stable both-edges;
 }
 
+.mdl-button {
+    text-transform: none;
+}
+
+
 /* Remove extra margin above the first heading of a page. */
 :is(h1, h2, h3):first-child {
     margin-top: 0;

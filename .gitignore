@@ -1,4 +1,11 @@
+# Temporary Files
 _site
+_minify-HTML-out
+_prep-for-jekyll
+_minify-HTML-out
 .sass-cache
+
+# Unnessecary Package Manager Files
 Gemfile.lock
+package-lock.json
 node_modules
