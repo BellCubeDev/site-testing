@@ -28,7 +28,7 @@ jobs:
       - name: Install Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.3.7
+          ruby-version: '3.1'
 
       - name: Install Dependencies (Node & Ruby)
         # Output dir: [in-place]
