@@ -34,7 +34,7 @@ jobs:
         # Output dir: [in-place]
         run: |
           # Command used for debugging purposes only
-          ls $GITHUB_WORKSPACE/*/*/*/*/*/*/*/*/*/*/*/*/*
+          ls $GITHUB_WORKSPACE/**/*
 
           cd $GITHUB_WORKSPACE/site
           npm install --omit=dev
