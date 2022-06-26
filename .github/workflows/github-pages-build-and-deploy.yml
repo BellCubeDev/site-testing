@@ -33,13 +33,16 @@ jobs:
       - name: Install Dependencies (Node & Ruby)
         # Output dir: [in-place]
         run: |
+          # Command used for debugging purposes only
+          ls $GITHUB_WORKSPACE/*/*/*/*/*/*/*/*/*/*/*/*/*
+
           cd $GITHUB_WORKSPACE/site
-          npm install --production
+          npm install --omit=dev
           bundle install
 
           # Some minifiers
-          npm install minify-all-js -g
-          npm install html-minifier-terser -g
+          npm install minify-all-js --location=global
+          npm install html-minifier-terser --location=global
 
 
 
@@ -51,6 +54,7 @@ jobs:
 
           # Move everything else to the correct folder, except Typescript files (since they were compiled above)
           rm -f src/**/*.ts
+          mkdir $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/
           mv -n src/* $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/
 
 
@@ -64,12 +68,13 @@ jobs:
         # Output dir: _jekyll-out
         run: |
           cd $GITHUB_WORKSPACE/site
+          mkdir $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/
           jekyll build --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out --source $GITHUB_WORKSPACE/_generated/_prep-for-jekyll --verbose --safe --trace
 
       - name: Minify HTML (etc.)
         # Output dir: _minify-HTML-out
         run: |
-          cd $GITHUB_WORKSPACE/_generated/_generated
+          cd $GITHUB_WORKSPACE/_generated/
 
           # HTML
           html-minifier-terser --collapse-boolean-attributes --collapse-whitespace --conservative-collapse --decode-entities --minify-urls true --no-newlines-before-tag-close --process-conditional-comments --quote-character " --remove-attribute-quotes --remove-comments --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --sort-attributes --sort-class-name \
