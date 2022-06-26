@@ -38,7 +38,9 @@ jobs:
 
           cd $GITHUB_WORKSPACE/site
           npm install --omit=dev
-          bundle install
+          # bundle install - handled by 'bundle add' below
+          bundle remove json
+          bundle add json --version 1.8.6
 
           # Some minifiers
           npm install minify-all-js --location=global
