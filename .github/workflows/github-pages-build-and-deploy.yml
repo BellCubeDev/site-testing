@@ -25,12 +25,12 @@ jobs:
       - name: Install NPM
         uses: actions/setup-node@v3.3.0
 
-      - name: Install Ruby & Gems
+      - name: Install Ruby #& Gems
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
-          #bundler-cache: true # ~~Should be equivalent to `bundle install' (but faster)~~ was slower in my testing, and didn't automatically expose the jekyll command to the shell.
-          #working-directory: site
+          bundler-cache: true # Should be equivalent to `bundle install' (but faster), though it does not expose executables directly
+          working-directory: site
 
       - name: Install Node Package & Ruby Gem Dependencies
         # Output dir: [in-place]
@@ -40,7 +40,7 @@ jobs:
 
           cd $GITHUB_WORKSPACE/site
           npm install --omit=dev
-          bundle install
+          # bundle install
 
           # Some minifiers
           npm install minify-all-js --location=global
@@ -74,7 +74,7 @@ jobs:
           printenv
 
           mkdir $GITHUB_WORKSPACE/_generated/_jekyll-out
-          jekyll build --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out --source $GITHUB_WORKSPACE/_generated/_prep-for-jekyll --verbose --safe --trace
+          bundle execute jekyll build --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out --source $GITHUB_WORKSPACE/_generated/_prep-for-jekyll --verbose --safe --trace
 
       - name: Minify HTML (etc.)
         # Output dir: _minify-HTML-out
