@@ -32,7 +32,7 @@ jobs:
           bundler-cache: true # Should be equivalent to `bundle install' (but faster)
           working-directory: site
 
-      - name: Install Dependencies (Node Packages & Ruby Gems)
+      - name: Install Node Dependencies
         # Output dir: [in-place]
         run: |
           # Command used for debugging purposes only
@@ -40,9 +40,6 @@ jobs:
 
           cd $GITHUB_WORKSPACE/site
           npm install --omit=dev
-
-          # Looks like the above didn't like jekyll
-          bundle install
 
           # Some minifiers
           npm install minify-all-js --location=global
