@@ -68,7 +68,7 @@ jobs:
         # Output dir: _jekyll-out
         run: |
           cd $GITHUB_WORKSPACE/site
-          mkdir $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/
+          mkdir $GITHUB_WORKSPACE/_generated/_jekyll-out
           jekyll build --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out --source $GITHUB_WORKSPACE/_generated/_prep-for-jekyll --verbose --safe --trace
 
       - name: Minify HTML (etc.)
