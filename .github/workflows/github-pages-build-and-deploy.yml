@@ -29,6 +29,8 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
+          bundler-cache: true # Should be equivalent to `bundle install' (but faster)
+          working-directory: $GITHUB_WORKSPACE/site
 
       - name: Install Dependencies (Node & Ruby)
         # Output dir: [in-place]
@@ -38,9 +40,6 @@ jobs:
 
           cd $GITHUB_WORKSPACE/site
           npm install --omit=dev
-          # bundle install - handled by 'bundle add' below
-          bundle remove json
-          bundle add json --version 1.8.6
 
           # Some minifiers
           npm install minify-all-js --location=global
