@@ -98,7 +98,7 @@ jobs:
           #echo -e "\n\n===========================================\n           BEGIN Debug command - ls\n===========================================\n\n"
           #ls -R $GITHUB_WORKSPACE/_generated/ts_out/
           #echo -e "\n\n===========================================\n            END  Debug command - ls\n===========================================\n\n"
-          bundle exec jekyll build --config $GITHUB_WORKSPACE/site/_config.yml --source $GITHUB_WORKSPACE/_generated/ts_out/ --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out/ --verbose --safe --trace
+          bundle exec jekyll build --config $GITHUB_WORKSPACE/site/_config.yml --source $GITHUB_WORKSPACE/_generated/ts_out/ --destination $GITHUB_WORKSPACE/_generated/_jekyll-out/ --verbose --safe --trace
 
 
 
