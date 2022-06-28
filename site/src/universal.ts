@@ -19,6 +19,25 @@ export class bcdStr extends String {
 }
 
 
+const _ganalytics_HTML = '<script async src="https://www.googletagmanager.com/gtag/js?id=G-5YE7EYGLGT"></script>'
+
+// Currently unused since I haven't made the opt-in prompt yet
+function enableAnalytics():void{
+    //console.log('[BCD-Analytics] Enabling analytics...');
+
+    document.head.insertAdjacentHTML('beforeend', _ganalytics_HTML);
+
+    //console.log('[BCD-Analytics] Analytics enabled.');
+    // @ts-ignore: Property 'dataLayer' does not exist on type 'Window & typeof globalThis'
+    window.dataLayer = window.dataLayer || [];
+
+    // @ts-ignore: Cannot find name 'dataLayer'.
+    function gtag(...args:any[]){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-5YE7EYGLGT');
+}
+
+
 /*
     This script hooks into Material Design Lite's "Component Design Pattern" API
     (see https://github.com/jasonmayes/mdl-component-design-pattern) to provide:

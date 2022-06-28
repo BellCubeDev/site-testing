@@ -3,6 +3,6 @@ _generated
 .sass-cache
 
 # Unnessecary Package Manager Files
-Gemfile.lock
+#Gemfile.lock # The workflow wants this
 package-lock.json
 node_modules
