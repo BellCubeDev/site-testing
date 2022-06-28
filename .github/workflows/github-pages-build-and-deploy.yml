@@ -38,7 +38,7 @@ jobs:
           # Command used for debugging purposes only
           # ls $GITHUB_WORKSPACE/**/*
 
-          cd $GITHUB_WORKSPACE/site
+          cd $GITHUB_WORKSPACE/site/
           npm install --omit=dev
           bundle install
 
@@ -49,28 +49,28 @@ jobs:
 
 
       - name: Compile Typescript
-        # Output dir: $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/
+        # Output dir: $GITHUB_WORKSPACE/_generated/ts_out/
         run: |
-          cd $GITHUB_WORKSPACE/site
+          cd $GITHUB_WORKSPACE/site/
           npx tsc --build --verbose tsconfig.json
 
           # Move everything else to the correct folder, except JavaScript and TypesScript files (since they were compiled/copied above)
-          cd $GITHUB_WORKSPACE/site/src
-          rm -f -r src/*.ts src/*.js
-          mkdir $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/
-          mv -n * $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/
+          cd $GITHUB_WORKSPACE/site/src/
+          rm -f -r *.ts *.js
+          mkdir $GITHUB_WORKSPACE/_generated/ts_out/
+          mv -n * $GITHUB_WORKSPACE/_generated/ts_out/
 
 
       - name: Minify JavaScript and JSON
-        # Output dir: [in-place] $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/
+        # Output dir: [in-place] $GITHUB_WORKSPACE/_generated/ts_out/
         run: |
-          minify-all-js $GITHUB_WORKSPACE/_generated/_prep-for-jekyll -j
+          minify-all-js $GITHUB_WORKSPACE/_generated/ts_out/ -j
 
 
       - name: Build with Jekyll
         # Output dir: $GITHUB_WORKSPACE/_generated/_jekyll-out/
         run: |
-          cd $GITHUB_WORKSPACE/site
+          cd $GITHUB_WORKSPACE/site/
           # Debug command
           #echo "\n\n===========================================\n BEGIN Debug command - printenv\n===========================================\n\n"
           #printenv
@@ -81,7 +81,7 @@ jobs:
           echo "\n\n===========================================\n           BEGIN Debug command - ls\n===========================================\n\n"
           ls -R $GITHUB_WORKSPACE/_generated/_prep-for-jekyll
           echo "\n\n===========================================\n            END  Debug command - ls\n===========================================\n\n"
-          bundle exec jekyll build --config $GITHUB_WORKSPACE/site/_config.yml --source $GITHUB_WORKSPACE/_generated/_prep-for-jekyll --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out --verbose --safe --trace
+          bundle exec jekyll build --config $GITHUB_WORKSPACE/site/_config.yml --source $GITHUB_WORKSPACE/_generated/ts_out/ --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out/ --verbose --safe --trace
 
       - name: Minify HTML (etc.)
         # Output dir: $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
