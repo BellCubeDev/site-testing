@@ -60,7 +60,7 @@ jobs:
           shopt -s nullglob
           cd $GITHUB_WORKSPACE/site/
           rm -f -r src/*.ts src/*.js
-          mv -v -n src/* src/**/* -t $GITHUB_WORKSPACE/_generated/ts_out/
+          mv -v src/* -t $GITHUB_WORKSPACE/_generated/ts_out/
 
 
       - name: Minify JavaScript and JSON
