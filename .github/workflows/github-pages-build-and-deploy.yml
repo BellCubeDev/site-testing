@@ -51,13 +51,13 @@ jobs:
       - name: Compile Typescript
         # Output dir: $GITHUB_WORKSPACE/_generated/ts_out/
         run: |
+          mkdir $GITHUB_WORKSPACE/_generated/ts_out/
           cd $GITHUB_WORKSPACE/site/
           npx tsc --build --verbose tsconfig.json
 
           # Move everything else to the correct folder, except JavaScript and TypesScript files (since they were compiled/copied above)
           cd $GITHUB_WORKSPACE/site/src/
           rm -f -r *.ts *.js
-          mkdir $GITHUB_WORKSPACE/_generated/ts_out/
           mv -n * $GITHUB_WORKSPACE/_generated/ts_out/
 
 
