@@ -132,7 +132,7 @@ jobs:
         with:
           name: Built-Pages
 #          path: $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
-          path: $GITHUB_WORKSPACE/_generated/_jekyll-out/*
+          path: ${{ github.workspace }}/_generated/_jekyll-out/
 
 
 
