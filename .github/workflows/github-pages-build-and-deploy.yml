@@ -13,14 +13,17 @@ jobs:
   build:
     name: "Build Site"
     runs-on: ubuntu-latest
-
     steps:
+
+
 
       # Setup Work
       - name: Checkout
         uses: actions/checkout@v3
         with:
           submodules: true
+
+
 
       - name: Install Ruby & Gems
         uses: ruby/setup-ruby@v1
@@ -29,8 +32,12 @@ jobs:
           #bundler-cache: true # Should be equivalent to `bundle install' (but faster), though it does not expose executables directly. Meh, that's what `bundle exec` is for!
           # ^ Was causing an issue with my good friend TypeScript when given a working directory and not working when not given a working directory.
 
+
+
       - name: Install NPM
         uses: actions/setup-node@v3.3.0
+
+
 
       - name: Install Node.js Package & Ruby Gem Dependencies
         # Output dir: [N/A]
@@ -56,17 +63,25 @@ jobs:
           cd $GITHUB_WORKSPACE/site/
           npx tsc --build --verbose tsconfig.json
 
-          # Move everything else to the correct folder, except JavaScript and TypesScript files (since they were compiled/copied above)
-          shopt -s nullglob
-          cd $GITHUB_WORKSPACE/site/
-          rm -f -r src/*.ts src/*.js
-          mv -v src/* -t $GITHUB_WORKSPACE/_generated/ts_out/
+
+
+      - name: Move Files to ts_out
+        # Move everything else to the correct folder, except JavaScript and TypesScript files (since they were compiled/copied above)
+
+        # Output dir: $GITHUB_WORKSPACE/_generated/ts_out/
+        run: |
+          cd $GITHUB_WORKSPACE/site/src/
+          rm -f -r *.ts *.js
+
+          rsync -t -r -v $GITHUB_WORKSPACE/site/src/* $GITHUB_WORKSPACE/_generated/ts_out/
+
 
 
       - name: Minify JavaScript and JSON
         # Output dir: [in-place] $GITHUB_WORKSPACE/_generated/ts_out/
         run: |
           minify-all-js $GITHUB_WORKSPACE/_generated/ts_out/ -j
+
 
 
       - name: Build with Jekyll
@@ -84,6 +99,8 @@ jobs:
           ls -R $GITHUB_WORKSPACE/_generated/ts_out/
           echo -e "\n\n===========================================\n            END  Debug command - ls\n===========================================\n\n"
           bundle exec jekyll build --config $GITHUB_WORKSPACE/site/_config.yml --source $GITHUB_WORKSPACE/_generated/ts_out/ --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out/ --verbose --safe --trace
+
+
 
       - name: Minify HTML (etc.)
         # Output dir: $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
@@ -108,24 +125,32 @@ jobs:
           rm -f $GITHUB_WORKSPACE/_generated/_jekyll-out/**/*.xml
           mv -n $GITHUB_WORKSPACE/_generated/_jekyll-out/* $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
 
+
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: Built-Pages
           path: $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
 
+
+
   deploy:
     name: "Deploy to the GitHub Pages branch"
     runs-on: ubuntu-latest
     needs:
       - build
-
     steps:
+
+
+
       - name: Download Artifact
         uses: actions/download-artifact@v3
         with:
           name: Built-Pages
           path: artifacts/built-pages
+
+
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.3.3
