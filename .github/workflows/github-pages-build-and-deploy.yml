@@ -36,7 +36,7 @@ jobs:
         # Output dir: [N/A]
         run: |
           # Command used for debugging purposes only
-          ls $GITHUB_WORKSPACE/**/*
+          # ls $GITHUB_WORKSPACE/**/*
 
           cd $GITHUB_WORKSPACE/site
           npm install --omit=dev
@@ -71,10 +71,16 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/site
           # Debug command
-          printenv
+          #echo "\n\n===========================================\n BEGIN Debug command - printenv\n===========================================\n\n"
+          #printenv
+          #echo "\n\n===========================================\n  END  Debug command - printenv\n===========================================\n\n"
 
           mkdir $GITHUB_WORKSPACE/_generated/_jekyll-out
-          bundle exec jekyll build --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out --source $GITHUB_WORKSPACE/_generated/_prep-for-jekyll --verbose --safe --trace
+          # Debug command
+          echo "\n\n===========================================\n           BEGIN Debug command - ls\n===========================================\n\n"
+          ls $GITHUB_WORKSPACE/_generated/_jekyll-out
+          echo "\n\n===========================================\n            END  Debug command - ls\n===========================================\n\n"
+          bundle exec jekyll build --config $GITHUB_WORKSPACE/site/_config.yml --source $GITHUB_WORKSPACE/_generated/_prep-for-jekyll --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out --verbose --safe --trace
 
       - name: Minify HTML (etc.)
         # Output dir: _minify-HTML-out
