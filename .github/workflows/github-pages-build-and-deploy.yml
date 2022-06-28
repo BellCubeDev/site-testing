@@ -26,12 +26,13 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
-          bundler-cache: true # Should be equivalent to `bundle install' (but faster), though it does not expose executables directly. Meh, that's what `bundle exec` is for!
+          #bundler-cache: true # Should be equivalent to `bundle install' (but faster), though it does not expose executables directly. Meh, that's what `bundle exec` is for!
+          # ^ Was causing an issue with my good friend TypeScript when given a working directory and not working when not given a working directory.
 
       - name: Install NPM
         uses: actions/setup-node@v3.3.0
 
-      - name: Install Node.js Package Dependencies
+      - name: Install Node.js Package & Ruby Gem Dependencies
         # Output dir: [N/A]
         run: |
           # Command used for debugging purposes only
@@ -39,6 +40,7 @@ jobs:
 
           cd $GITHUB_WORKSPACE/site
           npm install --omit=dev
+          bundle install
 
           # Some minifiers
           npm install minify-all-js --location=global
