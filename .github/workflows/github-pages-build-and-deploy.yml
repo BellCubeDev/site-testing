@@ -73,15 +73,15 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/site/
           # Debug command
-          #echo "\n\n===========================================\n BEGIN Debug command - printenv\n===========================================\n\n"
+          #echo -e "\n\n===========================================\n BEGIN Debug command - printenv\n===========================================\n\n"
           #printenv
-          #echo "\n\n===========================================\n  END  Debug command - printenv\n===========================================\n\n"
+          #echo -e "\n\n===========================================\n  END  Debug command - printenv\n===========================================\n\n"
 
           mkdir $GITHUB_WORKSPACE/_generated/_jekyll-out
           # Debug command
-          #echo "\n\n===========================================\n           BEGIN Debug command - ls\n===========================================\n\n"
-          #ls -R $GITHUB_WORKSPACE/_generated/_prep-for-jekyll
-          #echo "\n\n===========================================\n            END  Debug command - ls\n===========================================\n\n"
+          echo -e "\n\n===========================================\n           BEGIN Debug command - ls\n===========================================\n\n"
+          ls -R $GITHUB_WORKSPACE/_generated/_prep-for-jekyll
+          echo -e "\n\n===========================================\n            END  Debug command - ls\n===========================================\n\n"
           bundle exec jekyll build --config $GITHUB_WORKSPACE/site/_config.yml --source $GITHUB_WORKSPACE/_generated/ts_out/ --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out/ --verbose --safe --trace
 
       - name: Minify HTML (etc.)
