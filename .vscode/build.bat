@@ -80,7 +80,7 @@ ECHO.
 ECHO.
 ECHO [36mCompiling TypeScript files...[0m
 ECHO.
-call npx tsc --build tsconfig.json
+call npx tsc --build --verbose tsconfig.json
 if not errorlevel 0 (
     ECHO  [101mTypeScript compilation failed ^(for reasons other than compile errors!^).[0m
     exit /b 1
