@@ -95,9 +95,9 @@ jobs:
 
           mkdir $GITHUB_WORKSPACE/_generated/_jekyll-out/
           # Debug command
-          echo -e "\n\n===========================================\n           BEGIN Debug command - ls\n===========================================\n\n"
-          ls -R $GITHUB_WORKSPACE/_generated/ts_out/
-          echo -e "\n\n===========================================\n            END  Debug command - ls\n===========================================\n\n"
+          #echo -e "\n\n===========================================\n           BEGIN Debug command - ls\n===========================================\n\n"
+          #ls -R $GITHUB_WORKSPACE/_generated/ts_out/
+          #echo -e "\n\n===========================================\n            END  Debug command - ls\n===========================================\n\n"
           bundle exec jekyll build --config $GITHUB_WORKSPACE/site/_config.yml --source $GITHUB_WORKSPACE/_generated/ts_out/ --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out/ --verbose --safe --trace
 
 
@@ -131,7 +131,8 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: Built-Pages
-          path: $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
+#          path: $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
+          path: $GITHUB_WORKSPACE/_generated/_jekyll-out/
 
 
 
