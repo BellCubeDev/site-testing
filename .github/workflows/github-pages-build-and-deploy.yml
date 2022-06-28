@@ -54,10 +54,11 @@ jobs:
           cd $GITHUB_WORKSPACE/site
           npx tsc --build tsconfig.json
 
-          # Move everything else to the correct folder, except Typescript files (since they were compiled above)
-          rm -f src/**/*.ts
+          # Move everything else to the correct folder, except JavaScript and TypesScript files (since they were compiled/copied above)
+          cd $GITHUB_WORKSPACE/site/src
+          rm -f -r src/*.ts src/*.js
           mkdir $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/
-          mv -n src/* $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/
+          mv -n * $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/
 
 
       - name: Minify JavaScript and JSON
@@ -78,7 +79,7 @@ jobs:
           mkdir $GITHUB_WORKSPACE/_generated/_jekyll-out
           # Debug command
           echo "\n\n===========================================\n           BEGIN Debug command - ls\n===========================================\n\n"
-          ls $GITHUB_WORKSPACE/_generated/_prep-for-jekyll
+          ls -R $GITHUB_WORKSPACE/_generated/_prep-for-jekyll
           echo "\n\n===========================================\n            END  Debug command - ls\n===========================================\n\n"
           bundle exec jekyll build --config $GITHUB_WORKSPACE/site/_config.yml --source $GITHUB_WORKSPACE/_generated/_prep-for-jekyll --destination $GITHUB_WORKSPACE/_generated/_generated/_jekyll-out --verbose --safe --trace
 
