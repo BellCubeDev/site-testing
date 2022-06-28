@@ -52,7 +52,7 @@ jobs:
         # Output dir: $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/
         run: |
           cd $GITHUB_WORKSPACE/site
-          npx tsc --build --verbose --rootDir $GITHUB_WORKSPACE/site/src/ --output-dir $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/ tsconfig.json
+          npx tsc --build --verbose --rootDir $GITHUB_WORKSPACE/site/src/ --outDir $GITHUB_WORKSPACE/_generated/_prep-for-jekyll/ tsconfig.json
 
           # Move everything else to the correct folder, except JavaScript and TypesScript files (since they were compiled/copied above)
           cd $GITHUB_WORKSPACE/site/src
