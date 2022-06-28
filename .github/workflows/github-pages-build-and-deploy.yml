@@ -51,6 +51,7 @@ jobs:
       - name: Compile Typescript
         # Output dir: $GITHUB_WORKSPACE/_generated/ts_out/
         run: |
+          mkdir $GITHUB_WORKSPACE/_generated/
           mkdir $GITHUB_WORKSPACE/_generated/ts_out/
           cd $GITHUB_WORKSPACE/site/
           npx tsc --build --verbose tsconfig.json
