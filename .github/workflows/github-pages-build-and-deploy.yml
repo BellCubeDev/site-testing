@@ -57,9 +57,9 @@ jobs:
           npx tsc --build --verbose tsconfig.json
 
           # Move everything else to the correct folder, except JavaScript and TypesScript files (since they were compiled/copied above)
-          cd $GITHUB_WORKSPACE/site/src/
-          rm -f -r *.ts *.js
-          mv -n * $GITHUB_WORKSPACE/_generated/ts_out/
+          cd $GITHUB_WORKSPACE/site/
+          rm -f -r src/*.ts src/*.js
+          mv -n src/* $GITHUB_WORKSPACE/_generated/ts_out/
 
 
       - name: Minify JavaScript and JSON
