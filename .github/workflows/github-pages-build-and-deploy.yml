@@ -25,11 +25,11 @@ jobs:
       - name: Install NPM
         uses: actions/setup-node@v3.3.0
 
-      - name: Install Ruby #& Gems
+      - name: Install Ruby & Gems
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
-          bundler-cache: true # Should be equivalent to `bundle install' (but faster), though it does not expose executables directly
+          bundler-cache: true # Should be equivalent to `bundle install' (but faster), though it does not expose executables directly. Meh, that's what `bundle exec` is for!
           working-directory: site
 
       - name: Install Node Package & Ruby Gem Dependencies

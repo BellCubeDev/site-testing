@@ -1,14 +1,7 @@
 ---
 layout: page
 title: Tools - Papyrus Auto Docs
-extra_head: >
-    <script async src="papyrus-docs.js"></script>
-    
-    <link rel="stylesheet"
-      href="highlight.js/styles/base16/atelier-lakeside.min.css">
-    <script async src="highlight.js/highlight.min.js"></script>
-
-    <style>.mdl-layout__content {padding-bottom: 224px}</style>
+papy_docs: true
 description: >
     The Papyrus Auto Docs tool generates Markdown documentation for Papyrus scripts largely automatically. It includes options for both batch processing and single-file processing.
 permalink: /tools/papyrus/markdown-docs/
@@ -54,14 +47,14 @@ This page was build with generating documentation for <a href="https://modding.w
     <p>DO NOT simply copy-paste to the wiki! To provide coherent documentation, you should review each element with care. No generator is perfect, and programmers infamously do not document their code. The documentation extracted here may be lacking or even non-existent.</p>
 </div>
 
-<button id="papy_docs_folder-picker" onclick="generateDocs_folder()" type="button" style="width:160px;margin-right:8px;" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+<button id="papy_docs_folder-picker" type="button" style="width:160px;margin-right:8px;" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
     Select Directory
 </button>
 <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="papy_docs_folder-picker"><p>
     Select an entire directory for batch processing. <code>.psc</code> files will be parsed and the documentation will be outputted as <code>.psc.md</code> files alongside the original files. WILL overwrite existing files.
 </p></div>
 
-<button id="papy_docs_file-picker" onclick="generateDocs_file()" type="button" style="width:118px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+<button id="papy_docs_file-picker" type="button" style="width:118px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
     Select File
 </button>
 <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="papy_docs_file-picker"><p>
@@ -90,7 +83,7 @@ This page was build with generating documentation for <a href="https://modding.w
 
 <div id="papy_docs_register-pattern_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
                                                                       <!-- Pattern regex adapted from https://stackoverflow.com/a/30910/13076790 (changes: fix escaping, require starting with '/') -->
-    <input id="papy_docs_register-pattern" class="mdl-textfield__input" type="text" 
+    <input id="papy_docs_register-pattern" class="mdl-textfield__input" type="text"
         placeholder="RegisterFor%e%"> <!-- pattern="^.*?%e%.*$" -->
     <label class="mdl-textfield__label" for="papy_docs_register-pattern">Register Function Scheme</label>
 </div>
@@ -103,6 +96,6 @@ This page was build with generating documentation for <a href="https://modding.w
 <pre><code class="language-html" id="papy_docs_md-output" onclick=""><span class="hljs-section"># Markdown Output</span>
 
 Here, you'll find the <span class="hljs-code">`Markdown`</span> that you generate from <span class="hljs-strong">**<span class="hljs-emphasis">*single*</span>**</span> files (or the <span class="hljs-emphasis">*last*</span> file in the selected folder) above.
-    
-<span class="hljs-bullet">*</span> Thanks to [<span class="hljs-string">highlight.js</span>](<span class="hljs-link">https://highlightjs.org/</span>), we have fancy highlighting here!
+
+<span class="hljs-bullet">*</span> Thanks to [<span class="hljs-string">highlight_js</span>](<span class="hljs-link">https://highlightjs.org/</span>), we have fancy highlighting here!
 </code></pre>

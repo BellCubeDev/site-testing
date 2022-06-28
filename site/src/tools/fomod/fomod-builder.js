@@ -151,13 +151,8 @@ $$ |      \$$$$$$$ |\$$$$$$$ |\$$$$$$$\       $$$$$$\ $$ |  $$ |$$ |  \$$$$  |
 
 /** Function called when the DOM is ready for manipulation.
     All code should stem from here in some way.
-    @returns {nil} nothing
 */
-var bcd_universal_initRan = false;
-async function bcd_universalJS_init() {
-    if (bcd_universal_initRan) { return; }
-    bcd_universal_initRan = true;
-
+export async function bcd_fomodBuilder_init() {
     // Sets the various element variables found above
     setElementVars();
 
@@ -170,6 +165,7 @@ async function bcd_universalJS_init() {
 
     registerAutoSaveEvents();
 }
+window.bcd_init_functions.fomodBuilder = bcd_fomodBuilder_init;
 
 
 function setElementVars(){
@@ -364,7 +360,7 @@ async function openFomodDirectory(){
     var temp_fomodDirectory = await temp_rootDirectory.getDirectoryHandle('fomod', {create: true});
 
     // Delete the history now that the user has opened a new file
-    builderJSON_NewDocument()
+    builderJSON_NewDocument();
 
     // Get Info.xml and ModuleConfig.xml
 
@@ -642,12 +638,12 @@ var builderJSON_Instance = [Object.create(builderJSON)];
 
 /** Add an empty Builder JSON to the history states */
 function builderJSON_NewInstance() {
-    builderJSON_Instance.unshift(Object.create(builderJSON))
+    builderJSON_Instance.unshift(Object.create(builderJSON));
 }
 
 /** Add a new history state in preperation for undoable edits */
 function builderJSON_NewHistoryState(){
-    builderJSON_Instance.unshift(Object.create(builderJSON_Instance[0]))
+    builderJSON_Instance.unshift(Object.create(builderJSON_Instance[0]));
 
     // Trim the previous version count down to 4096
     if (builderJSON_Instance.length > 4096){
@@ -849,7 +845,7 @@ $$ |  $$\ $$ |  $$ |$$ | $$ | $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$   ____|$$ |  
 */
 function createComponent(tagName, componentType, attrs = {}, properties = {}){
     var elem = document.createElement(tagName);
-    
+
     // Nice one, Copilot! I had to manually verify it.
     for (var attr in attrs) {
         elem.setAttribute(attr, attrs[attr]);
@@ -873,7 +869,7 @@ class builder_SortOrderDropdown {
         this.element_ = element;
         this.init();
     }
-    
+
     /**
         * @param {MouseEvent} event The element that was clicked
     */
@@ -1106,9 +1102,7 @@ async function writeFile(fileHandle, contents) {
 */
 async function attainDirPerms(dir) {
     while (!(await tryForPermission(dir, 'readwrite'))){
-        if (!window.confirm(
-            document.getElementById(`fomod_localization_folderPicker_needsWriteAccess`).innerText
-        )){
+        if (!window.confirm("You must give write permissions for this directory to use this application.\n\nClick OK to give permissions.")){
             throw new DOMException('User denied directory write access', 'AbortError');
         }
     }

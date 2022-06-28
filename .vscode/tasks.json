@@ -6,8 +6,10 @@
         {
             "label": "Serve Site",
             "type": "shell",
-            "command": "start http://127.0.0.1:4000/site-testing/ && .vscode\\build.bat serve testing",
-            "problemMatcher": [],
+            "command": ".vscode\\build.bat serve testing http://127.0.0.1:4000/site-testing/",
+            "problemMatcher": [
+                "$tsc"
+            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -15,12 +17,12 @@
             "detail": "Runs the Jekyll site host and serves it locally.",
             "presentation": {
                 "echo": true,
-                "reveal": "silent",
-                "focus": true,
+                "reveal": "always",
+                "focus": false,
                 "panel": "new",
                 "showReuseMessage": false,
                 "clear": true,
-                "close": false,
+                "close": false
             }
         }
     ]

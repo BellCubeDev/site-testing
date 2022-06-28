@@ -42,7 +42,7 @@ social:
   name: BellCube's Site
 description: >
   The website for BellCube, a hobbyist video game modder and web developer. The site hosts documentation, tools, and project updates—and possibly the occasional blog post. Best of all, it's all open-source!
-    
+
   BellCube can be found on GitHub and Nexus Mods as well.
 
 
@@ -112,10 +112,10 @@ liquid:
 
 # Compress CSS
 sass:
-  sass_dir: /
+  sass_dir: /assets/site/
   sourcemap: always
   style: compressed
-  
+
 
 # Compress HTML Settings
 compress_html:

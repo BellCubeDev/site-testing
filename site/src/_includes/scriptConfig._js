@@ -1,0 +1,1 @@
+*/{% for item in config %}const {item.name} = {item.value};{% endfor %}/*

@@ -26,6 +26,12 @@ html > body {
     text-shadow: 0px 0px 5px #00000033;
 }
 
+* {
+    transition-property: color, background-color, border-color, fill;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in-out;
+}
+
 .mdl-layout-title {
     color: #fff;
 }
@@ -339,7 +345,7 @@ a {
     visibility: unset;
 }
 
-.bcd-details > .bcd-details_inner {
+.bcd-details > .bcd-details-inner {
     visibility: hidden;
 
     transition-property: margin-top;
@@ -356,7 +362,7 @@ a {
     /* animation-duration is 15ms longer than transition-duration when set by JavaScript */
 }
 
-.bcd-details.is-open > .bcd-details_inner {
+.bcd-details.is-open > .bcd-details-inner {
     visibility: unset;
     animation-name: unhideStuff;
     position: unset;
@@ -386,23 +392,23 @@ a {
     }
 }
 
-.bcd-details.contPad01-left > .bcd-details_inner {
+.bcd-details.contPad01-left > .bcd-details-inner {
     padding-left: 12px;
 }
 
-.bcd-details.contPad02-left > .bcd-details_inner {
+.bcd-details.contPad02-left > .bcd-details-inner {
     padding-left: 16px;
 }
 
-.bcd-details.contPad03-left > .bcd-details_inner {
+.bcd-details.contPad03-left > .bcd-details-inner {
     padding-left: 24px;
 }
 
-.bcd-details.contPad04-left > .bcd-details_inner {
+.bcd-details.contPad04-left > .bcd-details-inner {
     padding-left: 32px;
 }
 
-.bcd-details.contPad05-left > .bcd-details_inner {
+.bcd-details.contPad05-left > .bcd-details-inner {
     padding-left: 48px;
 }
 

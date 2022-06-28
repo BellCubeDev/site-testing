@@ -34,20 +34,24 @@ layout: compress_html
     <meta name="theme-color" content="#1b1b1b" /><meta name="color-scheme" content="dark" />
     <meta name="charset" content="utf-8" />
 
-    <script async src="{{ site.baseurl }}{% link assets/site/mdl/material.min.js %}"></script>
-    <script async src="{{ site.baseurl }}{% link assets/site/universal.js %}"></script>
+    <!-- Script Configuration -->
+    <!-- the setTimeout was taken from https://stackoverflow.com/a/38296629/13076790 -->
+    <script>window.bcd_init_functions={};setTimeout(()=>{document.body.className="";},1000);</script>
+    <script async type="module" src="{{ site.baseurl }}{% link assets/site/mdl/material.js %}" onload="window.bcd_init_functions.material()"></script>
+    <script async type="module" src="{{ site.baseurl }}{% link universal.js %}" onload="window.bcd_init_functions.universal()"></script>
 
-    <!-- taken from https://stackoverflow.com/a/38296629/13076790 -->
-    <script>
-        setTimeout(function(){
-            document.body.className="";
-        },1000);
-    </script>
+
 
     <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/mdl/css/material-blue.scss %}">
-
     <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/css/site.scss %}">
+
     {% if page.use_docs_CSS or layout.use_docs_CSS %}<link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/css/docs.scss %}" />{% endif %}
+
+    {% if page.papy_docs %}
+        <link rel="stylesheet" href="{{site.baseurl}}{% link assets/site/highlight_js/styles/base16/atelier-lakeside.scss %}">
+        <style>.mdl-layout__content {padding-bottom: 224px}</style>
+        <script async type="module" src="papyrus-docs.js" onload="window.bcd_init_functions.fomodBuilder()"></script>
+    {% endif %}
 
     <!--
         Appended to the bottom of site.css
@@ -62,7 +66,7 @@ layout: compress_html
             <span class="mdl-layout-title">
                 <picture>
                     <source srcset="{{ site.baseurl }}{% link assets/site/images/icon.avif %}" type="image/avif" />
-                    <img loading=lazy style="height:48px;" src="{{ site.baseurl }}{% link assets/site/images/icon.png %}" alt="" />
+                    <img loading=lazy style="width:48px;" src="{{ site.baseurl }}{% link assets/site/images/icon.png %}" alt="" />
                 </picture>
                 <span>BellCube Dev</span>
             </span>
@@ -160,5 +164,6 @@ layout: compress_html
                 Use Docs CSS? <code>{{ page.use_docs_CSS }}</code>
             -->
         </footer>
+    </div>
 </body>
 </html>
