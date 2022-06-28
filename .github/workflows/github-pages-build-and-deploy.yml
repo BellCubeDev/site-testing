@@ -57,6 +57,7 @@ jobs:
           npx tsc --build --verbose tsconfig.json
 
           # Move everything else to the correct folder, except JavaScript and TypesScript files (since they were compiled/copied above)
+          shopt -s nullglob
           cd $GITHUB_WORKSPACE/site/
           rm -f -r src/*.ts src/*.js
           mv -v -n src/* src/**/* -t $GITHUB_WORKSPACE/_generated/ts_out/
