@@ -146,7 +146,7 @@ jobs:
       checks: none
       deployments: none
       discussions: none
-      id-token: read
+      id-token: write
       issues: none
       packages: none
       pages: write
