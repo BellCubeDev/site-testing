@@ -142,15 +142,8 @@ jobs:
       - build
     permissions:
       contents: write
-      actions: none
-      checks: none
-      deployments: none
-      discussions: none
       id-token: write
-      issues: none
-      packages: none
       pages: write
-      pull-requests: none
     steps:
 
 
@@ -164,7 +157,11 @@ jobs:
 
 
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        uses: crazy-max/ghaction-github-pages@v3
         with:
-          branch: deployment
-          folder: artifacts/built-pages
+          target_branch: deployment
+          build_dir: artifacts/built-pages
+          jekyll: false
+          verbose: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
