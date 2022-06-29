@@ -1,9 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/github-workflow.json
-name: Build & Deploy GitHub Pages Site
-
+name: Build & Deploy Site
 on: # Run when the `main` branch is pushed to or when manually requested
-#  push:
-#    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
   workflow_dispatch:
 
 
@@ -13,8 +12,9 @@ jobs:
   build:
     name: "Build Site"
     runs-on: ubuntu-latest
-
     steps:
+
+
 
       # Setup Work
       - name: Checkout
@@ -22,95 +22,146 @@ jobs:
         with:
           submodules: true
 
-      - name: Install NPM
-        uses: actions/setup-node@v3.3.0
-        
-      - name: Install Ruby
+
+
+      - name: Install Ruby & Gems
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.3.7
+          ruby-version: '3.1'
+          #bundler-cache: true # Should be equivalent to `bundle install' (but faster), though it does not expose executables directly. Meh, that's what `bundle exec` is for!
+          # ^ Was causing an issue with my good friend TypeScript when given a working directory and not working when not given a working directory.
 
-      - name: Install Dependencies (Node & Ruby)
-        # Output dir: [in-place]
+
+
+      - name: Install NPM
+        uses: actions/setup-node@v3.3.0
+
+
+
+      - name: Install Node.js Package & Ruby Gem Dependencies
+        # Output dir: [N/A]
         run: |
-          cd $GITHUB_WORKSPACE/site
-          npm install --production
+          # Command used for debugging purposes only
+          # ls $GITHUB_WORKSPACE/**/*
+
+          cd $GITHUB_WORKSPACE/site/
+          npm install --omit=dev
           bundle install
 
           # Some minifiers
-          npm install minify-all-js -g
-          npm install html-minifier-terser -g
+          npm install minify-all-js --location=global
+          npm install html-minifier-terser --location=global
 
 
 
       - name: Compile Typescript
-        # Output dir: _prep-for-jekyll
+        # Output dir: $GITHUB_WORKSPACE/_generated/ts_out/
         run: |
-          cd $GITHUB_WORKSPACE/site
-          npx tsc --build tsconfig.json
+          mkdir $GITHUB_WORKSPACE/_generated/
+          mkdir $GITHUB_WORKSPACE/_generated/ts_out/
+          cd $GITHUB_WORKSPACE/site/
+          npx tsc --build --verbose tsconfig.json
 
-          # Move everything else to the correct folder, except Typescript files (since they were compiled above)
-          rm -f src/**/*.ts
-          mv -n src/* _prep-for-jekyll/
+
+
+      - name: Move Files to ts_out
+        # Move everything else to the correct folder, except JavaScript and TypesScript files (since they were compiled/copied above)
+
+        # Output dir: $GITHUB_WORKSPACE/_generated/ts_out/
+        run: |
+          cd $GITHUB_WORKSPACE/site/src/
+          rm -f -r *.ts *.js
+
+          rsync -t -r -v $GITHUB_WORKSPACE/site/src/* $GITHUB_WORKSPACE/_generated/ts_out/
+
 
 
       - name: Minify JavaScript and JSON
-        # Output dir: [in-place]
+        # Output dir: [in-place] $GITHUB_WORKSPACE/_generated/ts_out/
         run: |
-          cd $GITHUB_WORKSPACE/site
-          minify-all-js _prep-for-jekyll -j
+          minify-all-js $GITHUB_WORKSPACE/_generated/ts_out/ -j
+
 
 
       - name: Build with Jekyll
-        # Output dir: _jekyll-out
+        # Output dir: $GITHUB_WORKSPACE/_generated/_jekyll-out/
         run: |
           cd $GITHUB_WORKSPACE/site/
-          jekyll build --destination _jekyll-out --source _prep-for-jekyll --verbose --safe --trace
+          # Debug command
+          #echo -e "\n\n===========================================\n BEGIN Debug command - printenv\n===========================================\n\n"
+          #printenv
+          #echo -e "\n\n===========================================\n  END  Debug command - printenv\n===========================================\n\n"
 
-      - name: Minify HTML (etc.)
-        # Output dir: _minify-HTML-out
-        run: |
-          cd $GITHUB_WORKSPACE/site/_prep-for-jekyll
-          
-          # HTML
-          html-minifier-terser --collapse-boolean-attributes --collapse-whitespace --conservative-collapse --decode-entities --minify-urls true --no-newlines-before-tag-close --process-conditional-comments --quote-character " --remove-attribute-quotes --remove-comments --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --sort-attributes --sort-class-name \
-              --input-dir _jekyll-out --output-dir _minify-HTML-out --file-ext html
-          
-          # SVGs
-          html-minifier-terser --case-sensitive --collapse-boolean-attributes --collapse-whitespace --conservative-collapse --decode-entities --minify-urls true --no-newlines-before-tag-close --process-conditional-comments --quote-character " --remove-attribute-quotes --remove-comments --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --sort-attributes --sort-class-name \
-              --input-dir _jekyll-out --output-dir _minify-HTML-out --file-ext svg
-          
-          # XML
-          html-minifier-terser --case-sensitive --collapse-boolean-attributes --collapse-whitespace --conservative-collapse --decode-entities --minify-urls true --no-newlines-before-tag-close --process-conditional-comments --quote-character " --remove-attribute-quotes --remove-comments --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --sort-attributes --sort-class-name \
-              --input-dir _jekyll-out --output-dir _minify-HTML-out --file-ext xml
+          mkdir $GITHUB_WORKSPACE/_generated/_jekyll-out/
+          # Debug command
+          #echo -e "\n\n===========================================\n           BEGIN Debug command - ls\n===========================================\n\n"
+          #ls -R $GITHUB_WORKSPACE/_generated/ts_out/
+          #echo -e "\n\n===========================================\n            END  Debug command - ls\n===========================================\n\n"
+          bundle exec jekyll build --config $GITHUB_WORKSPACE/site/_config.yml --source $GITHUB_WORKSPACE/_generated/ts_out/ --destination $GITHUB_WORKSPACE/_generated/_jekyll-out/ --verbose --safe --trace
 
-          # Move Everything Else
-          rm -f _jekyll-out/**/*.html
-          rm -f _jekyll-out/**/*.svg
-          rm -f _jekyll-out/**/*.xml
-          mv -n _jekyll-out/* _minify-HTML-out/
+
+
+#      - name: Minify HTML (etc.)
+#        # Output dir: $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
+#        run: |
+#          cd $GITHUB_WORKSPACE/_generated/
+#
+#          # HTML
+#          html-minifier-terser --collapse-boolean-attributes --collapse-whitespace --conservative-collapse --decode-entities --minify-urls true --no-newlines-before-tag-close --process-conditional-comments --quote-character " --remove-attribute-quotes --remove-comments --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --sort-attributes --sort-class-name \
+#              --input-dir _jekyll-out --output-dir _minify-HTML-out --file-ext html
+#
+#          # SVGs
+#          html-minifier-terser --case-sensitive --collapse-boolean-attributes --collapse-whitespace --conservative-collapse --decode-entities --minify-urls true --no-newlines-before-tag-close --process-conditional-comments --quote-character " --remove-attribute-quotes --remove-comments --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --sort-attributes --sort-class-name \
+#              --input-dir _jekyll-out --output-dir _minify-HTML-out --file-ext svg
+#
+#          # XML
+#          html-minifier-terser --case-sensitive --collapse-boolean-attributes --collapse-whitespace --conservative-collapse --decode-entities --minify-urls true --no-newlines-before-tag-close --process-conditional-comments --quote-character " --remove-attribute-quotes --remove-comments --remove-redundant-attributes --remove-script-type-attributes --remove-style-link-type-attributes --sort-attributes --sort-class-name \
+#              --input-dir _jekyll-out --output-dir _minify-HTML-out --file-ext xml
+#
+#          # Move Everything Else
+#          rm -f $GITHUB_WORKSPACE/_generated/_jekyll-out/**/*.html
+#          rm -f $GITHUB_WORKSPACE/_generated/_jekyll-out/**/*.svg
+#          rm -f $GITHUB_WORKSPACE/_generated/_jekyll-out/**/*.xml
+#          mv -n $GITHUB_WORKSPACE/_generated/_jekyll-out/* $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
+
+
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: Built-Pages
-          path: $GITHUB_WORKSPACE/_minify-HTML-out
+#          path: $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
+          path: ${{ github.workspace }}/_generated/_jekyll-out/
+
+
 
   deploy:
     name: "Deploy to the GitHub Pages branch"
     runs-on: ubuntu-latest
     needs:
       - build
-
+    permissions:
+      contents: write
+      id-token: write
+      pages: write
     steps:
+
+
+
       - name: Download Artifact
         uses: actions/download-artifact@v3
         with:
           name: Built-Pages
           path: artifacts/built-pages
 
+
+
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        uses: crazy-max/ghaction-github-pages@v3
         with:
-          branch: deployment
-          folder: artifacts/built-pages
+          target_branch: deployment
+          build_dir: artifacts/built-pages
+          jekyll: false
+          verbose: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,11 +1,8 @@
-# Temporary Files
-_site
-_minify-HTML-out
-_prep-for-jekyll
-_minify-HTML-out
+# Temporary Files & folders
+_generated
 .sass-cache
 
 # Unnessecary Package Manager Files
-Gemfile.lock
+#Gemfile.lock # The workflow wants this
 package-lock.json
 node_modules

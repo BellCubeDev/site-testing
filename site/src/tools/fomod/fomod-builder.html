@@ -1,0 +1,431 @@
+---
+layout: page
+title: Tools - FOMOD Builder
+extra_head: >
+    <style>.mdl-layout__content {padding-bottom: 64px}</style>
+    <script async type="module" src="fomod-builder.js" onload="window.bcd_init_functions.fomodBuilder()"></script>
+description: >
+    The FOMOD Builder is a tool for creating FOMOD installers, a popular XML-based format for video game mod installers. It is the first of its kind to feature intuitive tooltips, dark mode, and eventually more. It is, at this time, incomplete.
+# , full schema support, Real-time renders, auditing
+permalink: /tools/fomod/
+redirect_from:
+  - /tools/fomod/builder/
+  - /tools/fomod-builder/
+scriptConfig:
+  - name: fomod_builder
+    value: true
+---
+
+{% capture vortexSVG %}
+     {{site.baseurl}}{% link assets/site/images/third-party-icons/Vortex.svg %}
+{% endcapture %}
+
+{% capture mo2SVG %}
+    {{site.baseurl}}{% link assets/site/images/third-party-icons/MO2.svg %}
+{% endcapture %}
+
+<!--
+    MO2 - Info.xml
+    https://github.com/Holt59/mo2-merge/blob/master/plugins/installer_fomod/src/fomodinstallerdialog.cpp#L626-L639
+
+    MO2 - ModuleConfig.xml
+    https://github.com/Holt59/mo2-merge/blob/master/plugins/installer_fomod/src/fomodinstallerdialog.cpp#L1226-L1253
+
+
+
+    Vortex - Info.xml
+    https://github.com/Nexus-Mods/Vortex/blob/master/src/extensions/installer_fomod/index.ts#L144-L167
+
+    Vortex - ModuleConfig.xml
+    ???
+-->
+
+
+<h1>FOMOD Builder</h1>
+<p>The FOMOD (or <b class="text-alt01">F</b>all<b class="text-alt01">O</b>ut <b class="text-alt01">MOD</b>) is a mod installer format pioneered by the Fallout Mod Manager. It is the most popular mod installer format, at least for Bethesda games. Until this site, there was no easy-to-follow FOMOD builder and no dark mode. There was no auto-saving and there there were no tooltips.<br />
+<br />
+NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full schema support! My real-time previews! My automatic auditing!</s> you'll have to wait for all of that.
+</p>
+
+<!-- File & Settings (General and Config) -->
+<div class="bcd-summary" for="details_builder_genConfig" ><i class="material-icons open-icon-90CC">expand_more</i>
+    <h2>FOMOD - General and Config</h2>
+    <h3 id="fomod_FolderPicker_folderName" style="padding-left:16px">No folder selected...</h3>
+</div><div class="bcd-details" id="details_builder_genConfig">
+    <form autocomplete="off" name="File Control" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px">
+        <button id="fomod_FolderPicker" type="button" style="width:144px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+            Pick Directory
+        </button>
+            <div id="fomod_localization_folderPicker_container" hidden>
+                <p id="fomod_localization_folderPicker_noFomod">Please select the root folder (the one containing 'fomod') or name your folder something other than 'fomod'.</p>
+                <p id="fomod_localization_folderPicker_needsWriteAccess">The editor requires write permissions to the root folder. Please grant write permissions to the root folder or hit cancel.</p>
+            </div>
+            <div class="mdl-tooltip" for="fomod_FolderPicker"><p>
+                This is the folder that you will put into an archive to be installed by users. If it is not set up for a FOMOD just yet, no worries!
+            </p></div>
+        <button id="fomod_saveButton" type="button" style="width:144px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+            Save
+        </button>
+    </form>
+
+    <form autocomplete="off" name="General Config" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px">
+
+        <!-- AutoSave Toggle -->
+        <label id="fomod_config_toggleAutosave_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="text-align:left" for="fomod_config_toggleAutosave">
+            <input type="checkbox" id="fomod_config_toggleAutosave" class="mdl-switch__input">
+            <span class="mdl-switch__label">Use Autosave</span>
+        </label>
+        <div class="mdl-tooltip" for="fomod_config_toggleAutosave_cont"><p>
+            Toggle controlling if the FOMOD Builder will automatically save the current configuration when you change it. This can be useful for making small tweaks, but can be a nightmare if you forget your backups. You've been warned!
+        </p></div>
+
+        <!-- Auto-Flag Toggle -->
+        <label id="fomod_config_use_autoflags_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="text-align:left" for="fomod_config_use_autoflags">
+            <input type="checkbox" id="fomod_config_use_autoflags" class="mdl-switch__input" checked>
+            <span class="mdl-switch__label">Use Automatic Install Flags</span>
+        </label>
+        <div class="mdl-tooltip" for="fomod_config_use_autoflags_cont"><p>
+            Converts file and folder installs to conditional installs. This speeds up the installer (very noticeably with Vortex), leading to a better user experience. The idea is that, instead of waiting for each file to install before continuing to the next page of the FOMOD, your files will be installed at the end of the installer. This allows users to choose their options all in one go before the mod manager works its magic.<br />
+            There is no drawback to this.
+        </p></div>
+
+        <!-- Save Configuration in Info.xml Toggle -->
+        <label id="fomod_config_saveConfigXML_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="text-align:left" for="fomod_config_saveConfigXML">
+            <input type="checkbox" id="fomod_config_saveConfigXML" class="mdl-switch__input">
+            <span class="mdl-switch__label">Include FOMOD Builder Config</span>
+        </label>
+        <div class="mdl-tooltip" for="fomod_config_saveConfigXML_cont"><p>
+            Saves FOMOD Builder settings within comments in the <code>Info.xml</code> file (which stores mod metadata). Can be useful if you work on large FOMODs and often revisit them, however it may increase your final file size and look like icky, yucky branding.<br />
+            <br />
+            If you use this, I do suggest that you turn it off before publishing.<br />
+            <br />
+            If used in conjunction with <code>Use Cookies</code>, a unique-only-on-your-machine identifier will be placed inside of <code>Info.xml</code>, which will load settings from the Cookie. If <code>Use Cookies</code> is toggled off, the Builder will fetch configuration from the before baking it into <code>Info.xml</code>.
+        </p></div>
+
+        <!-- Save Configuration in Cookies Toggle -->
+        <label id="fomod_config_saveConfigCookies_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="text-align:left" for="fomod_config_saveConfigCookies">
+            <input type="checkbox" id="fomod_config_saveConfigCookies" class="mdl-switch__input">
+            <span class="mdl-switch__label">Use Cookies</span>
+        </label>
+        <div class="mdl-tooltip" for="fomod_config_saveConfigCookies_cont"><p>
+            Saves FOMOD Builder settings within a cookie. This is useful if you want to use the same FOMOD Builder configuration across multiple browser sessions and even FOMODs.<br />
+            <br />
+            If you use this, I do suggest that you turn it off before publishing.<br />
+            <br />
+            If used in conjunction with <code>Include FOMOD Builder Config</code>, a unique-only-on-your-machine identifier will be placed inside of <code>Info.xml</code>, which will load settings from the Cookie. If <code>Use Cookies</code> is toggled off, the Builder will fetch configuration from the before baking it into <code>Info.xml</code>.
+        </p></div>
+
+        <!-- Include Info.xml Schema -->
+        <label id="fomod_config_saveInfoSchema_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="text-align:left" for="fomod_config_saveInfoSchema">
+            <input type="checkbox" id="fomod_config_saveInfoSchema" class="mdl-switch__input" checked>
+            <span class="mdl-switch__label">Save <i>Info.xml</i> Schema</span>
+        </label>
+        <div class="mdl-tooltip" for="fomod_config_saveInfoSchema_cont"><p>
+            Include a schema declaration in the <code>Info.xml</code> file? This is especially useful if using external programming tools, such as Visual Studio Code, to write your FOMOD.
+        </p></div>
+
+        <!-- Add Recommendation Comment Toggle -->
+        <label id="fomod_config_doBranding_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="text-align:left" for="fomod_config_doBranding">
+            <input type="checkbox" id="fomod_config_doBranding" class="mdl-switch__input">
+            <span class="mdl-switch__label">Add Recommendation Comment</span>
+        </label>
+        <div class="mdl-tooltip" for="fomod_config_doBranding_cont"><p>
+            Saves a comment near the top of <code>Info.xml</code> and <code>ModuleConfig.xml</code>. This is disabled by default for a reason - I hate forced watermarks as much as the next guy!<br />
+            <br />
+            But hey, if you want it, it's here. I'll use it because it's my own product. But you? You've got no obligation. It's just here for people like me who like giving way more credit than anyone needs.
+        </p></div>
+    </form>
+</div>
+
+<!-- Metadata -->
+<div class="bcd-summary" for="details_builder_meta" id="details_builder_meta_summary"><i class="material-icons open-icon-90CC">expand_more</i>
+    <h2 id="fomod_ModName">Metadata</h2>
+</div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_builder_meta_summary"><p>
+        Metadata for the mod, stored in the <code>Info.xml</code> file of the FOMOD (along with certain data in <code>ModuleConfig.xml</code>)
+        <br /><br /><hr /><br />
+        <h3>Used By</h3><ul class="mod-manager-list">
+            <li><img src="{{vortexSVG}}" />
+                Vortex
+            </li>
+            <li><img src="{{mo2SVG}}" />
+                Mod Organizer 2
+            </li>
+        </ul>
+    </p></div>
+<div class="bcd-details" id="details_builder_meta">
+    <form autocomplete="off" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px;" name="Metadata">
+        <div id="fomod_info_name_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+            <input id="fomod_info_name" class="mdl-textfield__input" type="text" placeholder="Mod Name">
+            <label class="mdl-textfield__label" for="fomod_info_name">Mod Name</label>
+        </div>
+        <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_name_cont"><p>
+            The name of the mod. This name is displayed at the top of the installer window.<br />
+            Mod Organizer 2 also uses this data to update whatever mod name it pulls from its metadata guessing.
+            <br /><br /><hr /><br />
+            <h3>Used By</h3><ul class="mod-manager-list">
+                <li><img src="{{vortexSVG}}" />
+                    Vortex
+                </li>
+                <li><img src="{{mo2SVG}}" />
+                    Mod Organizer 2
+                </li>
+            </ul>
+        </p></div>
+
+        <!-- MO2 Metadata -->
+
+        <div id="fomod_info_author_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+            <input id="fomod_info_author" class="mdl-textfield__input" type="text" placeholder="AuthorMc4uthorPants123">
+            <label class="mdl-textfield__label" for="fomod_info_author">Author</label>
+        </div>
+        <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_author_cont"><p>
+            Author of the mod. Displayed alongside other metadata in the installer window.
+            <br /><br /><hr /><br />
+            <h3>Used By</h3><ul class="mod-manager-list">
+                <li><img src="{{mo2SVG}}" />
+                    Mod Organizer 2
+                </li>
+            </ul>
+        </p></div>
+
+        <!-- Version Number -->
+        <div style="display:inline-flex;align-items:center;gap:16px;flex-direction:row;flex-wrap:nowrap;">
+
+            <!-- Version Number - Full -->
+            <div id="fomod_info_version_cont" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label info-input" style="width:120px" tabindex="-1" hidden>
+                <input id="fomod_info_version_full" class="mdl-textfield__input" style="pointer-events: all" type="text" placeholder="1.0.0">
+                <label class="mdl-textfield__label" for="fomod_info_version_full" style="pointer-events: all">Version</label>
+            </div>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version_cont"><p>
+                Version of the mod. Displayed alongside other metadata in the installer window.
+                <br /><br /><hr /><br />
+                <h3>Used By</h3><ul class="mod-manager-list">
+                    <li><img src="{{mo2SVG}}" />
+                        Mod Organizer 2
+                    </li>
+                </ul>
+            </p></div>
+
+            <!-- Version Number - SemVer -->
+            <div id="fomod_info_version_semver_cont" class="mdl-textfield--floating-label" style="display:inline-flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-end;width:120px;justify-content:space-evenly;" tabindex="-1">
+                <div style="width:32px;" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
+                    <!-- SemVer Major -->
+                    <input id="fomod_info_version_major" class="mdl-textfield__input" style="text-align:center" type="number" placeholder="1" >
+                    <label class="mdl-textfield__label" for="fomod_info_version_major">Major</label>
+                </div>
+                <p style="padding-bottom:4px">.</p>
+                <div style="width:32px;" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <!-- SemVer Minor -->
+                    <input id="fomod_info_version_minor" class="mdl-textfield__input" style="text-align:center" type="number" placeholder="0" >
+                    <label class="mdl-textfield__label" for="fomod_info_version_minor">Minor</label>
+                </div>
+                <p style="padding-bottom:4px">.</p>
+                <div style="width:32px;" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                    <!-- SemVer Patch -->
+                    <input id="fomod_info_version_patch" class="mdl-textfield__input" style="text-align:center" type="number" placeholder="0" >
+                    <label class="mdl-textfield__label" for="fomod_info_version_patch">Patch</label>
+                </div>
+            </div>
+            <div class="mdl-tooltip mdl-tooltip--bottom small01" for="fomod_info_version_semver_cont" style="max-width:750px;">
+                <p>Version of the mod. Displayed alongside other metadata in the installer window.</p>
+                <br /><br /><hr /><br />
+                <h3>Used By</h3><ul class="mod-manager-list">
+                    <li><img src="{{mo2SVG}}" />
+                        Mod Organizer 2
+                    </li>
+                </ul>
+                <br /><hr /><br />
+                <p>Semantic Versioning (often shortened to "SemVer") is a standard for easy, clear, and expressive versioning of software. It's broken down into 3 'tiers,' so to speak:</p>
+                <br />
+                <h4>Major</h4>
+                    <p>Incremented when you make changes that break dependent software (or, in this case, dependent mods).</p>
+                <br />
+                <h4>Minor</h4>
+                    <p>Incremented whenever you release a version with new features that doesn't break dependent software.</p>
+                <br />
+                <h4>Patch</h4>
+                    <p>Incremented whenever you release a version that adds no new content, instead fixing bugs or making small tweaks to existing features.</p>
+                <br />
+                <h3>Other Info</h3>
+                    <p>When you increment a number, every number after it is set to 0.</p>
+                    <br />
+                    <p>These numbers aren't actual decimals, they're just numbers separated by dots. <code>1.20.3</code> is much newer than <code>1.3.1</code>, for instance.</p>
+            </div>
+
+            <!-- SemVer Toggle -->
+            <label id="fomod_config_toggleUseCustomVers_cont" class="mdl-switch mdl-js-switch mdl-js-ripple-effect" style="width:100px;" for="fomod_config_toggleUseCustomVers" tabindex="-1">
+                <input type="checkbox" id="fomod_config_toggleUseCustomVers" class="mdl-switch__input">
+                <span class="mdl-switch__label">Custom</span>
+            </label>
+            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_config_toggleUseCustomVers_cont"><p>
+                Enable custom version input?
+                This allows you to enter versions that aren't SemVer compliant OR include suffixes, such as in <code>1.0.0-DEV</code>.
+            </p></div>
+        </div>
+
+        <div id="fomod_info_ID_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+            <input id="fomod_info_ID" class="mdl-textfield__input" type="number" placeholder="1234567890">
+            <label class="mdl-textfield__label" for="fomod_info_ID">Identification Number (ID)</label>
+        </div>
+        <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_ID_cont"><p>
+            <s>ID number of the mod. Used by MO2 to pull Nexus Mods information.</s><br />
+            The ID appears to be unused after reading, however it <i>does</i> share a variable name with the Nexus ID.
+            MO2 runs the value through <code>toInt()</code>, I've therefore limited the input of this field to an integer.
+            <br /><br /><hr /><br />
+            <h3>Used By</h3><ul class="mod-manager-list">
+                <li><img src="{{mo2SVG}}" />
+                    Mod Organizer 2
+                </li>
+            </ul>
+        </p></div>
+
+        <div id="fomod_info_website_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+            <!-- Pattern regex adapted from https://stackoverflow.com/a/30910/13076790 (changes: fix escaping) -->
+            <input id="fomod_info_website" class="mdl-textfield__input" type="url" pattern="^([a-z0-9+.-]+):(?:\/\/(?:((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*)@)?((?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*)(?::(\d*))?(\/(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?|(\/?(?:[a-z0-9-._~!$&'()*+,;=:@]|%[0-9A-F]{2})+(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?)(?:\?((?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*))?(?:#((?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*))?$" placeholder="https://example.com/">
+            <label class="mdl-textfield__label" for="fomod_info_website">Website</label>
+        </div>
+        <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_website_cont"><p>
+            Website URL for the mod. Typically either the mod's main download page or an author-hosted webpage, such as a documentation page with links to the download page(s).
+            MO2 displays the text "Link" as a hyperlink to the URL specified.
+            <br /><br /><hr /><br />
+            <h3>Used By</h3><ul class="mod-manager-list">
+                <li><img src="{{mo2SVG}}" />
+                    Mod Organizer 2
+                </li>
+            </ul>
+        </p></div>
+    </form>
+</div>
+
+<h1>Installer Steps</h1>
+<p>WARNING! Everything down here is purely for testing purposes. Nothing down here is even remotely final.</p>
+
+<div class="bcd_orderDropdown template">
+    <button id="fomod_steps_order" type="button" class="bcd_stepOrderBtn mdl-button mdl-js-button">
+        Step Order: <i class="bcd_stepOrderValue">Explicit</i>
+    </button>
+    <ul class="fomod_orderOptions mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="fomod_steps_order">
+        <li pos="0" class="mdl-menu__item mdl-menu__item--full-bleed-divider">Explicit</li>
+        <li pos="1" class="mdl-menu__item">Ascending</li>
+        <li pos="2" class="mdl-menu__item">Descending</li>
+    </ul>
+</div>
+
+<button id="fomod_steps_addStep" type="button" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+    <i class="material-icons">add</i>
+</button>
+
+<!-- Use the 'template' class to prevent the Component Handler from messing with the template -->
+<div id="step_container" class="bcd-fomod-stepContainer template">
+    <!-- Using the power of JavaScript, we can clone this element for each step -->
+    <!-- TODO: Finish the template and add the hidden attribute -->
+
+    <!-- TODO: Turn this into a menu via JS -->
+    <div class="bcd-fomod-sortOrder">Step Order: <i class="bcd_stepOrderValue"></i></div>
+
+    <!-- Group Editor -->
+    <div class="bcd-summary adjacent min-padding"><i class="material-icons open-icon-90CC">expand_more</i>
+        <h3 id="details_groups_step_summary_01">Groups</h3>
+    </div>
+    <div class="bcd-details adjacent">
+        <button type="button" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+            <i class="material-icons">add</i>
+        </button>
+        <div class="bcd-fomod-groups">
+            <div id="group_container" class="bcd-fomod-groupContainer template">
+                <div class="bcd_selectionType template">
+                    <button id="fomod_group_type_template" type="button" class="bcd_stepSelectionTypeBtn trmplate mdl-button mdl-js-button">
+                        Selection Type: <i class="bcd_stepSelectionTypeValue">SelectAny</i>
+                    </button>
+                    <ul class="fomod_selectionTypeOptions mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="fomod_group_type_template">
+                        <li pos="0" class="mdl-menu__item mdl-menu__item--full-bleed-divider">SelectAny</li>
+                        <li pos="1" class="mdl-menu__item">SelectExactlyOne</li>
+                        <li pos="2" class="mdl-menu__item">SelectAtMostOne</li>
+                        <li pos="3" class="mdl-menu__item">SelectAtLeastOne</li>
+                        <li pos="4" class="mdl-menu__item">SelectAll</li>
+                    </ul>
+                </div>
+
+                <!-- Option Editor -->
+                <div class="bcd-summary adjacent"><i class="material-icons open-icon-90CC">expand_more</i>
+                    <h3 id="details_options_step_summary_01">Options</h3>
+                    <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_options_step_summary_01"><p>
+                        Options are the checkboxes and radio buttons you actually interact with in the installer window. They can set flags, install files directly, and even completely disable themselves based on various conditions.
+                    </p></div>
+                </div>
+                <div class="bcd-details adjacent" id="details_options_step_01">
+                    <button type="button" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                        <i class="material-icons">add</i>
+                    </button>
+                    <div class="bcd-fomod-options">
+                        <!-- Option Editor -->
+                        <div class="bcd-summary adjacent"><i class="material-icons open-icon-90CC">expand_more</i>
+                            <h4 class="bcd_optionName">My Option 132</h4>
+                        </div>
+                        <div class="bcd-details adjacent">
+                            <div class="bcd_selectionType template">
+                                <button id="fomod_plugin_type_template" type="button" class="bcd_stepSelectionTypeBtn mdl-button mdl-js-button">
+                                    Default Selection Type: <i class="bcd_stepSelectionTypeValue">Optional</i>
+                                </button>
+                                <ul class="fomod_selectionTypeOptions mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="fomod_plugin_type_template">
+                                    <li pos="0" class="mdl-menu__item mdl-menu__item--full-bleed-divider">Optional</li>
+                                    <li pos="1" class="mdl-menu__item">Recommended</li>   <!-- Pre-selected            -->
+                                    <li pos="3" class="mdl-menu__item">Required</li>      <!-- Force-enabled           -->
+                                    <li pos="4" class="mdl-menu__item">NotUseable</li>    <!-- Disabled                -->
+                                    <li pos="2" class="mdl-menu__item">CouldBeUsable</li> <!-- (Supposedly useless) -->
+                                </ul>
+                            </div>
+                            <div id="fomod_option_name_cont_01" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+                                <input id="fomod_option_name_01" class="mdl-textfield__input" type="text" placeholder="Option Name">
+                                <label class="mdl-textfield__label" for="fomod_option_name_01">Option Name</label>
+                            </div>
+                            <div id="fomod_option_desc_cont_01" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+                                <input id="fomod_option_desc_01" class="mdl-textfield__input" type="text" placeholder="Option Description">
+                                <label class="mdl-textfield__label" for="fomod_option_desc_01">Option Description</label>
+                            </div>
+                            <div class="bcd_imagePicker"></div>
+                            <div class="bcd_flags-editor"></div>
+                            <div class="bcd_files-editor"></div>
+                            <div class="bcd_option-conditions-editor"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step Dependencies Editor -->
+    <div class="bcd-summary adjacent min-padding"><i class="material-icons open-icon-90CC">expand_more</i>
+        <h3 id="details_dependencies_step_summary_01">Visibility Conditions</h3>
+        <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_dependencies_step_summary_01"><p>
+            Conditions that determine whether or not the step should be shown to the user.
+        </p></div>
+    </div>
+    <div class="bcd-details adjacent">
+        <div class="bcd-fomod-dependencies">dependencies-editor-placeholder</div>
+    </div>
+</div>
+
+
+
+<!-- To-do list
+
+    Needed:
+    TODO: Realtime Auditing
+    TODO: Ctrl + Z support
+
+    Wanted:
+    TODO: Add preview and output simulation for Vortex's installer window
+
+    Nice-to-have:
+    TODO: Add preview and output simulation for MO2's installer window
+    TODO: Show recommendation to users adding multiple files within a single directory to a single option to use a folder instead
+    TODO: Show conflicts between files
+    TODO: Show conflicts between files contained within folders
+    TODO: Conflict editor
+
+    IllusiveMan:
+    TODO: Add Bulk Actions (multi-select?!!)
+    TODO: Group Merging
+
+-->

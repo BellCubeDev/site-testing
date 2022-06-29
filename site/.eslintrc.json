@@ -1,0 +1,42 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:github/recommended",
+        "plugin:sonarjs/recommended"
+    ],
+    "parserOptions": {
+        "ecmaFeatures": {
+            "jsx": true
+        },
+        "ecmaVersion": "latest",
+        "sourceType": "module"
+    },
+    "plugins": [
+        "react",
+        "github",
+        "unicorn",
+        "sonarjs"
+    ],
+    "rules": {
+        "sonarjs/cognitive-complexity": "off",
+        "no-unused-vars": "warn",
+        "no-empty": "off",
+        "camelcase": "off",
+        "prettier/prettier": "off",
+        "no-console": "off",
+        "no-var": "off",
+        "eqeqeq": "off",
+        "sonarjs/no-duplicate-string": "warn",
+        "func-style": "warn",
+        "github/no-then": "off",
+        "semi": "warn",
+        "i18n-text/no-en": "warn",
+        "import/extensions": "off",
+        "filenames/match-regex": "off"
+    }
+}
