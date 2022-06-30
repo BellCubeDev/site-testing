@@ -2627,6 +2627,7 @@ componentHandler.register({
    * @param {HTMLElement} element The element that will be upgraded.
    */
 export class MaterialTextfield {
+    /** @param {HTMLInputElement} element */
     constructor(element) {
         this.element_ = element;
         this.maxRows = this.Constant_.NO_MAX_ROWS;
