@@ -5,7 +5,7 @@ import {hljs} from '../../../assets/site/highlight_js/highlight.js';
 /*
     Thanks to Patrick Gillespie for the great ASCII art generator!
     https://patorjk.com/software/taag/#p=display&h=0&v=0&f=Big%20Money-nw
-    ...makes this code *so* much easier to maintain... you know, 'cuz I can fund my functions in VSCode's Minimap
+    ...makes this code *so* much easier to maintain... you know, 'cuz I can find my functions in VSCode's Minimap
 */
 var elem_papy_docs_libName:HTMLInputElement;
 var elem_papy_docs_libLink:HTMLInputElement;

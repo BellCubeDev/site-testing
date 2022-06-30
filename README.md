@@ -18,3 +18,27 @@ As well as some of the assets:
 
 * SVG icons for [GitHub](https://github.com), [Nexus Mods](https://nexusmods.com), [Vortex Mod Manager](https://www.nexusmods.com/about/vortex/), and [Mod Organizer 2](https://www.nexusmods.com/skyrimspecialedition/mods/6194)
 * [Material Symbols and Icons](https://fonts.google.com/icons): An icon font for use in Material Design, which I've made use of anywhere I needed a generic icon.
+
+# Build Instructions
+
+To build this project, you've got three options:
+
+## 1. The Simple Way (Windows Only)
+
+If you haven't already, install Node Package Manager (NPM) and RubyGems. Once you've done that, open a command prompt in the project's root directory and run the command `.vscode\build.bat`
+
+## 2. The Slightly-More-Complicated Way (GitHub Actions)
+
+Set up a repository on GitHub and run the workflow '*Build & Deploy Site*' to build the site. It will upload an artifact that includes the static site, ready to be served in any way you see fit.
+
+## 3. The Stupidly Complex Way (DIY)
+
+Figure out how the NPM packages and Ruby gems work and how to use them to build the site. Have fun!
+
+Actually, here. Install NPM and RubyGems, then run these commands in the `site` directory:```bash
+npm install
+
+gem install bundler
+bundle install
+
+```

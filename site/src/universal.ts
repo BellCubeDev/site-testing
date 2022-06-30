@@ -308,6 +308,19 @@ const possibilities_Generic = [
     "Our intelligence monitoring indicates exfiltration of several of your virtualized clusters in a sophisticated chain attack.", // From the hacker's FBI email sent in early November, 2021.
     "You are freeing bequickulous.",
     "Quick crown talks bumps over the crazy rog... nope",
+    "In the Arena of Logic I fight unarmed!",
+    "&lsquo;Tis just a flesh wound!",
+    "Ni!",
+    "<i>Vengeance!</i>",
+    "<i>ruh roh</i>",
+    "Smile my dear, you're never fully dressed without one.",
+    "Obscure?\nI can do obscure.",
+    "Of course, the Gods work in mysterious ways.\nLike a healing shiv.",
+    "First there was darkness. Then came the Strangers.",
+    "There's nothing cooler than casually walking away after blowing something up.",
+    "<i>Johnny, what can you make outta this?</i><br><i>This? Why, I could make a hat, or a broach, pterodactyl&hellip;</i>",
+    "Landshark!",
+    "When will then be now? Soon."
 ];
 
 
