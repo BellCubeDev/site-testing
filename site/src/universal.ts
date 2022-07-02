@@ -321,7 +321,8 @@ const possibilities_Generic = [
     "There's nothing cooler than casually walking away after blowing something up.",
     "<i>Johnny, what can you make outta this?</i><br><i>This? Why, I could make a hat, or a broach, pterodactyl&hellip;</i>",
     "Landshark!",
-    "When will then be now? Soon."
+    "When will then be now? Soon.", 
+    "Unless someone like you cares a whole awful lot, nothing is going to get better.<br />- Dr. Seuss"
 ];
 
 
