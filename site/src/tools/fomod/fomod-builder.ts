@@ -1,10 +1,18 @@
 import {bcdStr, bcd_ComponentTracker, BellCubicSummary} from '../../universal.js';
-import {componentHandler, MaterialMenu, MaterialTextfield} from '../../assets/site/mdl/material.js';
+import {componentHandler} from '../../assets/site/mdl/material.js';
+import * as builderClasses from './fomod-builder-classifications.js';
+
 /*
     Thanks to Patrick Gillespie for the great ASCII art generator!
     https://patorjk.com/software/taag/#p=display&h=0&v=0&f=Big%20Money-nw
-    ...makes this code *so* much easier to maintain... you know, 'cuz I can fund my functions in VSCode's Minimap
+    Really does make code *so* much easier to maintain. After all, I can actually find my functions in VSCode's Minimap
 */
+
+declare global {interface Window {
+    bcd_builder: {
+        directory: FileSystemDirectoryHandle|undefined
+    }
+}}
 
 
 /*$$$$$\  $$\           $$\                 $$\       $$\    $$\
@@ -86,420 +94,6 @@ const builder_consts = {
 
 
 var parseIntErr = new TypeError('Value is not a number.');
-
-// Look at this rough template for the DOM!
-var bcd_registeredComponents = {
-    bcdBuilder: {
-        //image_div: {},
-        //order_dpd: {},
-        step_div: {},
-             // order_dpd
-             // dependencies_div
-             // name
-            group_div: {},
-                 // order_dpd
-                 // name
-                groupType_dpd: {},
-                plugin_div: {},
-                     // name
-                     // description
-                    pluginTypeDescriptor_div: {},
-                        result_dpd: {},
-                         // dependencies_div
-                     // flagsList_div
-                     // installs_div
-
-        flagsList_div: {},
-            flag: {},
-
-        files_div: {},
-            file: {},
-            folder: {},
-
-        dependencies_div: {},
-            dependencyFOSE_div: {},
-            dependencyGame_div: {},
-            dependencyModM_div: {},
-            dependencyFlag_div: {},
-            dependencyFile_div: {},
-
-        installs_div: {},
-            files_group: {}
-                 // files_div
-                 // dependencies_div
-    }
-};
-
-type bcd_builder_dependency_file_state = 'Active'|'Inactive'|'Missing'
-type bcd_builder_dependency_group_operator = 'And'|'Or'
-type bcd_builder_semVer = [number?, number?, number?]
-
-export class bcd_builder_input_image extends MaterialTextfield {
-    static cssClass='fomod_imageInput';
-    boundElement:HTMLImageElement;
-    boundElementAsClass:bcd_builder_input_image_display;
-
-    constructor(element:HTMLInputElement){
-        super(element);
-
-        this.boundElement = element.parentElement?.querySelector('.fomod_imageDisplay') as HTMLImageElement;
-        if (!this.boundElement) {console.log('Error Item:', this);throw new TypeError('No bound image display was found for this FOMOD Image Input.');}
-
-        this.boundElementAsClass = new bcd_builder_input_image_display(this.boundElement);
-                                                                                                //@ts-ignore o overload matches this call.
-        this.element_.addEventListener('change', this.updateImage.bind(this));                  //@ts-ignore o overload matches this call.
-        this.element_.addEventListener('input', this.updateImage.bind(this));
-    }
-
-    updateImage(newInput:string){
-        this.boundElementAsClass.updateImage(this.element_);
-    }
-}
-
-export class bcd_builder_input_image_display {
-    element:HTMLImageElement;
-    boundElement?:HTMLInputElement;
-
-    constructor(element:HTMLImageElement, boundElement?:HTMLInputElement){
-        this.element = element;
-        this.boundElement = boundElement
-    }
-
-    updateImage(input:HTMLInputElement|string){
-        if (typeof input === 'string') {
-            this.element.src = input;
-            if (this.boundElement) this.boundElement.value = input;
-            return
-        }
-        this.element.src = input.value;
-    }
-}
-
-export class bcd_builder_dropdown extends MaterialMenu {}
-export class bcd_builder_dropdown_order extends bcd_builder_dropdown {}
-export class bcd_builder_dropdown_groupType extends bcd_builder_dropdown {}
-export class bcd_builder_dropdown_pluginType extends bcd_builder_dropdown {}
-
-export class bcd_builder_XMLElement {
-    instanceElement:Element|undefined;
-    constructor(instanceElement:Element|undefined = undefined) {
-        this.instanceElement = instanceElement;
-    }
-}
-
-export class bcd_builder_flag {
-    name:string = '';
-    value:string = '';
-    constructor(name:string = '', value:string = '') {
-        this.name = name;
-        this.value = value;
-    }
-}
-
-export class bcd_builder_dependency extends bcd_builder_XMLElement{
-    asXML(document:XMLDocument):Comment|Element {
-        return document.createComment('ERROR: This call of asXML() was not overridden by a child class! ' + this.constructor.name);
-    }
-    constructor(instanceElement:Element|undefined = undefined) {
-        super(instanceElement);
-    }
-}
-export class bcd_builder_dependency_group extends bcd_builder_dependency {
-    operator:bcd_builder_dependency_group_operator /*= 'And'*/;
-    children:bcd_builder_dependency[] = [];
-
-    constructor(instanceElement:Element|undefined = undefined, operator:bcd_builder_dependency_group_operator = 'And', parseChildren:boolean = false) {
-        super(instanceElement);
-        this.operator = operator;
-        if (instanceElement) {this.operator = instanceElement.getAttribute('operator') as bcd_builder_dependency_group_operator || operator;}
-
-        if (!parseChildren || !instanceElement) return;
-
-        for (const elem_child of instanceElement.children) {
-            this.children.push(parseDependency(elem_child)!);
-        }
-    }
-
-    // <moduleDependencies operator="And">
-    asXML(document:XMLDocument, nodeName = 'dependencies'):Element {
-        if (!this.instanceElement) this.instanceElement = document.createElement(nodeName);
-
-        if (this.instanceElement && this.instanceElement.tagName !== nodeName) {
-            this.instanceElement.remove();
-            this.instanceElement = document.createElement(nodeName);
-            for (const child of this.children) {
-                if (child.instanceElement) this.instanceElement.appendChild(child.instanceElement);
-            }
-        }
-
-        this.instanceElement.setAttribute('operator', this.operator)
-        for (const child of this.children) {
-            this.instanceElement.appendChild(child.asXML(document))
-        }
-        return this.instanceElement
-    }
-}
-export class bcd_builder_dependency_flag extends bcd_builder_dependency {
-    flag:string = '';
-    value:string = '';
-
-    // <flagDependency flag="" value="" />
-    asXML(document:XMLDocument):Element {
-        const thisElement = document.createElement('flagDependency')
-        thisElement.setAttribute('flag', this.flag)
-        thisElement.setAttribute('value', this.value)
-        return thisElement
-    }
-}
-export class bcd_builder_dependency_file extends bcd_builder_dependency {
-    file:string = '';
-    state:bcd_builder_dependency_file_state = 'Active';
-
-    // <fileDependency file="2" state="Active" />
-    asXML(document:XMLDocument):Element {
-        const thisElement = document.createElement('fileDependency')
-        thisElement.setAttribute('file', this.file)
-        thisElement.setAttribute('state', this.state)
-        return thisElement
-    }
-}
-export class bcd_builder_dependency_versionCheck extends bcd_builder_dependency {
-    version:string = '';
-}
-export class bcd_builder_dependency_FOSE extends bcd_builder_dependency_versionCheck {
-
-    // <foseDependency version="" />
-    asXML(document:XMLDocument):Element {
-        const thisElement = document.createElement('foseDependency')
-        thisElement.setAttribute('version', this.version)
-        return thisElement
-    }
-}
-export class bcd_builder_dependency_game extends bcd_builder_dependency_versionCheck {
-
-    // <gameDependency version="" />
-    asXML(document:XMLDocument):Element {
-        const thisElement = document.createElement('gameDependency')
-        thisElement.setAttribute('version', this.version)
-        return thisElement
-    }
-}
-export class bcd_builder_dependency_modManager extends bcd_builder_dependency_versionCheck {
-
-    // <fommDependency version="1" />
-    asXML(document:XMLDocument):Element {
-        const thisElement = document.createElement('fommDependency')
-        thisElement.setAttribute('version', this.version)
-        return thisElement
-    }
-}
-
-function parseDependency(dependency:Element|undefined):bcd_builder_dependency|undefined {
-    if (!dependency) return undefined;
-    const type = dependency.tagName
-    switch (type) {
-        case 'dependencies': return new bcd_builder_dependency_group(dependency, undefined, true);
-        case 'fileDependency': return new bcd_builder_dependency_file(dependency);
-        case 'flagDependency': return new bcd_builder_dependency_flag(dependency);
-        case 'foseDependency': return new bcd_builder_dependency_FOSE(dependency);
-        case 'gameDependency': return new bcd_builder_dependency_game(dependency);
-        case 'fommDependency': return new bcd_builder_dependency_modManager(dependency);
-        default: throw new TypeError('Unknown dependency type: ' + type);
-    }
-}
-
-
-
-type bcd_buider_GroupType = 'SelectAll'|'SelectAny'|'SelectAtMostOne'|'SelectAtLeastOne'|'SelectExactlyOne';
-type bcd_buider_PlguinType = 'Optional'|'Recommended'|'CouldBeUseable'|'Required'|'NotUseable';
-export class bcd_buider_PlguinTypeDescriptor extends bcd_builder_XMLElement {
-    default:bcd_buider_PlguinType = 'Optional';
-
-    dependencies:bcd_buider_PlguinTypeDescriptor_dependency[] = [];
-
-    private instanceElement_basic:Element|undefined = undefined;
-    private instanceElement_complex:Element|undefined = undefined;
-    private instanceElement_complex_type:Element|undefined = undefined;
-    private instanceElement_complex_patterns:Element|undefined = undefined;
-
-    asXML(document:XMLDocument):Element {
-        this.instanceElement = this.instanceElement ?? document.createElement('typeDescriptor');
-
-        if (this.dependencies.length === 0) {
-            this.instanceElement_complex?.remove(); this.instanceElement_complex = undefined;
-
-            this.instanceElement_basic = this.instanceElement_basic ?? this.instanceElement.appendChild(document.createElement('type'));
-            this.instanceElement_basic.setAttribute('default', this.default);
-
-            return this.instanceElement;
-        }
-
-        this.instanceElement_complex = this.instanceElement_complex ?? this.instanceElement.appendChild(document.createElement('dependencyType'));
-
-        this.instanceElement_complex_type = this.instanceElement_complex_type ?? this.instanceElement_complex.appendChild(document.createElement('defaultType'));
-        this.instanceElement_complex_type.setAttribute('name', this.default);
-
-        this.instanceElement_complex_patterns = this.instanceElement_complex_patterns ?? this.instanceElement_complex.appendChild(document.createElement('patterns'));
-        for (const dependency of this.dependencies) {
-            this.instanceElement_complex_patterns.appendChild(dependency.asXML(document));
-        }
-
-        return this.instanceElement;
-    }
-}
-
-export class bcd_buider_PlguinTypeDescriptor_dependency extends bcd_builder_XMLElement {
-    type:bcd_buider_PlguinType = 'Optional';
-    dependency:bcd_builder_dependency_group;
-    private instanceElement_type:Element|undefined = undefined;
-
-    constructor(dependency:bcd_builder_dependency_group, type:bcd_buider_PlguinType = 'Optional') {
-        super();
-        this.dependency = dependency;
-        this.type = type;
-    }
-
-    asXML(document:XMLDocument):Element {
-        this.instanceElement = this.instanceElement ?? document.createElement('pattern');
-
-        this.instanceElement_type = this.instanceElement_type ?? this.instanceElement.appendChild(document.createElement('type'));
-        this.instanceElement_type.setAttribute('name', this.type);
-
-        this.instanceElement.appendChild(this.dependency.asXML(document));
-
-        return this.instanceElement;
-    }
-}
-
-export class bcd_buider_FOMOD {
-    meta_name: String = ''
-    meta_image: String = ''
-    meta_author: String = ''
-    meta_version: String = ''
-    meta_id: Number = 0
-    meta_url: String = ''
-
-    installs: /*bcd_buider_FOMOD_install*/[] = []
-
-    conditions: bcd_builder_dependency_group|undefined;
-    steps: bcd_buider_FOMOD_step[] = [];
-}
-
-export class bcd_buider_FOMOD_step {
-    name:String = '';
-    order:'Ascending'|'Descending'|'Explicit' = 'Explicit';
-    groups:bcd_buider_FOMOD_group[] = [];
-}
-
-export class bcd_buider_FOMOD_group {
-    name:String = '';
-    type:bcd_buider_GroupType = 'SelectAny';
-    plugins:bcd_builder_plugin[] = [];
-}
-
-export class bcd_builder_plugin {
-    name:String = '';
-    description:String = '';
-    conditionFlags:bcd_builder_dependency_flag[] = [];
-    files:bcd_builder_dependency_file[] = [];
-    typeDescriptor:bcd_buider_PlguinType|bcd_buider_PlguinTypeDescriptor = 'Optional'
-}
-
-var builderJSON = {} as any// {
-//    conditions: undefined,
-//    meta: { // TODO: Incorporate this into the already-existing builder stuff
-//        name: String,
-//        image: String,
-//        author: String,
-//        version: String,
-//        id: Number,
-//        url: String
-//    },
-//    steps: { // config > installSteps
-//        order: "", // config > installSteps.order
-//        steps: [
-//            {
-//                name: "", // config > installSteps > installStep.name
-//                order: "", // config > installSteps > installStep > optionalFileGroups.order
-//                groups: [
-//                    {
-//                        name: "", // config > installSteps > installStep > optionalFileGroups > group.name
-//                        type: "", // config > installSteps > installStep > optionalFileGroups > group.type
-//                        plugins: [
-//                            {
-//                                name: "", // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin.name
-//                                description: "", // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > description
-//                                flags: {/* key-value pairs */}, // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > conditionFlags
-//                                files: [ // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > files
-//                                    {
-//                                        file: true, // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > files > [file, folder]
-//                                        source: "", // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > files > [file, folder].source
-//                                        destination: "", // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > files > [file, folder].destination
-//                                        priority: 0 // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > files > [file, folder].priority
-//                                    }
-//                                ],
-//                                selectionType: {
-//                                    type: "", // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > typeDescriptor > [type.name, dependencyType > defaultType.name]
-//                                    conditions: [ // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > typeDescriptor > dependencyType > patterns
-//                                        {
-//                                            type: "",  // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > typeDescriptor > dependencyType > patterns > defaultType.name
-//                                            conditions: [/* See 'conditions' at the top */] // config > installSteps > installStep > optionalFileGroups > group > plugins > plugin > typeDescriptor > dependencyType > patterns > pattern > dependencies
-//                                        }
-//                                    ]
-//                                }
-//                            }
-//                        ]
-//                    }
-//                ]
-//            }
-//        ]
-//    },
-//    installs: [ // config > [requiredInstallFiles, conditionalFileInstalls]
-//        {
-//            identifier: "", // Helpful name stored in comments
-//            /* Example:
-//                <pattern><!-- name="123" -->
-//            */
-//            conditions: [/* See 'conditions' at the top */], // config > conditionalFileInstalls > patterns > pattern
-//            files: [ // config > [requiredInstallFiles, conditionalFileInstalls > patterns > files]
-//                {
-//                    file: true, // [file, folder]
-//                    source: "", // [file, folder].source
-//                    destination: "", // file, folder].destination
-//                    priority: 0 // [file, folder].priority
-//                }
-//            ]
-//        }
-//    ]
-//    defaultFlags: {/* key-value pairs */} // Custom Wizardry
-//};
-
-// Max history states: 4095 + current state (4096 total, or index 4095)
-var builderJSON_Instance:any[] = [Object.create(builderJSON)];
-
-/** Add an empty Builder JSON to the history states */
-function builderJSON_NewInstance() {
-//    builderJSON_Instance.unshift(Object.create(builderJSON));
-}
-
-/** Add a new history state in preperation for undoable edits */
-function builderJSON_NewHistoryState(){
-//    builderJSON_Instance.unshift(Object.create(builderJSON_Instance[0]));
-//
-//    // Trim the previous version count down to 4096
-//    if (builderJSON_Instance.length > 4096){
-//        builderJSON_Instance.slice(0, 4096); // Slice's End index is non-inclusive, so we're pulling 0 to 4095 (4096 items)
-//    }
-}
-
-/** Wipe the previous BuilderJSON instance, creating a new one in its stead. */
-function builderJSON_NewDocument(){
-    builderJSON_Instance = [Object.create(builderJSON)];
-}
-
-function builderJSON_Parse(){
-    // TODO: Add Builder JSON Parse function (for loading history states)
-}
 
 
 /*$$$$$\                                      $$$$$$\           $$\   $$\
@@ -596,14 +190,14 @@ $$ |  $$ |$$   ____|$$ |  $$ |$$   ____|$$ |      $$  __$$ |$$ |      $$ |  $$ |
     @param {any} defaultValue Value to return should an error occur. Defaults to `''`
     @returns {string} The value of the cookie.
 */
-function getCookie(cookieName:string, defaultValue:string):String{
+function getCookie(cookieName:string, defaultValue:string):string{
     try {
         // Get the value of the cookie, if it exists
         return document.cookie.split('; ')
           .find(row => row.startsWith(`${cookieName}=`))
           ?.split('=')[1] ?? defaultValue;
-    } catch(error:any){
-        console.debug(`[BCD-FomodBuilder] Error "${error.name}" getting the value of cookie '${cookieName}' - it may not exist.`);
+    } catch(error:unknown){
+        console.debug(`[BCD-FomodBuilder] Error "${(error as Error).name}" getting the value of cookie '${cookieName}' - it may not exist.`);
         return defaultValue;
     }
 }
@@ -727,8 +321,6 @@ async function openFomodDirectory(){
 
     var temp_fomodDirectory = await temp_rootDirectory.getDirectoryHandle('fomod', {create: true});
 
-    // Delete the history now that the user has opened a new file
-    builderJSON_NewDocument();
 
     // Get Info.xml and ModuleConfig.xml
 
@@ -752,7 +344,7 @@ async function openFomodDirectory(){
     //moduleConfig_file = temp_moduleConfig_file;     <--   are called in the respective parsers
 
     // Open the Metadata section
-    (bcd_ComponentTracker.findItem(BellCubicSummary, elm_collapsableMetadata) as BellCubicSummary).open();
+    bcd_ComponentTracker.findItem(BellCubicSummary, elm_collapsableMetadata, item => item.self === elm_collapsableMetadata)?.open();
 }
 
 
@@ -775,7 +367,7 @@ $$$$$$\ $$ |  $$ |$$ |      \$$$$$$  |      $$ |      $$ |$$ |\$$$$$$$\
 */
 function parseInfoXML(xmlString:string) {
     info_xml = XMLParser.parseFromString(xmlString, "text/xml");
-    info_xml_tags = getXMLTag(info_xml, 'fomod', false)!;
+    info_xml_tags = getXMLTag(info_xml, 'fomod');
 
     elm_inputName.value = readXMLTag(info_xml_tags, 'Name');
     elm_inputAuthor.value = readXMLTag(info_xml_tags, 'Author');
@@ -851,7 +443,7 @@ function parseVersComponent(versArr:string[], pos:number, element:HTMLInputEleme
 
 function openSemVer(){
     // Turn the MDL checkbox off
-    elm_toggleUseCustomVers.removeAttribute('checked');
+    elm_toggleUseCustomVers.removeAttribute('checked');                                                                             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     elm_toggleUseCustomVers.parentElement!.classList.remove(builder_consts.isOpen);
 
     // Show the SemVer input fields
@@ -866,7 +458,7 @@ function openSemVer(){
 
 function closeSemVer(){
     // Turn the MDL checkbox on
-    elm_toggleUseCustomVers.setAttribute('checked', '');
+    elm_toggleUseCustomVers.setAttribute('checked', '');                                                                            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     elm_toggleUseCustomVers.parentElement!.classList.add(builder_consts.isOpen);
 
     // Hide the SemVer input fields
@@ -937,15 +529,15 @@ function parseModuleConfigXML(xmlString:string) {
     var temp_moduleConfig_xml_root = getXMLTag(temp_moduleConfig_xml, 'config');
 
     // Get the module name
-    builderJSON_Instance[0].moduleName = readXMLTag(temp_moduleConfig_xml_root, "moduleName");
+    //builderJSON_Instance[0].moduleName = readXMLTag(temp_moduleConfig_xml_root, "moduleName");
 
      // TODO Handle conflicts between Info.xml and ModuleConfig.xml (e.g. with names)
 
     // Get the module image
-    builderJSON_Instance[0].moduleImage = getXMLTag(temp_moduleConfig_xml_root, "moduleImage")?.getAttribute("path");
+    //builderJSON_Instance[0].moduleImage = getXMLTag(temp_moduleConfig_xml_root, "moduleImage")?.getAttribute("path");
 
     // Get Module Conditions
-    builderJSON_Instance[0].conditions = parseDependency(getXMLTag(temp_moduleConfig_xml_root, "moduleDependencies", false));
+    //builderJSON_Instance[0].conditions = parseDependency(getXMLTag(temp_moduleConfig_xml_root, "moduleDependencies", false));
 
     // Get base-level installs
     //builderJSON_Instance[0].installs.push(parseModuleFiles(getXMLTag(temp_moduleConfig_xml_root, "requiredInstallFiles", false)));
@@ -956,55 +548,6 @@ function parseModuleConfigXML(xmlString:string) {
     }*/
 }
 
-
-/** Parses File lists from ModuleConfig.xml and adds them to the builderJSON
-    Will return an empty array if xmlParentElement is undefined
-    @param {HTMLElement} xmlParentElement - The element to parse from
-    @param {Boolean} [addToBaseTags=false] - Whether to add the files to the objects at the base of the builderJSON
-    @returns {{identifier: String, conditions: {}, files: []
-        }} An array of file objects
-*/
-function parseModuleFiles(xmlParentElement:Element, addToBaseTags = false){
-    if (typeof xmlParentElement === "undefined") {
-        return [];
-    }
-    var temp_files = [];
-    var temp_files_unconditioned = [];
-    for (var element of xmlParentElement.children) {
-        var temp_json = {
-            file: true,
-            source: getAttrDefault(element, 'source', ''),
-            destination: getAttrDefault(element, 'destination', ''),
-            priority: getAttrDefault(element, 'priority', '0')
-        };
-        if (element.tagName === "folder") {
-            temp_json.file = false;
-        }
-        if (getAttrDefault(element, 'alwaysInstall', "false") == "true") {
-            temp_files_unconditioned.push(temp_json);
-        } else {
-            temp_files.push(temp_json);
-        }
-    }
-    builderJSON.installs.push({
-        identifier: "",
-        conditions: [],
-        files: [...temp_files_unconditioned]
-    });
-    if (addToBaseTags) {
-        builderJSON.installs.push({
-            identifier: "",
-            conditions: xmlParentElement.parentElement?.tagName.toLowerCase() == "pattern" ? parseDependency(xmlParentElement.parentElement?.getElementsByTagName("dependencies")[0] as HTMLElement) : [],
-            files: [...temp_files]
-        });
-    } else {
-        return {
-            identifier: "",
-            conditions: xmlParentElement.parentElement?.tagName.toLowerCase() == "pattern" ? parseDependency(xmlParentElement.parentElement?.getElementsByTagName("dependencies")[0] as HTMLElement) : [],
-            files: [...temp_files]
-        };
-    }
-}
 
 
 
@@ -1064,7 +607,7 @@ async function save(){
     }
 
     console.log('Adding FOMOD Version to Info.xml');
-    var versTag = getXMLTag(info_xml, 'Version', true)!;
+    var versTag = getXMLTag(info_xml, 'Version', true);
     if (checkToggleSwitch(elm_toggleUseCustomVers)) {
         versTag.innerHTML = encodeXML(inputValue(elm_inputVersionFull));
     } else {
@@ -1123,7 +666,7 @@ $$ |      $$ |$$ |\$$$$$$$\       \$$$$$$  |\$$$$$$$ |$$$$$$$  |  \$$$$  |\$$$$$
 /** Requests the specified permission for the specified FileSystemHandle. */
 async function tryForPermission(handle:FileSystemHandle, perm:FileSystemPermissionMode ){
     try{
-        return await handle.requestPermission({'mode': perm}) == 'granted';
+        return await handle.requestPermission({'mode': perm}) == 'granted';                                                                                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch(e:any) {
         if (e.prototype.name == 'AbortError'){
             return false;
@@ -1142,13 +685,13 @@ async function tryForPermission(handle:FileSystemHandle, perm:FileSystemPermissi
     @returns {Promise<string>} - The contents of the file
 */
 async function readFile(file:File|FileSystemFileHandle){
-    const file_ = file instanceof FileSystemFileHandle ? await file.getFile() : file
+    const file_ = file instanceof FileSystemFileHandle ? await file.getFile() : file;
     // Nice job, Copilot!
     return new Promise<string>((resolve, reject) => {
         const temp_fileReader = new FileReader();
         temp_fileReader.onload = (readerEvent) => {
             //console.log('readFile Result:\n', readerEvent.target.result)
-            if (!readerEvent.target?.result) {reject('FileReader.onload returned null!'); throw new Error('FileReader.onload returned null!');}
+            if (!readerEvent.target?.result) {const err = new Error('FileReader.onload returned null!'); reject(err); throw err;}
             resolve(readerEvent.target.result.toString());
         };
         temp_fileReader.onerror = (err) => {
@@ -1336,18 +879,13 @@ function readXMLTag(xml:Document|Element|undefined, tagName:string, create = tru
         if (!tag) return '';
 
         return decodeXML(tag.innerHTML);
-    } catch (e:any) {console.log(`Error "${e.name}" reading the value of tag '${tagName}'\n${e.stack}`);}
+    } catch (e:unknown) {console.log(`Error "${(e as Error).name}" reading the value of tag '${tagName}'\n${(e as Error).stack}`);}
     return '';
 }
 
-/** Get the specified XML tag
-    @param {Document|HTMLElement} xml The HTMLElement or Document to get the child of
-    @param {String} tagName The name of the tag to read
-    @param {Boolean} create If the tag doesn't exist, should we create it?
-    @returns {HTMLElement} The specified tag, creating it and appending it to the end if it doesn't exist
-*/
-function getXMLTag(xml:Document|Element|undefined, tagName:string, create = true):Element|undefined{
-    if (!xml || tagName) return undefined;
+function getXMLTag(xml:Document|Element, tagName:string, create?:true):Element;
+function getXMLTag(xml:Document|Element, tagName:string, create:boolean):Element|undefined;
+function getXMLTag(xml:Document|Element, tagName:string, create:false|true|boolean = true):Element|undefined{
     try{
         /* TODO Add case-insensitivity in a reliable way
         var elem = HTMLElement.prototype;
@@ -1365,8 +903,8 @@ function getXMLTag(xml:Document|Element|undefined, tagName:string, create = true
         var tempTag = xml.getElementsByTagName(tagName)[0];
 
         if (typeof tempTag !== 'undefined'){return tempTag;}
-    } catch (e:any) {
-        console.log(`Error "${e.name}" getting the tag '${tagName}'\n${e.stack}`);
+    } catch (e:unknown) {
+        console.log(`Error "${(e as Error).name}" getting the tag '${tagName}'\n${(e as Error).stack}`);
     }
 
     if (!create){return undefined;}
@@ -1416,7 +954,7 @@ $$ |  $$ |$$\   $$ |$$ |  $$ |$$ |\$$$ |      $$ |  $$ |  $$ |$$\ $$ |$$ | \____
  \______/  \______/  \______/ \__|  \__|       \______/    \____/ \__|\__|\______*/
 
 export class bcdObj extends Object {
-    constructor(obj:any) {
+    constructor(obj:object) {
         super(obj);
     }
     renameKey(oldKeyName:string, newKeyName:string):void{ //@ts-ignore: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'bcdObj'.
@@ -1425,5 +963,5 @@ export class bcdObj extends Object {
         // Delete the key, if it exists (the function doesn't care)
         //@ts-ignore: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'bcdObj'.
         delete this[oldKeyName];
-    };
+    }
 }

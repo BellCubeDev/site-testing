@@ -1,14 +1,17 @@
 {
+    "root": true,
     "env": {
         "browser": true,
-        "es2021": true
+        "es2021": true,
+        "es2022": true
     },
     "extends": [
         "eslint:recommended",
-        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended",
         "plugin:github/recommended",
         "plugin:sonarjs/recommended"
     ],
+    "parser": "@typescript-eslint/parser",
     "parserOptions": {
         "ecmaFeatures": {
             "jsx": true,
@@ -18,14 +21,34 @@
         "sourceType": "module"
     },
     "plugins": [
-        "react",
+        "@typescript-eslint",
         "github",
         "unicorn",
         "sonarjs"
     ],
     "rules": {
+        // Handled, often more gracefully, by TypeScript
+        "import/no-unresolved": "off",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/no-inferrable-types": "off",
+        "no-undef": "off",
+        "no-redeclare": "off",
+
+        // Either I don't care or it's an unwanted style enforcement
+        "eslint-comments/no-use": ["error", {"allow": ["eslint-disable", "eslint-disable-next-line"]}],
+        "@typescript-eslint/ban-ts-comment": ["warn", {
+            "ts-expect-error": "allow-with-description",
+            "ts-ignore": "allow-with-description",
+            "ts-nocheck": true,
+            "ts-check": true,
+            "minimumDescriptionLength": 3
+        }],
+        "@typescript-eslint/ban-types": ["warn", {
+            "types":{"Function":false},
+            "extendDefaults": true
+        }],
         "sonarjs/cognitive-complexity": "off",
-        "no-unused-vars": "warn",
         "no-empty": "off",
         "camelcase": "off",
         "prettier/prettier": "off",
@@ -38,6 +61,7 @@
         "semi": "warn",
         "i18n-text/no-en": "warn",
         "import/extensions": "off",
-        "filenames/match-regex": "off"
+        "filenames/match-regex": "off",
+        "import/no-namespace": "off"
     }
 }

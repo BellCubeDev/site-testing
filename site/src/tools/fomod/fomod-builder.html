@@ -49,12 +49,12 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 
 <!-- File & Settings (General and Config) -->
 <div class="bcd-summary" for="details_builder_genConfig" ><i class="material-icons open-icon-90CC">expand_more</i>
-    <h2>FOMOD - General and Config</h2>
+    <h2>FOMOD - Files and Config</h2>
     <h3 id="fomod_FolderPicker_folderName" style="padding-left:16px">No folder selected...</h3>
 </div><div class="bcd-details" id="details_builder_genConfig">
     <form autocomplete="off" name="File Control" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px">
-        <button id="fomod_FolderPicker" type="button" style="width:144px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
-            Pick Directory
+        <button id="fomod_FolderPicker" type="button" style="width:192px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-openDir">
+            Select FOMOD Directory
         </button>
             <div id="fomod_localization_folderPicker_container" hidden>
                 <p id="fomod_localization_folderPicker_noFomod">Please select the root folder (the one containing 'fomod') or name your folder something other than 'fomod'.</p>
@@ -63,9 +63,15 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             <div class="mdl-tooltip" for="fomod_FolderPicker"><p>
                 This is the folder that you will put into an archive to be installed by users. If it is not set up for a FOMOD just yet, no worries!
             </p></div>
-        <button id="fomod_saveButton" type="button" style="width:144px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+        <button id="fomod_saveButton" type="button" style="width:144px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-save">
             Save
         </button>
+        <button id="fomod_saveButtonNUKE" type="button" style="width:144px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-save">
+            Clean Save
+        </button>
+        <div class="mdl-tooltip" for="fomod_saveButtonNUKE"><p>
+            Will nuke your current file and generate a new one from scratch. This can be dangerous if you've manually commented on the file, however it also ensures that the FOMOD is schema-compliant&mdash;which can fix most instances of Vortex rejecting the installer due to non-compliance.
+        </p></div>
     </form>
 
     <form autocomplete="off" name="General Config" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px">

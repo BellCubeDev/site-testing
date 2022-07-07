@@ -1,13 +1,13 @@
-console.log("%cHello and welcome to the JavaScript console! This is where wizards do their magic!\nAs for me? I'm the wizard you don't want to anger.", "color: #2d6");
 import {componentHandler} from './assets/site/mdl/material.js';
+console.log("%cHello and welcome to the JavaScript console! This is where wizards do their magic!\nAs for me? I'm the wizard you don't want to anger.", "color: #2d6");
 
 export class bcdStr extends String {
-    constructor(str_:string){super(str_)}
+    constructor(str_:string){super(str_);}
 
     /** Removes whitespace at the beginning and end of a string and at the end of every included line*/ //@ts-ignore: Property 'capitalizeFirstLetter' does not exist on type 'String'.
     capitalizeFirstLetter():bcdStr{
         return new bcdStr(this.charAt(0).toUpperCase() + this.slice(1));
-    };
+    }
 
     /** Removes whitespace at the beginning and end of a string and at the end of every included line*/ //@ts-ignore: Property 'trimWhitespace' does not exist on type 'String'.
     trimWhitespace():bcdStr{
@@ -15,11 +15,16 @@ export class bcdStr extends String {
             .trimStart()                // Trim whitespace at the start of the string
             .trimEnd()                  // Trim whitespace at the end of the string
             .replace(/[^\S\n]*$/gm, '') // Trim whitespace at the end of each line
-    );};
+    );}
 }
 
+declare global {interface Window {
+    dataLayer: [];
+    bcd_init_functions: {[key:string]: Function};
+}}
 
-const _ganalytics_HTML = '<script async src="https://www.googletagmanager.com/gtag/js?id=G-5YE7EYGLGT"></script>'
+
+const _ganalytics_HTML = '<script async src="https://www.googletagmanager.com/gtag/js?id=G-5YE7EYGLGT"></script>';
 
 // Currently unused since I haven't made the opt-in prompt yet
 function enableAnalytics():void{
@@ -28,11 +33,11 @@ function enableAnalytics():void{
     document.head.insertAdjacentHTML('beforeend', _ganalytics_HTML);
 
     //console.log('[BCD-Analytics] Analytics enabled.');
-    // @ts-ignore: Property 'dataLayer' does not exist on type 'Window & typeof globalThis'
     window.dataLayer = window.dataLayer || [];
 
     // @ts-ignore: Cannot find name 'dataLayer'.
-    function gtag(...args:any[]){dataLayer.push(arguments);}
+    // eslint-disable-next-line prefer-rest-params
+    function gtag(...args:unknown[]){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'G-5YE7EYGLGT');
 }
@@ -49,41 +54,60 @@ function enableAnalytics():void{
     * A random text generator
 */
 interface componentTrackingItem {
-    obj:{[index:string]:any},
-    arr:any[]
+    obj:{[index:string]:unknown},
+    arr:unknown[]
 }
+
 interface registered_components {
     [index:string]:componentTrackingItem
 }
-/** Dummy class to get around the complexities of exporting. */
+
+
+interface trackableConstructor<TConstructor> extends Function {
+    asString: string,
+    new(...args: never[]): TConstructor,
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [key: string|number|symbol]: any
+}
+
+/** Wrapped in a class to get around the complexities of exporting. */
 export class bcd_ComponentTracker {
     static registered_components:registered_components = {};
-    static registerComponent(component:any, constructor:any){
-        if (!constructor.asString) throw new TypeError("Tracked constructors must have a static asString property.");
+
+
+    static registerComponent<TConstructor>(component:TConstructor, constructor: trackableConstructor<TConstructor>, element:HTMLElement):void{
         bcd_ComponentTracker.createComponent(constructor);
-        if (component.id)
-            bcd_ComponentTracker.registered_components[constructor.asString].obj = component;
+
+        if (element.id !== '')
+            bcd_ComponentTracker.registered_components[constructor.asString].obj[element.id] = component;
         else
             bcd_ComponentTracker.registered_components[constructor.asString].arr.push(component);
     }
-    static createComponent(constructor:any){
+
+    static createComponent<TConstructor>(constructor:trackableConstructor<TConstructor>){
         if (typeof bcd_ComponentTracker.registered_components[constructor.asString] === 'undefined')
             bcd_ComponentTracker.registered_components[constructor.asString] = {obj: {}, arr: []};
     }
-    static findItem(constructor:any, element:HTMLElement):any|undefined{
+
+
+    static findItem<TConstructor>(constructor: trackableConstructor<TConstructor>, element:HTMLElement, findPredicate: (arg0:TConstructor) => boolean): TConstructor|undefined {
         if (element.id)
-            return bcd_ComponentTracker.registered_components[constructor.asString].obj[element.id];
+            return bcd_ComponentTracker.registered_components[constructor.asString].obj[element.id] as TConstructor;
         else
-            return bcd_ComponentTracker.registered_components[constructor.asString].arr.find((item:any) => item.element === element);
+            return (bcd_ComponentTracker.registered_components[constructor.asString].arr as TConstructor[]).find(findPredicate);
     }
 }
 
-export const bcd_const_transitionDur:string = "transition-duration";
-export const bcd_const_animDur:string = "animation-duration";
-export const bcd_const_marginTop:string = "margin-top";
-export const bcd_const_classIsOpen:string = "is-open";
-export const bcd_const_classAdjacent:string = "adjacent";
-export const bcd_const_classDetailsInner:string = "bcd-details-inner";
+const bcd_const_transitionDur:string = "transition-duration";
+const bcd_const_animDur:string = "animation-duration";
+const bcd_const_marginTop:string = "margin-top";
+const bcd_const_classIsOpen:string = "is-open";
+const bcd_const_classAdjacent:string = "adjacent";
+const bcd_const_classDetailsInner:string = "bcd-details-inner";
+
+// eslint-disable-next-line i18n-text/no-en
+const bcd_const_errItem = "Error Item:";
 
 /* (these variables are defined here so they aren't kept in memory the whole time)
 We pull from the Conditionalized array before the Generic array to ensure that we always have some text.
@@ -105,7 +129,7 @@ const possibilities_conditionalized:[conditionObj, string][] = [
     [ {random: .01}, "And why not? Imagine how unbearably, how unutterably cold the universe would be if one were all alone." ], // https://www.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html
     [ {random: .075}, "STOP REFRESHING!!!" ],
     [ {time: [[3,0], [11,59]]}, "Good morning!" ],
-    [ {time: [[3,0], [11,59]]}, "&lsquo;Mornin! Nice day for fishin&rsquo;, ain&rsquo; it?" ],
+    [ {time: [[3,0], [11,59]]}, "&lsquo;Mornin! Nice day for fishin&rsquo;, ain&rsquo;t it?" ],
     [ {time: [[12,0], [12,0]]}, "Good noon!" ],
     [ {time: [[12,1], [19,0]]}, "Good afternoon!" ],
     [ {time: [[18,30], [24,0]]}, "Good evening!" ],
@@ -115,7 +139,7 @@ const possibilities_conditionalized:[conditionObj, string][] = [
     [ {random: .00001}, "WHAT IN OBLIVION?!!! <b>WHY ARE YOU SO LUCKY?!!</b>" ],
     [ {random: .05}, "Known Troublemakers:<ul><li>Lively</li><li>Lively&rsquo;s Cat</li><li>Lively Again</li></ul>- BigBizkit" ],
     [ {random: .33}, "Nexus Mods is the best!"],
-    [ {random: .05}, "And then I... I would be named... <i><b>TIM!</b></i><br />The horrors would never cease!" ],
+    [ {random: .05}, "And then I&hellip; I would be named&hellip; <i><b>TIM!</b></i><br />The horrors would never cease!" ],
     [ {random: .02}, "Greetings, Dragonborn."], //rdunlap
     [ {random: .1}, "Welcome, Dovahkiin."], //rdunlap
     [ {random: .05}, "War. War never changes."], //rdunlap
@@ -153,7 +177,7 @@ const possibilities_Generic = [
     "My olfactory sensors are picking up <b>quite a strong odor.</b>",
     "With people like you making decisions, no wonder nuclear war broke out.",
     "Have I mentioned I&rsquo;m afraid of heights? Especially ones with ramshackle crumbly bits?",
-    "Here&rsquo;s the thing, I... <i>I forget the thing.</i>",
+    "Here&rsquo;s the thing, I&hellip; <i>I forget the thing.</i>",
     "That coin-pouch getting heavy?",
     "So rise up! <b>RIIIIIISE UP</b>, children of the Empire! <b>RIIIIIISE UP</b>, Stormcloaks!",
     "We mug people! And wagons.",
@@ -167,25 +191,25 @@ const possibilities_Generic = [
     "¡Hola!",
     "So who made the machines? That&rsquo;s who we want to contact.", // https://www.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html
     "Hey, check out the <a href=\"https://octodex.github.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Octodex</a>!",
-    "I used to be an adventurer like you. Then I took an arrow in the knee...",
+    "I used to be an adventurer like you. Then I took an arrow in the knee&hellip;",
     "Wonderful! Remarkably well preserved too.",
     "I thought adventurers were supposed to look tough?",
     "Halt. You&rsquo;re under arrest for murder and conspiracy against the city of Markarth!",
-    "They say Ulfric Stormcloak murdered the high king... with his voice! Shouted him apart!",
+    "They say Ulfric Stormcloak murdered the high king&hellip; with his voice! Shouted him apart!",
     "&lsquo;Tis a wicked axe you wield there, friend. That blade looks sharp enough to cut through a god.",
-    "You know what? You&rsquo;re not worth the hassle. Go... be some other guard&rsquo;s problem.",
+    "You know what? You&rsquo;re not worth the hassle. Go&hellip; be some other guard&rsquo;s problem.",
     "My cousin&rsquo;s out fighting dragons, and what do I get? Guard duty.",
     "Iron sword, huh? What are you killing, butterflies?",
     "I mostly deal with petty thievery and drunken brawls. Been too long since we&rsquo;ve had a good bandit raid.",
-    "Your shield... Dwarf-make, is it not? But yet it seems so much... more.",
-    "By Shor, is that... is that Azura&rsquo;s Star? How did you come to possess such a rare treasure?",
+    "Your shield&hellip; Dwarf-make, is it not? But yet it seems so much&hellip; more.",
+    "By Shor, is that&hellip; is that Azura&rsquo;s Star? How did you come to possess such a rare treasure?",
     "Fine armor you&rsquo;ve got there. Dwarven make, am I right?",
     "Judging by your armor, I&rsquo;d say you&rsquo;re an Imperial scout. If so, well met.",
-    "That Stormcloak armor&rsquo;s getting on my nerves...",
+    "That Stormcloak armor&rsquo;s getting on my nerves&hellip;",
     "Hey, you mix potions, right? Can you brew me an ale?",
     "Don&rsquo;t suppose you&rsquo;d enchant my sword? Dull old blade can barely cut butter.",
     "In the ancient tongue, you are Dovahkiin - Dragonborn!",
-    "They say the College has been snooping around Saarthal. Mages in a burial crypt. No good can come of that...",
+    "They say the College has been snooping around Saarthal. Mages in a burial crypt. No good can come of that&hellip;",
     "I&rsquo;m just looking for my spoon.",
     "I caught a glimpse of that captured dragon. It&rsquo;s.. beautiful. In its own way.",
     "Thalmor in the Ratway? What&rsquo;s next, spriggans in the Bee and Barb?",
@@ -193,7 +217,7 @@ const possibilities_Generic = [
     "Ooh, ooh, what kind of message? A song? A summons? Wait, I know! A death threat written on the back of an Argonian concubine!",
     "But more to the point. Do you - tiny, puny, expendable little mortal - actually think you can convince me to leave?",
     "I&rsquo;m not a warlock, but I can make you one.", // Copilot?!!
-    "Was it Molag? No, no... Little Tim, the toymaker&rsquo;s son? The ghost of King Lysandus? Or was it... Yes! Stanley, that talking grapefruit from Passwall.",
+    "Was it Molag? No, no&hellip; Little Tim, the toymaker&rsquo;s son? The ghost of King Lysandus? Or was it&hellip; Yes! Stanley, that talking grapefruit from Passwall.",
     "Now you. You can call me Ann Marie. But only if you&rsquo;re partial to being flayed alive and having an angry immortal skip rope with your entrails!",
     "Sheogorath, Daedric Prince of Madness. At your service.",
     "I am a part of you, little mortal. I am a shadow in your subconscious, a blemish on your fragile little psyche. You know me. You just don&rsquo;t know it.",
@@ -201,12 +225,12 @@ const possibilities_Generic = [
     "Let&rsquo;s make sure I&rsquo;m not forgetting anything. Clothes? Check. Beard? Check! Luggage?<br />Luggage! Now where did I leave my luggage?",
     "Ha! I do love it when the mortals know they&rsquo;re being manipulated. Makes things infinitely more interesting.",
     "The Wabbajack! Huh? Huh? Didn&rsquo;t see that coming, did you?",
-    "Well, I suppose it&rsquo;s back to the Shivering Isles. The trouble Haskill can get into while I&rsquo;m gone simply boggles the mind...",
+    "Well, I suppose it&rsquo;s back to the Shivering Isles. The trouble Haskill can get into while I&rsquo;m gone simply boggles the mind&hellip;",
     "Do you mind? I&rsquo;m busy doing the fishstick. It&rsquo;s a very delicate state of mind!",
     "The butler did it! Or is it the advisor? Whoever that man behind the throne was.",
-    "Ah, now this is a sad path. Pelagius hated and feared many things. Assassins, wild dogs, the undead, pumpernickel...",
-    "Um... We&rsquo;re not talking about Barbas, are we? Clavicus Vile&rsquo;s... dog? Oohh... awkward.",
-    "You know, I was there for that whole sordid affair. Marvelous time! Butterflies, blood, a Fox, a severed head... Oh, and the cheese! To die for.",
+    "Ah, now this is a sad path. Pelagius hated and feared many things. Assassins, wild dogs, the undead, pumpernickel&hellip;",
+    "Um&hellip; We&rsquo;re not talking about Barbas, are we? Clavicus Vile&rsquo;s&hellip; dog? Oohh&hellip; awkward.",
+    "You know, I was there for that whole sordid affair. Marvelous time! Butterflies, blood, a Fox, a severed head&hellip; Oh, and the cheese! To die for.",
     "<img style=\"max-width: 64px\" src=\"https://cdn.discordapp.com/emojis/934113805670170714.webp?quality=lossless\" alt=\"Nexus Mods Mug\" decoding=\"async\" fetchpriority=\"low\" loading=\"lazy\" />",
     "You. Yes, you. I&rsquo;m still waiting.",
     "Because it&rsquo;s dull, you twit! It&rsquo;ll hurt more!",
@@ -227,14 +251,14 @@ const possibilities_Generic = [
     "We were made to dominate. The will to power is in our blood. You feel it in yourself, do you not?",
     "What is better - to be born good, or to overcome your evil nature through great effort?",
     "No day goes by where I am not tempted to return to my inborn nature.",
-    "They see me as master. Wuth. Onik. Old and wise. It is true I am old...",
+    "They see me as master. Wuth. Onik. Old and wise. It is true I am old&hellip;",
     "Just because you can do a thing, does not always mean you should.",
     "There are many hungers it is better to deny than to feed.",
-    "Do you have no better reason for acting than destiny? Are you nothing but a plaything of dez... of fate?",
+    "Do you have no better reason for acting than destiny? Are you nothing but a plaything of dez&hellip; of fate?",
     "Perhaps this world is simply the Egg of the next kalpa? Lein vokiin? Would you stop the next world from being born?",
     "Drem. Patience. I am answering, in my way.",
     "I am the one who will bring you back to your own world.", // Nice one, Copilot!
-    "I do not know how he came to be caught. But the bronjun... the Jarl... was very proud of his pet. Paak!",
+    "I do not know how he came to be caught. But the bronjun&hellip; the Jarl&hellip; was very proud of his pet. Paak!",
     "Even we who ride the currents of Time cannot see past Time&rsquo;s end. Wuldsetiid los tahrodiis.",
     "Those who try to hasten the end, may delay it. Those who work to delay the end, may bring it closer.",
     "By long tradition, the elder speaks first.",
@@ -249,12 +273,12 @@ const possibilities_Generic = [
     "And, as you told me once, the next world will have to take care of itself. Even I cannot see past Time&rsquo;s ending.",
     "Even I cannot see past Time&rsquo;s ending to what comes next. We must do the best we can with this world.",
     "You have won a mighty victory—one that will echo through all the ages of this world for those who have eyes to see.",
-    "Perhaps now you have some insight into the forces that shape the vennesetiid... the currents of Time.",
+    "Perhaps now you have some insight into the forces that shape the vennesetiid&hellip; the currents of Time.",
     "You once told me you did not believe in destiny.",
     "You have proven yourself worthy of the next world.", // Copilot's on FIRE today!
     "You once told me you did not believe in destiny.",
     "His doom was written when he claimed for himself the lordship that properly belongs to Bormahu.",
-    "It is an... artifact from outside time. It does not exist, but it has always existed. They are...hmm... fragments of creation.",
+    "It is an&hellip; artifact from outside time. It does not exist, but it has always existed. They are&hellip;hmm&hellip; fragments of creation.",
     "There is no question. You are doom-driven. The very bones of the earth are at your disposal.",
     "Hmm, yes. I have been pondering on exactly that question.",
     "\"Fade\" in your tongue. Mortals have greater affinity for this Word than the dov. Everything mortal fades away in time, but the spirit remains.",
@@ -265,7 +289,7 @@ const possibilities_Generic = [
     "You can trust me, I would not have helped you otherwise.",
     "Some would say that all things must end, so that the next can come to pass. ",
     "The ox, not wishing to be anybody&rsquo;s dinner, prayed very vocally to Ius. This came out as a loud Moo, of course.",
-    "The best techniques are passed on by the survivors...",
+    "The best techniques are passed on by the survivors&hellip;",
     "Each event is preceded by Prophecy. But without the hero, there is no Event.",
     "The world turned against us.",
     "Yet, we survived.",
@@ -275,7 +299,7 @@ const possibilities_Generic = [
     "Some say we broke our promises.<br />Some say we betrayed our brothers.<br />Some say we abandoned God.",
     "But it is us, not them that brought us this far.",
     "And those that make sacrifices today, will reap the rewards of tomorrow.",
-    "If you don&rsquo; eat yer meat, you can&rsquo; have any pudding.",
+    "If you don&rsquo;t eat yer meat, you can&rsquo;t have any pudding.",
     "I&rsquo;m not sure what I&rsquo;m doing here, but I&rsquo;m sure I&rsquo;m doing something.",
 
     // Fable 1 was a bit fun
@@ -293,7 +317,7 @@ const possibilities_Generic = [
     "Hey, you. You&rsquo;re finally awake.",
     "It&rsquo;s a good day for doom",
     "Where&rsquo;s the Beef!",
-    "I can&rsquo; believe I ate the whole thing!",
+    "I can&rsquo;t believe I ate the whole thing!",
     "Capitan, what should we do? Sweet Rolls aren&rsquo;t on the list.<br />Forget the list, they go in the cart!",
     "I love it!",
     "That&rsquo;s not a knife… THAT&rsquo;s a knife.",
@@ -308,7 +332,7 @@ const possibilities_Generic = [
     "Beware this threat actor is currently working under inspection of the NCCIC, as we are dependent on some of his intelligence research we can not interfere physically within 4 hours, which could be enough time to cause severe damage to your infrastructure.", // From the hacker's FBI email sent in early November, 2021.
     "Our intelligence monitoring indicates exfiltration of several of your virtualized clusters in a sophisticated chain attack.", // From the hacker's FBI email sent in early November, 2021.
     "You are freeing bequickulous.",
-    "Quick crown talks bumps over the crazy rog... nope",
+    "Quick crown talks bumps over the crazy rog&hellip; nope",
     "In the Arena of Logic I fight unarmed!",
     "&lsquo;Tis just a flesh wound!",
     "Ni!",
@@ -321,8 +345,10 @@ const possibilities_Generic = [
     "There's nothing cooler than casually walking away after blowing something up.",
     "<i>Johnny, what can you make outta this?</i><br><i>This? Why, I could make a hat, or a broach, pterodactyl&hellip;</i>",
     "Landshark!",
-    "When will then be now? Soon.", 
-    "Unless someone like you cares a whole awful lot, nothing is going to get better.<br />- Dr. Seuss"
+    "When will then be now? Soon.",
+    "Unless someone like you cares a whole awful lot, nothing is going to get better.<br />- Dr. Seuss",
+    "It's only when we've lost everything, that we are free to do anything.",
+    "We&rsquo;re gonna need a bigger boat."
 ];
 
 
@@ -338,18 +364,6 @@ export function randomNumber(min = 0, max = 1, places = 0):number{
     );
 }
 
-//Returns true if it is a DOM node
-export function isNode(obj:any):boolean {return (
-    typeof Node === "object" ? obj instanceof Node :
-    obj && typeof obj === "object" && typeof obj.nodeType === "number" && typeof obj.nodeName==="string"
-);}
-
-// Returns true if it is a DOM element
-//
-export function isElement(obj:any):boolean {return (
-    typeof HTMLElement === "object" ? obj instanceof HTMLElement : //DOM2
-    obj && typeof obj === "object" && obj !== null && obj.nodeType === 1 && typeof obj.nodeName==="string"
-);}
 
 
 class bcd_collapsableParent {
@@ -370,10 +384,10 @@ class bcd_collapsableParent {
 
     /*
     debugCheck():void{
-        if (!this.details) {console.log('Error Item:', this); throw new TypeError("bcd_collapsableParent: Details not found!");}
-        if (!this.details_inner) {console.log('Error Item:', this); throw new TypeError("bcd_collapsableParent: Details_inner not found!");}
-        if (!this.summary) {console.log('Error Item:', this); throw new TypeError("bcd_collapsableParent: Summary not found!");}
-        if (!this.openIcons90deg) {console.log('Error Item:', this); throw new TypeError("bcd_collapsableParent: OpenIcons90deg not found!");}
+        if (!this.details) {console.log(bcd_const_errItem, this); throw new TypeError("bcd_collapsableParent: Details not found!");}
+        if (!this.details_inner) {console.log(bcd_const_errItem, this); throw new TypeError("bcd_collapsableParent: Details_inner not found!");}
+        if (!this.summary) {console.log(bcd_const_errItem, this); throw new TypeError("bcd_collapsableParent: Summary not found!");}
+        if (!this.openIcons90deg) {console.log(bcd_const_errItem, this); throw new TypeError("bcd_collapsableParent: OpenIcons90deg not found!");}
     }
     */
 
@@ -463,17 +477,17 @@ export class BellCubicDetails extends bcd_collapsableParent {
         //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.details_inner)});
         if (this.adjacent) {
             const temp_summary = this.self.previousElementSibling;
-            if (!(temp_summary && temp_summary.classList.contains(BellCubicSummary.cssClass))) {console.log('Error Item:', this); throw new TypeError("[BCD-DETAILS] Error: Adjacent Details element must be preceded by a Summary element.");}
+            if (!(temp_summary && temp_summary.classList.contains(BellCubicSummary.cssClass))) {console.log(bcd_const_errItem, this); throw new TypeError("[BCD-DETAILS] Error: Adjacent Details element must be preceded by a Summary element.");}
             this.summary = temp_summary as HTMLElement;
         } else {
             const temp_summary = this.self.ownerDocument.querySelector(`.bcd-summary[for="${this.details.id}"`);
-            if (!temp_summary) {console.log('Error Item:', this); throw new TypeError("[BCD-DETAILS] Error: Non-adjacent Details elements must have a Summary element with a `for` attribute matching the Details element's id.");}
+            if (!temp_summary) {console.log(bcd_const_errItem, this); throw new TypeError("[BCD-DETAILS] Error: Non-adjacent Details elements must have a Summary element with a `for` attribute matching the Details element's id.");}
             this.summary = temp_summary as HTMLElement;
         }
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
         //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.details_inner)});
         setTimeout(() => {
-            bcd_ComponentTracker.registerComponent(this, BellCubicDetails);
+            bcd_ComponentTracker.registerComponent(this, BellCubicDetails, this.details);
             this.reEval(false);
             this.reEval();
             this.self.classList.add('initialized');
@@ -488,7 +502,7 @@ export class BellCubicSummary extends bcd_collapsableParent {
     constructor(element:HTMLElement) {
         super(element);
         this.summary = element; // @ts-expect-error: No overload matches this call.
-        this.summary.addEventListener('click', this.handleClick.bind(this))
+        this.summary.addEventListener('click', this.handleClick.bind(this));
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
 
         /*console.log("[BCD-SUMMARY] Registering  component: ", this)*/
@@ -496,11 +510,11 @@ export class BellCubicSummary extends bcd_collapsableParent {
         //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.details_inner)});
         if (this.adjacent) {
             const temp_details = this.self.nextElementSibling;
-            if (!(temp_details && temp_details.classList.contains(BellCubicDetails.cssClass))) {console.log('Error Item:', this); throw new TypeError("[BCD-SUMMARY] Error: Adjacent Summary element must be proceeded by a Details element.");}
+            if (!(temp_details && temp_details.classList.contains(BellCubicDetails.cssClass))) {console.log(bcd_const_errItem, this); throw new TypeError("[BCD-SUMMARY] Error: Adjacent Summary element must be proceeded by a Details element.");}
             this.details = temp_details as HTMLElement;
         } else {
             const temp_details = this.self.ownerDocument.getElementById(this.summary.getAttribute('for') ?? '');
-            if (!temp_details) {console.log('Error Item:', this); throw new TypeError("[BCD-SUMMARY] Error: Non-adjacent Details elements must have a summary element with a `for` attribute matching the Details element's id.");}
+            if (!temp_details) {console.log(bcd_const_errItem, this); throw new TypeError("[BCD-SUMMARY] Error: Non-adjacent Details elements must have a summary element with a `for` attribute matching the Details element's id.");}
             this.details = temp_details as HTMLElement;
         }
 
@@ -514,11 +528,11 @@ export class BellCubicSummary extends bcd_collapsableParent {
         if (!temp_inner) {this.divertedCompletion(); return;}
             else this.details_inner = temp_inner as HTMLElement;
 
-        bcd_ComponentTracker.registerComponent(this, BellCubicSummary);
+        bcd_ComponentTracker.registerComponent(this, BellCubicSummary, this.details);
         this.reEval(false);
         this.reEval();
         this.self.classList.add('initialized');
-    })}
+    });}
 
     /**
         @param {PointerEvent} event
@@ -545,23 +559,20 @@ function registerComponents():void{
 
     // Tell mdl about our shiny new components
 
-    // eslint-disable-next-line no-undef
     try{componentHandler.register({
         constructor: BellCubicDetails,
         classAsString: 'BellCubicDetails',
         cssClass: BellCubicDetails.cssClass,
         widget: false
-    });}catch(e){registerComponentsError(e, BellCubicDetails);}
-    // eslint-disable-next-line no-undef
+    });}catch(e:unknown){registerComponentsError(e, BellCubicDetails);}
     try{componentHandler.register({
         constructor: BellCubicSummary,
         classAsString: 'BellCubicSummary',
         cssClass: BellCubicSummary.cssClass,
         widget: false
-    });}catch(e){registerComponentsError(e, BellCubicSummary);}
+    });}catch(e:unknown){registerComponentsError(e, BellCubicSummary);}
     // Upgrade the elements with the classes we just registered components for
 
-    // eslint-disable-next-line no-undef
     componentHandler.upgradeElements([
         ...document.getElementsByClassName(BellCubicDetails.cssClass),
         ...document.getElementsByClassName(BellCubicSummary.cssClass),
@@ -570,7 +581,7 @@ function registerComponents():void{
     //console.log("[BCD-Components] Components registered.");
 }
 
-function registerComponentsError(e:any/*Actually Error, but don't worry about it*/, component:Function):void{
+function registerComponentsError(e:unknown/*Actually Error, but don't worry about it*/, component:Function):void{
     console.log("[BCD-Components] Error registering component", component, ": ", e);
 }
 
@@ -598,7 +609,7 @@ export function bcd_universalJS_init():void {
         randomTextField.innerHTML = possibilities_Generic[randomNumber(0, possibilities_Generic.length - 1)];
         /*console.log(`[BCD-RANDOM-TEXT] Condition failed. Using generic text.`);*/
     }
-} //@ts-ignore: Property 'bcd_init_functions' does not exist on type 'Window & typeof globalThis'.
+}
 window.bcd_init_functions.universal = bcd_universalJS_init;
 
 // This function is not super hard to understand if you can read comments and collapse blocks of code.
@@ -628,15 +639,12 @@ function checkCondition(condition:conditionObj):boolean {
 
         // Date
         /*console.log(`[BCD-RANDOM-TEXT] Checking date condition`);*/
-        if (typeof condition.date !== 'undefined') if (!checkDateCondition(condition.date)) return false;
+        return !(typeof condition.date !== 'undefined' && !checkDateCondition(condition.date));
         // And if any of that threw an error,
     } catch (err) {
         /*console.log(`[BCD-RANDOM-TEXT] {checkCondition(${condition})} Error - ${err.name}\n==================\n${err.stack}\n==================`);*/
         return false;
     }
-
-    // If we got through ALL OF THAT, we're good!
-    return true;
 }
 
 function checkDateCondition(dateBounds: [[number, number, number], [number, number, number]]):boolean {
@@ -658,13 +666,9 @@ function checkDateCondition(dateBounds: [[number, number, number], [number, numb
     }
 
     // Are we above the maximum? The condition is not met if so.
-    if (maxDate != [0, 0, 0] && !(
+    return !(maxDate != [0, 0, 0] && !(
             (currentDate[2] < maxDate[2]) ||
             (currentDate[2] == maxDate[2] && currentDate[0] < maxDate[0]) ||
             (currentDate[2] == maxDate[2] && currentDate[0] == maxDate[0] && currentDate[1] <= maxDate[1])
-        )) {
-        return false;
-    }
-
-    return true
+    ));
 }

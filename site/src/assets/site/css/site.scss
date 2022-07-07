@@ -319,6 +319,22 @@ a {
     overflow-x: hidden;
 }
 
+.mdl-button--raised.mdl-button--colored.bcd-button-open {
+    background-color: #0084ff;
+}
+
+.mdl-button--raised.mdl-button--colored.bcd-button-openDir {
+    background-color: #00a2b8;
+}
+
+.mdl-button--raised.mdl-button--colored.bcd-button-openFile {
+    background-color: #3c60ff;
+}
+
+.mdl-button--raised.mdl-button--colored.bcd-button-save {
+    background-color: #009950;
+}
+
 .bcd-summary {
     display: flex;
     flex-direction: row;
@@ -356,10 +372,10 @@ a {
     animation-name: hideDelay;
     animation-timing-function: steps(1, end);
 
-    /* Defaults (overridden by universal.js) */
+    /* Defaults (overridden by universal.ts) */
     animation-duration: 0ms;
     transition-duration: 0ms;
-    /* animation-duration is 15ms longer than transition-duration when set by JavaScript */
+    /* animation-duration is 15ms longer than transition-duration when set by universal.ts */
 }
 
 .bcd-details.is-open > .bcd-details-inner {
