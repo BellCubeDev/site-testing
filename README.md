@@ -35,10 +35,15 @@ Set up a repository on GitHub and run the workflow '*Build & Deploy Site*' to bu
 
 Figure out how the NPM packages and Ruby gems work and how to use them to build the site. Have fun!
 
-Actually, here. Install NPM and RubyGems, then run these commands in the `site` directory:```bash
+Actually, here. Install NPM and RubyGems, then run these commands in the `site` directory:
+
+```bash
+
 npm install
 
 gem install bundler
 bundle install
 
 ```
+
+More instructions soon™
