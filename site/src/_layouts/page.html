@@ -151,7 +151,7 @@ layout: compress_html
         </main>
         <footer class="mdl-layout__content">
             <div style="margin-right:auto;margin-left:auto;">
-                {%assign _current_year = 'now' | date: "Y" %}
+                {%assign _current_year = 'now' | date: "%Y" %}
                 <p>©&nbsp;{% if site.first_publication_year != _current_year %}{{ site.first_publication_year }}–{{ _current_year }}{% else %}{{ _current_year }}{% endif %}&nbsp;BellCube&nbsp;Dev,
                 <a href="{{ site.repourl }}/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">GNU&nbsp;General&nbsp;Public&nbsp;License v3.0</a>.
                 <a href="{{ site.repourl }}/" target="_blank" rel="noopener noreferrer">Source&nbsp;available&nbsp;on&nbsp;GitHub</a>
