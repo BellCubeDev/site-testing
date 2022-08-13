@@ -132,27 +132,16 @@ jobs:
           path: ${{ github.workspace }}/_generated/_jekyll-out/
 
 
-#      - name: Upload Artifact
-#        uses: actions/upload-artifact@v3
-#        with: # Built-Pages
-#          name: github-pages
-##          path: $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
-#          path: ${{ github.workspace }}/_generated/_jekyll-out/
 
-
-
-  # Deploy job
   deploy:
-    # Add a dependency to the build job
-    name: "Deploy to the GitHub Pages"
+    name: "Deploy to GitHub Pages"
     runs-on: ubuntu-latest
     needs:
        - build
 
-    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
-      pages: write      # to deploy to Pages
-      id-token: write   # to verify the deployment originates from an appropriate source
+      pages: write
+      id-token: write
 
     environment:
       name: github-pages
@@ -164,36 +153,34 @@ jobs:
         uses: actions/deploy-pages@v1
 
 
-# Old 'deploy' job
 
-#
-#  deploy:
-#    name: "Deploy to the GitHub Pages branch"
-#    runs-on: ubuntu-latest
-#    needs:
-#      - build
-#    permissions:
-#      contents: write
-#      id-token: write
-#      pages: write
-#    steps:
-#
-#
-#
-#      - name: Download Artifact
-#        uses: actions/download-artifact@v3
-#        with:
-#          name: Built-Pages
-#          path: artifacts/built-pages
-#
-#
-#
-#      - name: Deploy to GitHub Pages
-#        uses: crazy-max/ghaction-github-pages@v3
-#        with:
-#          target_branch: deployment
-#          build_dir: artifacts/built-pages
-#          jekyll: false
-#          verbose: true
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  deploy_branch:
+    name: "Deploy to Visibility Branch"
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    permissions:
+      contents: write
+      id-token: write
+      pages: write
+
+    environment:
+      name: github-pages-deploy-to-visibility-branch
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: github-pages
+          path: artifacts/github-pages
+
+      - name: Deploy to Visibility Branch
+        uses: crazy-max/ghaction-github-pages@v3
+        with:
+          target_branch: deployment
+          build_dir: artifacts/github-pages
+          jekyll: false
+          verbose: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
