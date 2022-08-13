@@ -166,7 +166,7 @@ jobs:
 
     environment:
       name: github-pages-deploy-to-visibility-branch
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: https://github.com/${{ github.repository }}/tree/deployment
 
     steps:
       - name: Download Artifact
