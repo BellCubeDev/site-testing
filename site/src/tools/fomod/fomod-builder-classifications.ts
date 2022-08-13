@@ -116,8 +116,8 @@ $$ |  $$\ $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \
 export class bcd_builder_flag {
     name = "";
     value = "";
-    getters:never[] = [];
-    setters:never[] = [];
+    getters:unknown[] = [];
+    setters:unknown[] = [];
 
     constructor(name = "", value = "") {
         this.name = name;
@@ -249,11 +249,11 @@ function parseDependency(dependency: Element): bcd_builder_dependency {
 }
 
 type bcd_builder_PluginType =
-    | "Optional"
-    | "Recommended"
-    | "CouldBeUseable"
-    | "Required"
-    | "NotUseable";
+    | "Optional"        // Unchecked but checkable
+    | "Recommended"     // Checked but uncheckable
+    | "CouldBeUseable"  // TODO: Check if this has a use
+    | "Required"        // Permanently checked
+    | "NotUseable";     // Permanently unchecked
 export class bcd_builder_PluginTypeDescriptor extends bcd_builder_XMLElement {
     default: bcd_builder_PluginType = "Optional";
 
@@ -320,12 +320,11 @@ export class bcd_builder_PluginTypeDescriptor extends bcd_builder_XMLElement {
 
 export class bcd_builder_PluginTypeDescriptor_dependency extends bcd_builder_XMLElement {
     type: bcd_builder_PluginType = "Optional";
-    dependency: bcd_builder_dependency_group;
     instanceElement_type: Element | undefined = undefined;
 
-    constructor(
-        dependency: bcd_builder_dependency_group,
-        type: bcd_builder_PluginType = "Optional"
+    dependency: bcd_builder_dependency_group;
+
+    constructor(dependency: bcd_builder_dependency_group, type: bcd_builder_PluginType = "Optional"
     ) {
         super();
         this.dependency = dependency;
@@ -336,9 +335,8 @@ export class bcd_builder_PluginTypeDescriptor_dependency extends bcd_builder_XML
         this.instanceElement =
             this.instanceElement ?? document.createElement("pattern");
 
-        this.instanceElement_type =
-            this.instanceElement_type ??
-            this.instanceElement.appendChild(document.createElement("type"));
+        this.instanceElement_type = this.instanceElement_type
+                                    ?? this.instanceElement.appendChild(document.createElement("type"));
         this.instanceElement_type.setAttribute("name", this.type);
 
         this.instanceElement.appendChild(this.dependency.asModuleXML(document));
@@ -395,7 +393,10 @@ $$ |  $$ |$$ |  $$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \____$$\
           $$ |
           \_*/
 
-type bcd_builder_groupSortOrder = "Ascending" | "Descending" | "Explicit";
+type bcd_builder_groupSortOrder =
+    | "Ascending"  // Alphabetical
+    | "Descending" // Reverse Alphabetical
+    | "Explicit";  // Explicit order
 
 export class bcd_builder_FOMOD_step extends bcd_builder_XMLElement {
     name = "";

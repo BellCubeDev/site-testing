@@ -5,6 +5,8 @@
     License: ~ MIT (or more permissive) [via base16-schemes-source]
     Maintainer: @highlightjs/core-team
     Version: 2021.09.0
+
+    Modified by BellCube
 */
 
 pre code.hljs {
@@ -23,20 +25,20 @@ code.hljs {
 }
 
 .hljs ::selection, .hljs::selection {
-    background-color: #516d7b;
+    background-color: #2f4957ad;
     color: #7ea2b4
 }
 
 .hljs-comment {
-    color: #5a7b8c
+    color: #529955 /* VS Code anyone? */
 }
 
 .hljs-tag {
-    color: #7195a8
+    color: #1f8dc9
 }
 
 .hljs-operator, .hljs-punctuation, .hljs-subst {
-    color: #7ea2b4
+    color: #649fbd
 }
 
 .hljs-operator {
@@ -44,47 +46,64 @@ code.hljs {
 }
 
 .hljs-bullet, .hljs-deletion, .hljs-name, .hljs-selector-tag, .hljs-template-variable, .hljs-variable {
-    color: #d22d72
+    color: #da8aab
 }
 
-.hljs-attr, .hljs-link, .hljs-literal, .hljs-number, .hljs-symbol, .hljs-variable.constant_ {
-    color: #935c25
+.hljs-attr {
+    color: #d17f2c
 }
+
+.hljs-link, .hljs-literal, .hljs-symbol {
+    color: #45bbff
+}
+
+.hljs-number {
+    color: #94dd8e
+}
+
+.hljs-variable.constant_ {
+    color: #09a5ff
+}
+
 
 .hljs-class .hljs-title, .hljs-title, .hljs-title.class_ {
-    color: #8a8a0f
+    color: #d1d11d
 }
 
 .hljs-strong {
     font-weight: 700;
-    color: #8a8a0f
+    color: #c5c55d
 }
 
 .hljs-addition, .hljs-code, .hljs-string, .hljs-title.class_.inherited__ {
-    color: #568c3b
+    color: #88da5f
 }
 
 .hljs-built_in, .hljs-doctag, .hljs-keyword.hljs-atrule, .hljs-quote, .hljs-regexp {
-    color: #2d8f6f
+    color: #4ec9b0 /* VS Code anyone? */
 }
 
 .hljs-attribute, .hljs-function .hljs-title, .hljs-section, .hljs-title.function_, .ruby .hljs-property {
-    color: #257fad
+    color: #1c95d1
 }
 
 .diff .hljs-meta, .hljs-keyword, .hljs-template-tag, .hljs-type {
-    color: #6b6bb8
+    color: #6b6bd4
 }
 
 .hljs-emphasis {
-    color: #6b6bb8;
+    color: #8181ff;
     font-style: italic
 }
 
 .hljs-meta, .hljs-meta .hljs-keyword, .hljs-meta .hljs-string {
-    color: #b72dd2
+    color: #e253ff
 }
 
 .hljs-meta .hljs-keyword, .hljs-meta-keyword {
     font-weight: 700
+}
+
+a[class*="hljs"] {
+    text-decoration: underline;
 }

@@ -1,7 +1,10 @@
 ---
 layout: page
 title: Tools - Papyrus Auto Docs
-papy_docs: true
+extra_head: >
+    <style>.mdl-layout__content {padding-bottom: 224px}</style>
+    <script async type="module" src="papyrus-docs.js" onload="window.bcd_init_functions.fomodBuilder()"></script>
+hljs_styles: true
 description: >
     The Papyrus Auto Docs tool generates Markdown documentation for Papyrus scripts largely automatically. It includes options for both batch processing and single-file processing.
 permalink: /tools/papyrus/markdown-docs/
@@ -50,50 +53,50 @@ This page was build with generating documentation for <a href="https://modding.w
 <button id="papy_docs_folder-picker" type="button" style="width:160px;margin-right:8px;" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-openDir">
     Select Directory
 </button>
-<div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="papy_docs_folder-picker"><p>
+<div class="mdl-tooltip mdl-tooltip--bottom small01" for="papy_docs_folder-picker"><p>
     Select an entire directory for batch processing. <code>.psc</code> files will be parsed and the documentation will be outputted as <code>.psc.md</code> files alongside the original files. WILL overwrite existing files.
 </p></div>
 
 <button id="papy_docs_file-picker" type="button" style="width:118px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-openFile">
     Select File
 </button>
-<div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="papy_docs_file-picker"><p>
+<div class="mdl-tooltip mdl-tooltip--bottom small01" for="papy_docs_file-picker"><p>
     Select a single file for processing. The documentation will be outputted in the below text area.
 </p></div>
 
 <br />
 
-<div id="papy_docs_lib-Name_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+<div id="papy_docs_lib-Name_cont" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
     <input id="papy_docs_lib-Name" class="mdl-textfield__input" type="text" placeholder="Vanilla">
     <label class="mdl-textfield__label" for="papy_docs_lib-Name">Library Name</label>
 </div>
-<div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="papy_docs_lib-Name_cont"><p>
+<div class="mdl-tooltip mdl-tooltip--bottom small01" for="papy_docs_lib-Name_cont"><p>
     The name of the library. For instance, <code>Vanilla</code>.
 </p></div>
 
-<div id="papy_docs_lib-Link_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+<div id="papy_docs_lib-Link_cont" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
                                                                       <!-- Pattern regex adapted from https://stackoverflow.com/a/30910/13076790 (changes: fix escaping, require starting with '/') -->
     <input id="papy_docs_lib-Link" class="mdl-textfield__input" type="url" pattern="^\/((?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?|(\/?(?:[a-z0-9-._~!$&'()*+,;=:@]|%[0-9A-F]{2})+(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?(?:\?((?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*))?(?:#((?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*))?$"
         placeholder="/skyrim/developers/papyrus/concepts/libraries">
     <label class="mdl-textfield__label" for="papy_docs_lib-Link">Library URL</label>
 </div>
-<div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="papy_docs_lib-Link_cont"><p>
+<div class="mdl-tooltip mdl-tooltip--bottom small01" for="papy_docs_lib-Link_cont"><p>
     <i>Modding.wiki</i>-relative URL to the library's folder page.
 </p></div>
 
-<div id="papy_docs_register-pattern_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+<div id="papy_docs_register-pattern_cont" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
                                                                       <!-- Pattern regex adapted from https://stackoverflow.com/a/30910/13076790 (changes: fix escaping, require starting with '/') -->
     <input id="papy_docs_register-pattern" class="mdl-textfield__input" type="text"
         placeholder="RegisterFor%e%"> <!-- pattern="^.*?%e%.*$" -->
     <label class="mdl-textfield__label" for="papy_docs_register-pattern">Register Function Scheme</label>
 </div>
-<div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="papy_docs_register-pattern_cont"><p>
+<div class="mdl-tooltip mdl-tooltip--bottom small01" for="papy_docs_register-pattern_cont"><p>
     Case-insensitive scheme to look for when trying to detect Event Registration functions. <code>%e%</code> is substituted for the event's name (with some words, common prefixes, and common suffixes removed).
     <br /><br />
     The default (<code>RegisterFor%e%</code>) will serve just fine for vanilla.
 </p></div>
 
-<pre><code class="language-html" id="papy_docs_md-output" onclick=""><span class="hljs-section"># Markdown Output</span>
+<pre><code class="language-markdown" id="papy_docs_md-output" onclick=""><span class="hljs-section"># Markdown Output</span>
 
 Here, you'll find the <span class="hljs-code">`Markdown`</span> that you generate from <span class="hljs-strong">**<span class="hljs-emphasis">*single*</span>**</span> files (or the <span class="hljs-emphasis">*last*</span> file in the selected folder) above.
 

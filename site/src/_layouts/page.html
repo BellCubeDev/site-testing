@@ -46,11 +46,8 @@ layout: compress_html
     <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/css/site.scss %}">
 
     {% if page.use_docs_CSS or layout.use_docs_CSS %}<link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/css/docs.scss %}" />{% endif %}
-
-    {% if page.papy_docs %}
+    {% if page.hljs_styles %}
         <link rel="stylesheet" href="{{site.baseurl}}{% link assets/site/highlight_js/styles/base16/atelier-lakeside.scss %}">
-        <style>.mdl-layout__content {padding-bottom: 224px}</style>
-        <script async type="module" src="papyrus-docs.js" onload="window.bcd_init_functions.fomodBuilder()"></script>
     {% endif %}
 
     <!--

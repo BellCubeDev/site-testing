@@ -2,12 +2,14 @@
 ---
 
 .docs.sideBar_cont {
-    display: flex;
-    flex-direction: row-reverse;
-    flex-wrap: nowrap;
+    display: grid;
+    grid-template-columns: minmax(0px, auto) min-content;
+    width: 100%;
 }
 
 .docs.sideBar_cont > .docs.sideBar {
+    grid-column: 2;
+    grid-row: 1;
     max-width: 250px;
     background-color: #222;
     border: #fff9 1px solid;
@@ -17,9 +19,11 @@
     height: min-content;
 }
 
-@media (max-width:750px){
+@media (max-width:800px){
     .docs.sideBar_cont {
+        display: flex;
         flex-direction: column;
+        flex-wrap: nowrap;
     }
 
     .docs.sideBar_cont > .docs.sideBar {
@@ -30,8 +34,13 @@
 }
 
 .docs.sideBar_cont > :not(.docs.sideBar){
+    grid-column: 1;
     width: 100%;
     display: block;
+}
+
+.docs.sideBar_cont > .docs.content{
+    grid-row: 1;
 }
 
 .docs.mdl-navigation__link {
@@ -50,4 +59,3 @@
     font-size: 2em;
     margin: 8px;
 }
-

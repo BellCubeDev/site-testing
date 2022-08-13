@@ -338,17 +338,25 @@ const possibilities_Generic = [
     "Ni!",
     "<i>Vengeance!</i>",
     "<i>ruh roh</i>",
-    "Smile my dear, you're never fully dressed without one.",
+    "Smile my dear, you&rsquo;re never fully dressed without one.",
     "Obscure?<br />I can do obscure.",
     "Of course, the Gods work in mysterious ways.<br  />Like a healing shiv.",
     "First there was darkness. Then came the Strangers.",
-    "There's nothing cooler than casually walking away after blowing something up.",
+    "There&rsquo;s nothing cooler than casually walking away after blowing something up.",
     "<i>Johnny, what can you make outta this?</i><br><i>This? Why, I could make a hat, or a broach, pterodactyl&hellip;</i>",
     "Landshark!",
     "When will then be now? Soon.",
     "Unless someone like you cares a whole awful lot, nothing is going to get better.<br />- Dr. Seuss",
-    "It's only when we've lost everything, that we are free to do anything.",
-    "We&rsquo;re gonna need a bigger boat."
+    "It&rsquo;s only when we&rsquo;ve lost everything, that we are free to do anything.",
+    "We&rsquo;re gonna need a bigger boat.",
+    "The skies are marked with numberless sparks, each a fire, and every one a sign.",
+    "Perhaps the Gods have placed you here so that we may meet.",
+    "With such hope, and with the promise of your aid, my heart must be satisfied.",
+    "Men are but flesh and blood. They know their doom, but not the hour.",
+    "Stand true, my friend. May your heart be your guide and the gods grant you strength.",
+    "Remember me, and remember my words. This burden is now yours alone. You hold our future in your hands.",
+    "This can only lead to your death. My guardians are sworn to protect me.",
+    "Your destiny calls you down a different road."
 ];
 
 
@@ -365,6 +373,14 @@ export function randomNumber(min = 0, max = 1, places = 0):number{
 }
 
 
+
+interface BCDComponent extends Function {
+    asString:string;
+    cssClass:string;
+}
+
+// This is a const, but it is manipulated via Push/Pop.
+const bcdComponents:BCDComponent[] = [];
 
 class bcd_collapsableParent {
     // For children to set
@@ -440,7 +456,6 @@ class bcd_collapsableParent {
     }
 }
 
-
 export class BellCubicDetails extends bcd_collapsableParent {
     static cssClass = "bcd-details";
     static asString = "BellCubicDetails";
@@ -462,13 +477,13 @@ export class BellCubicDetails extends bcd_collapsableParent {
         //console.log(this.details_inner);
 
         // The `children` HTMLCollection is live, so we're fetching each element and throwing it into an array...
-        var temp_childrenArr = [];
-        for (const elm of this.details.children){
-            temp_childrenArr.push(elm);
+        var temp_childrenArr:ChildNode[] = [];
+        for (const node of this.details.childNodes){
+            temp_childrenArr.push(node);
         }
         // ...and actually moving the elements into the new div here.
-        for (const elm of temp_childrenArr){
-            this.details_inner.appendChild(elm);
+        for (const node of temp_childrenArr){
+            this.details_inner.appendChild(node);
         }
 
         this.details.appendChild(this.details_inner);
@@ -494,6 +509,7 @@ export class BellCubicDetails extends bcd_collapsableParent {
         });
     }
 }
+bcdComponents.push(BellCubicDetails);
 
 export class BellCubicSummary extends bcd_collapsableParent {
     static cssClass = 'bcd-summary';
@@ -544,45 +560,55 @@ export class BellCubicSummary extends bcd_collapsableParent {
         this.toggle();
     }
 }
+bcdComponents.push(BellCubicSummary);
+
+export class bcd_prettyJSON {
+    static cssClass = 'bcd-prettyJSON';
+    static asString = 'bcd_prettyJSON';
+    element_:HTMLElement;
+    constructor(element:HTMLElement) {
+        this.element_ = element;
+
+        const raw_json = element.innerText;
+        const json = JSON.parse(raw_json);
+        console.log("Registered new Pretty JSON element:", element, json);
+
+        this.element_.innerText = JSON.stringify(json, null, 2);
+
+        this.element_.classList.add('initialized');
+    }
+}
+bcdComponents.push(bcd_prettyJSON);
+
+function registerBCDComponent(component:BCDComponent):void {
+    try{
+        componentHandler.register({
+            constructor: component,
+            classAsString: component.asString,
+            cssClass: component.cssClass,
+            widget: false
+        });
+    }catch(e:unknown){
+        console.log("[BCD-Components] Error registering component", component.asString, "with class", component.cssClass, ":\n", e);
+    }
+}
 
 
 function registerComponents():void{
-    //console.log('[BCD-Components] Queuing component registration...');
-
-    if (typeof componentHandler === 'undefined') {
-        setTimeout(registerComponents, 10);
-        console.debug('[BCD-Components] Waiting for componentHandler...');
-        return;
-    }
-
-    //console.log("[BCD-Components] Registering components...");
+    console.log("[BCD-Components] Registering components...");
 
     // Tell mdl about our shiny new components
 
-    try{componentHandler.register({
-        constructor: BellCubicDetails,
-        classAsString: 'BellCubicDetails',
-        cssClass: BellCubicDetails.cssClass,
-        widget: false
-    });}catch(e:unknown){registerComponentsError(e, BellCubicDetails);}
-    try{componentHandler.register({
-        constructor: BellCubicSummary,
-        classAsString: 'BellCubicSummary',
-        cssClass: BellCubicSummary.cssClass,
-        widget: false
-    });}catch(e:unknown){registerComponentsError(e, BellCubicSummary);}
+    const elementsToUpgrade:Element[] = [];
+    for (const component of bcdComponents) {
+        registerBCDComponent(component);
+        elementsToUpgrade.push(...document.getElementsByClassName(component.cssClass));
+    }
+    console.debug("[BCD-Components] Registered components:", bcdComponents, elementsToUpgrade);
     // Upgrade the elements with the classes we just registered components for
-
-    componentHandler.upgradeElements([
-        ...document.getElementsByClassName(BellCubicDetails.cssClass),
-        ...document.getElementsByClassName(BellCubicSummary.cssClass),
-    ]);
+    componentHandler.upgradeElements(elementsToUpgrade);
 
     //console.log("[BCD-Components] Components registered.");
-}
-
-function registerComponentsError(e:unknown/*Actually Error, but don't worry about it*/, component:Function):void{
-    console.log("[BCD-Components] Error registering component", component, ": ", e);
 }
 
 

@@ -146,7 +146,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 <!-- Metadata -->
 <div class="bcd-summary" for="details_builder_meta" id="details_builder_meta_summary"><i class="material-icons open-icon-90CC">expand_more</i>
     <h2 id="fomod_ModName">Metadata</h2>
-</div><div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_builder_meta_summary"><p>
+</div><div class="mdl-tooltip mdl-tooltip--bottom small01" for="details_builder_meta_summary"><p>
         Metadata for the mod, stored in the <code>Info.xml</code> file of the FOMOD (along with certain data in <code>ModuleConfig.xml</code>)
         <br /><br /><hr /><br />
         <h3>Used By</h3><ul class="mod-manager-list">
@@ -160,11 +160,11 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     </p></div>
 <div class="bcd-details" id="details_builder_meta">
     <form autocomplete="off" style="display:flex;flex-direction:row;flex-wrap:wrap;gap:32px;padding:32px;" name="Metadata">
-        <div id="fomod_info_name_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+        <div id="fomod_info_name_cont" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
             <input id="fomod_info_name" class="mdl-textfield__input" type="text" placeholder="Mod Name">
             <label class="mdl-textfield__label" for="fomod_info_name">Mod Name</label>
         </div>
-        <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_name_cont"><p>
+        <div class="mdl-tooltip mdl-tooltip--bottom small01" for="fomod_info_name_cont"><p>
             The name of the mod. This name is displayed at the top of the installer window.<br />
             Mod Organizer 2 also uses this data to update whatever mod name it pulls from its metadata guessing.
             <br /><br /><hr /><br />
@@ -180,11 +180,11 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 
         <!-- MO2 Metadata -->
 
-        <div id="fomod_info_author_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+        <div id="fomod_info_author_cont" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
             <input id="fomod_info_author" class="mdl-textfield__input" type="text" placeholder="AuthorMc4uthorPants123">
             <label class="mdl-textfield__label" for="fomod_info_author">Author</label>
         </div>
-        <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_author_cont"><p>
+        <div class="mdl-tooltip mdl-tooltip--bottom small01" for="fomod_info_author_cont"><p>
             Author of the mod. Displayed alongside other metadata in the installer window.
             <br /><br /><hr /><br />
             <h3>Used By</h3><ul class="mod-manager-list">
@@ -202,7 +202,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 <input id="fomod_info_version_full" class="mdl-textfield__input" style="pointer-events: all" type="text" placeholder="1.0.0">
                 <label class="mdl-textfield__label" for="fomod_info_version_full" style="pointer-events: all">Version</label>
             </div>
-            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_version_cont"><p>
+            <div class="mdl-tooltip mdl-tooltip--bottom small01" for="fomod_info_version_cont"><p>
                 Version of the mod. Displayed alongside other metadata in the installer window.
                 <br /><br /><hr /><br />
                 <h3>Used By</h3><ul class="mod-manager-list">
@@ -214,7 +214,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 
             <!-- Version Number - SemVer -->
             <div id="fomod_info_version_semver_cont" class="mdl-textfield--floating-label" style="display:inline-flex;flex-direction:row;flex-wrap:nowrap;align-items:flex-end;width:120px;justify-content:space-evenly;" tabindex="-1">
-                <div style="width:32px;" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label">
+                <div style="width:32px;" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                     <!-- SemVer Major -->
                     <input id="fomod_info_version_major" class="mdl-textfield__input" style="text-align:center" type="number" placeholder="1" >
                     <label class="mdl-textfield__label" for="fomod_info_version_major">Major</label>
@@ -263,17 +263,17 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 <input type="checkbox" id="fomod_config_toggleUseCustomVers" class="mdl-switch__input">
                 <span class="mdl-switch__label">Custom</span>
             </label>
-            <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_config_toggleUseCustomVers_cont"><p>
+            <div class="mdl-tooltip mdl-tooltip--bottom small01" for="fomod_config_toggleUseCustomVers_cont"><p>
                 Enable custom version input?
                 This allows you to enter versions that aren't SemVer compliant OR include suffixes, such as in <code>1.0.0-DEV</code>.
             </p></div>
         </div>
 
-        <div id="fomod_info_ID_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+        <div id="fomod_info_ID_cont" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
             <input id="fomod_info_ID" class="mdl-textfield__input" type="number" placeholder="1234567890">
             <label class="mdl-textfield__label" for="fomod_info_ID">Identification Number (ID)</label>
         </div>
-        <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_ID_cont"><p>
+        <div class="mdl-tooltip mdl-tooltip--bottom small01" for="fomod_info_ID_cont"><p>
             <s>ID number of the mod. Used by MO2 to pull Nexus Mods information.</s><br />
             The ID appears to be unused after reading, however it <i>does</i> share a variable name with the Nexus ID.
             MO2 runs the value through <code>toInt()</code>, I've therefore limited the input of this field to an integer.
@@ -285,12 +285,12 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
             </ul>
         </p></div>
 
-        <div id="fomod_info_website_cont" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+        <div id="fomod_info_website_cont" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
             <!-- Pattern regex adapted from https://stackoverflow.com/a/30910/13076790 (changes: fix escaping) -->
             <input id="fomod_info_website" class="mdl-textfield__input" type="url" pattern="^([a-z0-9+.-]+):(?:\/\/(?:((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*)@)?((?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*)(?::(\d*))?(\/(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?|(\/?(?:[a-z0-9-._~!$&'()*+,;=:@]|%[0-9A-F]{2})+(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?)(?:\?((?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*))?(?:#((?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*))?$" placeholder="https://example.com/">
             <label class="mdl-textfield__label" for="fomod_info_website">Website</label>
         </div>
-        <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="fomod_info_website_cont"><p>
+        <div class="mdl-tooltip mdl-tooltip--bottom small01" for="fomod_info_website_cont"><p>
             Website URL for the mod. Typically either the mod's main download page or an author-hosted webpage, such as a documentation page with links to the download page(s).
             MO2 displays the text "Link" as a hyperlink to the URL specified.
             <br /><br /><hr /><br />
@@ -355,7 +355,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                 <!-- Option Editor -->
                 <div class="bcd-summary adjacent"><i class="material-icons open-icon-90CC">expand_more</i>
                     <h3 id="details_options_step_summary_01">Options</h3>
-                    <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_options_step_summary_01"><p>
+                    <div class="mdl-tooltip mdl-tooltip--bottom small01" for="details_options_step_summary_01"><p>
                         Options are the checkboxes and radio buttons you actually interact with in the installer window. They can set flags, install files directly, and even completely disable themselves based on various conditions.
                     </p></div>
                 </div>
@@ -381,11 +381,11 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
                                     <li pos="2" class="mdl-menu__item">CouldBeUsable</li> <!-- (Supposedly useless) -->
                                 </ul>
                             </div>
-                            <div id="fomod_option_name_cont_01" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+                            <div id="fomod_option_name_cont_01" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
                                 <input id="fomod_option_name_01" class="mdl-textfield__input" type="text" placeholder="Option Name">
                                 <label class="mdl-textfield__label" for="fomod_option_name_01">Option Name</label>
                             </div>
-                            <div id="fomod_option_desc_cont_01" class="mdl-textfield mdl-js-textfield wide04 mdl-textfield--floating-label" tabindex="-1">
+                            <div id="fomod_option_desc_cont_01" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
                                 <input id="fomod_option_desc_01" class="mdl-textfield__input" type="text" placeholder="Option Description">
                                 <label class="mdl-textfield__label" for="fomod_option_desc_01">Option Description</label>
                             </div>
@@ -403,7 +403,7 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
     <!-- Step Dependencies Editor -->
     <div class="bcd-summary adjacent min-padding"><i class="material-icons open-icon-90CC">expand_more</i>
         <h3 id="details_dependencies_step_summary_01">Visibility Conditions</h3>
-        <div class="mdl-tooltip mdl-tooltip--bottom wide03 small01" for="details_dependencies_step_summary_01"><p>
+        <div class="mdl-tooltip mdl-tooltip--bottom small01" for="details_dependencies_step_summary_01"><p>
             Conditions that determine whether or not the step should be shown to the user.
         </p></div>
     </div>
