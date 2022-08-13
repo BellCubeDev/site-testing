@@ -1,3 +1,4 @@
+import { request } from 'http';
 import {componentHandler} from './assets/site/mdl/material.js';
 console.log("%cHello and welcome to the JavaScript console! This is where wizards do their magic!\nAs for me? I'm the wizard you don't want to anger.", "color: #2d6");
 
@@ -18,9 +19,11 @@ export class bcdStr extends String {
     );}
 }
 
+type objOf<T> = {[key:string]: T};
+
 declare global {interface Window {
     dataLayer: [];
-    bcd_init_functions: {[key:string]: Function};
+    bcd_init_functions: objOf<Function>;
 }}
 
 
@@ -54,12 +57,8 @@ function enableAnalytics():void{
     * A random text generator
 */
 interface componentTrackingItem {
-    obj:{[index:string]:unknown},
+    obj:objOf<unknown>,
     arr:unknown[]
-}
-
-interface registered_components {
-    [index:string]:componentTrackingItem
 }
 
 
@@ -73,7 +72,7 @@ interface trackableConstructor<TConstructor> extends Function {
 
 /** Wrapped in a class to get around the complexities of exporting. */
 export class bcd_ComponentTracker {
-    static registered_components:registered_components = {};
+    static registered_components:objOf<componentTrackingItem> = {};
 
 
     static registerComponent<TConstructor>(component:TConstructor, constructor: trackableConstructor<TConstructor>, element:HTMLElement):void{
@@ -418,30 +417,46 @@ class bcd_collapsableParent {
     }
 
     /** Re-evaluate the collapsable's current state. */
-    reEval(doSetDuration:boolean = true) {//this.debugCheck();
-        // All the SetTimeout does here is diver processing to the next processing cycle. This prevents some of the layout shift oddities I've observed.
-        setTimeout(() => {
-            if (this.isOpen()) { this.open(doSetDuration); } else { this.close(doSetDuration); }
+    reEval(doSetDuration?:false):void
+    reEval(doSetDuration?:true, instant?:true):void
+    reEval(doSetDuration:boolean = true, instant?:true):void {
+                requestAnimationFrame(() => {
+            if (this.isOpen()) { this.open(doSetDuration, instant); } else { this.close(doSetDuration, instant); }
         });
     }
 
     /** Open the collapsable menu. */
-    open(doSetDuration:boolean = true) {//this.debugCheck();
-        this.evaluateDuration(doSetDuration);
+    open(doSetDuration:boolean = true, instant = false) {//this.debugCheck();
+        if (!instant) this.evaluateDuration(doSetDuration);
 
+        if (instant) this.evaluateDuration(doSetDuration);
         this.details_inner.style.marginTop = `0px`;
+        if (instant) this.evaluateDuration(doSetDuration);
+
         this.details.classList.add(bcd_const_classIsOpen);
         this.summary.classList.add(bcd_const_classIsOpen);
     }
 
     /** Close the collapsable menu. */
-    close(doSetDuration:boolean = true) {//this.debugCheck();
-        /*console.log("Setting margin-top to -" + this.details_inner.offsetHeight + "px", this.details_inner)*/
-        this.evaluateDuration(doSetDuration);
+    close(doSetDuration:boolean = true, instant = false) {//this.debugCheck();
+        if (!instant) this.evaluateDuration(doSetDuration);
 
+        if (instant) this.instantTransition();
         this.details_inner.style.marginTop = `-${this.details_inner.offsetHeight * 1.04}px`;
+        if (instant) this.evaluateDuration(true);
+
         this.details.classList.remove(bcd_const_classIsOpen);
         this.summary.classList.remove(bcd_const_classIsOpen);
+    }
+
+    instantTransition():void {
+        if (this.details_inner) {
+            this.details_inner.style.transitionDuration = `0s`;
+            this.details_inner.style.animationDuration = `$0s`;
+            for (const icon of this.openIcons90deg) {
+                (icon as HTMLElement).style.animationDuration = `0s`;
+            }
+        }
     }
 
     /* Determines what the transition and animation duration of the collapsable menu is */
@@ -501,15 +516,33 @@ export class BellCubicDetails extends bcd_collapsableParent {
         }
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
         //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.details_inner)});
-        setTimeout(() => {
+
+        new ResizeObserver(this.reEvalOnSizeChange.bind(this)).observe(this.details_inner);
+
+        requestAnimationFrame(() => {
             bcd_ComponentTracker.registerComponent(this, BellCubicDetails, this.details);
-            this.reEval(false);
             this.reEval();
             this.self.classList.add('initialized');
         });
     }
+
+    reEvalOnSizeChange(event: Event|unknown) {
+        console.warn('Observe event!');
+        // @ts-ignore: TypeScript doesn't seem to be able to parse this IF statement properly because of the `unknown` type.
+        if (event && event.propertyName && event.propertyName === 'margin-top') return;
+        this.reEval(true, true);
+    }
 }
 bcdComponents.push(BellCubicDetails);
+
+
+const queryParamsArr = window.location.search.substring(1).split('&').map(param => param.split('='));
+const queryParams: objOf<string> = {};
+
+for (const param of queryParamsArr) {
+    queryParams[param[0]] = param[1];
+}
+
 
 export class BellCubicSummary extends bcd_collapsableParent {
     static cssClass = 'bcd-summary';
@@ -538,14 +571,13 @@ export class BellCubicSummary extends bcd_collapsableParent {
         this.divertedCompletion();
     }
 
-    divertedCompletion(){setTimeout(()=>{
+    divertedCompletion(){requestAnimationFrame(()=>{
 
         const temp_inner = this.details.querySelector(`.${bcd_const_classDetailsInner}`);
         if (!temp_inner) {this.divertedCompletion(); return;}
             else this.details_inner = temp_inner as HTMLElement;
 
         bcd_ComponentTracker.registerComponent(this, BellCubicSummary, this.details);
-        this.reEval(false);
         this.reEval();
         this.self.classList.add('initialized');
     });}

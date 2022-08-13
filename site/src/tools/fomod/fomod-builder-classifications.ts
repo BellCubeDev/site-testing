@@ -591,7 +591,28 @@ export class bcd_builder_FOMOD extends bcd_builder_XMLElement {
     meta_author;
     meta_version;
     meta_id: number;
-    meta_url;
+
+    meta_url:URL|string = ''; // Is actually set during the constructor, however TS is too static to understand that.
+
+    setURL(url:URL|string, doWarn:boolean=true):void{
+        if (url instanceof URL) this.meta_url = url;
+        else {
+            try {
+                this.meta_url = new URL(url);
+            } catch (e) {
+                this.meta_url = url;
+
+                if(doWarn) null; // TODO: Warn about invalid URL
+            }
+        }
+    }
+
+    getURLAsString():string{
+        return this.meta_url instanceof URL ?
+                                              this.meta_url.toString()
+                                            : this.meta_url;
+    }
+
 
     installs: bcd_builder_FOMOD_install[];
 
@@ -616,7 +637,7 @@ export class bcd_builder_FOMOD extends bcd_builder_XMLElement {
         this.meta_author = meta_author;
         this.meta_version = meta_version;
         this.meta_id = meta_id;
-        this.meta_url = meta_url;
+        this.setURL(meta_url);
         this.installs = installs;
         this.conditions = conditions;
         this.steps = steps;
@@ -631,7 +652,7 @@ export class bcd_builder_FOMOD extends bcd_builder_XMLElement {
         this.instanceElement.setAttribute("author", this.meta_author);
         this.instanceElement.setAttribute("version", this.meta_version);
         this.instanceElement.setAttribute("id", this.meta_id.toString());
-        this.instanceElement.setAttribute("url", this.meta_url);
+        this.instanceElement.setAttribute("url", this.getURLAsString());
 
         for (const install of this.installs) {
             this.instanceElement.appendChild(install.asModuleXML(document));

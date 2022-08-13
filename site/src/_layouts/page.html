@@ -81,10 +81,10 @@ layout: compress_html
                         <span>Sitemap</span>
                     </a>
 
-                    <button class="bcd-summary is-open" type="button" for="details_nav_tools">
+                    <button class="bcd-summary adjacent is-open" type="button">
                         <i class="material-icons open-icon-90CC">expand_more</i><h3>Tools</h3>
                     </button>
-                    <div class="bcd-details is-open" id="details_nav_tools">
+                    <div class="bcd-details adjacent is-open">
                         <a class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}{% link tools/fomod/fomod-builder.html %}">
                             <i class="material-icons">build_circle</i>
                             <span>FOMOD Builder</span>
@@ -96,29 +96,20 @@ layout: compress_html
                     </div>
 
                     <!-- Currently testing to see which of these two is broken OR if nesting is perfectly balanced with no exploits-->
-                    <button class="bcd-summary" type="button" for="details_nav_docs">
+                    <button class="bcd-summary adjacent" type="button">
                         <i class="material-icons open-icon-90CC">expand_more</i><h3>Documentation</h3>
                     </button>
-                    <div class="bcd-details contPad01-left" id="details_nav_docs">
-                        <button class="bcd-summary noTopPad" type="button" for="details_nav_docs_lsp">
-                            <i class="material-icons open-icon-90CC">expand_more</i>
-                            <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link documentation/linear-spell-progression/linear-spell-progression.html %}"><div class="center-vert">
-                                <i class="material-icons" style="padding-left: 0px;">book</i>
-                                <span>Linear Spell<br />Progression</span>
-                            </div></a>
-                        </button>
-                        <div class="bcd-details contPad04-left" id="details_nav_docs_lsp">
-                            <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link documentation/linear-spell-progression/creating-a-plugin.html %}"><div class="center-vert">
-                                <i class="material-icons" style="padding-left:24px">build</i>
-                                <span>Creating a<br />Plugin</span>
-                            </div></a>
-                        </div>
+                    <div class="bcd-details adjacent contPad01-left">
+                        <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link documentation/linear-spell-progression/linear-spell-progression.html %}"><div class="center-vert">
+                            <i class="material-icons" style="padding-left: 0px;">book</i>
+                            <span>Linear Spell<br />Progression</span>
+                        </div></a>
                     </div>
 
                     <h2>Other Places</h2>
                     <a class="mdl-navigation__link icon--nexus mdl-navigation__link--icon" target="_blank" rel="noopener noreferrer"
                         href="https://www.nexusmods.com/skyrimspecialedition/users/98340728?tab=user+files">
-                        <svg id="vector" xmlns="http://www.w3.org/2000/svg" class="material-icons" version="1.1" viewBox="0 0 162.5 162.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="material-icons" version="1.1" viewBox="0 0 162.5 162.5">
                             <!--
                                 THIS VECTOR GRAPHIC IS THE INTELLECTUAL PROPERTY OF BLACK TREE GAMING LIMITED.
                                 THIS IS NOT CREATED OR OWNED BY BELLCUBE.

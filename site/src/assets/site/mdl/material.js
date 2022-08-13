@@ -2887,17 +2887,17 @@ export class MaterialTooltip {
         // Modification by BellCube to adjust for the navigation drawer
         if (window.innerWidth > 1024) {
             if (left + marginLeft < 256) {
-                console.log('Using desktop layout. Adjusting tooltip position.');
+                //console.log('Using desktop layout. Adjusting tooltip position.');
                 marginLeft += Math.abs(256 - (left + marginLeft));
             } else {
-                console.log('Using desktop layout. Not adjusting tooltip position.');
+                //console.log('Using desktop layout. Not adjusting tooltip position.');
             }
         } else {
             if (left + marginLeft < 16) {
-                console.log('Using mobile layout. Adjusting tooltip position.');
+                //console.log('Using mobile layout. Adjusting tooltip position.');
                 marginLeft += Math.abs(16 - (left + marginLeft));
             } else {
-                console.log('Using mobile layout. Not adjusting tooltip position.');
+                //console.log('Using mobile layout. Not adjusting tooltip position.');
             }
         }
 
@@ -3081,6 +3081,7 @@ export class MaterialLayout {
        * @private
        */
     drawerToggleHandler_(evt) {
+        /*
         if (evt && evt.type === 'keydown') {
             if (evt.keyCode === this.Keycodes_.SPACE || evt.keyCode === this.Keycodes_.ENTER) {
                 // prevent scrolling in drawer nav
@@ -3090,6 +3091,7 @@ export class MaterialLayout {
                 return;
             }
         }
+        */
         this.toggleDrawer();
     }
     /**
@@ -3233,6 +3235,14 @@ export class MaterialLayout {
                     drawerButtonIcon.classList.add(this.CssClasses_.ICON);
                     drawerButtonIcon.innerHTML = this.Constant_.MENU_ICON;
                     drawerButton.appendChild(drawerButtonIcon);
+                }
+                const titleElement = this.element_.querySelector('.mdl-layout-title');
+                console.debug('titleElement', titleElement);
+                if (titleElement) {
+                    titleElement.setAttribute('role', 'button');
+                    titleElement.setAttribute('tabindex', '-1');
+                    titleElement.addEventListener('click', this.drawerToggleHandler_.bind(this));
+                    titleElement.addEventListener('keydown', this.drawerToggleHandler_.bind(this));
                 }
                 if (this.drawer_.classList.contains(this.CssClasses_.ON_LARGE_SCREEN)) {
                     //If drawer has ON_LARGE_SCREEN class then add it to the drawer toggle button as well.

@@ -96,7 +96,7 @@ p {
 }
 
 .mdl-layout__content {
-    padding: 16px;
+    /*padding: 16px;*/
     padding-bottom: 128px;
     background: #1b1b1b;
     height: max-content;
@@ -112,6 +112,7 @@ footer.mdl-layout__content {
     align-items: center;
     height: min-content;
     padding: 12px;
+    padding-left: 312px;
     overflow: visible;
 }
 
@@ -364,10 +365,12 @@ a {
 .bcd-details > .bcd-details-inner {
     visibility: hidden;
 
-    transition-property: margin-top;
+    transition-property: height, margin-top;
     transition-timing-function: ease-in-out;
 
     margin-top: -100%;
+
+    height: calc(100% * 1px);
 
     animation-name: hideDelay;
     animation-timing-function: steps(1, end);
