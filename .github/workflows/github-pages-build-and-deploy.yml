@@ -125,13 +125,19 @@ jobs:
 #          mv -n $GITHUB_WORKSPACE/_generated/_jekyll-out/* $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
 
 
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
-        with: # Built-Pages
-          name: github-pages
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
 #          path: $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
           path: ${{ github.workspace }}/_generated/_jekyll-out/
+
+
+#      - name: Upload Artifact
+#        uses: actions/upload-artifact@v3
+#        with: # Built-Pages
+#          name: github-pages
+##          path: $GITHUB_WORKSPACE/_generated/_minify-HTML-out/
+#          path: ${{ github.workspace }}/_generated/_jekyll-out/
 
 
 
