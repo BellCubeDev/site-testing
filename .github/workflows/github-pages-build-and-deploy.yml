@@ -170,7 +170,7 @@ jobs:
 
     steps:
       - name: Download Artifact
-        uses: actions/download-artifact@v3
+        uses: alehechka/download-tartifact@v1
         with:
           name: github-pages
           path: artifacts/github-pages
