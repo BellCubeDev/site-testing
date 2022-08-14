@@ -144,7 +144,7 @@ jobs:
       id-token: write
 
     environment:
-      name: github-pages
+      name: GitHub Pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
@@ -165,7 +165,7 @@ jobs:
       pages: write
 
     environment:
-      name: github-pages-deploy-to-visibility-branch
+      name: Visibility Branch
       url: https://github.com/${{ github.repository }}/tree/deployment
 
     steps:
