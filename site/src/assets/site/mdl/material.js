@@ -3103,7 +3103,7 @@ export class MaterialLayout {
        * @private
        */
     drawerToggleHandler_(evt) {
-        /*
+
         if (evt && evt.type === 'keydown') {
             if (evt.keyCode === this.Keycodes_.SPACE || evt.keyCode === this.Keycodes_.ENTER) {
                 // prevent scrolling in drawer nav
@@ -3113,7 +3113,7 @@ export class MaterialLayout {
                 return;
             }
         }
-        */
+
         this.toggleDrawer();
     }
     /**
@@ -3167,10 +3167,19 @@ export class MaterialLayout {
         // Set accessibility properties.
         if (this.drawer_.classList.contains(this.cssClasses_.IS_DRAWER_OPEN)) {
             this.drawer_.setAttribute('aria-hidden', 'false');
+            this.drawer_.removeAttribute('tabindex');
             drawerButton.setAttribute('aria-expanded', 'true');
+            const elemToFocusNextSibling = this.drawer_.querySelector('.mdl-navigation__link')
+            if (elemToFocusNextSibling && elemToFocusNextSibling.previousSibling && elemToFocusNextSibling.previousElementSibling.focus){
+                elemToFocusNextSibling.previousElementSibling.setAttribute('tabindex', '0');
+                elemToFocusNextSibling.previousElementSibling.focus({preventScroll:true});
+                requestAnimationFrame(() => {requestAnimationFrame(() => {elemToFocusNextSibling.previousElementSibling.removeAttribute('tabindex');})});
+            } else console.error("Ruh roh! No focusable elements in the drawer!", elemToFocusNextSibling, elemToFocusNextSibling.previousElementSibling);
         } else {
             this.drawer_.setAttribute('aria-hidden', 'true');
+            this.drawer_.setAttribute('tabindex', '-256');
             drawerButton.setAttribute('aria-expanded', 'false');
+            drawerButton.focus({preventScroll:true});
         }
     }
     /**
@@ -3291,8 +3300,9 @@ export class MaterialLayout {
                 this.element_.appendChild(obfuscator);
                 obfuscator.addEventListener('click', this.drawerToggleHandler_.bind(this));
                 this.obfuscator_ = obfuscator;
-                this.drawer_.addEventListener('keydown', this.keyboardEventHandler_.bind(this));
+                document.addEventListener('keydown', this.keyboardEventHandler_.bind(this));
                 this.drawer_.setAttribute('aria-hidden', 'true');
+                this.drawer_.setAttribute('tabindex', '-256');
             }
             // Keep an eye on screen size, and add/remove auxiliary class for styling
             // of small screens.

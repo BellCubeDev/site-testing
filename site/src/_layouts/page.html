@@ -3,7 +3,7 @@ layout: compress_html
 ---
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head><meta charset='utf-8' /><meta name="charset" content="utf-8" />
 
     <title>BellCube: {{ page.title }}</title>
     <meta property="og:title" content="{{ page.title }}">
@@ -23,7 +23,6 @@ layout: compress_html
     <meta property="og:image:height" content="2048" />
     <meta property="og:image:alt" content="Cubic Bell" />
 
-    <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{{page.description}}" />
@@ -32,7 +31,6 @@ layout: compress_html
     <meta name="author" content="{{ site.author.name }}" /><meta name="creator" content="{{ site.author.name }}" /><meta name="publisher" content="{{ site.author.name }}" />
     <meta name="generator" content="jekyll" />
     <meta name="theme-color" content="#1b1b1b" /><meta name="color-scheme" content="dark" />
-    <meta name="charset" content="utf-8" />
 
     <!-- Script Configuration -->
     <!-- the setTimeout was taken from https://stackoverflow.com/a/38296629/13076790 -->
@@ -69,6 +67,7 @@ layout: compress_html
                 word-wrap: normal;
                 direction: ltr;
                 -webkit-font-smoothing: antialiased;
+                -webkit-user-select: none;
                 user-select: none;
             }
 
@@ -615,7 +614,7 @@ layout: compress_html
 </head>
 <body class="preload">
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
-        <div class="mdl-layout__drawer">
+        <div class="mdl-layout__drawer" tabindex="-256">
             <span class="mdl-layout-title">
                 <picture>
                     <source srcset="{{ site.baseurl }}{% link assets/site/images/icon.avif %}" type="image/avif" />

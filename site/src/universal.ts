@@ -103,6 +103,21 @@ export function randomNumber(min = 0, max = 1, places = 0):number{
 }
 
 
+function focusAnyElement(element:HTMLElement|undefined, preventScrolling: boolean = false):void{
+    if (!element || !element.focus) return;
+
+    const hadTabIndex = element.hasAttribute('tabindex');
+    if (!hadTabIndex) element.setAttribute('tabindex', '0');
+
+    element.focus({preventScroll: preventScrolling});
+
+    // Wrap inside two requestAnimationFrame calls to ensure the browser could focus the element before removing the tabindex attribute.
+    requestAnimationFrame(() => {requestAnimationFrame(() => {
+        if (!hadTabIndex) element.removeAttribute('tabindex');
+    });});
+}
+
+
 
 interface BCDComponent extends Function {
     asString:string;
@@ -206,6 +221,13 @@ class bcd_collapsableParent {
     }
 }
 
+enum keycodes {
+    enter = 13,
+    escape = 27,
+    space = 32,
+    tab = 9,
+}
+
 export class BellCubicDetails extends bcd_collapsableParent {
     static cssClass = "bcd-details";
     static asString = "BellCubicDetails";
@@ -283,8 +305,9 @@ export class BellCubicSummary extends bcd_collapsableParent {
 
     constructor(element:HTMLElement) {
         super(element);
-        this.summary = element; // @ts-expect-error: No overload matches this call.
+        this.summary = element;
         this.summary.addEventListener('click', this.handleClick.bind(this));
+        this.summary.addEventListener('keypress', this.handleKey.bind(this));
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
 
         /*console.log("[BCD-SUMMARY] Registering  component: ", this)*/
@@ -315,14 +338,24 @@ export class BellCubicSummary extends bcd_collapsableParent {
         this.self.classList.add('initialized');
     });}
 
-    /**
-        @param {PointerEvent} event
-    */
-    handleClick(event:PointerEvent){
+    handleClick(event:MouseEvent){
         //console.log(event, event.target.tagName);
-        // @ts-expect-error: Property 'path' does not exist on type 'PointerEvent'
-        if (event.path.slice(0, 5).map((el:HTMLElement) => el.tagName === 'A').includes(true)) return;
+
+        console.log(event);
+
+        // @ts-expect-error: Property 'path' DOES exist on type 'PointerEvent', at least according to the browser.
+        if (!event.pointerType || event.path.slice(0, 5).map((el:HTMLElement) => el.tagName === 'A').includes(true)) return;
         this.toggle();
+        focusAnyElement(this.details_inner);
+    }
+
+    handleKey(event:KeyboardEvent){
+        if (event.key === ' ' || event.key === 'Enter') requestAnimationFrame(() =>{
+            this.toggle();
+
+            if (!this.isOpen()) focusAnyElement(this.summary as HTMLElement);
+                else focusAnyElement(this.details_inner.firstElementChild as HTMLElement);
+        });
     }
 }
 bcdComponents.push(BellCubicSummary);

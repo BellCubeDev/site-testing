@@ -1,6 +1,12 @@
 ---
 ---
 
+[aria-hidden="true"], [aria-hidden="true"] * {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    pointer-events: none !important;
+}
+
 img {
     max-width: 100%;
 }
@@ -91,7 +97,7 @@ p {
     line-height: 0;
 }
 
-.GitHub-Stats-Card:hover, .GitHub-Stats-Card:focus {
+.GitHub-Stats-Card:is(:hover, :-ms-keyboard-active, :focus, :active) {
     background-color: #345a;
 }
 
@@ -287,6 +293,22 @@ a {
     align-content: center;
     justify-content: flex-start;
     align-items: center;
+
+    outline: none;
+}
+
+.bcd-summary :not(.material-icons) {
+    transition-duration: 100ms;
+    transition-timing-function: ease-in-out;
+    transition-property: text-shadow, text-decoration0color;
+
+    text-shadow: #fff0 0px 0px 1px;
+    text-decoration: underline #fff0 7.5%;
+}
+
+.bcd-summary:is(:hover, :-ms-keyboard-active, :focus, :active) :not(.material-icons) {
+    text-decoration-color: #fff;
+    text-shadow: #000b 2px 2px 5px;
 }
 
 .bcd-summary.min-padding {
@@ -553,13 +575,13 @@ body.preload * {
     .nexus-SVG-primary{
         fill: #222;
     }
-    .icon--nexus:is(:hover, :focus) .nexus-SVG-primary {
+    .icon--nexus:is(:hover, :-ms-keyboard-active, :focus, :active) .nexus-SVG-primary {
         fill: #da8e35;
     }
     .nexus-SVG-secondary{
         fill: #000;
     }
-    .icon--nexus:is(:hover, :focus) .nexus-SVG-secondary {
+    .icon--nexus:is(:hover, :-ms-keyboard-active, :focus, :active) .nexus-SVG-secondary {
         fill: #b4762c;
     }
 
@@ -579,9 +601,10 @@ body.preload * {
         margin: 0;
         white-space: nowrap;
         width: 100%;
+        outline: none;
     }
 
-    .mdl-layout__drawer .mdl-navigation .mdl-navigation__link:hover, .mdl-navigation__link:hover {
+    .mdl-layout__drawer .mdl-navigation .mdl-navigation__link:is(:hover, :-ms-keyboard-active, :focus, :active), .mdl-navigation__link:is(:hover, :-ms-keyboard-active, :focus, :active) {
         background-color: #ffffff40;
     }
 
