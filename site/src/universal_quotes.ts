@@ -259,7 +259,9 @@ export const possibilities_Generic = [
     "Remember me, and remember my words. This burden is now yours alone. You hold our future in your hands.",
     "This can only lead to your death. My guardians are sworn to protect me.",
     "Your destiny calls you down a different road.",
-    "What if fish had legs?" // - doodlez
+    "What if fish had legs?", // - doodlez
+    "Better to poop in the shower than to shower in the poop.", // - mxinformation
+    "What&rsquo;s the deal with airline food?", // - mxinformation
 ];
 
 
