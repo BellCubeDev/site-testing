@@ -56,6 +56,23 @@ layout: compress_html
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
     -->
     {{ page.extra_head }}
+
+
+    <!--
+        TEMP GOOGLE ANALYTICS CODE
+
+    -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-5YE7EYGLGT"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-5YE7EYGLGT');
+    </script>
+    <!--
+
+    -->
 </head>
 <body class="preload">
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
@@ -145,14 +162,10 @@ layout: compress_html
                 <a href="{{ site.repourl }}/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">GNU&nbsp;General&nbsp;Public&nbsp;License v3.0</a>.
                 <a href="{{ site.repourl }}/" target="_blank" rel="noopener noreferrer">Source&nbsp;available&nbsp;on&nbsp;GitHub</a>
             </div>
-            <!-- I'm thinking of something... you'll have to wait.
-                <button type="button" style="margin-right:0px;margin-left:0px;width:24px;min-width:24px;height:24px;" class="bcd_debugButton mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
-                    <i class="material-icons" style="font-size:75%">code</i>
-                </button>
-            -->
-            <!--
-                Use Docs CSS? <code>{{ page.use_docs_CSS }}</code>
-            -->
+            <button id="debuggers-all-powerful-button" type="button" style="margin-right:8px;margin-left:0px;width:24px;min-width:24px;height:24px;" class="bcd_debugButton mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+                <i class="material-icons" style="font-size:75%">code</i>
+            </button>
+                <ul for="debuggers-all-powerful-button" class="bcd-debuggers-all-powerful-button mdl-menu mdl-menu--top-right mdl-js-ripple-effect"></ul>
         </footer>
     </div>
 </body>

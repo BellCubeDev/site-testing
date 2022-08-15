@@ -1,5 +1,5 @@
 import { request } from 'http';
-import {componentHandler} from './assets/site/mdl/material.js';
+import * as mdl from './assets/site/mdl/material.js';
 import * as quotes from './universal_quotes.js';
 console.log("%cHello and welcome to the JavaScript console! This is where wizards do their magic!\nAs for me? I'm the wizard you don't want to anger.", "color: #2d6");
 
@@ -35,36 +35,29 @@ export function sortArr<TUnknown>(arr: TUnknown[], refArr: TUnknown[]) {
 
 export type objOf<T> = {[key:string]: T};
 
-
-const _ganalytics_HTML = '<script async src="https://www.googletagmanager.com/gtag/js?id=G-5YE7EYGLGT"></script>';
+type abc = HeadersInit
 
 // Currently unused since I haven't made the opt-in prompt yet
-function enableAnalytics():void{
+async function enableAnalytics() {
     //console.log('[BCD-Analytics] Enabling analytics...');
 
-    document.head.insertAdjacentHTML('beforeend', _ganalytics_HTML);
+    //document.head.insertAdjacentHTML('beforeend', '<script async src="https://www.googletagmanager.com/gtag/js?id=G-5YE7EYGLGT"></script>');
+    const fetched = await fetch('https://www.google-analytics.com/analytics.js', {mode: 'no-cors', headers: [['Sec-Fetch-Dest', 'script'], ['Sec-Fetch-Mode', 'no-cors'], ['Sec-Fetch-Site', 'cross-site'], ['accept', '*/*']], method: 'GET', keepalive: true});
 
-    //console.log('[BCD-Analytics] Analytics enabled.');
+    const scriptElement = document.createElement('script');
+    scriptElement.innerHTML = await fetched.text();
+    document.head.appendChild(scriptElement);
+
+    console.log('[BCD-Analytics] Analytics enabled.');
+
     window.dataLayer = window.dataLayer || [];
 
-    // @ts-ignore: Cannot find name 'dataLayer'.
-    // eslint-disable-next-line prefer-rest-params
-    function gtag(...args:unknown[]){dataLayer.push(arguments);}
+    function gtag(...args:unknown[]){window.dataLayer.push(args as never);}
     gtag('js', new Date());
     gtag('config', 'G-5YE7EYGLGT');
 }
 
 
-/*
-    This script hooks into Material Design Lite's "Component Design Pattern" API
-    (see https://github.com/jasonmayes/mdl-component-design-pattern) to provide:
-
-    * An animatable alternative to <Details>/<Summary> (bcd-details and bcd-summary)
-        - Provides Open, Close, Toggle, and re-evaluate functions on both the bcd-details and bcd-summary elements.
-        - Provides a "for" attribute to the bcd-summary element to specify the ID of the bcd-details element it should toggle.
-
-    * A random text generator
-*/
 interface componentTrackingItem {
     obj:objOf<unknown>,
     arr:unknown[]
@@ -119,9 +112,10 @@ const bcd_const_errItem = "Error Item:";
 
 export function randomNumber(min = 0, max = 1, places = 0):number{
     const placesMult = Math.pow(10, places);
+    //console.log(`10^${places} = ${placesMult}`);
     return (
-        (
-            Math.round(
+        Math.round(
+            (
                 Math.random() * (max - min) + min
             ) * placesMult
         ) / placesMult
@@ -283,10 +277,7 @@ export class BellCubicDetails extends bcd_collapsableParent {
         });
     }
 
-    reEvalOnSizeChange(event: Event|unknown) {
-        console.warn('Observe event!');
-        // @ts-ignore: TypeScript doesn't seem to be able to parse this IF statement properly because of the `unknown` type.
-        if (event && event.propertyName && event.propertyName === 'margin-top') return;
+    reEvalOnSizeChange(event: unknown) {
         this.reEval(true, true);
     }
 }
@@ -300,6 +291,7 @@ for (const param of queryParamsArr) {
     queryParams[param[0]] = param[1];
 }
 
+//console.log(queryParams);
 
 export class BellCubicSummary extends bcd_collapsableParent {
     static cssClass = 'bcd-summary';
@@ -360,7 +352,7 @@ export class bcd_prettyJSON {
 
         const raw_json = element.innerText;
         const json = JSON.parse(raw_json);
-        console.log("Registered new Pretty JSON element:", element, json);
+        //console.log("Registered new Pretty JSON element:", element, json);
 
         this.element_.innerText = JSON.stringify(json, null, 2);
 
@@ -369,15 +361,145 @@ export class bcd_prettyJSON {
 }
 bcdComponents.push(bcd_prettyJSON);
 
+export enum menuCorners {
+    unaligned = 'mdl-menu--unaligned',
+    topLeft = 'mdl-menu--bottom-left',
+    topRight = 'mdl-menu--bottom-right',
+    bottomLeft = 'mdl-menu--top-left',
+    bottomRight = 'mdl-menu--top-right'
+}
+
+type optionObj = objOf<Function|null>
+
+export class bcdDropdown extends mdl.MaterialMenu {
+
+    options(): void | optionObj {return;}
+
+    doReorder:boolean;
+
+    options_: optionObj;
+    options_keys: string[];
+
+    unselectedOptions: string[] = [];
+    selectedOption: string = '';
+
+    element_: HTMLElement;
+
+    selectionElements: undefined | HTMLCollectionOf<HTMLElement>;
+
+    constructor(element: Element, doReorder: boolean = true) {
+        super(element);
+        this.element_ = element as HTMLElement;
+        this.doReorder = doReorder;
+
+        const tempOptions = this.options();
+        if (!tempOptions) throw new TypeError('A BellCubic Dropdown cannot be created directly. It must be created through a subclass extending the `options` method past `void`.');
+        this.options_ = tempOptions;
+        this.options_keys = Object.keys(this.options_);
+
+        this.unselectedOptions = this.doReorder ? this.options_keys.slice(1) : this.options_keys;
+        this.selectedOption = this.options_keys[0];
+
+        for (const option of this.options_keys) {
+            this.element_.appendChild(this.createOption(option));
+        }
+
+        this.selectionElements = this.forElement_?.getElementsByClassName('bcd-dropdown_value') as HTMLCollectionOf<HTMLElement>;
+
+        this.updateOptions();
+    }
+
+    updateOptions() {
+        const children: HTMLLIElement[] = [...(this.element_ as HTMLElement).getElementsByTagName('li') ];
+        //console.log('Updating options:', children);
+
+        if (this.doReorder) {
+            const goldenChild = children.find((elm) => (elm as HTMLLIElement).innerText === this.selectedOption);
+            if (!goldenChild) throw new Error('Could not find the selected option in the dropdown.');
+
+            this.makeSelected(goldenChild);
+        }
+
+        const demonChildren = this.doReorder ? children.filter((elm) => (elm as HTMLLIElement).innerText !== this.selectedOption) : children;
+        demonChildren.sort( (a, b) => this.options_keys.indexOf(a.innerText) - this.options_keys.indexOf(b.innerText) );
+
+        for (const child of demonChildren) {
+            this.element_.removeChild(child);
+            this.makeNotSelected(child);
+            this.element_.appendChild(child);
+        }
+    }
+
+    createOption(option: string, clickCallback?: Function|null, addToList: boolean = false): HTMLLIElement {
+        const li = document.createElement('li');
+        li.innerText = option;
+        li.classList.add('mdl-menu__item');
+        this.registerItem(li);
+
+        const temp_clickCallback = clickCallback ?? this.options_[option] ?? null;
+
+        if (addToList) {
+            this.element_.appendChild(li);
+            this.options_keys.push(option);
+            this.options_[option] = temp_clickCallback;
+        }
+
+        li.addEventListener('click', temp_clickCallback?.bind(this));
+
+        this.onCreateOption(option);
+        return li;
+    }
+
+    onItemSelected(option: HTMLLIElement) {
+        this.selectedOption = option.innerText;
+        this.updateOptions();
+    }
+
+    onCreateOption(option: string): void {return;}
+
+    makeSelected(option: HTMLLIElement) {
+        if (this.doReorder) option.classList.add('mdl-menu__item--full-bleed-divider');
+
+        for (const elm of this.selectionElements ?? []) {
+            elm.innerText = option.innerText;
+        }
+    }
+
+    makeNotSelected(option: HTMLLIElement) {
+        //console.debug('makeNotSelected - starting on:', option);
+        option.classList.remove('mdl-menu__item--full-bleed-divider');
+        //console.debug('makeNotSelected: - finished on:', option);
+    }
+}
+
+class bcdDropdown_AwesomeButton extends bcdDropdown {
+    static asString = 'BCD - Debugger\'s All-Powerful Button';
+    static cssClass = 'bcd-debuggers-all-powerful-button';
+
+    constructor(element: Element) {
+        super(element, false);
+    }
+
+    options(): objOf<Function|null> {
+        return {
+            'Opt-in to Google Analytics': () => {
+                console.log('Opting in to Google Analytics...');
+                enableAnalytics();
+            }
+        };
+    }
+}
+bcdComponents.push(bcdDropdown_AwesomeButton);
+
 export function registerBCDComponent(component:BCDComponent):void {
     try{
-        componentHandler.register({
+        mdl.componentHandler.register({
             constructor: component,
             classAsString: component.asString,
             cssClass: component.cssClass,
             widget: false
         });
-        componentHandler.upgradeElements(document.getElementsByClassName(component.cssClass));
+        mdl.componentHandler.upgradeElements(document.getElementsByClassName(component.cssClass));
     }catch(e:unknown){
         console.error("[BCD-Components] Error registering component", component.asString, "with class", component.cssClass, ":\n", e);
     }

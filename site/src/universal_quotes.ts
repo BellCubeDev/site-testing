@@ -263,6 +263,13 @@ export const possibilities_Generic = [
     "Better to poop in the shower than to shower in the poop.", // - mxinformation
     "What&rsquo;s the deal with airline food?", // - mxinformation
     "Lesbiab", // - chuckseven1
+    "The Chip is my invention, my property, MINE.",
+    "We are writers, my love. We don't cry; we bleed on paper.", // - A.Y.
+    "<code>79 + 1 = 80</code>", // - Sigismund
+    "...the hit 2010 video game Fallout: New Vegas...", // - Sigismund
+    "And He said to me, It is done! I am the Alpha and the Omega, the Beginning and the End. I will give of the fountain of the water of life freely to him who thirsts.",
+    "28 STAB WOUNDS",
+    "Now be a good courier and deliver it!",
 ];
 
 
