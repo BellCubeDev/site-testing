@@ -103,7 +103,7 @@ export function randomNumber(min = 0, max = 1, places = 0):number{
 }
 
 
-function focusAnyElement(element:HTMLElement|undefined, preventScrolling: boolean = false):void{
+function focusAnyElement(element:HTMLElement|undefined, preventScrolling: boolean = true):void{
     if (!element || !element.focus) return;
 
     const hadTabIndex = element.hasAttribute('tabindex');
@@ -499,7 +499,7 @@ class bcdDropdown_AwesomeButton extends bcdDropdown {
 
     options(): objOf<Function|null> {
         return {
-
+            'View Debug Page': () => {document.getElementById('debug-link')?.click();}
         };
     }
 }

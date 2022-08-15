@@ -2,87 +2,93 @@
 layout: page
 title: Debug Page
 description: Page for debugging stuff. Prints a bunch of variables that probably won't be useful to you.
+permalink: /debug/
+redirect_from:
+  - /debug
 ---
 
-<h1>Page Variables</h1>
-<br />page.categories:<pre><code class="bcd-prettyJSON">{{ page.categories | jsonify | escape }}</code></pre>
-<br />page.collection:<pre><code class="bcd-prettyJSON">{{ page.collection | jsonify | escape }}</code></pre>
-<br />page.content:<pre><code class="bcd-prettyJSON">{{ page.content | jsonify | escape }}</code></pre>
-<br />page.date:<pre><code class="bcd-prettyJSON">{{ page.date | jsonify | escape }}</code></pre>
-<br />page.description:<pre><code class="bcd-prettyJSON">{{ page.description | jsonify | escape }}</code></pre>
-<br />page.dir:<pre><code class="bcd-prettyJSON">{{ page.dir | jsonify | escape }}</code></pre>
-<br />page.excerpt:<pre><code class="bcd-prettyJSON">{{ page.excerpt | jsonify | escape }}</code></pre>
-<br />page.formattedTitle:<pre><code class="bcd-prettyJSON">{{ page.formattedTitle | jsonify | escape }}</code></pre>
-<br />page.id:<pre><code class="bcd-prettyJSON">{{ page.id | jsonify | escape }}</code></pre>
-<br />page.layout:<pre><code class="bcd-prettyJSON">{{ page.layout | jsonify | escape }}</code></pre>
-<br />page.name:<pre><code class="bcd-prettyJSON">{{ page.name | jsonify | escape }}</code></pre>
-<br />page.next:<pre><code class="bcd-prettyJSON">{{ page.next | jsonify | escape }}</code></pre>
-<br />page.path:<pre><code class="bcd-prettyJSON">{{ page.path | jsonify | escape }}</code></pre>
-<br />page.permalink:<pre><code class="bcd-prettyJSON">{{ page.permalink | jsonify | escape }}</code></pre>
-<br />page.previous:<pre><code class="bcd-prettyJSON">{{ page.previous | jsonify | escape }}</code></pre>
-<br />page.published:<pre><code class="bcd-prettyJSON">{{ page.published | jsonify | escape }}</code></pre>
-<br />page.tags:<pre><code class="bcd-prettyJSON">{{ page.tags | jsonify | escape }}</code></pre>
-<br />page.title:<pre><code class="bcd-prettyJSON">{{ page.title | jsonify | escape }}</code></pre>
-<br />page.url:<pre><code class="bcd-prettyJSON">{{ page.url | jsonify | escape }}</code></pre>
+<a href="{{ site.baseurl }}{% link debug-extended.html %}" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Extended Debug Page</a> (where some of the larger variables are printed)
 
-<h1>Site-Wide Variables</h1>
-<br />site.author:<pre><code class="bcd-prettyJSON">{{ site.author | jsonify | escape }}</code></pre>
-<br />site.baseurl:<pre><code class="bcd-prettyJSON">{{ site.baseurl | jsonify | escape }}</code></pre>
-<br />site.categories:<pre><code class="bcd-prettyJSON">{{ site.categories | jsonify | escape }}</code></pre>
-<br />site.collections:<pre><code class="bcd-prettyJSON">{{ site.collections | jsonify | escape }}</code></pre>
-<br />site.compress_css:<pre><code class="bcd-prettyJSON">{{ site.compress_css | jsonify | escape }}</code></pre>
-<br />site.compress_javascript:<pre><code class="bcd-prettyJSON">{{ site.compress_javascript | jsonify | escape }}</code></pre>
-<br />site.compress_js_templates:<pre><code class="bcd-prettyJSON">{{ site.compress_js_templates | jsonify | escape }}</code></pre>
-<br />site.compress_json:<pre><code class="bcd-prettyJSON">{{ site.compress_json | jsonify | escape }}</code></pre>
-<br />site.data:<pre><code class="bcd-prettyJSON">{{ site.data | jsonify | escape }}</code></pre>
-<br />site.defaults:<pre><code class="bcd-prettyJSON">{{ site.defaults | jsonify | escape }}</code></pre>
-<br />site.documents:<pre><code class="bcd-prettyJSON">{{ site.documents | jsonify | escape }}</code></pre>
-<br />site.error_mode:<pre><code class="bcd-prettyJSON">{{ site.error_mode | jsonify | escape }}</code></pre>
-<br />site.first_publication_year:<pre><code class="bcd-prettyJSON">{{ site.first_publication_year | jsonify | escape }}</code></pre>
-<br />site.html_files:<pre><code class="bcd-prettyJSON">{{ site.static_files | jsonify | escape }}</code></pre>
-<br />site.html_pages:<pre><code class="bcd-prettyJSON">{{ site.html_pages | jsonify | escape }}</code></pre>
-<br />site.image:<pre><code class="bcd-prettyJSON">{{ site.image | jsonify | escape }}</code></pre>
-<br />site.jekyll-minifier:<pre><code class="bcd-prettyJSON">{{ site.jekyll-minifier | jsonify | escape }}</code></pre>
-<br />site.latest_publication_year:<pre><code class="bcd-prettyJSON">{{ site.latest_publication_year | jsonify | escape }}</code></pre>
-<br />site.liquid:<pre><code class="bcd-prettyJSON">{{ site.liquid | jsonify | escape }}</code></pre>
-<br />site.livereload:<pre><code class="bcd-prettyJSON">{{ site.livereload | jsonify | escape }}</code></pre>
-<br />site.livereload_min_delay:<pre><code class="bcd-prettyJSON">{{ site.livereload_min_delay | jsonify | escape }}</code></pre>
-<br />site.lsi :<pre><code class="bcd-prettyJSON">{{ site.lsi  | jsonify | escape }}</code></pre>
-<br />site.markdown_ext:<pre><code class="bcd-prettyJSON">{{ site.markdown_ext | jsonify | escape }}</code></pre>
-<br />site.open_url:<pre><code class="bcd-prettyJSON">{{ site.open_url | jsonify | escape }}</code></pre>
-<br />site.pages:<code class="bcd-prettyJSON">{{ site.pages | jsonify | escape }}</code></pre>
-<br />site.path:<pre><code class="bcd-prettyJSON">{{ site.path | jsonify | escape }}</code></pre>
-<br />site.plugins:<pre><code class="bcd-prettyJSON">{{ site.plugins | jsonify | escape }}</code></pre>
-<br />site.posts:<pre><code class="bcd-prettyJSON">{{ site.posts | jsonify | escape }}</code></pre>
-<br />site.preserve_line_breaks:<pre><code class="bcd-prettyJSON">{{ site.preserve_line_breaks | jsonify | escape }}</code></pre>
-<br />site.preserve_php:<pre><code class="bcd-prettyJSON">{{ site.preserve_php | jsonify | escape }}</code></pre>
-<br />site.related_posts:<pre><code class="bcd-prettyJSON">{{ site.related_posts | jsonify | escape }}</code></pre>
-<br />site.remove_comments:<pre><code class="bcd-prettyJSON">{{ site.remove_comments | jsonify | escape }}</code></pre>
-<br />site.remove_form_attributes:<pre><code class="bcd-prettyJSON">{{ site.remove_form_attributes | jsonify | escape }}</code></pre>
-<br />site.remove_http_protocol:<pre><code class="bcd-prettyJSON">{{ site.remove_http_protocol | jsonify | escape }}</code></pre>
-<br />site.remove_https_protocol:<pre><code class="bcd-prettyJSON">{{ site.remove_https_protocol | jsonify | escape }}</code></pre>
-<br />site.remove_input_attributes:<pre><code class="bcd-prettyJSON">{{ site.remove_input_attributes | jsonify | escape }}</code></pre>
-<br />site.remove_intertag_spaces:<pre><code class="bcd-prettyJSON">{{ site.remove_intertag_spaces | jsonify | escape }}</code></pre>
-<br />site.remove_javascript_protocol:<pre><code class="bcd-prettyJSON">{{ site.remove_javascript_protocol | jsonify | escape }}</code></pre>
-<br />site.remove_link_attributes:<pre><code class="bcd-prettyJSON">{{ site.remove_link_attributes | jsonify | escape }}</code></pre>
-<br />site.remove_multi_spaces:<pre><code class="bcd-prettyJSON">{{ site.remove_multi_spaces | jsonify | escape }}</code></pre>
-<br />site.remove_quotes:<pre><code class="bcd-prettyJSON">{{ site.remove_quotes | jsonify | escape }}</code></pre>
-<br />site.remove_script_attributes:<pre><code class="bcd-prettyJSON">{{ site.remove_script_attributes | jsonify | escape }}</code></pre>
-<br />site.remove_spaces_inside_tags:<pre><code class="bcd-prettyJSON">{{ site.remove_spaces_inside_tags | jsonify | escape }}</code></pre>
-<br />site.remove_style_attributes:<pre><code class="bcd-prettyJSON">{{ site.remove_style_attributes | jsonify | escape }}</code></pre>
-<br />site.safe:<pre><code class="bcd-prettyJSON">{{ site.safe | jsonify | escape }}</code></pre>
-<br />site.show_drafts:<pre><code class="bcd-prettyJSON">{{ site.show_drafts | jsonify | escape }}</code></pre>
-<br />site.simple_boolean_attributes:<pre><code class="bcd-prettyJSON">{{ site.simple_boolean_attributes | jsonify | escape }}</code></pre>
-<br />site.simple_doctype:<pre><code class="bcd-prettyJSON">{{ site.simple_doctype | jsonify | escape }}</code></pre>
-<br />site.source:<pre><code class="bcd-prettyJSON">{{ site.source | jsonify | escape }}</code></pre>
-<br />site.static_files:<pre><code class="bcd-prettyJSON">{{ site.static_files | jsonify | escape }}</code></pre>
-<br />site.strict_filters:<pre><code class="bcd-prettyJSON">{{ site.strict_filters | jsonify | escape }}</code></pre>
-<br />site.strict_front_matter:<pre><code class="bcd-prettyJSON">{{ site.strict_front_matter | jsonify | escape }}</code></pre>
-<br />site.strict_variables:<pre><code class="bcd-prettyJSON">{{ site.strict_variables | jsonify | escape }}</code></pre>
-<br />site.tags:<pre><code class="bcd-prettyJSON">{{ site.tags | jsonify | escape }}</code></pre>
-<br />site.time:<pre><code class="bcd-prettyJSON">{{ site.time | jsonify | escape }}</code></pre>
-<br />site.timezone:<pre><code class="bcd-prettyJSON">{{ site.timezone | jsonify | escape }}</code></pre>
-<br />site.url:<pre><code class="bcd-prettyJSON">{{ site.url | jsonify | escape }}</code></pre>
-<br />site.values:<pre><code class="bcd-prettyJSON">{{ site.values | jsonify | escape }}</code></pre>
-<br />site.verbose :<pre><code class="bcd-prettyJSON">{{ site.verbose  | jsonify | escape }}</code></pre>
-<br />site.whitelist:<pre><code class="bcd-prettyJSON">{{ site.whitelist | jsonify | escape }}</code></pre>
+<button class="bcd-summary adjacent is-open" type="button"><i class="material-icons open-icon-90CC">expand_more</i>
+    <h1>Page Variables</h1>
+</button>
+<div class="bcd-details adjacent is-open">
+    <br />page.categories:<pre><code class="bcd-prettyJSON">{{ page.categories | jsonify | escape }}</code></pre>
+    <br />page.collection:<pre><code class="bcd-prettyJSON">{{ page.collection | jsonify | escape }}</code></pre>
+    <br />page.date:<pre><code class="bcd-prettyJSON">{{ page.date | jsonify | escape }}</code></pre>
+    <br />page.description:<pre><code class="bcd-prettyJSON">{{ page.description | jsonify | escape }}</code></pre>
+    <br />page.dir:<pre><code class="bcd-prettyJSON">{{ page.dir | jsonify | escape }}</code></pre>
+    <br />page.excerpt:<pre><code class="bcd-prettyJSON">{{ page.excerpt | jsonify | escape }}</code></pre>
+    <br />page.formattedTitle:<pre><code class="bcd-prettyJSON">{{ page.formattedTitle | jsonify | escape }}</code></pre>
+    <br />page.id:<pre><code class="bcd-prettyJSON">{{ page.id | jsonify | escape }}</code></pre>
+    <br />page.layout:<pre><code class="bcd-prettyJSON">{{ page.layout | jsonify | escape }}</code></pre>
+    <br />page.name:<pre><code class="bcd-prettyJSON">{{ page.name | jsonify | escape }}</code></pre>
+    <br />page.next:<pre><code class="bcd-prettyJSON">{{ page.next | jsonify | escape }}</code></pre>
+    <br />page.path:<pre><code class="bcd-prettyJSON">{{ page.path | jsonify | escape }}</code></pre>
+    <br />page.permalink:<pre><code class="bcd-prettyJSON">{{ page.permalink | jsonify | escape }}</code></pre>
+    <br />page.previous:<pre><code class="bcd-prettyJSON">{{ page.previous | jsonify | escape }}</code></pre>
+    <br />page.published:<pre><code class="bcd-prettyJSON">{{ page.published | jsonify | escape }}</code></pre>
+    <br />page.tags:<pre><code class="bcd-prettyJSON">{{ page.tags | jsonify | escape }}</code></pre>
+    <br />page.title:<pre><code class="bcd-prettyJSON">{{ page.title | jsonify | escape }}</code></pre>
+    <br />page.url:<pre><code class="bcd-prettyJSON">{{ page.url | jsonify | escape }}</code></pre>
+</div>
+
+<button class="bcd-summary adjacent is-open" type="button"><i class="material-icons open-icon-90CC">expand_more</i>
+    <h1>Site-Wide Variables</h1>
+</button>
+<div class="bcd-details adjacent is-open">
+    <br />site.author:<pre><code class="bcd-prettyJSON">{{ site.author | jsonify | escape }}</code></pre>
+    <br />site.baseurl:<pre><code class="bcd-prettyJSON">{{ site.baseurl | jsonify | escape }}</code></pre>
+    <br />site.categories:<pre><code class="bcd-prettyJSON">{{ site.categories | jsonify | escape }}</code></pre>
+    <br />site.compress_css:<pre><code class="bcd-prettyJSON">{{ site.compress_css | jsonify | escape }}</code></pre>
+    <br />site.compress_javascript:<pre><code class="bcd-prettyJSON">{{ site.compress_javascript | jsonify | escape }}</code></pre>
+    <br />site.compress_js_templates:<pre><code class="bcd-prettyJSON">{{ site.compress_js_templates | jsonify | escape }}</code></pre>
+    <br />site.compress_json:<pre><code class="bcd-prettyJSON">{{ site.compress_json | jsonify | escape }}</code></pre>
+    <br />site.data:<pre><code class="bcd-prettyJSON">{{ site.data | jsonify | escape }}</code></pre>
+    <br />site.documents:<pre><code class="bcd-prettyJSON">{{ site.documents | jsonify | escape }}</code></pre>
+    <br />site.error_mode:<pre><code class="bcd-prettyJSON">{{ site.error_mode | jsonify | escape }}</code></pre>
+    <br />site.first_publication_year:<pre><code class="bcd-prettyJSON">{{ site.first_publication_year | jsonify | escape }}</code></pre>
+    <br />site.image:<pre><code class="bcd-prettyJSON">{{ site.image | jsonify | escape }}</code></pre>
+    <br />site.jekyll-minifier:<pre><code class="bcd-prettyJSON">{{ site.jekyll-minifier | jsonify | escape }}</code></pre>
+    <br />site.latest_publication_year:<pre><code class="bcd-prettyJSON">{{ site.latest_publication_year | jsonify | escape }}</code></pre>
+    <br />site.liquid:<pre><code class="bcd-prettyJSON">{{ site.liquid | jsonify | escape }}</code></pre>
+    <br />site.livereload:<pre><code class="bcd-prettyJSON">{{ site.livereload | jsonify | escape }}</code></pre>
+    <br />site.livereload_min_delay:<pre><code class="bcd-prettyJSON">{{ site.livereload_min_delay | jsonify | escape }}</code></pre>
+    <br />site.lsi :<pre><code class="bcd-prettyJSON">{{ site.lsi  | jsonify | escape }}</code></pre>
+    <br />site.markdown_ext:<pre><code class="bcd-prettyJSON">{{ site.markdown_ext | jsonify | escape }}</code></pre>
+    <br />site.open_url:<pre><code class="bcd-prettyJSON">{{ site.open_url | jsonify | escape }}</code></pre>
+    <br />site.pages:<code class="bcd-prettyJSON">{{ site.pages | jsonify | escape }}</code></pre>
+    <br />site.path:<pre><code class="bcd-prettyJSON">{{ site.path | jsonify | escape }}</code></pre>
+    <br />site.posts:<pre><code class="bcd-prettyJSON">{{ site.posts | jsonify | escape }}</code></pre>
+    <br />site.preserve_line_breaks:<pre><code class="bcd-prettyJSON">{{ site.preserve_line_breaks | jsonify | escape }}</code></pre>
+    <br />site.preserve_php:<pre><code class="bcd-prettyJSON">{{ site.preserve_php | jsonify | escape }}</code></pre>
+    <br />site.related_posts:<pre><code class="bcd-prettyJSON">{{ site.related_posts | jsonify | escape }}</code></pre>
+    <br />site.remove_comments:<pre><code class="bcd-prettyJSON">{{ site.remove_comments | jsonify | escape }}</code></pre>
+    <br />site.remove_form_attributes:<pre><code class="bcd-prettyJSON">{{ site.remove_form_attributes | jsonify | escape }}</code></pre>
+    <br />site.remove_http_protocol:<pre><code class="bcd-prettyJSON">{{ site.remove_http_protocol | jsonify | escape }}</code></pre>
+    <br />site.remove_https_protocol:<pre><code class="bcd-prettyJSON">{{ site.remove_https_protocol | jsonify | escape }}</code></pre>
+    <br />site.remove_input_attributes:<pre><code class="bcd-prettyJSON">{{ site.remove_input_attributes | jsonify | escape }}</code></pre>
+    <br />site.remove_intertag_spaces:<pre><code class="bcd-prettyJSON">{{ site.remove_intertag_spaces | jsonify | escape }}</code></pre>
+    <br />site.remove_javascript_protocol:<pre><code class="bcd-prettyJSON">{{ site.remove_javascript_protocol | jsonify | escape }}</code></pre>
+    <br />site.remove_link_attributes:<pre><code class="bcd-prettyJSON">{{ site.remove_link_attributes | jsonify | escape }}</code></pre>
+    <br />site.remove_multi_spaces:<pre><code class="bcd-prettyJSON">{{ site.remove_multi_spaces | jsonify | escape }}</code></pre>
+    <br />site.remove_quotes:<pre><code class="bcd-prettyJSON">{{ site.remove_quotes | jsonify | escape }}</code></pre>
+    <br />site.remove_script_attributes:<pre><code class="bcd-prettyJSON">{{ site.remove_script_attributes | jsonify | escape }}</code></pre>
+    <br />site.remove_spaces_inside_tags:<pre><code class="bcd-prettyJSON">{{ site.remove_spaces_inside_tags | jsonify | escape }}</code></pre>
+    <br />site.remove_style_attributes:<pre><code class="bcd-prettyJSON">{{ site.remove_style_attributes | jsonify | escape }}</code></pre>
+    <br />site.safe:<pre><code class="bcd-prettyJSON">{{ site.safe | jsonify | escape }}</code></pre>
+    <br />site.show_drafts:<pre><code class="bcd-prettyJSON">{{ site.show_drafts | jsonify | escape }}</code></pre>
+    <br />site.simple_boolean_attributes:<pre><code class="bcd-prettyJSON">{{ site.simple_boolean_attributes | jsonify | escape }}</code></pre>
+    <br />site.simple_doctype:<pre><code class="bcd-prettyJSON">{{ site.simple_doctype | jsonify | escape }}</code></pre>
+    <br />site.source:<pre><code class="bcd-prettyJSON">{{ site.source | jsonify | escape }}</code></pre>
+    <br />site.strict_filters:<pre><code class="bcd-prettyJSON">{{ site.strict_filters | jsonify | escape }}</code></pre>
+    <br />site.strict_front_matter:<pre><code class="bcd-prettyJSON">{{ site.strict_front_matter | jsonify | escape }}</code></pre>
+    <br />site.strict_variables:<pre><code class="bcd-prettyJSON">{{ site.strict_variables | jsonify | escape }}</code></pre>
+    <br />site.tags:<pre><code class="bcd-prettyJSON">{{ site.tags | jsonify | escape }}</code></pre>
+    <br />site.time:<pre><code class="bcd-prettyJSON">{{ site.time | jsonify | escape }}</code></pre>
+    <br />site.timezone:<pre><code class="bcd-prettyJSON">{{ site.timezone | jsonify | escape }}</code></pre>
+    <br />site.url:<pre><code class="bcd-prettyJSON">{{ site.url | jsonify | escape }}</code></pre>
+    <br />site.values:<pre><code class="bcd-prettyJSON">{{ site.values | jsonify | escape }}</code></pre>
+    <br />site.verbose :<pre><code class="bcd-prettyJSON">{{ site.verbose  | jsonify | escape }}</code></pre>
+    <br />site.whitelist:<pre><code class="bcd-prettyJSON">{{ site.whitelist | jsonify | escape }}</code></pre>
+</div>

@@ -1,0 +1,30 @@
+---
+layout: page
+title: Debug Page
+description: Page for debugging stuff. Prints a bunch of variables that probably won't be useful to you.
+permalink: /debug/extended/
+redirect_from:
+  - /debug/extended
+---
+
+<a href="{{ site.baseurl }}{% link debug.html %}" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Regular Debug Page</a> (where most of the variables are printed)
+
+
+<button class="bcd-summary adjacent is-open" type="button"><i class="material-icons open-icon-90CC">expand_more</i>
+    <h1>Page Variables</h1>
+</button>
+<div class="bcd-details adjacent is-open">
+    <br />page.content:<pre><code class="bcd-prettyJSON">{{ page.content | jsonify | escape }}</code></pre>
+</div>
+
+<button class="bcd-summary adjacent is-open" type="button"><i class="material-icons open-icon-90CC">expand_more</i>
+    <h1>Site-Wide Variables</h1>
+</button>
+<div class="bcd-details adjacent is-open">
+    <br />site.collections:<pre><code class="bcd-prettyJSON">{{ site.collections | jsonify | escape }}</code></pre>
+    <br />site.defaults:<pre><code class="bcd-prettyJSON">{{ site.defaults | jsonify | escape }}</code></pre>
+    <br />site.html_files:<pre><code class="bcd-prettyJSON">{{ site.html_files | jsonify | escape }}</code></pre>
+    <br />site.html_pages:<pre><code class="bcd-prettyJSON">{{ site.html_pages | jsonify | escape }}</code></pre>
+    <br />site.plugins:<pre><code class="bcd-prettyJSON">{{ site.plugins | jsonify | escape }}</code></pre>
+    <br />site.static_files:<pre><code class="bcd-prettyJSON">{{ site.static_files | jsonify | escape }}</code></pre>
+</div>
