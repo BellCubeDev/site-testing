@@ -35,28 +35,6 @@ export function sortArr<TUnknown>(arr: TUnknown[], refArr: TUnknown[]) {
 
 export type objOf<T> = {[key:string]: T};
 
-type abc = HeadersInit
-
-// Currently unused since I haven't made the opt-in prompt yet
-async function enableAnalytics() {
-    //console.log('[BCD-Analytics] Enabling analytics...');
-
-    //document.head.insertAdjacentHTML('beforeend', '<script async src="https://www.googletagmanager.com/gtag/js?id=G-5YE7EYGLGT"></script>');
-    const fetched = await fetch('https://www.google-analytics.com/analytics.js', {mode: 'no-cors', headers: [['Sec-Fetch-Dest', 'script'], ['Sec-Fetch-Mode', 'no-cors'], ['Sec-Fetch-Site', 'cross-site'], ['accept', '*/*']], method: 'GET', keepalive: true});
-
-    const scriptElement = document.createElement('script');
-    scriptElement.innerHTML = await fetched.text();
-    document.head.appendChild(scriptElement);
-
-    console.log('[BCD-Analytics] Analytics enabled.');
-
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag(...args:unknown[]){window.dataLayer.push(args as never);}
-    gtag('js', new Date());
-    gtag('config', 'G-5YE7EYGLGT');
-}
-
 
 interface componentTrackingItem {
     obj:objOf<unknown>,
@@ -482,10 +460,7 @@ class bcdDropdown_AwesomeButton extends bcdDropdown {
 
     options(): objOf<Function|null> {
         return {
-            'Opt-in to Google Analytics': () => {
-                console.log('Opting in to Google Analytics...');
-                enableAnalytics();
-            }
+            
         };
     }
 }
