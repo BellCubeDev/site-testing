@@ -23,6 +23,7 @@ export class bcdStr extends String {
 declare global {interface Window {
     dataLayer: [];
     bcd_init_functions: objOf<Function>;
+    bcd_ComponentTracker: Function;
 }}
 
 
@@ -77,6 +78,7 @@ export class bcd_ComponentTracker {
             return (bcd_ComponentTracker.registered_components[constructor.asString].arr as TConstructor[]).find(findPredicate);
     }
 }
+window.bcd_ComponentTracker = bcd_ComponentTracker;
 
 const bcd_const_transitionDur:string = "transition-duration";
 const bcd_const_animDur:string = "animation-duration";
@@ -158,9 +160,11 @@ class bcd_collapsableParent {
     open(doSetDuration:boolean = true, instant = false) {//this.debugCheck();
         if (!instant) this.evaluateDuration(doSetDuration);
 
-        if (instant) this.evaluateDuration(doSetDuration);
+        if (instant) this.instantTransition();
         this.details_inner.style.marginTop = `0px`;
-        if (instant) this.evaluateDuration(doSetDuration);
+
+        // Wrap `evaluateDuration` in two requestsAnimationFrames to allow the CSS to properly update
+        if (instant) requestAnimationFrame(() => {requestAnimationFrame(() => {this.evaluateDuration(doSetDuration);});});
 
         this.details.classList.add(bcd_const_classIsOpen);
         this.summary.classList.add(bcd_const_classIsOpen);
@@ -168,11 +172,13 @@ class bcd_collapsableParent {
 
     /** Close the collapsable menu. */
     close(doSetDuration:boolean = true, instant = false) {//this.debugCheck();
-        if (!instant) this.evaluateDuration(doSetDuration);
+        if (doSetDuration) this.evaluateDuration(doSetDuration);
 
         if (instant) this.instantTransition();
         this.details_inner.style.marginTop = `-${this.details_inner.offsetHeight * 1.04}px`;
-        if (instant) this.evaluateDuration(true);
+
+        // Wrap `evaluateDuration` in two requestsAnimationFrames to allow the CSS to properly update
+        if (instant) requestAnimationFrame(()=>{requestAnimationFrame(() => {this.evaluateDuration(true);});});
 
         this.details.classList.remove(bcd_const_classIsOpen);
         this.summary.classList.remove(bcd_const_classIsOpen);
@@ -250,7 +256,7 @@ export class BellCubicDetails extends bcd_collapsableParent {
 
         requestAnimationFrame(() => {
             bcd_ComponentTracker.registerComponent(this, BellCubicDetails, this.details);
-            this.reEval();
+            this.reEval(true, true);
             this.self.classList.add('initialized');
         });
     }
@@ -305,7 +311,7 @@ export class BellCubicSummary extends bcd_collapsableParent {
             else this.details_inner = temp_inner as HTMLElement;
 
         bcd_ComponentTracker.registerComponent(this, BellCubicSummary, this.details);
-        this.reEval();
+        this.reEval(true, true);
         this.self.classList.add('initialized');
     });}
 
@@ -460,7 +466,7 @@ class bcdDropdown_AwesomeButton extends bcdDropdown {
 
     options(): objOf<Function|null> {
         return {
-            
+
         };
     }
 }

@@ -436,11 +436,11 @@ export function materialInit() {
     /**
      * Dummy function to avoid JS errors.
      */
-    componentHandler.upgradeElement = function() {};
+    componentHandler.upgradeElement = function() {return;};
     /**
      * Dummy function to avoid JS errors.
      */
-    componentHandler.register = function() {};
+    componentHandler.register = function() {return;};
   }
 }
 window.bcd_init_functions.material = materialInit;
