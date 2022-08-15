@@ -69,15 +69,15 @@ export const possibilities_Generic = [
     "I don&rsquo;t know if the LOOT admins love me or are annoyed with me.",
     "What a crazy world we live in!",
     "Starfield Community Patch BABY!!!",
-    "Thank Vivec you&rsquo;ve arrived. There is much to do!", // - Thallassa
-    "The cake is a lie", //rdunlap
+    "Thank Vivec you&rsquo;ve arrived. There is much to do!",
+    "The cake is a lie",
     "May the ground quake as you pass!",
     "<s>WELCOME to Belethor&rsquo;s General Goods!</s>",
     "You. I&rsquo;ve seen you. Let me see your face.",
     "Halt! Halt!",
     "Hm? Need something?",
-    "May the force be with you.", //DarkDominion
-    "You&rsquo;re braver than I thought!", //DarkDominion
+    "May the force be with you.",
+    "You&rsquo;re braver than I thought!",
     "You&rsquo;re asking my opinion? How uncharacteristic.",
     "My olfactory sensors are picking up <b>quite a strong odor.</b>",
     "With people like you making decisions, no wonder nuclear war broke out.",
@@ -206,18 +206,15 @@ export const possibilities_Generic = [
     "And those that make sacrifices today, will reap the rewards of tomorrow.",
     "If you don&rsquo;t eat yer meat, you can&rsquo;t have any pudding.",
     "I&rsquo;m not sure what I&rsquo;m doing here, but I&rsquo;m sure I&rsquo;m doing something.",
-
-    // Fable 1 was a bit fun
     "Darkwood&rsquo;s a dangerous place, Hero.",
     "Farm-boy!",
     "My helmet, my armour, my sword and my shield. Bring these to me and the path I shall yield.",
-    "Hero, your health is low. Do you have any potions&mdash;or food?", // &mdash; = Em Dash
+    "Hero, your health is low. Do you have any potions&mdash;or food?",
     "Deep in the forest of Albion lay the small town of Oakvale, unchanged by time and untouched by the sword. Here lived a boy and his family; a boy dreaming of greatness. Of one day being a Hero.",
     "They&rsquo;re all dead. You don&rsquo;t want to join them, do you?",
     "You might not realize it, but I just saved your life.",
     "So you finally pried yourself from your pillow I see.",
     "Hook coast? Nobody goes there. Nobody comes from there.",
-
     "What we&rsquo;ve got here is failure to communicate.",
     "Hey, you. You&rsquo;re finally awake.",
     "It&rsquo;s a good day for doom",
@@ -261,7 +258,8 @@ export const possibilities_Generic = [
     "Stand true, my friend. May your heart be your guide and the gods grant you strength.",
     "Remember me, and remember my words. This burden is now yours alone. You hold our future in your hands.",
     "This can only lead to your death. My guardians are sworn to protect me.",
-    "Your destiny calls you down a different road."
+    "Your destiny calls you down a different road.",
+    "What if fish had legs?" // - doodlez
 ];
 
 
