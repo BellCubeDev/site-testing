@@ -31,7 +31,7 @@ $$ $$\$$ |$$ |  $$ |$$ |  $$ |  $$ |$$\ $$   ____| \____$$\
 
 export const possibilities_conditionalized:[conditionObj, string][] = [
     [ {random: .01,}, "Your firstborn is Sheson&rsquo;s!" ],
-    [ {random: .01}, "And why not? Imagine how unbearably, how unutterably cold the universe would be if one were all alone." ], // https://www.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html
+    [ {random: .01}, "And why not? Imagine how unbearably, how unutterably cold the universe would be if one were all alone." ], // - https://www.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html
     [ {random: .075}, "STOP REFRESHING!!!" ],
     [ {time: [[3,0], [11,59]]}, "Good morning!" ],
     [ {time: [[3,0], [11,59]]}, "&lsquo;Mornin! Nice day for fishin&rsquo;, ain&rsquo;t it?" ],
@@ -45,13 +45,13 @@ export const possibilities_conditionalized:[conditionObj, string][] = [
     [ {random: .05}, "Known Troublemakers:<ul><li>Lively</li><li>Lively&rsquo;s Cat</li><li>Lively Again</li></ul>- BigBizkit" ],
     [ {random: .33}, "Nexus Mods is the best!"],
     [ {random: .05}, "And then I&hellip; I would be named&hellip; <i><b>TIM!</b></i><br />The horrors would never cease!" ],
-    [ {random: .02}, "Greetings, Dragonborn."], //rdunlap
-    [ {random: .1}, "Welcome, Dovahkiin."], //rdunlap
-    [ {random: .05}, "War. War never changes."], //rdunlap
-    [ {random: .01}, "The Institute liked that."], //rdunlap
+    [ {random: .02}, "Greetings, Dragonborn."],
+    [ {random: .1}, "Welcome, Dovahkiin."],
+    [ {random: .05}, "War. War never changes."],
+    [ {random: .01}, "The Institute liked that."],
     [ {random: .01}, "Do you get to the Cloud District very often?"],
-    [ {random: .1}, "By Azura, by Azura, by Azura! It&rsquo;s you! The Grand Champion!"], //Otellino
-    [ {random: .055}, "You should not be here, Mortal! Your life is forfeit. Your flesh is mine."], //Otellino
+    [ {random: .1}, "By Azura, by Azura, by Azura! It&rsquo;s you! The Grand Champion!"],
+    [ {random: .055}, "You should not be here, Mortal! Your life is forfeit. Your flesh is mine."],
     [ {random: .1}, "Psst. Hey, I know who you are. Hail Sithis."],
     [ {random: .1}, "You wear the armor of the bear, my friend. A fine choice."],
     [ {time: [[20,0], [24,0]]}, "Only burglars and vampires creep around after dark. So which are you?" ],
@@ -87,14 +87,14 @@ export const possibilities_Generic = [
     "So rise up! <b>RIIIIIISE UP</b>, children of the Empire! <b>RIIIIIISE UP</b>, Stormcloaks!",
     "We mug people! And wagons.",
     "By the rules of the street, I now own there.",
-    "I just make character and run amok.", //chuckseven1
+    "I just make character and run amok.", // - chuckseven1
     "You a fan of grilled cheese?",
     "Ever tried Vegimite? Stuff&rsquo;s bitter as all get-out.",
-    "Sup.", //Haelfire
+    "Sup.", // - Haelfire
     "I stuffed that kitty cat so full of lead, we&rsquo;ll have to use it as a pencil instead.",
     "May the Bluebird of Paradise roost in your nostril.",
     "¡Hola!",
-    "So who made the machines? That&rsquo;s who we want to contact.", // https://www.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html
+    "So who made the machines? That&rsquo;s who we want to contact.", // - https://www.mit.edu/people/dpolicar/writing/prose/text/thinkingMeat.html
     "Hey, check out the <a href=\"https://octodex.github.com/\" target=\"_blank\" rel=\"noopener noreferrer\">Octodex</a>!",
     "I used to be an adventurer like you. Then I took an arrow in the knee&hellip;",
     "Wonderful! Remarkably well preserved too.",
@@ -262,6 +262,7 @@ export const possibilities_Generic = [
     "What if fish had legs?", // - doodlez
     "Better to poop in the shower than to shower in the poop.", // - mxinformation
     "What&rsquo;s the deal with airline food?", // - mxinformation
+    "Lesbiab", // - chuckseven1
 ];
 
 
