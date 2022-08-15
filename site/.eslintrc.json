@@ -39,6 +39,11 @@
         "no-duplicate-imports": "off",
         "no-duplicate-case": "off",
         "no-dupe-args": "off",
+        "no-shadow": "off",
+        "no-shadow-restricted-names": "off",
+        "no-undefined": "off",
+        "no-unused-expressions": "off",
+        "no-unused-labels": "off",
 
         // Either I don't care or it's an unwanted style enforcement
         "eslint-comments/no-use": ["error", {"allow": ["eslint-disable", "eslint-disable-next-line"]}],

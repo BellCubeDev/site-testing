@@ -4,7 +4,7 @@ import {
     MaterialTextfield,
 } from "../../assets/site/mdl/material.js";
 import { bcd_ComponentTracker } from "../../universal.js";
-import "./fomod-builder"; // Brings in global things
+import "./fomod-builder.js"; // Brings in global things
 
 /*
     Thanks to Patrick Gillespie for the great ASCII art generator!

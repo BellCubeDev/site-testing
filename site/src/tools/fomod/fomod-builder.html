@@ -306,15 +306,12 @@ NO MORE I SAY! Give me my dark mode! My auto-saving! My tooltips! <s>My full sch
 <h1>Installer Steps</h1>
 <p>WARNING! Everything down here is purely for testing purposes. Nothing down here is even remotely final.</p>
 
-<div class="bcd_orderDropdown template">
+<div>
     <button id="fomod_steps_order" type="button" class="bcd_stepOrderBtn mdl-button mdl-js-button">
-        Step Order: <i class="bcd_stepOrderValue">Explicit</i>
+        Step Order: <i class="bcd-dropdown_value">Explicit</i>
     </button>
-    <ul class="fomod_orderOptions mdl-menu mdl-menu--bottom-left mdl-js-menu mdl-js-ripple-effect" for="fomod_steps_order">
-        <li pos="0" class="mdl-menu__item mdl-menu__item--full-bleed-divider">Explicit</li>
-        <li pos="1" class="mdl-menu__item">Ascending</li>
-        <li pos="2" class="mdl-menu__item">Descending</li>
-    </ul>
+
+    <ul class="bcd-dropdown-sorting-order mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect" for="fomod_steps_order"></ul>
 </div>
 
 <button id="fomod_steps_addStep" type="button" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">

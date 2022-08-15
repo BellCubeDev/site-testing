@@ -9,7 +9,9 @@ In addition, many minor changes - such as moving the code from its initial singl
 to the global scope - and modernizing certain aspects of the script, such as converting the old-school class definitions
 to modern class definitions using the keyword, have been made.
 
-Finally, an Export statement has been added to the end of the file to export various utilities from the script.
+Furthermore, changes have been made to make the code more modular.
+
+Finally, Export keywords have been added to the module.
 */
 
 /**
@@ -541,11 +543,11 @@ export class MaterialButton {
        */
     init() {
         if (this.element_) {
-            if (this.element_.classList.contains(this.CssClasses_.RIPPLE_EFFECT)) {
+            if (this.element_.classList.contains(this.cssClasses_.RIPPLE_EFFECT)) {
                 var rippleContainer = document.createElement('span');
-                rippleContainer.classList.add(this.CssClasses_.RIPPLE_CONTAINER);
+                rippleContainer.classList.add(this.cssClasses_.RIPPLE_CONTAINER);
                 this.rippleElement_ = document.createElement('span');
-                this.rippleElement_.classList.add(this.CssClasses_.RIPPLE);
+                this.rippleElement_.classList.add(this.cssClasses_.RIPPLE);
                 rippleContainer.appendChild(this.rippleElement_);
                 this.boundRippleBlurHandler = this.blurHandler_.bind(this);
                 this.rippleElement_.addEventListener('click', this.boundRippleBlurHandler);
@@ -571,7 +573,7 @@ export class MaterialButton {
        * @enum {string}
        * @private
        */
-    CssClasses_ = {
+    cssClasses_ = {
         RIPPLE_EFFECT: 'mdl-js-ripple-effect',
         RIPPLE_CONTAINER: 'mdl-button__ripple-container',
         RIPPLE: 'mdl-ripple'
@@ -629,7 +631,7 @@ export class MaterialCheckbox {
     * @enum {string}
     * @private
     */
-    static CssClasses_ = {
+    static cssClasses_ = {
         INPUT: 'mdl-checkbox__input',
         BOX_OUTLINE: 'mdl-checkbox__box-outline',
         FOCUS_HELPER: 'mdl-checkbox__focus-helper',
@@ -660,7 +662,7 @@ export class MaterialCheckbox {
     * @private
     */
     onFocus_(event) {
-        this.element_.classList.add(this.CssClasses_.IS_FOCUSED);
+        this.element_.classList.add(this.cssClasses_.IS_FOCUSED);
     }
     /**
     * Handle lost focus of element.
@@ -669,7 +671,7 @@ export class MaterialCheckbox {
     * @private
     */
     onBlur_(event) {
-        this.element_.classList.remove(this.CssClasses_.IS_FOCUSED);
+        this.element_.classList.remove(this.cssClasses_.IS_FOCUSED);
     }
     /**
     * Handle mouseup.
@@ -709,9 +711,9 @@ export class MaterialCheckbox {
     */
     checkToggleState() {
         if (this.inputElement_.checked) {
-            this.element_.classList.add(this.CssClasses_.IS_CHECKED);
+            this.element_.classList.add(this.cssClasses_.IS_CHECKED);
         } else {
-            this.element_.classList.remove(this.CssClasses_.IS_CHECKED);
+            this.element_.classList.remove(this.cssClasses_.IS_CHECKED);
         }
     }
     /**
@@ -721,9 +723,9 @@ export class MaterialCheckbox {
     */
     checkDisabled() {
         if (this.inputElement_.disabled) {
-            this.element_.classList.add(this.CssClasses_.IS_DISABLED);
+            this.element_.classList.add(this.cssClasses_.IS_DISABLED);
         } else {
-            this.element_.classList.remove(this.CssClasses_.IS_DISABLED);
+            this.element_.classList.remove(this.cssClasses_.IS_DISABLED);
         }
     }
     /**
@@ -767,26 +769,26 @@ export class MaterialCheckbox {
     */
     init() {
         if (this.element_) {
-            this.inputElement_ = this.element_.querySelector(`.${  this.CssClasses_.INPUT}`);
+            this.inputElement_ = this.element_.querySelector(`.${  this.cssClasses_.INPUT}`);
             var boxOutline = document.createElement('span');
-            boxOutline.classList.add(this.CssClasses_.BOX_OUTLINE);
+            boxOutline.classList.add(this.cssClasses_.BOX_OUTLINE);
             var tickContainer = document.createElement('span');
-            tickContainer.classList.add(this.CssClasses_.FOCUS_HELPER);
+            tickContainer.classList.add(this.cssClasses_.FOCUS_HELPER);
             var tickOutline = document.createElement('span');
-            tickOutline.classList.add(this.CssClasses_.TICK_OUTLINE);
+            tickOutline.classList.add(this.cssClasses_.TICK_OUTLINE);
             boxOutline.appendChild(tickOutline);
             this.element_.appendChild(tickContainer);
             this.element_.appendChild(boxOutline);
-            if (this.element_.classList.contains(this.CssClasses_.RIPPLE_EFFECT)) {
-                this.element_.classList.add(this.CssClasses_.RIPPLE_IGNORE_EVENTS);
+            if (this.element_.classList.contains(this.cssClasses_.RIPPLE_EFFECT)) {
+                this.element_.classList.add(this.cssClasses_.RIPPLE_IGNORE_EVENTS);
                 this.rippleContainerElement_ = document.createElement('span');
-                this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_CONTAINER);
-                this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_EFFECT);
-                this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_CENTER);
+                this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_CONTAINER);
+                this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_EFFECT);
+                this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_CENTER);
                 this.boundRippleMouseUp = this.onMouseUp_.bind(this);
                 this.rippleContainerElement_.addEventListener('click', this.boundRippleMouseUp);
                 var ripple = document.createElement('span');
-                ripple.classList.add(this.CssClasses_.RIPPLE);
+                ripple.classList.add(this.cssClasses_.RIPPLE);
                 this.rippleContainerElement_.appendChild(ripple);
                 this.element_.appendChild(this.rippleContainerElement_);
             }
@@ -799,7 +801,7 @@ export class MaterialCheckbox {
             this.inputElement_.addEventListener('blur', this.boundInputOnBlur);
             this.element_.addEventListener('click', this.boundElementMouseUp);
             this.updateClasses_();
-            this.element_.classList.add(this.CssClasses_.IS_UPGRADED);
+            this.element_.classList.add(this.cssClasses_.IS_UPGRADED);
         }
     }
 }
@@ -854,7 +856,7 @@ export class MaterialIconToggle {
        * @private
        */
     onFocus_(event) {
-        this.element_.classList.add(this.CssClasses_.IS_FOCUSED);
+        this.element_.classList.add(this.cssClasses_.IS_FOCUSED);
     }
     /**
        * Handle lost focus of element.
@@ -863,7 +865,7 @@ export class MaterialIconToggle {
        * @private
        */
     onBlur_(event) {
-        this.element_.classList.remove(this.CssClasses_.IS_FOCUSED);
+        this.element_.classList.remove(this.cssClasses_.IS_FOCUSED);
     }
     /**
        * Handle mouseup.
@@ -924,17 +926,17 @@ export class MaterialIconToggle {
        */
     init() {
         if (this.element_) {
-            this.inputElement_ = this.element_.querySelector(`.${this.CssClasses_.INPUT}`);
-            if (this.element_.classList.contains(this.CssClasses_.JS_RIPPLE_EFFECT)) {
-                this.element_.classList.add(this.CssClasses_.RIPPLE_IGNORE_EVENTS);
+            this.inputElement_ = this.element_.querySelector(`.${this.cssClasses_.INPUT}`);
+            if (this.element_.classList.contains(this.cssClasses_.JS_RIPPLE_EFFECT)) {
+                this.element_.classList.add(this.cssClasses_.RIPPLE_IGNORE_EVENTS);
                 this.rippleContainerElement_ = document.createElement('span');
-                this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_CONTAINER);
-                this.rippleContainerElement_.classList.add(this.CssClasses_.JS_RIPPLE_EFFECT);
-                this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_CENTER);
+                this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_CONTAINER);
+                this.rippleContainerElement_.classList.add(this.cssClasses_.JS_RIPPLE_EFFECT);
+                this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_CENTER);
                 this.boundRippleMouseUp = this.onMouseUp_.bind(this);
                 this.rippleContainerElement_.addEventListener('click', this.boundRippleMouseUp);
                 var ripple = document.createElement('span');
-                ripple.classList.add(this.CssClasses_.RIPPLE);
+                ripple.classList.add(this.cssClasses_.RIPPLE);
                 this.rippleContainerElement_.appendChild(ripple);
                 this.element_.appendChild(this.rippleContainerElement_);
             }
@@ -965,7 +967,7 @@ export class MaterialIconToggle {
        * @enum {string}
        * @private
        */
-    CssClasses_ = {
+    cssClasses_ = {
         INPUT: 'mdl-icon-toggle__input',
         JS_RIPPLE_EFFECT: 'mdl-js-ripple-effect',
         RIPPLE_IGNORE_EVENTS: 'mdl-js-ripple-effect--ignore-events',
@@ -1030,7 +1032,8 @@ componentHandler.register({
    * @param {HTMLElement} element The element that will be upgraded.
    */
 export class MaterialMenu {
-    constructor(element) { constructor_579(element, this); }
+    element_;
+    constructor(element) { constructor_579(element, this); this.element_ = element; }
     /**
        * Initialize element.
        */
@@ -1038,14 +1041,14 @@ export class MaterialMenu {
         if (this.element_) {
             // Create container for the menu.
             var container = document.createElement('div');
-            container.classList.add(this.CssClasses_.CONTAINER);
+            container.classList.add(MaterialMenu.cssClasses_.CONTAINER);
             this.element_.parentElement.insertBefore(container, this.element_);
             this.element_.parentElement.removeChild(this.element_);
             container.appendChild(this.element_);
             this.container_ = container;
             // Create outline for the menu (shadow and background).
             var outline = document.createElement('div');
-            outline.classList.add(this.CssClasses_.OUTLINE);
+            outline.classList.add(MaterialMenu.cssClasses_.OUTLINE);
             this.outline_ = outline;
             container.insertBefore(outline, this.element_);
             // Find the "for" element and bind events to it.
@@ -1059,50 +1062,59 @@ export class MaterialMenu {
                     forEl.addEventListener('keydown', this.handleForKeyboardEvent_.bind(this));
                 }
             }
-            var items = this.element_.querySelectorAll(`.${this.CssClasses_.ITEM}`);
+            var items = this.element_.querySelectorAll(`.${MaterialMenu.cssClasses_.ITEM}`);
             this.boundItemKeydown_ = this.handleItemKeyboardEvent_.bind(this);
             this.boundItemClick_ = this.handleItemClick_.bind(this);
-            for (var i_ = 0; i_ < items.length; i_++) {
-                // Add a listener to each menu item.
-                items[i_].addEventListener('click', this.boundItemClick_);
-                // Add a tab index to each menu item.
-                items[i_].tabIndex = '-1';
-                // Add a keyboard listener to each menu item.
-                items[i_].addEventListener('keydown', this.boundItemKeydown_);
+            for (const item of items) {
+                this.registerItem(item);
             }
             // Add ripple classes to each item, if the user has enabled ripples.
-            if (this.element_.classList.contains(this.CssClasses_.RIPPLE_EFFECT)) {
-                this.element_.classList.add(this.CssClasses_.RIPPLE_IGNORE_EVENTS);
-                for (i_ = 0; i_ < items.length; i_++) {
-                    var item = items[i_];
-                    var rippleContainer = document.createElement('span');
-                    rippleContainer.classList.add(this.CssClasses_.ITEM_RIPPLE_CONTAINER);
-                    var ripple = document.createElement('span');
-                    ripple.classList.add(this.CssClasses_.RIPPLE);
-                    rippleContainer.appendChild(ripple);
-                    item.appendChild(rippleContainer);
-                    item.classList.add(this.CssClasses_.RIPPLE_EFFECT);
-                }
+            if (this.element_.classList.contains(MaterialMenu.cssClasses_.RIPPLE_EFFECT)) {
+                this.element_.classList.add(MaterialMenu.cssClasses_.RIPPLE_IGNORE_EVENTS);
             }
+
             // Copy alignment classes to the container, so the outline can use them.
-            if (this.element_.classList.contains(this.CssClasses_.BOTTOM_LEFT)) {
-                this.outline_.classList.add(this.CssClasses_.BOTTOM_LEFT);
+            if (this.element_.classList.contains(MaterialMenu.cssClasses_.BOTTOM_LEFT)) {
+                this.outline_.classList.add(MaterialMenu.cssClasses_.BOTTOM_LEFT);
             }
-            if (this.element_.classList.contains(this.CssClasses_.BOTTOM_RIGHT)) {
-                this.outline_.classList.add(this.CssClasses_.BOTTOM_RIGHT);
+            if (this.element_.classList.contains(MaterialMenu.cssClasses_.BOTTOM_RIGHT)) {
+                this.outline_.classList.add(MaterialMenu.cssClasses_.BOTTOM_RIGHT);
             }
-            if (this.element_.classList.contains(this.CssClasses_.TOP_LEFT)) {
-                this.outline_.classList.add(this.CssClasses_.TOP_LEFT);
+            if (this.element_.classList.contains(MaterialMenu.cssClasses_.TOP_LEFT)) {
+                this.outline_.classList.add(MaterialMenu.cssClasses_.TOP_LEFT);
             }
-            if (this.element_.classList.contains(this.CssClasses_.TOP_RIGHT)) {
-                this.outline_.classList.add(this.CssClasses_.TOP_RIGHT);
+            if (this.element_.classList.contains(MaterialMenu.cssClasses_.TOP_RIGHT)) {
+                this.outline_.classList.add(MaterialMenu.cssClasses_.TOP_RIGHT);
             }
-            if (this.element_.classList.contains(this.CssClasses_.UNALIGNED)) {
-                this.outline_.classList.add(this.CssClasses_.UNALIGNED);
+            if (this.element_.classList.contains(MaterialMenu.cssClasses_.UNALIGNED)) {
+                this.outline_.classList.add(MaterialMenu.cssClasses_.UNALIGNED);
             }
-            container.classList.add(this.CssClasses_.IS_UPGRADED);
+            container.classList.add(MaterialMenu.cssClasses_.IS_UPGRADED);
         }
     }
+
+    registerItem(item) {
+        // Add a tab index to the menu item.
+        item.tabIndex = '-1';
+
+        // Add interact listeners to the menu item.
+        item.addEventListener('click', this.boundItemClick_);
+        item.addEventListener('keydown', this.boundItemKeydown_);
+
+        if (this.element_.classList.contains(MaterialMenu.cssClasses_.RIPPLE_EFFECT)) {
+            const rippleContainer = document.createElement('span');
+            rippleContainer.classList.add(MaterialMenu.cssClasses_.ITEM_RIPPLE_CONTAINER);
+
+            const ripple = document.createElement('span');
+            ripple.classList.add(MaterialMenu.cssClasses_.RIPPLE);
+
+            rippleContainer.appendChild(ripple);
+            item.appendChild(rippleContainer);
+
+            item.classList.add(MaterialMenu.cssClasses_.RIPPLE_EFFECT);
+        }
+    }
+
     /**
        * Handles a click on the "for" element, by positioning the menu and then
        * toggling it.
@@ -1114,16 +1126,16 @@ export class MaterialMenu {
         if (this.element_ && this.forElement_) {
             var rect = this.forElement_.getBoundingClientRect();
             var forRect = this.forElement_.parentElement.getBoundingClientRect();
-            if (this.element_.classList.contains(this.CssClasses_.UNALIGNED)) {
-            } else if (this.element_.classList.contains(this.CssClasses_.BOTTOM_RIGHT)) {
+            if (this.element_.classList.contains(MaterialMenu.cssClasses_.UNALIGNED)) {
+            } else if (this.element_.classList.contains(MaterialMenu.cssClasses_.BOTTOM_RIGHT)) {
                 // Position below the "for" element, aligned to its right.
                 this.container_.style.right = `${forRect.right - rect.right}px`;
                 this.container_.style.top = `${this.forElement_.offsetTop + this.forElement_.offsetHeight}px`;
-            } else if (this.element_.classList.contains(this.CssClasses_.TOP_LEFT)) {
+            } else if (this.element_.classList.contains(MaterialMenu.cssClasses_.TOP_LEFT)) {
                 // Position above the "for" element, aligned to its left.
                 this.container_.style.left = `${this.forElement_.offsetLeft}px`;
                 this.container_.style.bottom = `${forRect.bottom - rect.top}px`;
-            } else if (this.element_.classList.contains(this.CssClasses_.TOP_RIGHT)) {
+            } else if (this.element_.classList.contains(MaterialMenu.cssClasses_.TOP_RIGHT)) {
                 // Position above the "for" element, aligned to its right.
                 this.container_.style.right = `${forRect.right - rect.right}px`;
                 this.container_.style.bottom = `${forRect.bottom - rect.top}px`;
@@ -1143,12 +1155,12 @@ export class MaterialMenu {
        */
     handleForKeyboardEvent_(evt) {
         if (this.element_ && this.container_ && this.forElement_) {
-            var items = this.element_.querySelectorAll(`.${this.CssClasses_.ITEM}:not([disabled])`);
-            if (items && items.length > 0 && this.container_.classList.contains(this.CssClasses_.IS_VISIBLE)) {
-                if (evt.keyCode === this.Keycodes_.UP_ARROW) {
+            var items = this.element_.querySelectorAll(`.${MaterialMenu.cssClasses_.ITEM}:not([disabled])`);
+            if (items && items.length > 0 && this.container_.classList.contains(MaterialMenu.cssClasses_.IS_VISIBLE)) {
+                if (evt.keyCode === MaterialMenu.Keycodes_.UP_ARROW) {
                     evt.preventDefault();
                     items[items.length - 1].focus();
-                } else if (evt.keyCode === this.Keycodes_.DOWN_ARROW) {
+                } else if (evt.keyCode === MaterialMenu.Keycodes_.DOWN_ARROW) {
                     evt.preventDefault();
                     items[0].focus();
                 }
@@ -1163,24 +1175,24 @@ export class MaterialMenu {
        */
     handleItemKeyboardEvent_(evt) {
         if (this.element_ && this.container_) {
-            var items = this.element_.querySelectorAll(`.${this.CssClasses_.ITEM}:not([disabled])`);
-            if (items && items.length > 0 && this.container_.classList.contains(this.CssClasses_.IS_VISIBLE)) {
+            var items = this.element_.querySelectorAll(`.${MaterialMenu.cssClasses_.ITEM}:not([disabled])`);
+            if (items && items.length > 0 && this.container_.classList.contains(MaterialMenu.cssClasses_.IS_VISIBLE)) {
                 var currentIndex = Array.prototype.slice.call(items).indexOf(evt.target);
-                if (evt.keyCode === this.Keycodes_.UP_ARROW) {
+                if (evt.keyCode === MaterialMenu.Keycodes_.UP_ARROW) {
                     evt.preventDefault();
                     if (currentIndex > 0) {
                         items[currentIndex - 1].focus();
                     } else {
                         items[items.length - 1].focus();
                     }
-                } else if (evt.keyCode === this.Keycodes_.DOWN_ARROW) {
+                } else if (evt.keyCode === MaterialMenu.Keycodes_.DOWN_ARROW) {
                     evt.preventDefault();
                     if (items.length > currentIndex + 1) {
                         items[currentIndex + 1].focus();
                     } else {
                         items[0].focus();
                     }
-                } else if (evt.keyCode === this.Keycodes_.SPACE || evt.keyCode === this.Keycodes_.ENTER) {
+                } else if (evt.keyCode === MaterialMenu.Keycodes_.SPACE || evt.keyCode === MaterialMenu.Keycodes_.ENTER) {
                     evt.preventDefault();
                     // Send mousedown and mouseup to trigger ripple.
                     var e = new MouseEvent('mousedown');
@@ -1189,7 +1201,7 @@ export class MaterialMenu {
                     evt.target.dispatchEvent(e);
                     // Send click.
                     evt.target.click();
-                } else if (evt.keyCode === this.Keycodes_.ESCAPE) {
+                } else if (evt.keyCode === MaterialMenu.Keycodes_.ESCAPE) {
                     evt.preventDefault();
                     this.hide();
                 }
@@ -1212,8 +1224,18 @@ export class MaterialMenu {
                 this.hide();
                 this.closing_ = false;
             }.bind(this), this.Constant_.CLOSE_TIMEOUT);
+
+            this.onItemSelected(evt.target);
         }
     }
+
+    /**
+       * Function called when an item is selected.
+       *
+       * @param {HTMLLIElement} option The option that was clicked
+       */
+    onItemSelected(option){return;}
+
     /**
        * Calculates the initial clip (for opening the menu) or final clip (for closing
        * it), and applies it. This allows us to animate from or to the correct point,
@@ -1224,16 +1246,16 @@ export class MaterialMenu {
        * @private
        */
     applyClip_(height, width) {
-        if (this.element_.classList.contains(this.CssClasses_.UNALIGNED)) {
+        if (this.element_.classList.contains(MaterialMenu.cssClasses_.UNALIGNED)) {
             // Do not clip.
             this.element_.style.clip = '';
-        } else if (this.element_.classList.contains(this.CssClasses_.BOTTOM_RIGHT)) {
+        } else if (this.element_.classList.contains(MaterialMenu.cssClasses_.BOTTOM_RIGHT)) {
             // Clip to the top right corner of the menu.
             this.element_.style.clip = `rect(0 ${width}px 0 ${width}px)`;
-        } else if (this.element_.classList.contains(this.CssClasses_.TOP_LEFT)) {
+        } else if (this.element_.classList.contains(MaterialMenu.cssClasses_.TOP_LEFT)) {
             // Clip to the bottom left corner of the menu.
             this.element_.style.clip = `rect(${height}px 0 ${height}px 0)`;
-        } else if (this.element_.classList.contains(this.CssClasses_.TOP_RIGHT)) {
+        } else if (this.element_.classList.contains(MaterialMenu.cssClasses_.TOP_RIGHT)) {
             // Clip to the bottom right corner of the menu.
             this.element_.style.clip = `rect(${height}px ${width}px ${height}px ${width}px)`;
         } else {
@@ -1248,7 +1270,7 @@ export class MaterialMenu {
        * @private
        */
     removeAnimationEndListener_(evt) {
-        evt.target.classList.remove(MaterialMenu.prototype.CssClasses_.IS_ANIMATING);
+        evt.target.classList.remove(MaterialMenu.cssClasses_.IS_ANIMATING);
     }
     /**
        * Adds an event listener to clean up after the animation ends.
@@ -1277,10 +1299,10 @@ export class MaterialMenu {
             var transitionDuration = this.Constant_.TRANSITION_DURATION_SECONDS * this.Constant_.TRANSITION_DURATION_FRACTION;
             // Calculate transition delays for individual menu items, so that they fade
             // in one at a time.
-            var items = this.element_.querySelectorAll(`.${this.CssClasses_.ITEM}`);
+            var items = this.element_.querySelectorAll(`.${MaterialMenu.cssClasses_.ITEM}`);
             for (var i_ = 0; i_ < items.length; i_++) {
                 var itemDelay = null;
-                if (this.element_.classList.contains(this.CssClasses_.TOP_LEFT) || this.element_.classList.contains(this.CssClasses_.TOP_RIGHT)) {
+                if (this.element_.classList.contains(MaterialMenu.cssClasses_.TOP_LEFT) || this.element_.classList.contains(MaterialMenu.cssClasses_.TOP_RIGHT)) {
                     itemDelay = `${(height - items[i_].offsetTop - items[i_].offsetHeight) / height * transitionDuration}s`;
                 } else {
                     itemDelay = `${items[i_].offsetTop / height * transitionDuration}s`;
@@ -1292,9 +1314,9 @@ export class MaterialMenu {
             // Wait for the next frame, turn on animation, and apply the final clip.
             // Also make it visible. This triggers the transitions.
             window.requestAnimationFrame(function () {
-                this.element_.classList.add(this.CssClasses_.IS_ANIMATING);
+                this.element_.classList.add(MaterialMenu.cssClasses_.IS_ANIMATING);
                 this.element_.style.clip = `rect(0 ${width}px ${height}px 0)`;
-                this.container_.classList.add(this.CssClasses_.IS_VISIBLE);
+                this.container_.classList.add(MaterialMenu.cssClasses_.IS_VISIBLE);
             }.bind(this));
             // Clean up after the animation is complete.
             this.addAnimationEndListener_();
@@ -1321,7 +1343,7 @@ export class MaterialMenu {
        */
     hide() {
         if (this.element_ && this.container_ && this.outline_) {
-            var items = this.element_.querySelectorAll(`.${this.CssClasses_.ITEM}`);
+            var items = this.element_.querySelectorAll(`.${MaterialMenu.cssClasses_.ITEM}`);
             // Remove all transition delays; menu items fade out concurrently.
             for (var i__ = 0; i__ < items.length; i__++) {
                 items[i__].style.removeProperty('transition-delay');
@@ -1332,9 +1354,9 @@ export class MaterialMenu {
             var width = rect.width;
             // Turn on animation, and apply the final clip. Also make invisible.
             // This triggers the transitions.
-            this.element_.classList.add(this.CssClasses_.IS_ANIMATING);
+            this.element_.classList.add(MaterialMenu.cssClasses_.IS_ANIMATING);
             this.applyClip_(height, width);
-            this.container_.classList.remove(this.CssClasses_.IS_VISIBLE);
+            this.container_.classList.remove(MaterialMenu.cssClasses_.IS_VISIBLE);
             // Clean up after the animation is complete.
             this.addAnimationEndListener_();
         }
@@ -1345,7 +1367,7 @@ export class MaterialMenu {
        * @public
        */
     toggle(evt) {
-        if (this.container_.classList.contains(this.CssClasses_.IS_VISIBLE)) {
+        if (this.container_.classList.contains(MaterialMenu.cssClasses_.IS_VISIBLE)) {
             this.hide();
         } else {
             this.show(evt);
@@ -1372,7 +1394,7 @@ export class MaterialMenu {
     * @enum {number}
     * @private
     */
-    Keycodes_ = {
+    static Keycodes_ = {
         ENTER: 13,
         ESCAPE: 27,
         SPACE: 32,
@@ -1387,7 +1409,7 @@ export class MaterialMenu {
     * @enum {string}
     * @private
     */
-    CssClasses_ = {
+    static cssClasses_ = {
         CONTAINER: 'mdl-menu__container',
         OUTLINE: 'mdl-menu__outline',
         ITEM: 'mdl-menu__item',
@@ -1450,7 +1472,7 @@ export class MaterialProgress {
        * @public
        */
     setProgress(p) {
-        if (this.element_.classList.contains(this.CssClasses_.INDETERMINATE_CLASS)) {
+        if (this.element_.classList.contains(this.cssClasses_.INDETERMINATE_CLASS)) {
             return;
         }
         this.progressbar_.style.width = `${p}%`;
@@ -1503,7 +1525,7 @@ export class MaterialProgress {
        * @enum {string}
        * @private
        */
-    CssClasses_ = { INDETERMINATE_CLASS: 'mdl-progress__indeterminate' };
+    cssClasses_ = { INDETERMINATE_CLASS: 'mdl-progress__indeterminate' };
 }
 window['MaterialProgress'] = MaterialProgress;
 // The component registers itself. It can assume componentHandler is available
@@ -1549,9 +1571,9 @@ export class MaterialRadio {
     onChange_(event) {
         // Since other radio buttons don't get change events, we need to look for
         // them to update their classes.
-        var radios = document.getElementsByClassName(this.CssClasses_.JS_RADIO);
+        var radios = document.getElementsByClassName(this.cssClasses_.JS_RADIO);
         for (var i_ = 0; i_ < radios.length; i_++) {
-            var button = radios[i_].querySelector(`.${this.CssClasses_.RADIO_BTN}`);
+            var button = radios[i_].querySelector(`.${this.cssClasses_.RADIO_BTN}`);
             // Different name == different group, so no point updating those.
             if (button.getAttribute('name') === this.btnElement_.getAttribute('name') && typeof radios[i_]['MaterialRadio'] !== 'undefined') {
                 radios[i_]['MaterialRadio'].updateClasses_();
@@ -1565,7 +1587,7 @@ export class MaterialRadio {
        * @private
        */
     onFocus_(event) {
-        this.element_.classList.add(this.CssClasses_.IS_FOCUSED);
+        this.element_.classList.add(this.cssClasses_.IS_FOCUSED);
     }
     /**
        * Handle lost focus.
@@ -1574,7 +1596,7 @@ export class MaterialRadio {
        * @private
        */
     onBlur_(event) {
-        this.element_.classList.remove(this.CssClasses_.IS_FOCUSED);
+        this.element_.classList.remove(this.cssClasses_.IS_FOCUSED);
     }
     /**
        * Handle mouseup.
@@ -1614,9 +1636,9 @@ export class MaterialRadio {
        */
     checkDisabled() {
         if (this.btnElement_.disabled) {
-            this.element_.classList.add(this.CssClasses_.IS_DISABLED);
+            this.element_.classList.add(this.cssClasses_.IS_DISABLED);
         } else {
-            this.element_.classList.remove(this.CssClasses_.IS_DISABLED);
+            this.element_.classList.remove(this.cssClasses_.IS_DISABLED);
         }
     }
     /**
@@ -1626,9 +1648,9 @@ export class MaterialRadio {
        */
     checkToggleState() {
         if (this.btnElement_.checked) {
-            this.element_.classList.add(this.CssClasses_.IS_CHECKED);
+            this.element_.classList.add(this.cssClasses_.IS_CHECKED);
         } else {
-            this.element_.classList.remove(this.CssClasses_.IS_CHECKED);
+            this.element_.classList.remove(this.cssClasses_.IS_CHECKED);
         }
     }
     /**
@@ -1672,27 +1694,27 @@ export class MaterialRadio {
        */
     init() {
         if (this.element_) {
-            this.btnElement_ = this.element_.querySelector(`.${this.CssClasses_.RADIO_BTN}`);
+            this.btnElement_ = this.element_.querySelector(`.${this.cssClasses_.RADIO_BTN}`);
             this.boundChangeHandler_ = this.onChange_.bind(this);
             this.boundFocusHandler_ = this.onChange_.bind(this);
             this.boundBlurHandler_ = this.onBlur_.bind(this);
             this.boundMouseUpHandler_ = this.onMouseup_.bind(this);
             var outerCircle = document.createElement('span');
-            outerCircle.classList.add(this.CssClasses_.RADIO_OUTER_CIRCLE);
+            outerCircle.classList.add(this.cssClasses_.RADIO_OUTER_CIRCLE);
             var innerCircle = document.createElement('span');
-            innerCircle.classList.add(this.CssClasses_.RADIO_INNER_CIRCLE);
+            innerCircle.classList.add(this.cssClasses_.RADIO_INNER_CIRCLE);
             this.element_.appendChild(outerCircle);
             this.element_.appendChild(innerCircle);
             var rippleContainer;
-            if (this.element_.classList.contains(this.CssClasses_.RIPPLE_EFFECT)) {
-                this.element_.classList.add(this.CssClasses_.RIPPLE_IGNORE_EVENTS);
+            if (this.element_.classList.contains(this.cssClasses_.RIPPLE_EFFECT)) {
+                this.element_.classList.add(this.cssClasses_.RIPPLE_IGNORE_EVENTS);
                 rippleContainer = document.createElement('span');
-                rippleContainer.classList.add(this.CssClasses_.RIPPLE_CONTAINER);
-                rippleContainer.classList.add(this.CssClasses_.RIPPLE_EFFECT);
-                rippleContainer.classList.add(this.CssClasses_.RIPPLE_CENTER);
+                rippleContainer.classList.add(this.cssClasses_.RIPPLE_CONTAINER);
+                rippleContainer.classList.add(this.cssClasses_.RIPPLE_EFFECT);
+                rippleContainer.classList.add(this.cssClasses_.RIPPLE_CENTER);
                 rippleContainer.addEventListener('click', this.boundMouseUpHandler_);
                 var ripple = document.createElement('span');
-                ripple.classList.add(this.CssClasses_.RIPPLE);
+                ripple.classList.add(this.cssClasses_.RIPPLE);
                 rippleContainer.appendChild(ripple);
                 this.element_.appendChild(rippleContainer);
             }
@@ -1701,7 +1723,7 @@ export class MaterialRadio {
             this.btnElement_.addEventListener('blur', this.boundBlurHandler_);
             this.element_.addEventListener('click', this.boundMouseUpHandler_);
             this.updateClasses_();
-            this.element_.classList.add(this.CssClasses_.IS_UPGRADED);
+            this.element_.classList.add(this.cssClasses_.IS_UPGRADED);
         }
     }
     /**
@@ -1719,7 +1741,7 @@ export class MaterialRadio {
         * @enum {string}
         * @private
         */
-    CssClasses_ = {
+    cssClasses_ = {
         IS_FOCUSED: 'is-focused',
         IS_DISABLED: 'is-disabled',
         IS_CHECKED: 'is-checked',
@@ -1840,9 +1862,9 @@ export class MaterialSlider {
         // Calculate and apply percentages to div structure behind slider.
         var fraction = (this.element_.value - this.element_.min) / (this.element_.max - this.element_.min);
         if (fraction === 0) {
-            this.element_.classList.add(this.CssClasses_.IS_LOWEST_VALUE);
+            this.element_.classList.add(this.cssClasses_.IS_LOWEST_VALUE);
         } else {
-            this.element_.classList.remove(this.CssClasses_.IS_LOWEST_VALUE);
+            this.element_.classList.remove(this.cssClasses_.IS_LOWEST_VALUE);
         }
         if (!this.isIE_) {
             this.backgroundLower_.style.flex = fraction;
@@ -1890,7 +1912,7 @@ export class MaterialSlider {
                 // implementation limitations, we add a parent here that trims it down to
                 // a reasonable size.
                 var containerIE = document.createElement('div');
-                containerIE.classList.add(this.CssClasses_.IE_CONTAINER);
+                containerIE.classList.add(this.cssClasses_.IE_CONTAINER);
                 this.element_.parentElement.insertBefore(containerIE, this.element_);
                 this.element_.parentElement.removeChild(this.element_);
                 containerIE.appendChild(this.element_);
@@ -1899,18 +1921,18 @@ export class MaterialSlider {
                 // slider and allows us to style the left and right sides of it with
                 // different colors.
                 var container = document.createElement('div');
-                container.classList.add(this.CssClasses_.SLIDER_CONTAINER);
+                container.classList.add(this.cssClasses_.SLIDER_CONTAINER);
                 this.element_.parentElement.insertBefore(container, this.element_);
                 this.element_.parentElement.removeChild(this.element_);
                 container.appendChild(this.element_);
                 var backgroundFlex = document.createElement('div');
-                backgroundFlex.classList.add(this.CssClasses_.BACKGROUND_FLEX);
+                backgroundFlex.classList.add(this.cssClasses_.BACKGROUND_FLEX);
                 container.appendChild(backgroundFlex);
                 this.backgroundLower_ = document.createElement('div');
-                this.backgroundLower_.classList.add(this.CssClasses_.BACKGROUND_LOWER);
+                this.backgroundLower_.classList.add(this.cssClasses_.BACKGROUND_LOWER);
                 backgroundFlex.appendChild(this.backgroundLower_);
                 this.backgroundUpper_ = document.createElement('div');
-                this.backgroundUpper_.classList.add(this.CssClasses_.BACKGROUND_UPPER);
+                this.backgroundUpper_.classList.add(this.cssClasses_.BACKGROUND_UPPER);
                 backgroundFlex.appendChild(this.backgroundUpper_);
             }
             this.boundInputHandler = this.onInput_.bind(this);
@@ -1922,7 +1944,7 @@ export class MaterialSlider {
             this.element_.addEventListener('click', this.boundMouseUpHandler);
             this.element_.parentElement.addEventListener('mousedown', this.boundContainerMouseDownHandler);
             this.updateValueStyles_();
-            this.element_.classList.add(this.CssClasses_.IS_UPGRADED);
+            this.element_.classList.add(this.cssClasses_.IS_UPGRADED);
         }
     }
     /**
@@ -1940,7 +1962,7 @@ export class MaterialSlider {
        * @enum {string}
        * @private
        */
-    CssClasses_ = {
+    cssClasses_ = {
         IE_CONTAINER: 'mdl-slider__ie-container',
         SLIDER_CONTAINER: 'mdl-slider__container',
         BACKGROUND_FLEX: 'mdl-slider__background-flex',
@@ -2166,16 +2188,16 @@ export class MaterialSpinner {
        */
     createLayer(index) {
         var layer = document.createElement('div');
-        layer.classList.add(this.CssClasses_.MDL_SPINNER_LAYER);
-        layer.classList.add(`${this.CssClasses_.MDL_SPINNER_LAYER}-${index}`);
+        layer.classList.add(this.cssClasses_.MDL_SPINNER_LAYER);
+        layer.classList.add(`${this.cssClasses_.MDL_SPINNER_LAYER}-${index}`);
         var leftClipper = document.createElement('div');
-        leftClipper.classList.add(this.CssClasses_.MDL_SPINNER_CIRCLE_CLIPPER);
-        leftClipper.classList.add(this.CssClasses_.MDL_SPINNER_LEFT);
+        leftClipper.classList.add(this.cssClasses_.MDL_SPINNER_CIRCLE_CLIPPER);
+        leftClipper.classList.add(this.cssClasses_.MDL_SPINNER_LEFT);
         var gapPatch = document.createElement('div');
-        gapPatch.classList.add(this.CssClasses_.MDL_SPINNER_GAP_PATCH);
+        gapPatch.classList.add(this.cssClasses_.MDL_SPINNER_GAP_PATCH);
         var rightClipper = document.createElement('div');
-        rightClipper.classList.add(this.CssClasses_.MDL_SPINNER_CIRCLE_CLIPPER);
-        rightClipper.classList.add(this.CssClasses_.MDL_SPINNER_RIGHT);
+        rightClipper.classList.add(this.cssClasses_.MDL_SPINNER_CIRCLE_CLIPPER);
+        rightClipper.classList.add(this.cssClasses_.MDL_SPINNER_RIGHT);
         var circleOwners = [
             leftClipper,
             gapPatch,
@@ -2183,7 +2205,7 @@ export class MaterialSpinner {
         ];
         for (var i_ = 0; i_ < circleOwners.length; i_++) {
             var circle = document.createElement('div');
-            circle.classList.add(this.CssClasses_.MDL_SPINNER_CIRCLE);
+            circle.classList.add(this.cssClasses_.MDL_SPINNER_CIRCLE);
             circleOwners[i_].appendChild(circle);
         }
         layer.appendChild(leftClipper);
@@ -2236,7 +2258,7 @@ export class MaterialSpinner {
        * @enum {string}
        * @private
        */
-    CssClasses_ = {
+    cssClasses_ = {
         MDL_SPINNER_LAYER: 'mdl-spinner__layer',
         MDL_SPINNER_CIRCLE_CLIPPER: 'mdl-spinner__circle-clipper',
         MDL_SPINNER_CIRCLE: 'mdl-spinner__circle',
@@ -2296,7 +2318,7 @@ export class MaterialSwitch {
        * @private
        */
     onFocus_(event) {
-        this.element_.classList.add(this.CssClasses_.IS_FOCUSED);
+        this.element_.classList.add(this.cssClasses_.IS_FOCUSED);
     }
     /**
        * Handle lost focus of element.
@@ -2305,7 +2327,7 @@ export class MaterialSwitch {
        * @private
        */
     onBlur_(event) {
-        this.element_.classList.remove(this.CssClasses_.IS_FOCUSED);
+        this.element_.classList.remove(this.cssClasses_.IS_FOCUSED);
     }
     /**
        * Handle mouseup.
@@ -2366,26 +2388,26 @@ export class MaterialSwitch {
        */
     init() {
         if (this.element_) {
-            this.inputElement_ = this.element_.querySelector(`.${this.CssClasses_.INPUT}`);
+            this.inputElement_ = this.element_.querySelector(`.${this.cssClasses_.INPUT}`);
             var track = document.createElement('div');
-            track.classList.add(this.CssClasses_.TRACK);
+            track.classList.add(this.cssClasses_.TRACK);
             var thumb = document.createElement('div');
-            thumb.classList.add(this.CssClasses_.THUMB);
+            thumb.classList.add(this.cssClasses_.THUMB);
             var focusHelper = document.createElement('span');
-            focusHelper.classList.add(this.CssClasses_.FOCUS_HELPER);
+            focusHelper.classList.add(this.cssClasses_.FOCUS_HELPER);
             thumb.appendChild(focusHelper);
             this.element_.appendChild(track);
             this.element_.appendChild(thumb);
             this.boundMouseUpHandler = this.onMouseUp_.bind(this);
-            if (this.element_.classList.contains(this.CssClasses_.RIPPLE_EFFECT)) {
-                this.element_.classList.add(this.CssClasses_.RIPPLE_IGNORE_EVENTS);
+            if (this.element_.classList.contains(this.cssClasses_.RIPPLE_EFFECT)) {
+                this.element_.classList.add(this.cssClasses_.RIPPLE_IGNORE_EVENTS);
                 this.rippleContainerElement_ = document.createElement('span');
-                this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_CONTAINER);
-                this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_EFFECT);
-                this.rippleContainerElement_.classList.add(this.CssClasses_.RIPPLE_CENTER);
+                this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_CONTAINER);
+                this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_EFFECT);
+                this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_CENTER);
                 this.rippleContainerElement_.addEventListener('click', this.boundMouseUpHandler);
                 var ripple = document.createElement('span');
-                ripple.classList.add(this.CssClasses_.RIPPLE);
+                ripple.classList.add(this.cssClasses_.RIPPLE);
                 this.rippleContainerElement_.appendChild(ripple);
                 this.element_.appendChild(this.rippleContainerElement_);
             }
@@ -2415,7 +2437,7 @@ export class MaterialSwitch {
        * @enum {string}
        * @private
        */
-    CssClasses_ = {
+    cssClasses_ = {
         INPUT: 'mdl-switch__input',
         TRACK: 'mdl-switch__track',
         THUMB: 'mdl-switch__thumb',
@@ -2495,17 +2517,17 @@ export class MaterialTabs {
        * @private
        */
     initTabs_() {
-        if (this.element_.classList.contains(this.CssClasses_.MDL_JS_RIPPLE_EFFECT)) {
-            this.element_.classList.add(this.CssClasses_.MDL_JS_RIPPLE_EFFECT_IGNORE_EVENTS);
+        if (this.element_.classList.contains(this.cssClasses_.MDL_JS_RIPPLE_EFFECT)) {
+            this.element_.classList.add(this.cssClasses_.MDL_JS_RIPPLE_EFFECT_IGNORE_EVENTS);
         }
         // Select element tabs, document panels
-        this.tabs_ = this.element_.querySelectorAll(`.${this.CssClasses_.TAB_CLASS}`);
-        this.panels_ = this.element_.querySelectorAll(`.${this.CssClasses_.PANEL_CLASS}`);
+        this.tabs_ = this.element_.querySelectorAll(`.${this.cssClasses_.TAB_CLASS}`);
+        this.panels_ = this.element_.querySelectorAll(`.${this.cssClasses_.PANEL_CLASS}`);
         // Create new tabs for each tab element
         for (var i_ = 0; i_ < this.tabs_.length; i_++) {
             new MaterialTab(this.tabs_[i_], this);
         }
-        this.element_.classList.add(this.CssClasses_.UPGRADED_CLASS);
+        this.element_.classList.add(this.cssClasses_.UPGRADED_CLASS);
     }
     /**
        * Reset tab state, dropping active classes
@@ -2514,7 +2536,7 @@ export class MaterialTabs {
        */
     resetTabState_() {
         for (var k = 0; k < this.tabs_.length; k++) {
-            this.tabs_[k].classList.remove(this.CssClasses_.ACTIVE_CLASS);
+            this.tabs_[k].classList.remove(this.cssClasses_.ACTIVE_CLASS);
         }
     }
     /**
@@ -2524,7 +2546,7 @@ export class MaterialTabs {
        */
     resetPanelState_() {
         for (var j = 0; j < this.panels_.length; j++) {
-            this.panels_[j].classList.remove(this.CssClasses_.ACTIVE_CLASS);
+            this.panels_[j].classList.remove(this.cssClasses_.ACTIVE_CLASS);
         }
     }
     /**
@@ -2550,7 +2572,7 @@ export class MaterialTabs {
        * @enum {string}
        * @private
        */
-    CssClasses_ = {
+    cssClasses_ = {
         TAB_CLASS: 'mdl-tabs__tab',
         PANEL_CLASS: 'mdl-tabs__panel',
         ACTIVE_CLASS: 'is-active',
@@ -2579,18 +2601,18 @@ export class MaterialTab{
                 var panel = ctx.element_.querySelector(`#${  href}`);
                 ctx.resetTabState_();
                 ctx.resetPanelState_();
-                tab.classList.add(ctx.CssClasses_.ACTIVE_CLASS);
-                panel.classList.add(ctx.CssClasses_.ACTIVE_CLASS);
+                tab.classList.add(ctx.cssClasses_.ACTIVE_CLASS);
+                panel.classList.add(ctx.cssClasses_.ACTIVE_CLASS);
             }
         });
 
-        if (!ctx.element_.classList.contains(ctx.CssClasses_.MDL_JS_RIPPLE_EFFECT)) return;
+        if (!ctx.element_.classList.contains(ctx.cssClasses_.MDL_JS_RIPPLE_EFFECT)) return;
 
         var rippleContainer = document.createElement('span');
-        rippleContainer.classList.add(ctx.CssClasses_.MDL_RIPPLE_CONTAINER);
-        rippleContainer.classList.add(ctx.CssClasses_.MDL_JS_RIPPLE_EFFECT);
+        rippleContainer.classList.add(ctx.cssClasses_.MDL_RIPPLE_CONTAINER);
+        rippleContainer.classList.add(ctx.cssClasses_.MDL_JS_RIPPLE_EFFECT);
         var ripple = document.createElement('span');
-        ripple.classList.add(ctx.CssClasses_.MDL_RIPPLE);
+        ripple.classList.add(ctx.cssClasses_.MDL_RIPPLE);
         rippleContainer.appendChild(ripple);
         tab.appendChild(rippleContainer);
     }
@@ -2653,7 +2675,7 @@ export class MaterialTextfield {
        * @private
        */
     onFocus_(event) {
-        this.element_.classList.add(this.CssClasses_.IS_FOCUSED);
+        this.element_.classList.add(this.cssClasses_.IS_FOCUSED);
     }
     /**
        * Handle lost focus.
@@ -2662,7 +2684,7 @@ export class MaterialTextfield {
        * @private
        */
     onBlur_(event) {
-        this.element_.classList.remove(this.CssClasses_.IS_FOCUSED);
+        this.element_.classList.remove(this.cssClasses_.IS_FOCUSED);
     }
     /**
        * Handle reset event from out side.
@@ -2692,9 +2714,9 @@ export class MaterialTextfield {
        */
     checkDisabled() {
         if (this.input_.disabled) {
-            this.element_.classList.add(this.CssClasses_.IS_DISABLED);
+            this.element_.classList.add(this.cssClasses_.IS_DISABLED);
         } else {
-            this.element_.classList.remove(this.CssClasses_.IS_DISABLED);
+            this.element_.classList.remove(this.cssClasses_.IS_DISABLED);
         }
     }
     /**
@@ -2704,9 +2726,9 @@ export class MaterialTextfield {
       */
     checkFocus() {
         if (this.element_.querySelector(':focus')) {
-            this.element_.classList.add(this.CssClasses_.IS_FOCUSED);
+            this.element_.classList.add(this.cssClasses_.IS_FOCUSED);
         } else {
-            this.element_.classList.remove(this.CssClasses_.IS_FOCUSED);
+            this.element_.classList.remove(this.cssClasses_.IS_FOCUSED);
         }
     }
     /**
@@ -2717,9 +2739,9 @@ export class MaterialTextfield {
     checkValidity() {
         if (this.input_.validity) {
             if (this.input_.validity.valid) {
-                this.element_.classList.remove(this.CssClasses_.IS_INVALID);
+                this.element_.classList.remove(this.cssClasses_.IS_INVALID);
             } else {
-                this.element_.classList.add(this.CssClasses_.IS_INVALID);
+                this.element_.classList.add(this.cssClasses_.IS_INVALID);
             }
         }
     }
@@ -2730,9 +2752,9 @@ export class MaterialTextfield {
        */
     checkDirty() {
         if (this.input_.value && this.input_.value.length > 0) {
-            this.element_.classList.add(this.CssClasses_.IS_DIRTY);
+            this.element_.classList.add(this.cssClasses_.IS_DIRTY);
         } else {
-            this.element_.classList.remove(this.CssClasses_.IS_DIRTY);
+            this.element_.classList.remove(this.cssClasses_.IS_DIRTY);
         }
     }
     /**
@@ -2768,8 +2790,8 @@ export class MaterialTextfield {
        */
     init() {
         if (this.element_) {
-            this.label_ = this.element_.querySelector(`.${this.CssClasses_.LABEL}`);
-            this.input_ = this.element_.querySelector(`.${this.CssClasses_.INPUT}`);
+            this.label_ = this.element_.querySelector(`.${this.cssClasses_.LABEL}`);
+            this.input_ = this.element_.querySelector(`.${this.cssClasses_.INPUT}`);
             if (this.input_) {
                 if (this.input_.hasAttribute(this.Constant_.MAX_ROWS_ATTRIBUTE)) {
                     this.maxRows = parseInt(this.input_.getAttribute(this.Constant_.MAX_ROWS_ATTRIBUTE), 10);
@@ -2778,7 +2800,7 @@ export class MaterialTextfield {
                     }
                 }
                 if (this.input_.hasAttribute('placeholder')) {
-                    this.element_.classList.add(this.CssClasses_.HAS_PLACEHOLDER);
+                    this.element_.classList.add(this.cssClasses_.HAS_PLACEHOLDER);
                 }
                 this.boundUpdateClassesHandler = this.updateClasses_.bind(this);
                 this.boundFocusHandler = this.onFocus_.bind(this);
@@ -2794,11 +2816,11 @@ export class MaterialTextfield {
                     this.boundKeyDownHandler = this.onKeyDown_.bind(this);
                     this.input_.addEventListener('keydown', this.boundKeyDownHandler);
                 }
-                var invalid = this.element_.classList.contains(this.CssClasses_.IS_INVALID);
+                var invalid = this.element_.classList.contains(this.cssClasses_.IS_INVALID);
                 this.updateClasses_();
-                this.element_.classList.add(this.CssClasses_.IS_UPGRADED);
+                this.element_.classList.add(this.cssClasses_.IS_UPGRADED);
                 if (invalid) {
-                    this.element_.classList.add(this.CssClasses_.IS_INVALID);
+                    this.element_.classList.add(this.cssClasses_.IS_INVALID);
                 }
                 if (this.input_.hasAttribute('autofocus')) {
                     this.element_.focus();
@@ -2825,7 +2847,7 @@ export class MaterialTextfield {
        * @enum {string}
        * @private
        */
-    CssClasses_ = {
+    cssClasses_ = {
         LABEL: 'mdl-textfield__label',
         INPUT: 'mdl-textfield__input',
         IS_DIRTY: 'is-dirty',
@@ -2902,7 +2924,7 @@ export class MaterialTooltip {
         }
 
         var marginTop = -1 * (this.element_.offsetHeight / 2);
-        if (this.element_.classList.contains(this.CssClasses_.LEFT) || this.element_.classList.contains(this.CssClasses_.RIGHT)) {
+        if (this.element_.classList.contains(this.cssClasses_.LEFT) || this.element_.classList.contains(this.cssClasses_.RIGHT)) {
             left = props.width / 2;
             if (top + marginTop < 0) {
                 this.element_.style.top = '0';
@@ -2920,17 +2942,17 @@ export class MaterialTooltip {
                 this.element_.style.marginLeft = `${marginLeft}px`;
             }
         }
-        if (this.element_.classList.contains(this.CssClasses_.TOP)) {
+        if (this.element_.classList.contains(this.cssClasses_.TOP)) {
             this.element_.style.top = `${props.top - this.element_.offsetHeight - 10}px`;
-        } else if (this.element_.classList.contains(this.CssClasses_.RIGHT)) {
+        } else if (this.element_.classList.contains(this.cssClasses_.RIGHT)) {
             this.element_.style.left = `${props.left + props.width + 10}px`;
-        } else if (this.element_.classList.contains(this.CssClasses_.LEFT)) {
+        } else if (this.element_.classList.contains(this.cssClasses_.LEFT)) {
             this.element_.style.left = `${props.left - this.element_.offsetWidth - 10}px`;
         } else {
             this.element_.style.top = `${props.top + props.height + 10}px`;
         }
 
-        this.element_.classList.add(this.CssClasses_.IS_ACTIVE);
+        this.element_.classList.add(this.cssClasses_.IS_ACTIVE);
     }
     /**
        * Hide tooltip on mouseleave or scroll
@@ -2938,7 +2960,7 @@ export class MaterialTooltip {
        * @private
        */
     hideTooltip_() {
-        this.element_.classList.remove(this.CssClasses_.IS_ACTIVE);
+        this.element_.classList.remove(this.cssClasses_.IS_ACTIVE);
     }
     /**
        * Initialize element.
@@ -2979,7 +3001,7 @@ export class MaterialTooltip {
        * @enum {string}
        * @private
        */
-    CssClasses_ = {
+    cssClasses_ = {
         IS_ACTIVE: 'is-active',
         BOTTOM: 'mdl-tooltip--bottom',
         LEFT: 'mdl-tooltip--left',
@@ -3027,21 +3049,21 @@ export class MaterialLayout {
        * @private
        */
     contentScrollHandler_() {
-        if (this.header_.classList.contains(this.CssClasses_.IS_ANIMATING)) {
+        if (this.header_.classList.contains(this.cssClasses_.IS_ANIMATING)) {
             return;
         }
-        var headerVisible = !this.element_.classList.contains(this.CssClasses_.IS_SMALL_SCREEN) || this.element_.classList.contains(this.CssClasses_.FIXED_HEADER);
-        if (this.content_.scrollTop > 0 && !this.header_.classList.contains(this.CssClasses_.IS_COMPACT)) {
-            this.header_.classList.add(this.CssClasses_.CASTING_SHADOW);
-            this.header_.classList.add(this.CssClasses_.IS_COMPACT);
+        var headerVisible = !this.element_.classList.contains(this.cssClasses_.IS_SMALL_SCREEN) || this.element_.classList.contains(this.cssClasses_.FIXED_HEADER);
+        if (this.content_.scrollTop > 0 && !this.header_.classList.contains(this.cssClasses_.IS_COMPACT)) {
+            this.header_.classList.add(this.cssClasses_.CASTING_SHADOW);
+            this.header_.classList.add(this.cssClasses_.IS_COMPACT);
             if (headerVisible) {
-                this.header_.classList.add(this.CssClasses_.IS_ANIMATING);
+                this.header_.classList.add(this.cssClasses_.IS_ANIMATING);
             }
-        } else if (this.content_.scrollTop <= 0 && this.header_.classList.contains(this.CssClasses_.IS_COMPACT)) {
-            this.header_.classList.remove(this.CssClasses_.CASTING_SHADOW);
-            this.header_.classList.remove(this.CssClasses_.IS_COMPACT);
+        } else if (this.content_.scrollTop <= 0 && this.header_.classList.contains(this.cssClasses_.IS_COMPACT)) {
+            this.header_.classList.remove(this.cssClasses_.CASTING_SHADOW);
+            this.header_.classList.remove(this.cssClasses_.IS_COMPACT);
             if (headerVisible) {
-                this.header_.classList.add(this.CssClasses_.IS_ANIMATING);
+                this.header_.classList.add(this.cssClasses_.IS_ANIMATING);
             }
         }
     }
@@ -3053,7 +3075,7 @@ export class MaterialLayout {
        */
     keyboardEventHandler_(evt) {
         // Only react when the drawer is open.
-        if (evt.keyCode === this.Keycodes_.ESCAPE && this.drawer_.classList.contains(this.CssClasses_.IS_DRAWER_OPEN)) {
+        if (evt.keyCode === this.Keycodes_.ESCAPE && this.drawer_.classList.contains(this.cssClasses_.IS_DRAWER_OPEN)) {
             this.toggleDrawer();
         }
     }
@@ -3064,13 +3086,13 @@ export class MaterialLayout {
        */
     screenSizeHandler_() {
         if (this.screenSizeMediaQuery_.matches) {
-            this.element_.classList.add(this.CssClasses_.IS_SMALL_SCREEN);
+            this.element_.classList.add(this.cssClasses_.IS_SMALL_SCREEN);
         } else {
-            this.element_.classList.remove(this.CssClasses_.IS_SMALL_SCREEN);
+            this.element_.classList.remove(this.cssClasses_.IS_SMALL_SCREEN);
             // Collapse drawer (if any) when moving to a large screen size.
             if (this.drawer_) {
-                this.drawer_.classList.remove(this.CssClasses_.IS_DRAWER_OPEN);
-                this.obfuscator_.classList.remove(this.CssClasses_.IS_DRAWER_OPEN);
+                this.drawer_.classList.remove(this.cssClasses_.IS_DRAWER_OPEN);
+                this.obfuscator_.classList.remove(this.cssClasses_.IS_DRAWER_OPEN);
             }
         }
     }
@@ -3100,7 +3122,7 @@ export class MaterialLayout {
        * @private
        */
     headerTransitionEndHandler_() {
-        this.header_.classList.remove(this.CssClasses_.IS_ANIMATING);
+        this.header_.classList.remove(this.cssClasses_.IS_ANIMATING);
     }
     /**
        * Handles expanding the header on click
@@ -3108,9 +3130,9 @@ export class MaterialLayout {
        * @private
        */
     headerClickHandler_() {
-        if (this.header_.classList.contains(this.CssClasses_.IS_COMPACT)) {
-            this.header_.classList.remove(this.CssClasses_.IS_COMPACT);
-            this.header_.classList.add(this.CssClasses_.IS_ANIMATING);
+        if (this.header_.classList.contains(this.cssClasses_.IS_COMPACT)) {
+            this.header_.classList.remove(this.cssClasses_.IS_COMPACT);
+            this.header_.classList.add(this.cssClasses_.IS_ANIMATING);
         }
     }
     /**
@@ -3120,7 +3142,7 @@ export class MaterialLayout {
        */
     resetTabState_(tabBar) {
         for (var k = 0; k < tabBar.length; k++) {
-            tabBar[k].classList.remove(this.CssClasses_.IS_ACTIVE);
+            tabBar[k].classList.remove(this.cssClasses_.IS_ACTIVE);
         }
     }
     /**
@@ -3130,7 +3152,7 @@ export class MaterialLayout {
        */
     resetPanelState_(panels) {
         for (var j = 0; j < panels.length; j++) {
-            panels[j].classList.remove(this.CssClasses_.IS_ACTIVE);
+            panels[j].classList.remove(this.cssClasses_.IS_ACTIVE);
         }
     }
     /**
@@ -3139,11 +3161,11 @@ export class MaterialLayout {
       * @public
       */
     toggleDrawer() {
-        var drawerButton = this.element_.querySelector(`.${this.CssClasses_.DRAWER_BTN}`);
-        this.drawer_.classList.toggle(this.CssClasses_.IS_DRAWER_OPEN);
-        this.obfuscator_.classList.toggle(this.CssClasses_.IS_DRAWER_OPEN);
+        var drawerButton = this.element_.querySelector(`.${this.cssClasses_.DRAWER_BTN}`);
+        this.drawer_.classList.toggle(this.cssClasses_.IS_DRAWER_OPEN);
+        this.obfuscator_.classList.toggle(this.cssClasses_.IS_DRAWER_OPEN);
         // Set accessibility properties.
-        if (this.drawer_.classList.contains(this.CssClasses_.IS_DRAWER_OPEN)) {
+        if (this.drawer_.classList.contains(this.cssClasses_.IS_DRAWER_OPEN)) {
             this.drawer_.setAttribute('aria-hidden', 'false');
             drawerButton.setAttribute('aria-expanded', 'true');
         } else {
@@ -3157,7 +3179,7 @@ export class MaterialLayout {
     init() {
         if (this.element_) {
             var container = document.createElement('div');
-            container.classList.add(this.CssClasses_.CONTAINER);
+            container.classList.add(this.cssClasses_.CONTAINER);
             var focusedElement = this.element_.querySelector(':focus');
             this.element_.parentElement.insertBefore(container, this.element_);
             this.element_.parentElement.removeChild(this.element_);
@@ -3169,13 +3191,13 @@ export class MaterialLayout {
             var numChildren = directChildren.length;
             for (var c = 0; c < numChildren; c++) {
                 var child = directChildren[c];
-                if (child.classList && child.classList.contains(this.CssClasses_.HEADER)) {
+                if (child.classList && child.classList.contains(this.cssClasses_.HEADER)) {
                     this.header_ = child;
                 }
-                if (child.classList && child.classList.contains(this.CssClasses_.DRAWER)) {
+                if (child.classList && child.classList.contains(this.cssClasses_.DRAWER)) {
                     this.drawer_ = child;
                 }
-                if (child.classList && child.classList.contains(this.CssClasses_.CONTENT)) {
+                if (child.classList && child.classList.contains(this.cssClasses_.CONTENT)) {
                     this.content_ = child;
                 }
             }
@@ -3190,29 +3212,29 @@ export class MaterialLayout {
                 }
             }.bind(this), false);
             if (this.header_) {
-                this.tabBar_ = this.header_.querySelector(`.${this.CssClasses_.TAB_BAR}`);
+                this.tabBar_ = this.header_.querySelector(`.${this.cssClasses_.TAB_BAR}`);
             }
             var mode = this.Mode_.STANDARD;
             if (this.header_) {
-                if (this.header_.classList.contains(this.CssClasses_.HEADER_SEAMED)) {
+                if (this.header_.classList.contains(this.cssClasses_.HEADER_SEAMED)) {
                     mode = this.Mode_.SEAMED;
-                } else if (this.header_.classList.contains(this.CssClasses_.HEADER_WATERFALL)) {
+                } else if (this.header_.classList.contains(this.cssClasses_.HEADER_WATERFALL)) {
                     mode = this.Mode_.WATERFALL;
                     this.header_.addEventListener('transitionend', this.headerTransitionEndHandler_.bind(this));
                     this.header_.addEventListener('click', this.headerClickHandler_.bind(this));
-                } else if (this.header_.classList.contains(this.CssClasses_.HEADER_SCROLL)) {
+                } else if (this.header_.classList.contains(this.cssClasses_.HEADER_SCROLL)) {
                     mode = this.Mode_.SCROLL;
-                    container.classList.add(this.CssClasses_.HAS_SCROLLING_HEADER);
+                    container.classList.add(this.cssClasses_.HAS_SCROLLING_HEADER);
                 }
                 if (mode === this.Mode_.STANDARD) {
-                    this.header_.classList.add(this.CssClasses_.CASTING_SHADOW);
+                    this.header_.classList.add(this.cssClasses_.CASTING_SHADOW);
                     if (this.tabBar_) {
-                        this.tabBar_.classList.add(this.CssClasses_.CASTING_SHADOW);
+                        this.tabBar_.classList.add(this.cssClasses_.CASTING_SHADOW);
                     }
                 } else if (mode === this.Mode_.SEAMED || mode === this.Mode_.SCROLL) {
-                    this.header_.classList.remove(this.CssClasses_.CASTING_SHADOW);
+                    this.header_.classList.remove(this.cssClasses_.CASTING_SHADOW);
                     if (this.tabBar_) {
-                        this.tabBar_.classList.remove(this.CssClasses_.CASTING_SHADOW);
+                        this.tabBar_.classList.remove(this.cssClasses_.CASTING_SHADOW);
                     }
                 } else if (mode === this.Mode_.WATERFALL) {
                     // Add and remove shadows depending on scroll position.
@@ -3224,15 +3246,15 @@ export class MaterialLayout {
             }
             // Add drawer toggling button to our layout, if we have an openable drawer.
             if (this.drawer_) {
-                var drawerButton = this.element_.querySelector(`.${this.CssClasses_.DRAWER_BTN}`);
+                var drawerButton = this.element_.querySelector(`.${this.cssClasses_.DRAWER_BTN}`);
                 if (!drawerButton) {
                     drawerButton = document.createElement('div');
                     drawerButton.setAttribute('aria-expanded', 'false');
                     drawerButton.setAttribute('role', 'button');
                     drawerButton.setAttribute('tabindex', '0');
-                    drawerButton.classList.add(this.CssClasses_.DRAWER_BTN);
+                    drawerButton.classList.add(this.cssClasses_.DRAWER_BTN);
                     var drawerButtonIcon = document.createElement('i');
-                    drawerButtonIcon.classList.add(this.CssClasses_.ICON);
+                    drawerButtonIcon.classList.add(this.cssClasses_.ICON);
                     drawerButtonIcon.innerHTML = this.Constant_.MENU_ICON;
                     drawerButton.appendChild(drawerButtonIcon);
                 }
@@ -3244,28 +3266,28 @@ export class MaterialLayout {
                     titleElement.addEventListener('click', this.drawerToggleHandler_.bind(this));
                     titleElement.addEventListener('keydown', this.drawerToggleHandler_.bind(this));
                 }
-                if (this.drawer_.classList.contains(this.CssClasses_.ON_LARGE_SCREEN)) {
+                if (this.drawer_.classList.contains(this.cssClasses_.ON_LARGE_SCREEN)) {
                     //If drawer has ON_LARGE_SCREEN class then add it to the drawer toggle button as well.
-                    drawerButton.classList.add(this.CssClasses_.ON_LARGE_SCREEN);
-                } else if (this.drawer_.classList.contains(this.CssClasses_.ON_SMALL_SCREEN)) {
+                    drawerButton.classList.add(this.cssClasses_.ON_LARGE_SCREEN);
+                } else if (this.drawer_.classList.contains(this.cssClasses_.ON_SMALL_SCREEN)) {
                     //If drawer has ON_SMALL_SCREEN class then add it to the drawer toggle button as well.
-                    drawerButton.classList.add(this.CssClasses_.ON_SMALL_SCREEN);
+                    drawerButton.classList.add(this.cssClasses_.ON_SMALL_SCREEN);
                 }
                 drawerButton.addEventListener('click', this.drawerToggleHandler_.bind(this));
                 drawerButton.addEventListener('keydown', this.drawerToggleHandler_.bind(this));
                 // Add a class if the layout has a drawer, for altering the left padding.
                 // Adds the HAS_DRAWER to the elements since this.header_ may or may
                 // not be present.
-                this.element_.classList.add(this.CssClasses_.HAS_DRAWER);
+                this.element_.classList.add(this.cssClasses_.HAS_DRAWER);
                 // If we have a fixed header, add the button to the header rather than
                 // the layout.
-                if (this.element_.classList.contains(this.CssClasses_.FIXED_HEADER)) {
+                if (this.element_.classList.contains(this.cssClasses_.FIXED_HEADER)) {
                     this.header_.insertBefore(drawerButton, this.header_.firstChild);
                 } else {
                     this.element_.insertBefore(drawerButton, this.content_);
                 }
                 var obfuscator = document.createElement('div');
-                obfuscator.classList.add(this.CssClasses_.OBFUSCATOR);
+                obfuscator.classList.add(this.cssClasses_.OBFUSCATOR);
                 this.element_.appendChild(obfuscator);
                 obfuscator.addEventListener('click', this.drawerToggleHandler_.bind(this));
                 this.obfuscator_ = obfuscator;
@@ -3279,26 +3301,26 @@ export class MaterialLayout {
             this.screenSizeHandler_();
             // Initialize tabs, if any.
             if (this.header_ && this.tabBar_) {
-                this.element_.classList.add(this.CssClasses_.HAS_TABS);
+                this.element_.classList.add(this.cssClasses_.HAS_TABS);
                 var tabContainer = document.createElement('div');
-                tabContainer.classList.add(this.CssClasses_.TAB_CONTAINER);
+                tabContainer.classList.add(this.cssClasses_.TAB_CONTAINER);
                 this.header_.insertBefore(tabContainer, this.tabBar_);
                 this.header_.removeChild(this.tabBar_);
                 var leftButton = document.createElement('div');
-                leftButton.classList.add(this.CssClasses_.TAB_BAR_BUTTON);
-                leftButton.classList.add(this.CssClasses_.TAB_BAR_LEFT_BUTTON);
+                leftButton.classList.add(this.cssClasses_.TAB_BAR_BUTTON);
+                leftButton.classList.add(this.cssClasses_.TAB_BAR_LEFT_BUTTON);
                 var leftButtonIcon = document.createElement('i');
-                leftButtonIcon.classList.add(this.CssClasses_.ICON);
+                leftButtonIcon.classList.add(this.cssClasses_.ICON);
                 leftButtonIcon.textContent = this.Constant_.CHEVRON_LEFT;
                 leftButton.appendChild(leftButtonIcon);
                 leftButton.addEventListener('click', function () {
                     this.tabBar_.scrollLeft -= this.Constant_.TAB_SCROLL_PIXELS;
                 }.bind(this));
                 var rightButton = document.createElement('div');
-                rightButton.classList.add(this.CssClasses_.TAB_BAR_BUTTON);
-                rightButton.classList.add(this.CssClasses_.TAB_BAR_RIGHT_BUTTON);
+                rightButton.classList.add(this.cssClasses_.TAB_BAR_BUTTON);
+                rightButton.classList.add(this.cssClasses_.TAB_BAR_RIGHT_BUTTON);
                 var rightButtonIcon = document.createElement('i');
-                rightButtonIcon.classList.add(this.CssClasses_.ICON);
+                rightButtonIcon.classList.add(this.cssClasses_.ICON);
                 rightButtonIcon.textContent = this.Constant_.CHEVRON_RIGHT;
                 rightButton.appendChild(rightButtonIcon);
                 rightButton.addEventListener('click', function () {
@@ -3311,14 +3333,14 @@ export class MaterialLayout {
                 // window size.
                 var tabUpdateHandler = function () {
                     if (this.tabBar_.scrollLeft > 0) {
-                        leftButton.classList.add(this.CssClasses_.IS_ACTIVE);
+                        leftButton.classList.add(this.cssClasses_.IS_ACTIVE);
                     } else {
-                        leftButton.classList.remove(this.CssClasses_.IS_ACTIVE);
+                        leftButton.classList.remove(this.cssClasses_.IS_ACTIVE);
                     }
                     if (this.tabBar_.scrollLeft < this.tabBar_.scrollWidth - this.tabBar_.offsetWidth) {
-                        rightButton.classList.add(this.CssClasses_.IS_ACTIVE);
+                        rightButton.classList.add(this.cssClasses_.IS_ACTIVE);
                     } else {
-                        rightButton.classList.remove(this.CssClasses_.IS_ACTIVE);
+                        rightButton.classList.remove(this.cssClasses_.IS_ACTIVE);
                     }
                 }.bind(this);
                 this.tabBar_.addEventListener('scroll', tabUpdateHandler);
@@ -3335,18 +3357,18 @@ export class MaterialLayout {
                     }.bind(this), this.Constant_.RESIZE_TIMEOUT);
                 }.bind(this);
                 window.addEventListener('resize', windowResizeHandler);
-                if (this.tabBar_.classList.contains(this.CssClasses_.JS_RIPPLE_EFFECT)) {
-                    this.tabBar_.classList.add(this.CssClasses_.RIPPLE_IGNORE_EVENTS);
+                if (this.tabBar_.classList.contains(this.cssClasses_.JS_RIPPLE_EFFECT)) {
+                    this.tabBar_.classList.add(this.cssClasses_.RIPPLE_IGNORE_EVENTS);
                 }
                 // Select element tabs, document panels
-                var tabs = this.tabBar_.querySelectorAll(`.${this.CssClasses_.TAB}`);
-                var panels = this.content_.querySelectorAll(`.${this.CssClasses_.PANEL}`);
+                var tabs = this.tabBar_.querySelectorAll(`.${this.cssClasses_.TAB}`);
+                var panels = this.content_.querySelectorAll(`.${this.cssClasses_.PANEL}`);
                 // Create new tabs for each tab element
                 for (var i_ = 0; i_ < tabs.length; i_++) {
                     new MaterialLayoutTab(tabs[i_], tabs, panels, this);
                 }
             }
-            this.element_.classList.add(this.CssClasses_.IS_UPGRADED);
+            this.element_.classList.add(this.cssClasses_.IS_UPGRADED);
         }
     }
     /**
@@ -3394,7 +3416,7 @@ export class MaterialLayout {
        * @enum {string}
        * @private
        */
-    CssClasses_ = {
+    cssClasses_ = {
         CONTAINER: 'mdl-layout__container',
         HEADER: 'mdl-layout__header',
         DRAWER: 'mdl-layout__drawer',
@@ -3452,19 +3474,19 @@ export class MaterialLayoutTab{
             var panel = layout.content_.querySelector(`#${  href}`);
             layout.resetTabState_(tabs);
             layout.resetPanelState_(panels);
-            tab.classList.add(layout.CssClasses_.IS_ACTIVE);
-            panel.classList.add(layout.CssClasses_.IS_ACTIVE);
+            tab.classList.add(layout.cssClasses_.IS_ACTIVE);
+            panel.classList.add(layout.cssClasses_.IS_ACTIVE);
         }
-        if (layout.tabBar_.classList.contains(layout.CssClasses_.JS_RIPPLE_EFFECT)) {
+        if (layout.tabBar_.classList.contains(layout.cssClasses_.JS_RIPPLE_EFFECT)) {
             var rippleContainer = document.createElement('span');
-            rippleContainer.classList.add(layout.CssClasses_.RIPPLE_CONTAINER);
-            rippleContainer.classList.add(layout.CssClasses_.JS_RIPPLE_EFFECT);
+            rippleContainer.classList.add(layout.cssClasses_.RIPPLE_CONTAINER);
+            rippleContainer.classList.add(layout.cssClasses_.JS_RIPPLE_EFFECT);
             var ripple = document.createElement('span');
-            ripple.classList.add(layout.CssClasses_.RIPPLE);
+            ripple.classList.add(layout.cssClasses_.RIPPLE);
             rippleContainer.appendChild(ripple);
             tab.appendChild(rippleContainer);
         }
-        if (!layout.tabBar_.classList.contains(layout.CssClasses_.TAB_MANUAL_SWITCH)) {
+        if (!layout.tabBar_.classList.contains(layout.cssClasses_.TAB_MANUAL_SWITCH)) {
             tab.addEventListener('click', function (e) {
                 if (tab.getAttribute('href').charAt(0) === '#') {
                     e.preventDefault();
@@ -3523,9 +3545,9 @@ export class MaterialDataTable {
         if (row) {
             return function () {
                 if (checkbox.checked) {
-                    row.classList.add(this.CssClasses_.IS_SELECTED);
+                    row.classList.add(this.cssClasses_.IS_SELECTED);
                 } else {
-                    row.classList.remove(this.CssClasses_.IS_SELECTED);
+                    row.classList.remove(this.cssClasses_.IS_SELECTED);
                 }
             }.bind(this);
         }
@@ -3537,13 +3559,13 @@ export class MaterialDataTable {
                     for (i_ = 0; i_ < opt_rows.length; i_++) {
                         el = opt_rows[i_].querySelector('td').querySelector('.mdl-checkbox');
                         el['MaterialCheckbox'].check();
-                        opt_rows[i_].classList.add(this.CssClasses_.IS_SELECTED);
+                        opt_rows[i_].classList.add(this.cssClasses_.IS_SELECTED);
                     }
                 } else {
                     for (i_ = 0; i_ < opt_rows.length; i_++) {
                         el = opt_rows[i_].querySelector('td').querySelector('.mdl-checkbox');
                         el['MaterialCheckbox'].uncheck();
-                        opt_rows[i_].classList.remove(this.CssClasses_.IS_SELECTED);
+                        opt_rows[i_].classList.remove(this.cssClasses_.IS_SELECTED);
                     }
                 }
             }.bind(this);
@@ -3563,14 +3585,14 @@ export class MaterialDataTable {
             'mdl-checkbox',
             'mdl-js-checkbox',
             'mdl-js-ripple-effect',
-            this.CssClasses_.SELECT_ELEMENT
+            this.cssClasses_.SELECT_ELEMENT
         ];
         label.className = labelClasses.join(' ');
         var checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.classList.add('mdl-checkbox__input');
         if (row) {
-            checkbox.checked = row.classList.contains(this.CssClasses_.IS_SELECTED);
+            checkbox.checked = row.classList.contains(this.cssClasses_.IS_SELECTED);
             checkbox.addEventListener('change', this.selectRow_(checkbox, row));
         } else if (opt_rows) {
             checkbox.addEventListener('change', this.selectRow_(checkbox, null, opt_rows));
@@ -3588,7 +3610,7 @@ export class MaterialDataTable {
             var bodyRows = Array.prototype.slice.call(this.element_.querySelectorAll('tbody tr'));
             var footRows = Array.prototype.slice.call(this.element_.querySelectorAll('tfoot tr'));
             var rows = bodyRows.concat(footRows);
-            if (this.element_.classList.contains(this.CssClasses_.SELECTABLE)) {
+            if (this.element_.classList.contains(this.cssClasses_.SELECTABLE)) {
                 var th = document.createElement('th');
                 var headerCheckbox = this.createCheckbox_(null, rows);
                 th.appendChild(headerCheckbox);
@@ -3604,7 +3626,7 @@ export class MaterialDataTable {
                         rows[i_].insertBefore(td, firstCell);
                     }
                 }
-                this.element_.classList.add(this.CssClasses_.IS_UPGRADED);
+                this.element_.classList.add(this.cssClasses_.IS_UPGRADED);
             }
         }
     }
@@ -3623,7 +3645,7 @@ export class MaterialDataTable {
        * @enum {string}
        * @private
        */
-    CssClasses_ = {
+    cssClasses_ = {
         DATA_TABLE: 'mdl-data-table',
         SELECTABLE: 'mdl-data-table--selectable',
         SELECT_ELEMENT: 'mdl-data-table__select',
@@ -3672,15 +3694,17 @@ export class MaterialRipple {
        * @private
        */
     downHandler_(event) {
-        if (!this.rippleElement_.style.width && !this.rippleElement_.style.height) {
-            var rect = this.element_.getBoundingClientRect();
-            this.boundHeight = rect.height;
-            this.boundWidth = rect.width;
-            this.rippleSize_ = Math.sqrt(rect.width * rect.width + rect.height * rect.height) * 2 + 2;
-            this.rippleElement_.style.width = `${this.rippleSize_}px`;
-            this.rippleElement_.style.height = `${this.rippleSize_}px`;
+        if (this.rippleElement_){
+            if (!this.rippleElement_.style.width && !this.rippleElement_.style.height) {
+                var rect = this.element_.getBoundingClientRect();
+                this.boundHeight = rect.height;
+                this.boundWidth = rect.width;
+                this.rippleSize_ = Math.sqrt(rect.width * rect.width + rect.height * rect.height) * 2 + 2;
+                this.rippleElement_.style.width = `${this.rippleSize_}px`;
+                this.rippleElement_.style.height = `${this.rippleSize_}px`;
+            }
+            this.rippleElement_.classList.add(this.cssClasses_.IS_VISIBLE);
         }
-        this.rippleElement_.classList.add(this.CssClasses_.IS_VISIBLE);
         if (event.type === 'mousedown' && this.ignoringMouseDown_) {
             this.ignoringMouseDown_ = false;
         } else {
@@ -3723,7 +3747,7 @@ export class MaterialRipple {
             // shows for tap events, which seem to trigger a mouseup too soon after
             // mousedown.
             window.setTimeout(function () {
-                this.rippleElement_.classList.remove(this.CssClasses_.IS_VISIBLE);
+                if (this.rippleElement_) this.rippleElement_.classList.remove(this.cssClasses_.IS_VISIBLE);
             }.bind(this), 0);
         }
     }
@@ -3733,9 +3757,9 @@ export class MaterialRipple {
        */
     init() {
         if (this.element_) {
-            this.recentering = this.element_.classList.contains(this.CssClasses_.RIPPLE_CENTER);
-            if (!this.element_.classList.contains(this.CssClasses_.RIPPLE_EFFECT_IGNORE_EVENTS)) {
-                this.rippleElement_ = this.element_.querySelector(`.${this.CssClasses_.RIPPLE}`);
+            this.recentering = this.element_.classList.contains(this.cssClasses_.RIPPLE_CENTER);
+            if (!this.element_.classList.contains(this.cssClasses_.RIPPLE_EFFECT_IGNORE_EVENTS)) {
+                this.rippleElement_ = this.element_.querySelector(`.${this.cssClasses_.RIPPLE}`);
                 this.frameCount_ = 0;
                 this.rippleSize_ = 0;
                 this.x_ = 0;
@@ -3810,9 +3834,9 @@ export class MaterialRipple {
             this.rippleElement_.style.msTransform = transformString;
             this.rippleElement_.style.transform = transformString;
             if (start) {
-                this.rippleElement_.classList.remove(this.CssClasses_.IS_ANIMATING);
+                this.rippleElement_.classList.remove(this.cssClasses_.IS_ANIMATING);
             } else {
-                this.rippleElement_.classList.add(this.CssClasses_.IS_ANIMATING);
+                this.rippleElement_.classList.add(this.cssClasses_.IS_ANIMATING);
             }
         }
     }
@@ -3847,7 +3871,7 @@ export class MaterialRipple {
        * @enum {string}
        * @private
        */
-    CssClasses_ = {
+    cssClasses_ = {
         RIPPLE_CENTER: 'mdl-ripple--center',
         RIPPLE_EFFECT_IGNORE_EVENTS: 'mdl-js-ripple-effect--ignore-events',
         RIPPLE: 'mdl-ripple',
@@ -3864,10 +3888,3 @@ componentHandler.register({
     cssClass: 'mdl-js-ripple-effect',
     widget: false
 });
-
-
-// Dummy class to make exporting variables less of a headache.
-export class mdl {
-    static componentHandler;
-}
-mdl.componentHandler = componentHandler;

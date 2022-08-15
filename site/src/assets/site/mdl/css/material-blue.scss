@@ -4297,12 +4297,11 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
     height: 0;
     width: 0;
     /*visibility: hidden;*/
-    z-index: -1
+    z-index: 999
 }
 
 .mdl-menu__container.is-visible,
 .mdl-menu__container.is-animating {
-    z-index: 999;
     visibility: visible
 }
 
@@ -4326,7 +4325,6 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
     will-change: transform;
     /*transition: transform .125s cubic-bezier(.4, 0, .2, 1), opacity .1s cubic-bezier(.4, 0, .2, 1);*/
     transition: transform .125s cubic-bezier(.4, 0, .2, 1), opacity .1s cubic-bezier(.4, 0, .2, 1), transform .125s cubic-bezier(.4, 0, .2, 1);
-    z-index: -1
 }
 
 .mdl-menu__container.is-visible .mdl-menu__outline {
@@ -4363,12 +4361,11 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
     margin: 0;
     opacity: 0;
     clip: rect(0 0 0 0);
-    z-index: -1
+    z-index: 999
 }
 
 .mdl-menu__container.is-visible .mdl-menu {
     opacity: 1;
-    z-index: 999
 }
 
 .mdl-menu.is-animating {
