@@ -573,6 +573,24 @@ body.preload * {
         overflow: hidden;
     }
 
+    ::-webkit-scrollbar {
+        width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #fff2;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #fff9;
+        transition-property: background;
+        transition-duration: 100ms;
+        transition-timing-function: ease-in-out;
+
+        border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #fffd;
+    }
+
     /* Fix search input vertical position. */
     .mdl-textfield {
         vertical-align: middle;

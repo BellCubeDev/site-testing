@@ -71,7 +71,7 @@ ECHO [36mCompiling TypeScript files...[0m
 ECHO.
 if "%~1" == "serve" (
     call npm install -g typescript tsc-watch
-    start "TypeScript Compiler" /min npx tsc-watch --build --verbose --onCompilationStarted "call robocopy src\ ..\_generated\ts_out\ /s /xf *.js *.ts" --onCompilationComplete "title TypeScript Compiler" tsconfig.json
+    start "TypeScript Compiler" /min "%~dp0\watch.bat"
 ) else (
     call npx tsc --build --verbose tsconfig.json && exit
 )

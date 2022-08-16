@@ -3070,7 +3070,7 @@ export class MaterialLayout {
     /**
        * Handles a keyboard event on the drawer.
        *
-       * @param {Event} evt The event that fired.
+       * @param {KeyboardEvent} evt The event that fired.
        * @private
        */
     keyboardEventHandler_(evt) {
@@ -3161,26 +3161,48 @@ export class MaterialLayout {
       * @public
       */
     toggleDrawer() {
-        var drawerButton = this.element_.querySelector(`.${this.cssClasses_.DRAWER_BTN}`);
         this.drawer_.classList.toggle(this.cssClasses_.IS_DRAWER_OPEN);
         this.obfuscator_.classList.toggle(this.cssClasses_.IS_DRAWER_OPEN);
         // Set accessibility properties.
-        if (this.drawer_.classList.contains(this.cssClasses_.IS_DRAWER_OPEN)) {
-            this.drawer_.setAttribute('aria-hidden', 'false');
-            this.drawer_.removeAttribute('tabindex');
-            drawerButton.setAttribute('aria-expanded', 'true');
-            const elemToFocusNextSibling = this.drawer_.querySelector('.mdl-navigation__link')
-            if (elemToFocusNextSibling && elemToFocusNextSibling.previousSibling && elemToFocusNextSibling.previousElementSibling.focus){
-                elemToFocusNextSibling.previousElementSibling.setAttribute('tabindex', '0');
-                elemToFocusNextSibling.previousElementSibling.focus({preventScroll:true});
-                requestAnimationFrame(() => {requestAnimationFrame(() => {elemToFocusNextSibling.previousElementSibling.removeAttribute('tabindex');})});
-            } else console.error("Ruh roh! No focusable elements in the drawer!", elemToFocusNextSibling, elemToFocusNextSibling.previousElementSibling);
-        } else {
-            this.drawer_.setAttribute('aria-hidden', 'true');
-            this.drawer_.setAttribute('tabindex', '-256');
-            drawerButton.setAttribute('aria-expanded', 'false');
-            drawerButton.focus({preventScroll:true});
+        if (this.drawer_.classList.contains(this.cssClasses_.IS_DRAWER_OPEN)) this.openDrawer(false);
+        else this.closeDrawer(false);
+    }
+
+    openDrawer(doNewClass = true) {
+        if (doNewClass) {
+            if (this.drawer_.classList.contains(this.cssClasses_.IS_DRAWER_OPEN)) return;
+            this.drawer_.classList.add(this.cssClasses_.IS_DRAWER_OPEN);
+            this.obfuscator_.classList.add(this.cssClasses_.IS_DRAWER_OPEN);
         }
+
+        this.drawer_.setAttribute('aria-hidden', 'false');
+        this.drawer_.removeAttribute('tabindex');
+
+        var drawerButton = this.element_.querySelector(`.${this.cssClasses_.DRAWER_BTN}`);
+        drawerButton.setAttribute('aria-expanded', 'true');
+
+        const elemToFocusNextSibling = this.drawer_.querySelector('.mdl-navigation__link');
+        if (elemToFocusNextSibling && elemToFocusNextSibling.previousSibling && elemToFocusNextSibling.previousElementSibling.focus){
+            elemToFocusNextSibling.previousElementSibling.setAttribute('tabindex', '0');
+            elemToFocusNextSibling.previousElementSibling.focus({preventScroll:true});
+            requestAnimationFrame(() => {requestAnimationFrame(() => {elemToFocusNextSibling.previousElementSibling.removeAttribute('tabindex');});});
+        } else
+            console.error("Ruh roh! No focusable elements in the drawer!", elemToFocusNextSibling, elemToFocusNextSibling.previousElementSibling);
+    }
+
+    closeDrawer(doNewClass = true) {
+        if (doNewClass) {
+            if (this.drawer_.classList.contains(this.cssClasses_.IS_DRAWER_OPEN)) return;
+            this.drawer_.classList.remove(this.cssClasses_.IS_DRAWER_OPEN);
+            this.obfuscator_.classList.remove(this.cssClasses_.IS_DRAWER_OPEN);
+        }
+
+        this.drawer_.setAttribute('aria-hidden', 'true');
+        this.drawer_.setAttribute('tabindex', '-256');
+
+        var drawerButton = this.element_.querySelector(`.${this.cssClasses_.DRAWER_BTN}`);
+        drawerButton.setAttribute('aria-expanded', 'false');
+        drawerButton.focus({preventScroll:true});
     }
     /**
        * Initialize element.
@@ -3267,6 +3289,7 @@ export class MaterialLayout {
                     drawerButtonIcon.innerHTML = this.Constant_.MENU_ICON;
                     drawerButton.appendChild(drawerButtonIcon);
                 }
+
                 const titleElement = this.element_.querySelector('.mdl-layout-title');
                 console.debug('titleElement', titleElement);
                 if (titleElement) {
@@ -3275,6 +3298,7 @@ export class MaterialLayout {
                     titleElement.addEventListener('click', this.drawerToggleHandler_.bind(this));
                     titleElement.addEventListener('keydown', this.drawerToggleHandler_.bind(this));
                 }
+
                 if (this.drawer_.classList.contains(this.cssClasses_.ON_LARGE_SCREEN)) {
                     //If drawer has ON_LARGE_SCREEN class then add it to the drawer toggle button as well.
                     drawerButton.classList.add(this.cssClasses_.ON_LARGE_SCREEN);
@@ -3282,8 +3306,6 @@ export class MaterialLayout {
                     //If drawer has ON_SMALL_SCREEN class then add it to the drawer toggle button as well.
                     drawerButton.classList.add(this.cssClasses_.ON_SMALL_SCREEN);
                 }
-                drawerButton.addEventListener('click', this.drawerToggleHandler_.bind(this));
-                drawerButton.addEventListener('keydown', this.drawerToggleHandler_.bind(this));
                 // Add a class if the layout has a drawer, for altering the left padding.
                 // Adds the HAS_DRAWER to the elements since this.header_ may or may
                 // not be present.
@@ -3298,11 +3320,17 @@ export class MaterialLayout {
                 var obfuscator = document.createElement('div');
                 obfuscator.classList.add(this.cssClasses_.OBFUSCATOR);
                 this.element_.appendChild(obfuscator);
-                obfuscator.addEventListener('click', this.drawerToggleHandler_.bind(this));
                 this.obfuscator_ = obfuscator;
-                document.addEventListener('keydown', this.keyboardEventHandler_.bind(this));
+
                 this.drawer_.setAttribute('aria-hidden', 'true');
                 this.drawer_.setAttribute('tabindex', '-256');
+
+                drawerButton.addEventListener('click', this.drawerToggleHandler_.bind(this));
+                drawerButton.addEventListener('keydown', this.drawerToggleHandler_.bind(this));
+
+                obfuscator.addEventListener('click', this.drawerToggleHandler_.bind(this));
+
+                document.addEventListener('keydown', this.keyboardEventHandler_.bind(this));
             }
             // Keep an eye on screen size, and add/remove auxiliary class for styling
             // of small screens.

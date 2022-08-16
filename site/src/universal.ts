@@ -343,8 +343,8 @@ export class BellCubicSummary extends bcd_collapsableParent {
 
         console.log(event);
 
-        // @ts-expect-error: Property 'path' DOES exist on type 'PointerEvent', at least according to the browser.
-        if (!event.pointerType || event.path.slice(0, 5).map((el:HTMLElement) => el.tagName === 'A').includes(true)) return;
+        // @ts-expect-error: Property 'path' and 'pointerType' DO exist on type 'MouseEvent', but not in Firefox.
+        if (!('pointerType' in event) || !event.pointerType || !event.path || event.path?.slice(0, 5).map((el:HTMLElement) => el.tagName === 'A').includes(true)) return;
         this.toggle();
         focusAnyElement(this.details_inner);
     }
