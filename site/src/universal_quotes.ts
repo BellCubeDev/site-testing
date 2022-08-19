@@ -7,15 +7,6 @@ random: A float between 0 and 1. If the Math.random number is less than this, th
 date: An array of date bounds in [M,D,YYYY]. Set either to [0,0,0] to mark it as unbounded.
 */
 
-export type conditionDate_Individual = [number, number, number]
-export type conditionDateBounds = [conditionDate_Individual, conditionDate_Individual]
-
-export type conditionTime_Individual = [number, number]
-export type conditionTimeBounds = [conditionTime_Individual, conditionTime_Individual]
-
-export type conditionObj = {random?: number; time?: conditionTimeBounds, date?: conditionDateBounds}
-
-
 
 /*$$$$$\                        $$\
 $$  __$$\                       $$ |
@@ -359,3 +350,13 @@ export function checkDateCondition(dateBounds: conditionDateBounds):boolean {
             (currentDate[2] == maxDate[2] && currentDate[0] == maxDate[0] && currentDate[1] <= maxDate[1])
     ));
 }
+
+
+
+export type conditionDate_Individual = [number, number, number]
+export type conditionDateBounds = [conditionDate_Individual, conditionDate_Individual]
+
+export type conditionTime_Individual = [number, number]
+export type conditionTimeBounds = [conditionTime_Individual, conditionTime_Individual]
+
+export type conditionObj = {random?: number; time?: conditionTimeBounds, date?: conditionDateBounds}
