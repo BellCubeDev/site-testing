@@ -354,7 +354,7 @@ export const componentHandler = {
      * Auxiliary function to downgrade a single node.
      * @param  {!Node} node the node to be downgraded
      */
-    function downgradeNode (node) { // eslint-disable-next-line github/array-foreach
+    function downgradeNode (node) {
       createdComponents_.filter(item => item.element_ === node).forEach(componentHandler.deconstructComponentInternal);
     }
     if (nodes instanceof Array || nodes instanceof NodeList) {
@@ -414,7 +414,7 @@ export const componentHandler = {
 window.componentHandler = componentHandler;
 
 
-function constructor_579(element, _this){
+function basicConstructor(element, _this){
     _this.element_ = element;
     _this.init();
 }
@@ -509,7 +509,8 @@ if (/iP(ad|hone|od).*OS 6/.test(window.navigator.userAgent) || !window.requestAn
    * @param {HTMLElement} element The element that will be upgraded.
    */
 export class MaterialButton {
-    constructor(element) { constructor_579(element, this); }
+    element_;
+    constructor(element) { basicConstructor(element, this); }
     /**
        * Handle blur of element.
        *
@@ -543,17 +544,20 @@ export class MaterialButton {
        */
     init() {
         if (this.element_) {
+            this.boundRippleBlurHandler = this.blurHandler_.bind(this);
+
             if (this.element_.classList.contains(this.cssClasses_.RIPPLE_EFFECT)) {
                 var rippleContainer = document.createElement('span');
                 rippleContainer.classList.add(this.cssClasses_.RIPPLE_CONTAINER);
+
                 this.rippleElement_ = document.createElement('span');
                 this.rippleElement_.classList.add(this.cssClasses_.RIPPLE);
-                rippleContainer.appendChild(this.rippleElement_);
-                this.boundRippleBlurHandler = this.blurHandler_.bind(this);
                 this.rippleElement_.addEventListener('click', this.boundRippleBlurHandler);
+
+                rippleContainer.appendChild(this.rippleElement_);
                 this.element_.appendChild(rippleContainer);
             }
-            this.boundButtonBlurHandler = this.blurHandler_.bind(this);
+
             this.element_.addEventListener('click', this.boundButtonBlurHandler);
             this.element_.addEventListener('mouseleave', this.boundButtonBlurHandler);
         }
@@ -614,7 +618,7 @@ componentHandler.register({
    */
 export class MaterialCheckbox {
     constructor(element){
-        constructor_579(element, this);
+        basicConstructor(element, this);
     }
     /**
     * Store constants in one place so they can be updated easily.
@@ -839,7 +843,7 @@ componentHandler.register({
    * @param {HTMLElement} element The element that will be upgraded.
    */
 export class MaterialIconToggle {
-    constructor(element) { constructor_579(element, this); }
+    constructor(element) { basicConstructor(element, this); }
     /**
        * Handle change of state.
        *
@@ -1033,7 +1037,7 @@ componentHandler.register({
    */
 export class MaterialMenu {
     element_;
-    constructor(element) { constructor_579(element, this); this.element_ = element; }
+    constructor(element) { basicConstructor(element, this); this.element_ = element; }
     /**
        * Initialize element.
        */
@@ -1464,7 +1468,7 @@ componentHandler.register({
    * @param {HTMLElement} element The element that will be upgraded.
    */
 export class MaterialProgress {
-    constructor(element) { constructor_579(element, this); }
+    constructor(element) { basicConstructor(element, this); }
     /**
        * Set the current progress of the progressbar.
        *
@@ -1561,7 +1565,7 @@ componentHandler.register({
    * @param {HTMLElement} element The element that will be upgraded.
    */
 export class MaterialRadio {
-    constructor(element) { constructor_579(element, this); }
+    constructor(element) { basicConstructor(element, this); }
     /**
        * Handle change of state.
        *
@@ -2179,7 +2183,7 @@ componentHandler.register({
    * @constructor
    */
 export class MaterialSpinner {
-    constructor(element) { constructor_579(element, this); }
+    constructor(element) { basicConstructor(element, this); }
     /**
        * Auxiliary method to create a spinner layer.
        *
@@ -2301,7 +2305,7 @@ componentHandler.register({
    * @param {HTMLElement} element The element that will be upgraded.
    */
 export class MaterialSwitch {
-    constructor(element) { constructor_579(element, this); }
+    constructor(element) { basicConstructor(element, this); }
     /**
        * Handle change of state.
        *
@@ -2892,7 +2896,7 @@ componentHandler.register({
    * @param {HTMLElement} element The element that will be upgraded.
    */
 export class MaterialTooltip {
-    constructor(element) { constructor_579(element, this); }
+    constructor(element) { basicConstructor(element, this); }
     /**
        * Handle mouseenter for tooltip.
        *
@@ -2907,21 +2911,8 @@ export class MaterialTooltip {
 
         //console.log(`[BCD-Material.Debug] window.innerWidth: ${window.innerWidth}, use desktop layout: ${window.innerWidth >= 1025}`);
         // Modification by BellCube to adjust for the navigation drawer
-        if (window.innerWidth > 1024) {
-            if (left + marginLeft < 256) {
-                //console.log('Using desktop layout. Adjusting tooltip position.');
-                marginLeft += Math.abs(256 - (left + marginLeft));
-            } else {
-                //console.log('Using desktop layout. Not adjusting tooltip position.');
-            }
-        } else {
-            if (left + marginLeft < 16) {
-                //console.log('Using mobile layout. Adjusting tooltip position.');
-                marginLeft += Math.abs(16 - (left + marginLeft));
-            } else {
-                //console.log('Using mobile layout. Not adjusting tooltip position.');
-            }
-        }
+
+        if (left + marginLeft < 16) marginLeft += Math.abs(16 - (left + marginLeft));
 
         var marginTop = -1 * (this.element_.offsetHeight / 2);
         if (this.element_.classList.contains(this.cssClasses_.LEFT) || this.element_.classList.contains(this.cssClasses_.RIGHT)) {
@@ -3042,28 +3033,28 @@ componentHandler.register({
    * @param {HTMLElement} element The element that will be upgraded.
    */
 export class MaterialLayout {
-    constructor(element) { constructor_579(element, this); }
+    constructor(element) { basicConstructor(element, this); }
     /**
        * Handles scrolling on the content.
        *
        * @private
        */
     contentScrollHandler_() {
-        if (this.header_.classList.contains(this.cssClasses_.IS_ANIMATING)) {
+        if (this.header_.classList.contains(MaterialLayout.cssClasses.IS_ANIMATING)) {
             return;
         }
-        var headerVisible = !this.element_.classList.contains(this.cssClasses_.IS_SMALL_SCREEN) || this.element_.classList.contains(this.cssClasses_.FIXED_HEADER);
-        if (this.content_.scrollTop > 0 && !this.header_.classList.contains(this.cssClasses_.IS_COMPACT)) {
-            this.header_.classList.add(this.cssClasses_.CASTING_SHADOW);
-            this.header_.classList.add(this.cssClasses_.IS_COMPACT);
+        var headerVisible = !this.element_.classList.contains(MaterialLayout.cssClasses.IS_SMALL_SCREEN) || this.element_.classList.contains(MaterialLayout.cssClasses.FIXED_HEADER);
+        if (this.content_.scrollTop > 0 && !this.header_.classList.contains(MaterialLayout.cssClasses.IS_COMPACT)) {
+            this.header_.classList.add(MaterialLayout.cssClasses.CASTING_SHADOW);
+            this.header_.classList.add(MaterialLayout.cssClasses.IS_COMPACT);
             if (headerVisible) {
-                this.header_.classList.add(this.cssClasses_.IS_ANIMATING);
+                this.header_.classList.add(MaterialLayout.cssClasses.IS_ANIMATING);
             }
-        } else if (this.content_.scrollTop <= 0 && this.header_.classList.contains(this.cssClasses_.IS_COMPACT)) {
-            this.header_.classList.remove(this.cssClasses_.CASTING_SHADOW);
-            this.header_.classList.remove(this.cssClasses_.IS_COMPACT);
+        } else if (this.content_.scrollTop <= 0 && this.header_.classList.contains(MaterialLayout.cssClasses.IS_COMPACT)) {
+            this.header_.classList.remove(MaterialLayout.cssClasses.CASTING_SHADOW);
+            this.header_.classList.remove(MaterialLayout.cssClasses.IS_COMPACT);
             if (headerVisible) {
-                this.header_.classList.add(this.cssClasses_.IS_ANIMATING);
+                this.header_.classList.add(MaterialLayout.cssClasses.IS_ANIMATING);
             }
         }
     }
@@ -3075,7 +3066,7 @@ export class MaterialLayout {
        */
     keyboardEventHandler_(evt) {
         // Only react when the drawer is open.
-        if (evt.keyCode === this.Keycodes_.ESCAPE && this.drawer_.classList.contains(this.cssClasses_.IS_DRAWER_OPEN)) {
+        if (evt.keyCode === this.Keycodes_.ESCAPE && this.drawer_.classList.contains(MaterialLayout.cssClasses.IS_DRAWER_OPEN)) {
             this.toggleDrawer();
         }
     }
@@ -3086,13 +3077,13 @@ export class MaterialLayout {
        */
     screenSizeHandler_() {
         if (this.screenSizeMediaQuery_.matches) {
-            this.element_.classList.add(this.cssClasses_.IS_SMALL_SCREEN);
+            this.element_.classList.add(MaterialLayout.cssClasses.IS_SMALL_SCREEN);
         } else {
-            this.element_.classList.remove(this.cssClasses_.IS_SMALL_SCREEN);
+            this.element_.classList.remove(MaterialLayout.cssClasses.IS_SMALL_SCREEN);
             // Collapse drawer (if any) when moving to a large screen size.
             if (this.drawer_) {
-                this.drawer_.classList.remove(this.cssClasses_.IS_DRAWER_OPEN);
-                this.obfuscator_.classList.remove(this.cssClasses_.IS_DRAWER_OPEN);
+                this.drawer_.classList.remove(MaterialLayout.cssClasses.IS_DRAWER_OPEN);
+                this.obfuscator_.classList.remove(MaterialLayout.cssClasses.IS_DRAWER_OPEN);
             }
         }
     }
@@ -3122,7 +3113,7 @@ export class MaterialLayout {
        * @private
        */
     headerTransitionEndHandler_() {
-        this.header_.classList.remove(this.cssClasses_.IS_ANIMATING);
+        this.header_.classList.remove(MaterialLayout.cssClasses.IS_ANIMATING);
     }
     /**
        * Handles expanding the header on click
@@ -3130,9 +3121,9 @@ export class MaterialLayout {
        * @private
        */
     headerClickHandler_() {
-        if (this.header_.classList.contains(this.cssClasses_.IS_COMPACT)) {
-            this.header_.classList.remove(this.cssClasses_.IS_COMPACT);
-            this.header_.classList.add(this.cssClasses_.IS_ANIMATING);
+        if (this.header_.classList.contains(MaterialLayout.cssClasses.IS_COMPACT)) {
+            this.header_.classList.remove(MaterialLayout.cssClasses.IS_COMPACT);
+            this.header_.classList.add(MaterialLayout.cssClasses.IS_ANIMATING);
         }
     }
     /**
@@ -3142,7 +3133,7 @@ export class MaterialLayout {
        */
     resetTabState_(tabBar) {
         for (var k = 0; k < tabBar.length; k++) {
-            tabBar[k].classList.remove(this.cssClasses_.IS_ACTIVE);
+            tabBar[k].classList.remove(MaterialLayout.cssClasses.IS_ACTIVE);
         }
     }
     /**
@@ -3152,7 +3143,7 @@ export class MaterialLayout {
        */
     resetPanelState_(panels) {
         for (var j = 0; j < panels.length; j++) {
-            panels[j].classList.remove(this.cssClasses_.IS_ACTIVE);
+            panels[j].classList.remove(MaterialLayout.cssClasses.IS_ACTIVE);
         }
     }
     /**
@@ -3161,24 +3152,24 @@ export class MaterialLayout {
       * @public
       */
     toggleDrawer() {
-        this.drawer_.classList.toggle(this.cssClasses_.IS_DRAWER_OPEN);
-        this.obfuscator_.classList.toggle(this.cssClasses_.IS_DRAWER_OPEN);
+        this.drawer_.classList.toggle(MaterialLayout.cssClasses.IS_DRAWER_OPEN);
+        this.obfuscator_.classList.toggle(MaterialLayout.cssClasses.IS_DRAWER_OPEN);
         // Set accessibility properties.
-        if (this.drawer_.classList.contains(this.cssClasses_.IS_DRAWER_OPEN)) this.openDrawer(false);
+        if (this.drawer_.classList.contains(MaterialLayout.cssClasses.IS_DRAWER_OPEN)) this.openDrawer(false);
         else this.closeDrawer(false);
     }
 
     openDrawer(doNewClass = true) {
         if (doNewClass) {
-            if (this.drawer_.classList.contains(this.cssClasses_.IS_DRAWER_OPEN)) return;
-            this.drawer_.classList.add(this.cssClasses_.IS_DRAWER_OPEN);
-            this.obfuscator_.classList.add(this.cssClasses_.IS_DRAWER_OPEN);
+            if (this.drawer_.classList.contains(MaterialLayout.cssClasses.IS_DRAWER_OPEN)) return;
+            this.drawer_.classList.add(MaterialLayout.cssClasses.IS_DRAWER_OPEN);
+            this.obfuscator_.classList.add(MaterialLayout.cssClasses.IS_DRAWER_OPEN);
         }
 
         this.drawer_.setAttribute('aria-hidden', 'false');
         this.drawer_.removeAttribute('tabindex');
 
-        var drawerButton = this.element_.querySelector(`.${this.cssClasses_.DRAWER_BTN}`);
+        var drawerButton = this.element_.querySelector(`.${MaterialLayout.cssClasses.DRAWER_BTN}`);
         drawerButton.setAttribute('aria-expanded', 'true');
 
         const elemToFocusNextSibling = this.drawer_.querySelector('.mdl-navigation__link');
@@ -3192,15 +3183,15 @@ export class MaterialLayout {
 
     closeDrawer(doNewClass = true) {
         if (doNewClass) {
-            if (this.drawer_.classList.contains(this.cssClasses_.IS_DRAWER_OPEN)) return;
-            this.drawer_.classList.remove(this.cssClasses_.IS_DRAWER_OPEN);
-            this.obfuscator_.classList.remove(this.cssClasses_.IS_DRAWER_OPEN);
+            if (this.drawer_.classList.contains(MaterialLayout.cssClasses.IS_DRAWER_OPEN)) return;
+            this.drawer_.classList.remove(MaterialLayout.cssClasses.IS_DRAWER_OPEN);
+            this.obfuscator_.classList.remove(MaterialLayout.cssClasses.IS_DRAWER_OPEN);
         }
 
         this.drawer_.setAttribute('aria-hidden', 'true');
         this.drawer_.setAttribute('tabindex', '-256');
 
-        var drawerButton = this.element_.querySelector(`.${this.cssClasses_.DRAWER_BTN}`);
+        var drawerButton = this.element_.querySelector(`.${MaterialLayout.cssClasses.DRAWER_BTN}`);
         drawerButton.setAttribute('aria-expanded', 'false');
         drawerButton.focus({preventScroll:true});
     }
@@ -3210,7 +3201,7 @@ export class MaterialLayout {
     init() {
         if (this.element_) {
             var container = document.createElement('div');
-            container.classList.add(this.cssClasses_.CONTAINER);
+            container.classList.add(MaterialLayout.cssClasses.CONTAINER);
             var focusedElement = this.element_.querySelector(':focus');
             this.element_.parentElement.insertBefore(container, this.element_);
             this.element_.parentElement.removeChild(this.element_);
@@ -3222,13 +3213,13 @@ export class MaterialLayout {
             var numChildren = directChildren.length;
             for (var c = 0; c < numChildren; c++) {
                 var child = directChildren[c];
-                if (child.classList && child.classList.contains(this.cssClasses_.HEADER)) {
+                if (child.classList && child.classList.contains(MaterialLayout.cssClasses.HEADER)) {
                     this.header_ = child;
                 }
-                if (child.classList && child.classList.contains(this.cssClasses_.DRAWER)) {
+                if (child.classList && child.classList.contains(MaterialLayout.cssClasses.DRAWER)) {
                     this.drawer_ = child;
                 }
-                if (child.classList && child.classList.contains(this.cssClasses_.CONTENT)) {
+                if (child.classList && child.classList.contains(MaterialLayout.cssClasses.CONTENT)) {
                     this.content_ = child;
                 }
             }
@@ -3243,29 +3234,29 @@ export class MaterialLayout {
                 }
             }.bind(this), false);
             if (this.header_) {
-                this.tabBar_ = this.header_.querySelector(`.${this.cssClasses_.TAB_BAR}`);
+                this.tabBar_ = this.header_.querySelector(`.${MaterialLayout.cssClasses.TAB_BAR}`);
             }
             var mode = this.Mode_.STANDARD;
             if (this.header_) {
-                if (this.header_.classList.contains(this.cssClasses_.HEADER_SEAMED)) {
+                if (this.header_.classList.contains(MaterialLayout.cssClasses.HEADER_SEAMED)) {
                     mode = this.Mode_.SEAMED;
-                } else if (this.header_.classList.contains(this.cssClasses_.HEADER_WATERFALL)) {
+                } else if (this.header_.classList.contains(MaterialLayout.cssClasses.HEADER_WATERFALL)) {
                     mode = this.Mode_.WATERFALL;
                     this.header_.addEventListener('transitionend', this.headerTransitionEndHandler_.bind(this));
                     this.header_.addEventListener('click', this.headerClickHandler_.bind(this));
-                } else if (this.header_.classList.contains(this.cssClasses_.HEADER_SCROLL)) {
+                } else if (this.header_.classList.contains(MaterialLayout.cssClasses.HEADER_SCROLL)) {
                     mode = this.Mode_.SCROLL;
-                    container.classList.add(this.cssClasses_.HAS_SCROLLING_HEADER);
+                    container.classList.add(MaterialLayout.cssClasses.HAS_SCROLLING_HEADER);
                 }
                 if (mode === this.Mode_.STANDARD) {
-                    this.header_.classList.add(this.cssClasses_.CASTING_SHADOW);
+                    this.header_.classList.add(MaterialLayout.cssClasses.CASTING_SHADOW);
                     if (this.tabBar_) {
-                        this.tabBar_.classList.add(this.cssClasses_.CASTING_SHADOW);
+                        this.tabBar_.classList.add(MaterialLayout.cssClasses.CASTING_SHADOW);
                     }
                 } else if (mode === this.Mode_.SEAMED || mode === this.Mode_.SCROLL) {
-                    this.header_.classList.remove(this.cssClasses_.CASTING_SHADOW);
+                    this.header_.classList.remove(MaterialLayout.cssClasses.CASTING_SHADOW);
                     if (this.tabBar_) {
-                        this.tabBar_.classList.remove(this.cssClasses_.CASTING_SHADOW);
+                        this.tabBar_.classList.remove(MaterialLayout.cssClasses.CASTING_SHADOW);
                     }
                 } else if (mode === this.Mode_.WATERFALL) {
                     // Add and remove shadows depending on scroll position.
@@ -3277,15 +3268,15 @@ export class MaterialLayout {
             }
             // Add drawer toggling button to our layout, if we have an openable drawer.
             if (this.drawer_) {
-                var drawerButton = this.element_.querySelector(`.${this.cssClasses_.DRAWER_BTN}`);
+                var drawerButton = this.element_.querySelector(`.${MaterialLayout.cssClasses.DRAWER_BTN}`);
                 if (!drawerButton) {
                     drawerButton = document.createElement('div');
                     drawerButton.setAttribute('aria-expanded', 'false');
                     drawerButton.setAttribute('role', 'button');
                     drawerButton.setAttribute('tabindex', '0');
-                    drawerButton.classList.add(this.cssClasses_.DRAWER_BTN);
+                    drawerButton.classList.add(MaterialLayout.cssClasses.DRAWER_BTN);
                     var drawerButtonIcon = document.createElement('i');
-                    drawerButtonIcon.classList.add(this.cssClasses_.ICON);
+                    drawerButtonIcon.classList.add(MaterialLayout.cssClasses.ICON);
                     drawerButtonIcon.innerHTML = this.Constant_.MENU_ICON;
                     drawerButton.appendChild(drawerButtonIcon);
                 }
@@ -3299,26 +3290,26 @@ export class MaterialLayout {
                     titleElement.addEventListener('keydown', this.drawerToggleHandler_.bind(this));
                 }
 
-                if (this.drawer_.classList.contains(this.cssClasses_.ON_LARGE_SCREEN)) {
+                if (this.drawer_.classList.contains(MaterialLayout.cssClasses.ON_LARGE_SCREEN)) {
                     //If drawer has ON_LARGE_SCREEN class then add it to the drawer toggle button as well.
-                    drawerButton.classList.add(this.cssClasses_.ON_LARGE_SCREEN);
-                } else if (this.drawer_.classList.contains(this.cssClasses_.ON_SMALL_SCREEN)) {
+                    drawerButton.classList.add(MaterialLayout.cssClasses.ON_LARGE_SCREEN);
+                } else if (this.drawer_.classList.contains(MaterialLayout.cssClasses.ON_SMALL_SCREEN)) {
                     //If drawer has ON_SMALL_SCREEN class then add it to the drawer toggle button as well.
-                    drawerButton.classList.add(this.cssClasses_.ON_SMALL_SCREEN);
+                    drawerButton.classList.add(MaterialLayout.cssClasses.ON_SMALL_SCREEN);
                 }
                 // Add a class if the layout has a drawer, for altering the left padding.
                 // Adds the HAS_DRAWER to the elements since this.header_ may or may
                 // not be present.
-                this.element_.classList.add(this.cssClasses_.HAS_DRAWER);
+                this.element_.classList.add(MaterialLayout.cssClasses.HAS_DRAWER);
                 // If we have a fixed header, add the button to the header rather than
                 // the layout.
-                if (this.element_.classList.contains(this.cssClasses_.FIXED_HEADER)) {
+                if (this.element_.classList.contains(MaterialLayout.cssClasses.FIXED_HEADER)) {
                     this.header_.insertBefore(drawerButton, this.header_.firstChild);
                 } else {
                     this.element_.insertBefore(drawerButton, this.content_);
                 }
                 var obfuscator = document.createElement('div');
-                obfuscator.classList.add(this.cssClasses_.OBFUSCATOR);
+                obfuscator.classList.add(MaterialLayout.cssClasses.OBFUSCATOR);
                 this.element_.appendChild(obfuscator);
                 this.obfuscator_ = obfuscator;
 
@@ -3339,26 +3330,26 @@ export class MaterialLayout {
             this.screenSizeHandler_();
             // Initialize tabs, if any.
             if (this.header_ && this.tabBar_) {
-                this.element_.classList.add(this.cssClasses_.HAS_TABS);
+                this.element_.classList.add(MaterialLayout.cssClasses.HAS_TABS);
                 var tabContainer = document.createElement('div');
-                tabContainer.classList.add(this.cssClasses_.TAB_CONTAINER);
+                tabContainer.classList.add(MaterialLayout.cssClasses.TAB_CONTAINER);
                 this.header_.insertBefore(tabContainer, this.tabBar_);
                 this.header_.removeChild(this.tabBar_);
                 var leftButton = document.createElement('div');
-                leftButton.classList.add(this.cssClasses_.TAB_BAR_BUTTON);
-                leftButton.classList.add(this.cssClasses_.TAB_BAR_LEFT_BUTTON);
+                leftButton.classList.add(MaterialLayout.cssClasses.TAB_BAR_BUTTON);
+                leftButton.classList.add(MaterialLayout.cssClasses.TAB_BAR_LEFT_BUTTON);
                 var leftButtonIcon = document.createElement('i');
-                leftButtonIcon.classList.add(this.cssClasses_.ICON);
+                leftButtonIcon.classList.add(MaterialLayout.cssClasses.ICON);
                 leftButtonIcon.textContent = this.Constant_.CHEVRON_LEFT;
                 leftButton.appendChild(leftButtonIcon);
                 leftButton.addEventListener('click', function () {
                     this.tabBar_.scrollLeft -= this.Constant_.TAB_SCROLL_PIXELS;
                 }.bind(this));
                 var rightButton = document.createElement('div');
-                rightButton.classList.add(this.cssClasses_.TAB_BAR_BUTTON);
-                rightButton.classList.add(this.cssClasses_.TAB_BAR_RIGHT_BUTTON);
+                rightButton.classList.add(MaterialLayout.cssClasses.TAB_BAR_BUTTON);
+                rightButton.classList.add(MaterialLayout.cssClasses.TAB_BAR_RIGHT_BUTTON);
                 var rightButtonIcon = document.createElement('i');
-                rightButtonIcon.classList.add(this.cssClasses_.ICON);
+                rightButtonIcon.classList.add(MaterialLayout.cssClasses.ICON);
                 rightButtonIcon.textContent = this.Constant_.CHEVRON_RIGHT;
                 rightButton.appendChild(rightButtonIcon);
                 rightButton.addEventListener('click', function () {
@@ -3371,14 +3362,14 @@ export class MaterialLayout {
                 // window size.
                 var tabUpdateHandler = function () {
                     if (this.tabBar_.scrollLeft > 0) {
-                        leftButton.classList.add(this.cssClasses_.IS_ACTIVE);
+                        leftButton.classList.add(MaterialLayout.cssClasses.IS_ACTIVE);
                     } else {
-                        leftButton.classList.remove(this.cssClasses_.IS_ACTIVE);
+                        leftButton.classList.remove(MaterialLayout.cssClasses.IS_ACTIVE);
                     }
                     if (this.tabBar_.scrollLeft < this.tabBar_.scrollWidth - this.tabBar_.offsetWidth) {
-                        rightButton.classList.add(this.cssClasses_.IS_ACTIVE);
+                        rightButton.classList.add(MaterialLayout.cssClasses.IS_ACTIVE);
                     } else {
-                        rightButton.classList.remove(this.cssClasses_.IS_ACTIVE);
+                        rightButton.classList.remove(MaterialLayout.cssClasses.IS_ACTIVE);
                     }
                 }.bind(this);
                 this.tabBar_.addEventListener('scroll', tabUpdateHandler);
@@ -3395,18 +3386,18 @@ export class MaterialLayout {
                     }.bind(this), this.Constant_.RESIZE_TIMEOUT);
                 }.bind(this);
                 window.addEventListener('resize', windowResizeHandler);
-                if (this.tabBar_.classList.contains(this.cssClasses_.JS_RIPPLE_EFFECT)) {
-                    this.tabBar_.classList.add(this.cssClasses_.RIPPLE_IGNORE_EVENTS);
+                if (this.tabBar_.classList.contains(MaterialLayout.cssClasses.JS_RIPPLE_EFFECT)) {
+                    this.tabBar_.classList.add(MaterialLayout.cssClasses.RIPPLE_IGNORE_EVENTS);
                 }
                 // Select element tabs, document panels
-                var tabs = this.tabBar_.querySelectorAll(`.${this.cssClasses_.TAB}`);
-                var panels = this.content_.querySelectorAll(`.${this.cssClasses_.PANEL}`);
+                var tabs = this.tabBar_.querySelectorAll(`.${MaterialLayout.cssClasses.TAB}`);
+                var panels = this.content_.querySelectorAll(`.${MaterialLayout.cssClasses.PANEL}`);
                 // Create new tabs for each tab element
                 for (var i_ = 0; i_ < tabs.length; i_++) {
                     new MaterialLayoutTab(tabs[i_], tabs, panels, this);
                 }
             }
-            this.element_.classList.add(this.cssClasses_.IS_UPGRADED);
+            this.element_.classList.add(MaterialLayout.cssClasses.IS_UPGRADED);
         }
     }
     /**
@@ -3452,9 +3443,8 @@ export class MaterialLayout {
        * decide to modify at a later date.
        *
        * @enum {string}
-       * @private
        */
-    cssClasses_ = {
+    static cssClasses = {
         CONTAINER: 'mdl-layout__container',
         HEADER: 'mdl-layout__header',
         DRAWER: 'mdl-layout__drawer',
@@ -3569,7 +3559,7 @@ componentHandler.register({
    * @param {Element} element The element that will be upgraded.
    */
 export class MaterialDataTable {
-    constructor(element) { constructor_579(element, this); }
+    constructor(element) { basicConstructor(element, this); }
     /**
        * Generates and returns a function that toggles the selection state of a
        * single row (or multiple rows).
@@ -3724,7 +3714,7 @@ componentHandler.register({
    * @param {HTMLElement} element The element that will be upgraded.
    */
 export class MaterialRipple {
-    constructor(element) { constructor_579(element, this); }
+    constructor(element) { basicConstructor(element, this); }
     /**
        * Handle mouse / finger down on element.
        *

@@ -10,6 +10,7 @@ layout: compress_html
 
 
     <link rel="shortcut icon" type="image/ico" href="{{ site.baseurl }}{% link /favicon.ico %}">
+    <link rel="license" href="{{ site.repourl }}/blob/main/LICENSE">
 
     <meta property="og:site_name" content="BellCubeDev.GitHub.IO">
     <link rel="canonical" href="{{site.mainurl}}{{page.url}}">
@@ -18,19 +19,20 @@ layout: compress_html
 
     <meta property="og:image" content="{{site.fullurl}}/assets/site/images/icon.png" />
     <meta property="og:image:secure_url" content="{{site.fullurl}}/assets/site/images/icon.png" />
-    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:type" content="image/png" />
     <meta property="og:image:width" content="2048" />
     <meta property="og:image:height" content="2048" />
     <meta property="og:image:alt" content="Cubic Bell" />
 
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="{{page.description}}" />
     <meta property="og:description" content="{{page.description}}" />
 
     <meta name="author" content="{{ site.author.name }}" /><meta name="creator" content="{{ site.author.name }}" /><meta name="publisher" content="{{ site.author.name }}" />
-    <meta name="generator" content="jekyll" />
+    <meta name="generator" content="Jekyll+TypeScript" />
     <meta name="theme-color" content="#1b1b1b" /><meta name="color-scheme" content="dark" />
+
+
 
     <!-- Script Configuration -->
     <!-- the setTimeout was taken from https://stackoverflow.com/a/38296629/13076790 -->
@@ -613,7 +615,7 @@ layout: compress_html
 
 </head>
 <body class="preload">
-    <a class="hidden" id="debug-link" href="{{ site.baseurl }}{% link debug.html %}"></a>
+    <a class="hidden" aria-hidden="true" id="debug-link" href="{{ site.baseurl }}{% link debug.html %}">PAY NO ATTENTION TO ME. I'M USED IN THE JAVASCRIPT CONTROLLING THE SITE.</a>
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
         <div class="mdl-layout__drawer" tabindex="-256">
             <span class="mdl-layout-title">
@@ -663,9 +665,9 @@ layout: compress_html
                     </div>
 
                     <h2>Other Places</h2>
-                    <a class="mdl-navigation__link icon--nexus mdl-navigation__link--icon" target="_blank" rel="noopener noreferrer"
+                    <a class="mdl-navigation__link icon--nexus mdl-navigation__link--icon" target="_blank" rel="external noopener"
                         href="https://www.nexusmods.com/skyrimspecialedition/users/98340728?tab=user+files">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="material-icons" version="1.1" viewBox="0 0 162.5 162.5">
+                        <svg alt="" xmlns="http://www.w3.org/2000/svg" class="material-icons" version="1.1" viewBox="0 0 162.5 162.5">
                             <!--
                                 THIS VECTOR GRAPHIC IS THE INTELLECTUAL PROPERTY OF BLACK TREE GAMING LIMITED.
                                 THIS IS NOT CREATED OR OWNED BY BELLCUBE.
@@ -675,9 +677,9 @@ layout: compress_html
                         </svg>
                         <span>Nexus Page</span>
                     </a>
-                    <a class="mdl-navigation__link mdl-navigation__link--icon" target="_blank" rel="noopener noreferrer"
+                    <a class="mdl-navigation__link mdl-navigation__link--icon" target="_blank" rel="external noopener"
                         href="https://github.com/BellCubeDev">
-                        <img style="padding-left:0px;max-width: 24px;" src="{{ site.baseurl }}{% link assets/site/images/third-party-icons/GitHub.svg %}">
+                        <img alt="" style="padding-left:0px;max-width: 24px;" src="{{ site.baseurl }}{% link assets/site/images/third-party-icons/GitHub.svg %}">
                         <span>GitHub Page</span>
                     </a>
                 </div>

@@ -1,10 +1,5 @@
-/* eslint-disable i18n-text/no-en */
-import {
-    MaterialMenu,
-    MaterialTextfield,
-} from "../../assets/site/mdl/material.js";
-import { bcd_ComponentTracker } from "../../universal.js";
-import "./fomod-builder.js"; // Brings in global things
+import * as main from "./fomod-builder.js"; // Brings in global things
+/* eslint-disable i18n-text/no-en */// FOMODs are XML files with a schema written in English, so disallowing English makes little sense.
 
 /*
     Thanks to Patrick Gillespie for the great ASCII art generator!
@@ -25,84 +20,6 @@ export class bcd_builder_XMLElement {
     }
 }
 
-/*
-$$\   $$\         $$$$$$\             $$\                          $$$$$$\
-$$ |  $$ |        \_$$  _|            $$ |                        $$  __$$\
-$$ |  $$ |          $$ |  $$$$$$$\  $$$$$$\    $$$$$$\   $$$$$$\  $$ /  \__| $$$$$$\   $$$$$$$\  $$$$$$\
-$$ |  $$ |          $$ |  $$  __$$\ \_$$  _|  $$  __$$\ $$  __$$\ $$$$\      \____$$\ $$  _____|$$  __$$\
-$$ |  $$ |          $$ |  $$ |  $$ |  $$ |    $$$$$$$$ |$$ |  \__|$$  _|     $$$$$$$ |$$ /      $$$$$$$$ |
-$$ |  $$ |          $$ |  $$ |  $$ |  $$ |$$\ $$   ____|$$ |      $$ |      $$  __$$ |$$ |      $$   ____|
-\$$$$$$  |        $$$$$$\ $$ |  $$ |  \$$$$  |\$$$$$$$\ $$ |      $$ |      \$$$$$$$ |\$$$$$$$\ \$$$$$$$\
- \______/ $$$$$$\ \______|\__|  \__|   \____/  \_______|\__|      \__|       \_______| \_______| \_______|
-          |____*/
-
-export class bcd_builder_dropdown extends MaterialMenu { }
-export class bcd_builder_dropdown_order extends bcd_builder_dropdown { }
-export class bcd_builder_dropdown_groupType extends bcd_builder_dropdown { }
-export class bcd_builder_dropdown_pluginType extends bcd_builder_dropdown { }
-
-type bcd_builder_dependency_file_state = "Active" | "Inactive" | "Missing";
-type bcd_builder_dependency_group_operator = "And" | "Or";
-
-
-// TODO Image Displays
-export class bcd_builder_input_image extends MaterialTextfield {
-    static cssClass = "fomod_imageInput";
-    boundDisplay: HTMLImageElement;
-    boundDisplayAsClass: bcd_builder_input_image_display;
-
-    constructor(element: HTMLInputElement) {
-        super(element);
-
-        this.boundDisplay = element.parentElement?.querySelector(
-            ".fomod_imageDisplay"
-        ) as HTMLImageElement;
-        if (!this.boundDisplay) {
-            console.log("Error Item:", this);
-            throw new TypeError(
-                "No bound image display was found for this FOMOD Image Input."
-            );
-        }
-
-        this.boundDisplayAsClass = new bcd_builder_input_image_display(
-            this.boundDisplay
-        );
-        //@ts-ignore No overload matches this call.
-        this.element_.addEventListener("change", this.updateImage.bind(this)); //@ts-ignore No overload matches this call.
-        this.element_.addEventListener("input", this.updateImage.bind(this));
-    }
-
-    updateImage(newInput: string) {
-        this.boundDisplayAsClass.updateImage(this.element_);
-    }
-}
-
-export class bcd_builder_input_image_display {
-    imageDisplayElement: HTMLImageElement;
-
-    boundInput?: HTMLInputElement;
-    boundInputAsClass?: bcd_builder_input_image;
-
-    constructor(imageDisplayElement: HTMLImageElement, boundInput?: HTMLInputElement) {
-        this.imageDisplayElement = imageDisplayElement;
-
-        if (boundInput) {
-            this.boundInput = boundInput;
-            this.boundInput.addEventListener("input", this.updateImage.bind(this, this.boundInput));
-            this.boundInput.addEventListener("change", this.updateImage.bind(this, this.boundInput));
-            this.boundInput.addEventListener("", this.updateImage.bind(this, this.boundInput));
-
-        }
-    }
-
-    updateImage(input: HTMLInputElement | string) {
-        if (typeof input === "string") {
-            this.imageDisplayElement.src = input;
-            if (this.boundInput) this.boundInput.value = input;
-
-        } else this.imageDisplayElement.src = input.value;
-    }
-}
 
 /*$$$$$\                            $$\ $$\   $$\     $$\
 $$  __$$\                           $$ |\__|  $$ |    \__|
@@ -130,6 +47,9 @@ export class bcd_builder_dependency extends bcd_builder_XMLElement {
         super(instanceElement);
     }
 }
+
+type bcd_builder_dependency_file_state = "Active" | "Inactive" | "Missing";
+type bcd_builder_dependency_group_operator = "And" | "Or";
 export class bcd_builder_dependency_group extends bcd_builder_dependency {
     operator: bcd_builder_dependency_group_operator /*= 'And'*/;
     children: bcd_builder_dependency[] = [];
@@ -368,7 +288,7 @@ export class bcd_builder_FOMOD_install extends bcd_builder_XMLElement {
             bcd_builder_FOMOD_install.files.push(file);
             this.file = file;
         } else {
-            window.bcd_builder.directory;
+            window.FOMODBuilder.directory;
         }
     }
 
@@ -516,7 +436,7 @@ export class bcd_builder_option_image extends bcd_builder_XMLElement {
         var temp_img: string[] | FileSystemFileHandle = image;
 
         if (!(temp_img instanceof Array))
-            window.bcd_builder.directory
+            window.FOMODBuilder.directory
                 ?.resolve(temp_img)
                 .then((path) => (this.image = path ?? []));
         else this.image = temp_img;

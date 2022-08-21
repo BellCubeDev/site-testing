@@ -11,18 +11,10 @@ permalink: /tools/fomod/
 redirect_from:
   - /tools/fomod/builder/
   - /tools/fomod-builder/
-scriptConfig:
-  - name: fomod_builder
-    value: true
 ---
 
-{% capture vortexSVG %}
-     {{site.baseurl}}{% link assets/site/images/third-party-icons/Vortex.svg %}
-{% endcapture %}
-
-{% capture mo2SVG %}
-    {{site.baseurl}}{% link assets/site/images/third-party-icons/MO2.svg %}
-{% endcapture %}
+{% capture vortexSVG %}{{site.baseurl}}{% link assets/site/images/third-party-icons/Vortex.svg %}{% endcapture %}
+{% capture mo2SVG %}{{site.baseurl}}{% link assets/site/images/third-party-icons/MO2.svg %}{% endcapture %}
 
 <!--
     MO2 - Info.xml
@@ -40,4 +32,65 @@ scriptConfig:
     ???
 -->
 
+<dialog id="no-support-modal" class="bcd-modal">
+    <h1>Support Notice</h1>
+    <p>The FOMOD Builder is currently only supported on Chromium-based browsers. While I do eventually plan to provide support for Firefox, Safari, and the like, Chromium-based browsers include powerful web APIs for things like <a href="https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API" target="_blank" rel="noopener">manipulation of files and directories</a> that the FOMOD Builder relies on at the moment. In the future, support for other browsers maybe added.</p>
+    <br />
+    <br />
+    <p>Your browser does not support at least one of the APIs tested. Please use a different browser. You may still exit this dialog and attempt to use the FOMOD Builder, however BellCube makes no guarantees as to whether or not it will work.</p>
+</dialog>
 
+<div role="tablist" class="tabs-list-container"> <!-- Holds the Tab buttons, which are filled in by JavaScript magic -->
+    <button role="tab" class="tab-list-button mdl-button mdl-js-ripple-effect" name="Management"></button>
+    <button role="tab" class="tab-list-button mdl-button mdl-js-ripple-effect" name="Metadata"></button>
+    <button role="tab" class="tab-list-button mdl-button mdl-js-ripple-effect" name="Steps"></button>
+    <button role="tab" class="tab-list-button mdl-button mdl-js-ripple-effect" name="Installations"></button>
+</div>
+
+<div class="tabs-content-container"><div> <!-- Holds the Tabs' content -->
+
+    <div role="tabpanel" class="tab-content" name="Management">
+        <p>Tab: Management</p>
+        <div class="open-file-container">
+            <button onload="console.log(this);"
+                type="button" style="width:192px"
+                class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-openDir">
+
+                Select FOMOD Directory
+
+            </button>
+                <div class="mdl-tooltip" for="fomod_FolderPicker"><p>
+                    This is the folder that you will put into an archive to be installed by users. If it is not set up for a FOMOD just yet, no worries!
+                </p></div>
+
+            <button
+                type="button" style="width:144px"
+                class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-save">
+
+                Save
+
+            </button>
+
+            <button
+                type="button" style="width:144px"
+                class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-save">
+
+                Clean Save
+
+            </button>
+                    <div class="mdl-tooltip" for="fomod_saveButtonNUKE"><p>
+                        Will nuke your current file and generate a new one from scratch. This can be dangerous if you've manually commented on the file, however it also ensures that the FOMOD is schema-compliant&mdash;which can fix most instances of Vortex rejecting the installer due to non-compliance.
+                    </p></div>
+        </div>
+    </div>
+    <div role="tabpanel" class="tab-content" name="Metadata">
+        <p>Tab: Metadata</p>
+    </div>
+    <div role="tabpanel" class="tab-content" name="Steps">
+        <p>Tab: Steps</p>
+    </div>
+    <div role="tabpanel" class="tab-content" name="Installations">
+        <p>Tab: Installations</p>
+    </div>
+
+</div></div>

@@ -10,5 +10,4 @@ export class bcdDropdownSortingOrder extends bcdUniversal.bcdDropdown {
     options(): bcdUniversal.objOf<Function|null> {
         return {'Explicit':null, 'Ascending':null, 'Descending':null};
     }
-
 }

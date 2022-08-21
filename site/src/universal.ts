@@ -1,31 +1,37 @@
 import { request } from 'http';
 import * as mdl from './assets/site/mdl/material.js';
 import * as quotes from './universal_quotes.js';
-console.log("%cHello and welcome to the JavaScript console! This is where wizards do their magic!\nAs for me? I'm the wizard you don't want to anger.", "color: #2d6");
-
-export class bcdStr extends String {
-    constructor(str_:string){super(str_);}
-
-    /** Removes whitespace at the beginning and end of a string and at the end of every included line*/ //@ts-ignore: Property 'capitalizeFirstLetter' does not exist on type 'String'.
-    capitalizeFirstLetter():bcdStr{
-        return new bcdStr(this.charAt(0).toUpperCase() + this.slice(1));
-    }
-
-    /** Removes whitespace at the beginning and end of a string and at the end of every included line*/ //@ts-ignore: Property 'trimWhitespace' does not exist on type 'String'.
-    trimWhitespace():bcdStr{
-        return new bcdStr(this
-            .trimStart()                // Trim whitespace at the start of the string
-            .trimEnd()                  // Trim whitespace at the end of the string
-            .replace(/[^\S\n]*$/gm, '') // Trim whitespace at the end of each line
-    );}
-}
 
 declare global {interface Window {
-    dataLayer: [];
+    /** A list of Query Parameters from the URI */
+    queryParams: objOf<string>;
+
+    /** A list of functions used when loading scripts */
     bcd_init_functions: objOf<Function>;
-    bcd_ComponentTracker: Function;
+
+    /** A special class used to track components across multiple module scripts */
+    bcd_ComponentTracker: bcd_ComponentTracker;
 }}
 
+window.queryParams = {};
+if (window.location.search[0] === '?') window.location.search.substring(1).split('&')
+                                        .map(param => param.split('='))
+                                        .forEach(param => window.queryParams[param[0].trim()] = param[1].trim());
+
+console.log("%cHello and welcome to the JavaScript console! This is where wizards do their magic!\nAs for me? I'm the wizard you don't want to anger.", "color: #2d6");
+
+
+/** Removes whitespace at the beginning and end of a string and at the end of every included line*/
+export function capitalizeFirstLetter(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+/** Removes whitespace at the beginning and end of a string and at the end of every included line*/
+export function trimWhitespace(str: string): string {
+    return  str.trimStart()                // Trim whitespace at the start of the string
+                .trimEnd()                  // Trim whitespace at the end of the string
+                .replace(/[^\S\n]*$/gm, '') // Trim whitespace at the end of each line
+;}
 
 
 export function sortArr<TUnknown>(arr: TUnknown[], refArr: TUnknown[]) {
@@ -289,16 +295,6 @@ export class BellCubicDetails extends bcd_collapsableParent {
 }
 bcdComponents.push(BellCubicDetails);
 
-
-const queryParamsArr = window.location.search.substring(1).split('&').map(param => param.split('='));
-const queryParams: objOf<string> = {};
-
-for (const param of queryParamsArr) {
-    queryParams[param[0]] = param[1];
-}
-
-//console.log(queryParams);
-
 export class BellCubicSummary extends bcd_collapsableParent {
     static cssClass = 'bcd-summary';
     static asString = 'BellCubicSummary';
@@ -310,9 +306,6 @@ export class BellCubicSummary extends bcd_collapsableParent {
         this.summary.addEventListener('keypress', this.handleKey.bind(this));
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
 
-        /*console.log("[BCD-SUMMARY] Registering  component: ", this)*/
-
-        //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.details_inner)});
         if (this.adjacent) {
             const temp_details = this.self.nextElementSibling;
             if (!(temp_details && temp_details.classList.contains(BellCubicDetails.cssClass))) {console.log(bcd_const_errItem, this); throw new TypeError("[BCD-SUMMARY] Error: Adjacent Summary element must be proceeded by a Details element.");}
@@ -323,7 +316,6 @@ export class BellCubicSummary extends bcd_collapsableParent {
             this.details = temp_details as HTMLElement;
         }
 
-        //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.details_inner)});
         this.divertedCompletion();
     }
 
@@ -338,23 +330,24 @@ export class BellCubicSummary extends bcd_collapsableParent {
         this.self.classList.add('initialized');
     });}
 
-    handleClick(event:MouseEvent){
-        //console.log(event, event.target.tagName);
+    correctFocus(keyDown?: boolean) {
+        if (!this.isOpen()) focusAnyElement(this.summary as HTMLElement);
+        if (this.isOpen() || !keyDown) requestAnimationFrame(() => {requestAnimationFrame(() => {
+            this.summary.blur();
+        });});
+    }
 
-        console.log(event);
-
+    handleClick(event?:MouseEvent){
         // @ts-expect-error: Property 'path' and 'pointerType' DO exist on type 'MouseEvent', but not in Firefox.
-        if (!('pointerType' in event) || !event.pointerType || !event.path || event.path?.slice(0, 5).map((el:HTMLElement) => el.tagName === 'A').includes(true)) return;
+        if (!event || !('pointerType' in event) || !event.pointerType || !event.path || event.path?.slice(0, 5).map((el:HTMLElement) => el.tagName === 'A').includes(true)) return;
         this.toggle();
-        focusAnyElement(this.details_inner);
+        this.correctFocus();
     }
 
     handleKey(event:KeyboardEvent){
         if (event.key === ' ' || event.key === 'Enter') requestAnimationFrame(() =>{
             this.toggle();
-
-            if (!this.isOpen()) focusAnyElement(this.summary as HTMLElement);
-                else focusAnyElement(this.details_inner.firstElementChild as HTMLElement);
+            this.correctFocus(true);
         });
     }
 }
@@ -377,6 +370,129 @@ export class bcd_prettyJSON {
     }
 }
 bcdComponents.push(bcd_prettyJSON);
+
+export class bcdModalDialog extends EventTarget {
+    static cssClass = 'bcd-modal';
+    static asString = 'BellCubic Modal';
+
+    static obfuscator: HTMLDivElement;
+    static modalsToShow: bcdModalDialog[] = [];
+    static shownModal: bcdModalDialog|null = null;
+
+    closeByClickOutside:boolean;
+
+    boundHideFunction = this.hide.bind(this);
+
+    element_:HTMLDialogElement;
+
+    constructor(element:HTMLDialogElement) {
+        super();
+
+        this.element_ = element;
+
+        // Move element to the root (so it shows above everything else)
+        document.documentElement.getElementsByTagName('body')[0].prepend(element);
+
+        if (!bcdModalDialog.obfuscator) {
+            bcdModalDialog.obfuscator = document.createElement('div');
+            bcdModalDialog.obfuscator.classList.add(mdl.MaterialLayout.cssClasses.OBFUSCATOR, 'bcd-modal-obfuscator');
+            document.documentElement.getElementsByTagName('body')[0].appendChild(bcdModalDialog.obfuscator);
+        }
+
+        this.closeByClickOutside = !this.element_.hasAttribute('no-click-outside');
+
+        setTimeout(function (this: bcdModalDialog) {
+            if (this.element_.hasAttribute('open-by-default')) this.show();
+        }.bind(this), 1000);
+    }
+
+    static evalQueue(delay: number = 100):void {
+
+        console.info("========================\nEvaluating modal queue...\n========================");
+
+        const willExit = {
+            shownModal: this.shownModal,
+            modalsToShow: this.modalsToShow,
+
+            shownModal_bool: !!this.modalsToShow.length,
+            modalsToShow_lengthBool: !this.modalsToShow.length
+        };
+        console.log('Will exit?', !!(this.shownModal || !this.modalsToShow.length), willExit);
+
+        if (this.shownModal || !this.modalsToShow.length) return;
+
+        const modal = bcdModalDialog.modalsToShow.shift(); if (!modal) return this.evalQueue();
+        bcdModalDialog.shownModal = modal;
+
+        console.log("Showing modal:", modal);
+
+        setTimeout(modal.show_forReal.bind(modal), delay);
+    }
+
+    show(){
+        bcdModalDialog.modalsToShow.push(this);
+        console.log("[BCD-MODAL] Modals to show (after assignment):", bcdModalDialog.modalsToShow);
+        bcdModalDialog.evalQueue();
+        console.log("[BCD-MODAL] Modals to show (after eval):", bcdModalDialog.modalsToShow);
+    }
+
+    /**
+        Event sent just before the modal is shown
+        If this event is canceled or PreventDefault() is called, the modal will not be shown.
+    */
+    static beforeShowEvent = new CustomEvent('beforeShow', {cancelable: true, bubbles: false, composed: false});
+
+    /** Event sent just after the modal is shown */
+    static afterShowEvent = new CustomEvent('afterShow', {cancelable: false, bubbles: false, composed: false});
+    private show_forReal() {
+        console.log("[BCD-MODAL] Showing modal:", this);
+        /* 'Before' Event */ if (!this.dispatchEvent(bcdModalDialog.beforeShowEvent) || !this.element_.dispatchEvent(bcdModalDialog.beforeShowEvent)) return;
+
+        bcdModalDialog.obfuscator.classList.add(mdl.MaterialLayout.cssClasses.IS_DRAWER_OPEN);
+        bcdModalDialog.obfuscator.addEventListener('click', this.boundHideFunction);
+
+        this.element_.show();
+        console.log("[BCD-MODAL] Modal shown:", this);
+
+        /* 'After' Event */  if (this.dispatchEvent(bcdModalDialog.afterShowEvent)) this.element_.dispatchEvent(bcdModalDialog.afterShowEvent);
+
+        console.log("[BCD-MODAL] Modals to show (after show):", bcdModalDialog.modalsToShow);
+    }
+
+    /**
+        Event sent just before the modal is hidden
+        If this event is canceled or PreventDefault() is called, the modal will not be shown.
+
+        The event is first sent for the class and, if not canceled and if PreventDefault() was not called, the event is sent for the element.
+    */
+    static beforeHideEvent = new CustomEvent('beforeHide', {cancelable: true, bubbles: false, composed: false});
+
+    /**
+        Event sent just after the modal is hidden
+
+        The event is first sent for the class and, if not canceled and if PreventDefault() was not called, the event is sent for the element.
+    */
+    static afterHideEvent = new CustomEvent('afterHide', {cancelable: false, bubbles: false, composed: false});
+
+    hide(event?: MouseEvent){
+        console.log("[BCD-MODAL] Hiding modal:", this);
+        if (event) event.stopImmediatePropagation();
+        /* 'Before' Event */ if (!this.dispatchEvent(bcdModalDialog.beforeHideEvent) ||!this.element_.dispatchEvent(bcdModalDialog.beforeHideEvent)) return;
+
+        this.element_.close();
+
+        bcdModalDialog.obfuscator.classList.remove(mdl.MaterialLayout.cssClasses.IS_DRAWER_OPEN);
+        bcdModalDialog.obfuscator.removeEventListener('click', this.boundHideFunction);
+
+        bcdModalDialog.shownModal = null;
+
+        /* 'After' Event */  if (this.dispatchEvent(bcdModalDialog.afterHideEvent)) this.element_.dispatchEvent(bcdModalDialog.afterHideEvent);
+
+        bcdModalDialog.evalQueue();
+    }
+
+}
+bcdComponents.push(bcdModalDialog);
 
 export enum menuCorners {
     unaligned = 'mdl-menu--unaligned',
@@ -489,7 +605,7 @@ export class bcdDropdown extends mdl.MaterialMenu {
     }
 }
 
-class bcdDropdown_AwesomeButton extends bcdDropdown {
+export class bcdDropdown_AwesomeButton extends bcdDropdown {
     static asString = 'BCD - Debugger\'s All-Powerful Button';
     static cssClass = 'bcd-debuggers-all-powerful-button';
 
@@ -504,6 +620,94 @@ class bcdDropdown_AwesomeButton extends bcdDropdown {
     }
 }
 bcdComponents.push(bcdDropdown_AwesomeButton);
+
+export class bcdTabButton extends mdl.MaterialButton {
+    static asString = 'BCD - Tab List Button';
+    static cssClass = 'tab-list-button';
+
+    element_: HTMLButtonElement;
+    boundTab:HTMLDivElement;
+    name:string = '';
+
+    constructor(element: HTMLButtonElement) {
+        if (element.tagName !== 'BUTTON') throw new TypeError('A BellCubic Tab Button must be created directly from a <button> element.');
+
+        const name = element.getAttribute('name');
+        if (!name) throw new TypeError('A BellCubic Tab Button must have a name attribute.');
+
+        const boundTab = document.querySelector(`div.tab-content[name="${name}"]`) as HTMLDivElement;
+        if (!boundTab) throw new TypeError(`Could not find a tab with the name "${name}".`);
+        if (!boundTab.parentElement) throw new TypeError(`Tab with name "${name}" has no parent element!`);
+
+        element.innerText = name;
+        element.setAttribute('type', 'button');
+
+        super(element); // Now we can use `this`!
+        this.element_ = element;
+
+        this.boundTab = boundTab;
+        this.name = name;
+
+        if (this.findTabNumber() === 0) this.makeSelected(0);
+
+        this.element_.addEventListener('click', this.onClick.bind(this));
+        this.element_.addEventListener('keypress', this.onKeyPress.bind(this));
+    }
+
+    /** @returns the index of this tab (0-based) or -1 if not found */
+    findTabNumber(button_?: Element): number {
+        const button = button_ ?? this.element_;
+        return [...(button.parentElement?.children ?? [])].indexOf(button);
+    }
+
+    makeSelected(tabNumber_?: number) {
+        const tabNumber = tabNumber_ ?? this.findTabNumber();
+        if (tabNumber === -1) throw new Error('Could not find the tab number.');
+
+        const siblingsAndSelf = [...(this.element_.parentElement?.children ?? [])];
+        if (siblingsAndSelf[tabNumber].classList.contains('active')) return;
+
+        for (const sibling of siblingsAndSelf) {
+            if (sibling === this.element_) {
+                sibling.classList.add('active');
+                sibling.setAttribute('aria-selected', 'true');
+            }
+            else {
+                sibling.classList.remove('active');
+                sibling.setAttribute('aria-selected', 'false');
+            }
+        }
+
+        if (!this.boundTab.parentElement) return; // I would worry about race conditions, but JavaScript executes synchronous code one function at a time
+
+        const tab_siblingsAndTab = [...this.boundTab.parentElement.children];
+        for (const tab of tab_siblingsAndTab) {
+            if (tab === this.boundTab) {
+                tab.classList.add('active');
+                tab.setAttribute('aria-hidden', 'false');
+
+                // TypeScript doesn't get that we wouldn't be iterating if parentElement were undefined, so a non-null assertion is necessary
+                this.boundTab.parentElement.style.marginLeft = `-${tabNumber}00vw`;
+            }
+            else {
+                tab.classList.remove('active');
+                tab.setAttribute('aria-hidden', 'true');
+            }
+        }
+    }
+
+    onClick(event?: MouseEvent): void {
+        this.makeSelected();
+        this.element_.blur();
+    }
+
+    onKeyPress(event: KeyboardEvent): void {
+        if (event.key === 'Enter' || event.key === ' ') {
+            this.onClick();
+        }
+    }
+}
+bcdComponents.push(bcdTabButton);
 
 export function registerBCDComponent(component:BCDComponent):void {
     try{

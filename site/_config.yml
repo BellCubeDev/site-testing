@@ -2,9 +2,8 @@
 # Site Variables
 # ============================
 
-# Copyright variables
+# Copyright Wizardry
 first_publication_year: 2022
-latest_publication_year: 2022
 
 # URL Root (used in URIs) - THESE SHOULD NOT END IN "/"
 baseurl: /site-testing
@@ -28,12 +27,6 @@ defaults:
       path: "sitemap.xml"
     values:
       layout: compress_html
-  - scope:
-      path: ""
-    values:
-      image:
-        path: /site-testing/assets/site/images/icon.png
-        alt: Cubic Bell
   - scope:
       path: "assets/site/misc/Info.xsd"
     values:

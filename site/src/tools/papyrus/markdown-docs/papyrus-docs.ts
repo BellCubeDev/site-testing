@@ -1,5 +1,4 @@
-export * from '../../../universal.js'
-import {bcdStr} from '../../../universal.js'
+import * as bcdUniversal from '../../../universal.js';
 import {hljs} from '../../../assets/site/highlight_js/highlight.js';
 
 /*
@@ -23,13 +22,22 @@ export function ___bcdLoad_autoPapyDocsInit() { //@ts-ignore Cannot find name 'a
         document.getElementById('papy_docs_file-picker'),
         document.getElementById('papy_docs_folder-picker')
     ];
-    if (temp_elements.find(e => e === null)) throw new DOMException('[BCD-PapyDocs] Error: Missing required HTML elements!');
-    elem_papy_docs_libName = temp_elements[0]! as HTMLInputElement;
-    elem_papy_docs_libLink = temp_elements[1]! as HTMLInputElement;
-    elem_papy_docs_registerPattern = temp_elements[2]! as HTMLInputElement;
+    if (temp_elements.some(e => e === null)) {
+        console.log(temp_elements);
+        throw new TypeError(`Looks like we're Missing elements!`);
+    }
+
+    elem_papy_docs_libName = temp_elements[0] as HTMLInputElement;
+
+    elem_papy_docs_libLink = temp_elements[1] as HTMLInputElement;
+
+    elem_papy_docs_registerPattern = temp_elements[2] as HTMLInputElement;
+
     elem_papy_docs_mdOutput = temp_elements[3]!;
+
     elem_papy_docs_filePicker = temp_elements[4]!;
     elem_papy_docs_filePicker.addEventListener('click', generateDocs_file);
+
     elem_papy_docs_folderPicker = temp_elements[5]!;
     elem_papy_docs_folderPicker.addEventListener('click', generateDocs_folder);
 } //@ts-ignore: Property 'bcd_init_functions' does not exist on type 'Window & typeof globalThis'.
@@ -68,7 +76,7 @@ const regex_Functions =
 /** Sets the output area's text with syntax highlighting*/
 function setMarkdownOutput(str:string){
     //console.log(str);
-    elem_papy_docs_mdOutput.innerHTML = hljs.highlight(new bcdStr(str).trimWhitespace(), {language: 'md'}).value;
+    elem_papy_docs_mdOutput.innerHTML = hljs.highlight(bcdUniversal.trimWhitespace(str), {language: 'md'}).value;
 }
 
 /*
@@ -147,7 +155,7 @@ async function generateDocs_folder(){
     @param {number} [recursion = 0] The number of levels to recurse into subdirectories. Negative numbers will recurse indefinitely.
     @param {function} finalCallback The function to execute when the iteration is complete
 */
-async function forEachFile(dir:FileSystemDirectoryHandle, callback:Function, recursion = 0):Promise<any[]>{
+async function forEachFile(dir:FileSystemDirectoryHandle, callback:Function, recursion = 0): Promise<unknown> {
     var promises = [];
     for await (const [name, file] of dir.entries()) {
         if (file.kind === 'file') {
@@ -180,7 +188,7 @@ $$ |      $$ |$$ |\$$$$$$$\       \$$$$$$  |\$$$$$$$ |$$$$$$$  |  \$$$$  |\$$$$$
     @param {FileSystemHandle} object The file or directory to request permission for
     @param {string} perm The permission to request
 */
-async function tryForPermission(object:FileSystemFileHandle, perm:String){
+async function tryForPermission(object:FileSystemFileHandle, perm:string){
     return await object.queryPermission({mode: perm as FileSystemPermissionMode }) === 'granted' || await object.requestPermission({mode: perm as FileSystemPermissionMode }) === 'granted';
     //return false;
 }
@@ -216,7 +224,6 @@ function readFile(file:File):Promise<string>{
 /** Writes file contents to the file system.*/
 async function writeFile(fileHandle:FileSystemFileHandle, contents:string|BufferSource|Blob):Promise<void> {
     //console.log(fileHandle);
-    //@ts-ignor Property 'createWritable' does not exist on type 'FileSystemFileHandle'.
     fileHandle.createWritable().then(async (writable:FileSystemWritableFileStream) =>{
         await writable.write(contents);
         writable.close();
@@ -260,35 +267,35 @@ $$\   $$ |$$ |      $$ |      $$ |$$ |  $$ |  $$ |$$\ $$ |      $$  __$$ |$$ |  
 
 // Various interfaces for intuitively defining various components of Papyrus for parsing.
 interface papyrus_Type {
-    type: string | bcdStr,
+    type: string,
     is_array: boolean
 }
 
 interface papyrus_Parameter extends papyrus_Type {
-    name: string | bcdStr;
-    default: string | bcdStr;
-};
+    name: string;
+    default: string;
+}
 
 interface papyrus_Function {
-    name: string | bcdStr,
+    name: string,
     returns: papyrus_Type,
     description: string,
     parameters: papyrus_Parameter[],
     global: boolean,
     native: boolean,
-    body: string | bcdStr
+    body: string
 }
 
 interface papyrus_Event extends papyrus_Function {
     global: false,
     native: false,
     returns: {type: 'None', is_array: false}
-};
+}
 
 interface papyrus_Script {
     name: string,
-    included_documentation?: string | bcdStr,
-    parent: string | bcdStr,
+    included_documentation?: string,
+    parent: string,
     conditional: boolean,
     hidden: boolean,
     native: boolean
@@ -299,7 +306,9 @@ interface papyrus_Script {
 /** Parses the passed-in script into Markdown documentation */
 function parseScript(scriptStr:string):string {
     var scriptname = parseScriptName(scriptStr);
-    var functions = sortArrayOfObjectAlphaByKey(parseFunctions(scriptStr), 'name') as papyrus_Function[];
+    var functions = sortArrayOfObjectAlphaByKey(
+        parseFunctions(scriptStr), 'name'
+        ) as papyrus_Function[];
     var functionTable = '';
 
     var events = sortArrayOfObjectAlphaByKey(parseEvents(scriptStr), 'name');
@@ -395,7 +404,7 @@ function parseScriptName(scriptStr:string): papyrus_Script {
         conditional: false,
         hidden: false,
         native: false
-    }
+    };
     return {
         name: parsed[1],
 
@@ -412,7 +421,7 @@ function parseScriptName(scriptStr:string): papyrus_Script {
 
 
 /** Parses the Events in the script */
-function parseEvents(scriptStr:String):papyrus_Event[] {
+function parseEvents(scriptStr:string):papyrus_Event[] {
     //console.log('Parsing events...');
     //console.log(regex_Events);
     //console.log(scriptStr);
@@ -425,9 +434,9 @@ function parseEvents(scriptStr:String):papyrus_Event[] {
 
         events.push({
             name: _event[2],
-            description: new bcdStr(_event[1]).trimWhitespace().replace(/^\s*;\s*/gm, ''),
+            description: bcdUniversal.trimWhitespace(_event[1]).replace(/^\s*;\s*/gm, ''),
             parameters: parseParameters(_event[3]),
-            body: typeof _event[4] === 'undefined' ? '' : new bcdStr(_event[4]).trimWhitespace(),
+            body: typeof _event[4] === 'undefined' ? '' : bcdUniversal.trimWhitespace(_event[4]),
             global: false,
             native: false,
             returns: {type: 'None', is_array: false}
@@ -449,7 +458,7 @@ function parseParameters(paramStr:string):papyrus_Parameter[] {
 
     for (var _param of params){
         result_arr.push({
-            type: new bcdStr(_param[1]).capitalizeFirstLetter(),
+            type: bcdUniversal.capitalizeFirstLetter(_param[1]),
             is_array: _param[2] !== undefined,
             name: _param[3],
             default: typeof _param[4] === 'undefined' ? '' : _param[3]
@@ -464,24 +473,24 @@ function parseParameters(paramStr:string):papyrus_Parameter[] {
     @returns {Array<>} - An array of event objects
 */
 
-function parseFunctions(scriptStr:String):papyrus_Function[] {
+function parseFunctions(scriptStr:string):papyrus_Function[] {
     var functions = [];
     var parsed = scriptStr.matchAll(regex_Functions);
     for (var _function of parsed){
         functions.push({
-            returns: {type: typeof _function[2] === 'undefined' ? '' :new bcdStr(_function[2]).capitalizeFirstLetter(), is_array: typeof _function[3] !== 'undefined'},
+            returns: {type: typeof _function[2] === 'undefined' ? '' : bcdUniversal.capitalizeFirstLetter(_function[2]), is_array: typeof _function[3] !== 'undefined'},
             name: _function[4],
             description: // Concatenate the various possible description matches
-                (typeof _function[1] === 'undefined' ? '' : new bcdStr(_function[1]).trimWhitespace().replace(/^\s*;\s*/gm, '')) +
+                (typeof _function[1] === 'undefined' ? '' : bcdUniversal.trimWhitespace(_function[1]).replace(/^\s*;\s*/gm, '')) +
                     (typeof _function[1] === 'undefined' || typeof _function[8] === 'undefined' ? '' : '\n\n') +
-                (typeof _function[8] === 'undefined' ? '' : new bcdStr(_function[1]).trimWhitespace().replace(/^\s*;\s*/gm, '')) +
+                (typeof _function[8] === 'undefined' ? '' : bcdUniversal.trimWhitespace(_function[1]).replace(/^\s*;\s*/gm, '')) +
                     (typeof _function[8] === 'undefined' || typeof _function[9] === 'undefined' ? '' : '\n\n') +
-                (typeof _function[9] === 'undefined' ? '' : new bcdStr(_function[9]).trimWhitespace().replace(/^\s*;\s*/gm, '')),
+                (typeof _function[9] === 'undefined' ? '' : bcdUniversal.trimWhitespace(_function[9]).replace(/^\s*;\s*/gm, '')),
 
             parameters: parseParameters(_function[5]),
             global: typeof _function[6] !== 'undefined' || typeof _function[8] !== 'undefined',
             native: typeof _function[7] !== 'undefined',
-            body: _function[11] === 'string' ? new bcdStr(_function[9]).trimWhitespace() : ''
+            body: _function[11] === 'string' ? bcdUniversal.trimWhitespace(_function[9]) : ''
         });
     }
     return functions;
@@ -518,16 +527,10 @@ function inputValue(element:HTMLInputElement, usePlaceholder:boolean = true):str
 }
 
 
-
-
-
-type anyObjectKey = string|number|symbol;
-type anyObject = {[index:anyObjectKey]:any}
-
-function sortArrayOfObjectAlphaByKey(obj:Array<anyObject>, key:anyObjectKey){
-    return obj.sort(function(a:anyObject, b:anyObject) {
-        var textA = a[key].toUpperCase();
-        var textB = b[key].toUpperCase();
+function sortArrayOfObjectAlphaByKey<TArr extends unknown[]>(obj:TArr, key:keyof TArr[number]): TArr {
+    return obj.sort((a:TArr[number], b:TArr[number]) => {
+        var textA = JSON.stringify(a[key]).toUpperCase();
+        var textB = JSON.stringify(b[key]).toUpperCase();
         return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
     });
 }
