@@ -923,3 +923,14 @@ div.mdl-layout__drawer h3{
 .bcd-modal[open], .bcd-modal-obfuscator.is-visible {
     opacity: 1;
 }
+
+.bcd-modal-buttons {
+    margin: 0px;
+    margin-left: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    align-content: center;
+}

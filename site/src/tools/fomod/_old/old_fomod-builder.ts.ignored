@@ -63,9 +63,9 @@ var elm_toggleConfigInCookie:HTMLInputElement;
 var elm_toggleInfoSchema:HTMLInputElement;
 var elm_toggleBranding:HTMLInputElement;
 
-// Collapsables
-var elm_collapsableMetadata:HTMLDivElement;
-var elm_collapsableGeneralAndConfig:HTMLDivElement;
+// collapsibles
+var elm_collapsibleMetadata:HTMLDivElement;
+var elm_collapsibleGeneralAndConfig:HTMLDivElement;
 
 // Idea by IllusiveMan
 var fileExtPathAssociations = {
@@ -156,9 +156,9 @@ function setElementVars():void{
     elm_toggleInfoSchema = document.getElementById(`fomod_config_saveInfoSchema`) as HTMLInputElement;
     elm_toggleBranding = document.getElementById(`fomod_config_doBranding`) as HTMLInputElement;
 
-    // collapsables
-    elm_collapsableMetadata = document.getElementById(`details_builder_meta`) as HTMLDivElement;
-    elm_collapsableGeneralAndConfig = document.getElementById(`details_builder_genConfig`) as HTMLDivElement;
+    // collapsibles
+    elm_collapsibleMetadata = document.getElementById(`details_builder_meta`) as HTMLDivElement;
+    elm_collapsibleGeneralAndConfig = document.getElementById(`details_builder_genConfig`) as HTMLDivElement;
 }
 
 
@@ -342,7 +342,7 @@ async function openFomodDirectory(){
     //moduleConfig_file = temp_moduleConfig_file;     <--   are called in the respective parsers
 
     // Open the Metadata section
-    bcd_ComponentTracker.findItem(BellCubicSummary, elm_collapsableMetadata, item => item.self === elm_collapsableMetadata)?.open();
+    bcd_ComponentTracker.findItem(BellCubicSummary, elm_collapsibleMetadata, item => item.self === elm_collapsibleMetadata)?.open();
 }
 
 

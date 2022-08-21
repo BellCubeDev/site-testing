@@ -2,24 +2,34 @@ import { request } from 'http';
 import * as mdl from './assets/site/mdl/material.js';
 import * as quotes from './universal_quotes.js';
 
-declare global {interface Window {
-    /** A list of Query Parameters from the URI */
-    queryParams: objOf<string>;
+/*
+    Thanks to Patrick Gillespie for the great ASCII art generator!
+    https://patorjk.com/software/taag/#p=display&h=0&v=0&f=Big%20Money-nw
+    ...makes this code *so* much easier to maintain... you know, 'cuz I can find my functions in VSCode's Minimap
 
-    /** A list of functions used when loading scripts */
-    bcd_init_functions: objOf<Function>;
 
-    /** A special class used to track components across multiple module scripts */
-    bcd_ComponentTracker: bcd_ComponentTracker;
-}}
 
-window.queryParams = {};
-if (window.location.search[0] === '?') window.location.search.substring(1).split('&')
-                                        .map(param => param.split('='))
-                                        .forEach(param => window.queryParams[param[0].trim()] = param[1].trim());
+$$\   $$\   $$\     $$\ $$\ $$\   $$\     $$\
+$$ |  $$ |  $$ |    \__|$$ |\__|  $$ |    \__|
+$$ |  $$ |$$$$$$\   $$\ $$ |$$\ $$$$$$\   $$\  $$$$$$\   $$$$$$$\
+$$ |  $$ |\_$$  _|  $$ |$$ |$$ |\_$$  _|  $$ |$$  __$$\ $$  _____|
+$$ |  $$ |  $$ |    $$ |$$ |$$ |  $$ |    $$ |$$$$$$$$ |\$$$$$$\
+$$ |  $$ |  $$ |$$\ $$ |$$ |$$ |  $$ |$$\ $$ |$$   ____| \____$$\
+\$$$$$$  |  \$$$$  |$$ |$$ |$$ |  \$$$$  |$$ |\$$$$$$$\ $$$$$$$  |
+ \______/    \____/ \__|\__|\__|   \____/ \__| \_______|\______*/
 
-console.log("%cHello and welcome to the JavaScript console! This is where wizards do their magic!\nAs for me? I'm the wizard you don't want to anger.", "color: #2d6");
 
+
+// ================================
+// ======== TYPE UTILITIES ========
+// ================================
+
+export type objOf<T> = {[key:string]: T};
+
+
+// ==================================
+// ======== STRING UTILITIES ========
+// ==================================
 
 /** Removes whitespace at the beginning and end of a string and at the end of every included line*/
 export function capitalizeFirstLetter(str: string): string {
@@ -34,22 +44,135 @@ export function trimWhitespace(str: string): string {
 ;}
 
 
+// =================================
+// ======== ARRAY UTILITIES ========
+// =================================
+
 export function sortArr<TUnknown>(arr: TUnknown[], refArr: TUnknown[]) {
     arr.sort(function(a, b){
         return refArr.indexOf(a) - refArr.indexOf(b);
     });
 }
 
-export type objOf<T> = {[key:string]: T};
+// ==================================
+// ======== NUMBER UTILITIES ========
+// ==================================
+
+export function randomNumber(min = 0, max = 1, places = 0):number{
+    const placesMult = Math.pow(10, places);
+    //console.log(`10^${places} = ${placesMult}`);
+    return (
+        Math.round(
+            (
+                Math.random() * (max - min) + min
+            ) * placesMult
+        ) / placesMult
+    );
+}
 
 
-interface componentTrackingItem {
+// ===============================
+// ======== DOM UTILITIES ========
+// ===============================
+
+export function focusAnyElement(element:HTMLElement|undefined, preventScrolling: boolean = true):void{
+    if (!element || !element.focus) return;
+
+    const hadTabIndex = element.hasAttribute('tabindex');
+    if (!hadTabIndex) element.setAttribute('tabindex', '0');
+
+    element.focus({preventScroll: preventScrolling});
+
+    // Wrap inside two requestAnimationFrame calls to ensure the browser could focus the element before removing the tabindex attribute.
+    requestAnimationFrame(() => {requestAnimationFrame(() => {
+        if (!hadTabIndex) element.removeAttribute('tabindex');
+    });});
+}
+
+
+
+/*$$$$$\                      $$\                 $$$$$$\           $$\   $$\
+$$ ___$$\                     \__|                \_$$  _|          \__|  $$ |
+$$/   $$ | $$$$$$\   $$$$$$$\ $$\  $$$$$$$\         $$ |  $$$$$$$\  $$\ $$$$$$\
+$$$$$$$\ | \____$$\ $$  _____|$$ |$$  _____|        $$ |  $$  __$$\ $$ |\_$$  _|
+$$  __$$\  $$$$$$$ |\$$$$$$\  $$ |$$ /              $$ |  $$ |  $$ |$$ |  $$ |
+$$ |  $$ |$$  __$$ | \____$$\ $$ |$$ |              $$ |  $$ |  $$ |$$ |  $$ |$$\
+$$$$$$$  |\$$$$$$$ |$$$$$$$  |$$ |\$$$$$$$\       $$$$$$\ $$ |  $$ |$$ |  \$$$$  |
+ \______/  \_______|\_______/ \__| \_______|      \______|\__|  \__|\__|   \___*/
+
+
+
+declare global {interface Window {
+    /** A list of Query Parameters from the URI */
+    queryParams: objOf<string>;
+
+    /** A list of functions used when loading scripts */
+    bcd_init_functions: objOf<Function>;
+
+    /** A special class used to track components across multiple module scripts */
+    bcd_ComponentTracker: bcd_ComponentTracker;
+}}
+
+enum strs {
+    transitionDur = "transition-duration",
+    animDur = "animation-duration",
+    marginTop = "margin-top",
+    classIsOpen = "is-open",
+    classAdjacent = "adjacent",
+    classDetailsInner = "bcd-details-inner",
+    errItem = "Error Item:"
+}
+
+window.queryParams = {};
+
+if (window.location.search[0] === '?')
+    window.location.search.substring(1).split('&')
+                            .map(param => param.split('='))
+                            .forEach(param => window.queryParams[param[0].trim()] = param[1].trim());
+
+
+
+interface BCDComponent extends Function {
+    asString:string;
+    cssClass:string;
+}
+
+// Used to store components that we'll be registering on DOM initialization
+const bcdComponents:BCDComponent[] = [];
+
+console.log("%cHello and welcome to the JavaScript console! This is where wizards do their magic!\nAs for me? I'm the wizard you don't want to anger.", "color: #2d6");
+
+
+
+/*$$$$$\                                                                              $$\
+$$  __$$\                                                                             $$ |
+$$ /  \__| $$$$$$\  $$$$$$\$$$$\   $$$$$$\   $$$$$$\  $$$$$$$\   $$$$$$\  $$$$$$$\  $$$$$$\
+$$ |      $$  __$$\ $$  _$$  _$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ \_$$  _|
+$$ |      $$ /  $$ |$$ / $$ / $$ |$$ /  $$ |$$ /  $$ |$$ |  $$ |$$$$$$$$ |$$ |  $$ |  $$ |
+$$ |  $$\ $$ |  $$ |$$ | $$ | $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |  $$ |$$\
+\$$$$$$  |\$$$$$$  |$$ | $$ | $$ |$$$$$$$  |\$$$$$$  |$$ |  $$ |\$$$$$$$\ $$ |  $$ |  \$$$$  |
+ \______/  \______/ \__| \__| \__|$$  ____/  \______/ \__|  \__| \_______|\__|  \__|   \____/
+                                  $$ |
+                                  $$ |
+                                  \__|
+$$$$$$$$\                               $$\
+\__$$  __|                              $$ |
+   $$ |    $$$$$$\   $$$$$$\   $$$$$$$\ $$ |  $$\  $$$$$$\   $$$$$$\
+   $$ |   $$  __$$\  \____$$\ $$  _____|$$ | $$  |$$  __$$\ $$  __$$\
+   $$ |   $$ |  \__| $$$$$$$ |$$ /      $$$$$$  / $$$$$$$$ |$$ |  \__|
+   $$ |   $$ |      $$  __$$ |$$ |      $$  _$$<  $$   ____|$$ |
+   $$ |   $$ |      \$$$$$$$ |\$$$$$$$\ $$ | \$$\ \$$$$$$$\ $$ |
+   \__|   \__|       \_______| \_______|\__|  \__| \_______|\_*/
+
+
+
+export interface componentTrackingItem {
     obj:objOf<unknown>,
     arr:unknown[]
 }
 
 
-interface trackableConstructor<TConstructor> extends Function {
+export interface trackableConstructor<TConstructor> extends Function {
     asString: string,
     new(...args: never[]): TConstructor,
 
@@ -86,54 +209,23 @@ export class bcd_ComponentTracker {
 }
 window.bcd_ComponentTracker = bcd_ComponentTracker;
 
-const bcd_const_transitionDur:string = "transition-duration";
-const bcd_const_animDur:string = "animation-duration";
-const bcd_const_marginTop:string = "margin-top";
-const bcd_const_classIsOpen:string = "is-open";
-const bcd_const_classAdjacent:string = "adjacent";
-const bcd_const_classDetailsInner:string = "bcd-details-inner";
-
-// eslint-disable-next-line i18n-text/no-en
-const bcd_const_errItem = "Error Item:";
-
-export function randomNumber(min = 0, max = 1, places = 0):number{
-    const placesMult = Math.pow(10, places);
-    //console.log(`10^${places} = ${placesMult}`);
-    return (
-        Math.round(
-            (
-                Math.random() * (max - min) + min
-            ) * placesMult
-        ) / placesMult
-    );
-}
 
 
-function focusAnyElement(element:HTMLElement|undefined, preventScrolling: boolean = true):void{
-    if (!element || !element.focus) return;
-
-    const hadTabIndex = element.hasAttribute('tabindex');
-    if (!hadTabIndex) element.setAttribute('tabindex', '0');
-
-    element.focus({preventScroll: preventScrolling});
-
-    // Wrap inside two requestAnimationFrame calls to ensure the browser could focus the element before removing the tabindex attribute.
-    requestAnimationFrame(() => {requestAnimationFrame(() => {
-        if (!hadTabIndex) element.removeAttribute('tabindex');
-    });});
-}
+/*$$$$$\            $$\ $$\                               $$\ $$\       $$\
+$$  __$$\           $$ |$$ |                              \__|$$ |      $$ |
+$$ /  \__| $$$$$$\  $$ |$$ | $$$$$$\   $$$$$$\   $$$$$$$\ $$\ $$$$$$$\  $$ | $$$$$$\
+$$ |      $$  __$$\ $$ |$$ | \____$$\ $$  __$$\ $$  _____|$$ |$$  __$$\ $$ |$$  __$$\
+$$ |      $$ /  $$ |$$ |$$ | $$$$$$$ |$$ /  $$ |\$$$$$$\  $$ |$$ |  $$ |$$ |$$$$$$$$ |
+$$ |  $$\ $$ |  $$ |$$ |$$ |$$  __$$ |$$ |  $$ | \____$$\ $$ |$$ |  $$ |$$ |$$   ____|
+\$$$$$$  |\$$$$$$  |$$ |$$ |\$$$$$$$ |$$$$$$$  |$$$$$$$  |$$ |$$$$$$$  |$$ |\$$$$$$$\
+ \______/  \______/ \__|\__| \_______|$$  ____/ \_______/ \__|\_______/ \__| \_______|
+                                      $$ |
+                                      $$ |
+                                      \_*/
 
 
 
-interface BCDComponent extends Function {
-    asString:string;
-    cssClass:string;
-}
-
-// This is a const, but it is manipulated via Push/Pop.
-const bcdComponents:BCDComponent[] = [];
-
-class bcd_collapsableParent {
+class bcd_collapsibleParent {
     // For children to set
     details!:HTMLElement;
     details_inner!:HTMLElement;
@@ -146,29 +238,20 @@ class bcd_collapsableParent {
 
     constructor(elm:HTMLElement){
         this.self = elm;
-        this.adjacent = elm.classList.contains(bcd_const_classAdjacent);
+        this.adjacent = elm.classList.contains(strs.classAdjacent);
     }
-
-    /*
-    debugCheck():void{
-        if (!this.details) {console.log(bcd_const_errItem, this); throw new TypeError("bcd_collapsableParent: Details not found!");}
-        if (!this.details_inner) {console.log(bcd_const_errItem, this); throw new TypeError("bcd_collapsableParent: Details_inner not found!");}
-        if (!this.summary) {console.log(bcd_const_errItem, this); throw new TypeError("bcd_collapsableParent: Summary not found!");}
-        if (!this.openIcons90deg) {console.log(bcd_const_errItem, this); throw new TypeError("bcd_collapsableParent: OpenIcons90deg not found!");}
-    }
-    */
 
     isOpen():boolean {//this.debugCheck();
-        return this.details.classList.contains(bcd_const_classIsOpen) || this.summary.classList.contains(bcd_const_classIsOpen);
+        return this.details.classList.contains(strs.classIsOpen) || this.summary.classList.contains(strs.classIsOpen);
     }
 
-    /** Toggle the collapsable menu. */
+    /** Toggle the collapsible menu. */
     toggle(doSetDuration:boolean = true) {//this.debugCheck();
         /*console.log('[BCD-DETAILS] toggle() called on ',this)*/
         if (this.isOpen()) { this.close(doSetDuration); } else { this.open(doSetDuration); }
     }
 
-    /** Re-evaluate the collapsable's current state. */
+    /** Re-evaluate the collapsible's current state. */
     reEval(doSetDuration?:false):void
     reEval(doSetDuration?:true, instant?:true):void
     reEval(doSetDuration:boolean = true, instant?:true):void {
@@ -177,7 +260,7 @@ class bcd_collapsableParent {
         });
     }
 
-    /** Open the collapsable menu. */
+    /** Open the collapsible menu. */
     open(doSetDuration:boolean = true, instant = false) {//this.debugCheck();
         if (!instant) this.evaluateDuration(doSetDuration);
 
@@ -187,11 +270,11 @@ class bcd_collapsableParent {
         // Wrap `evaluateDuration` in two requestsAnimationFrames to allow the CSS to properly update
         if (instant) requestAnimationFrame(() => {requestAnimationFrame(() => {this.evaluateDuration(doSetDuration);});});
 
-        this.details.classList.add(bcd_const_classIsOpen);
-        this.summary.classList.add(bcd_const_classIsOpen);
+        this.details.classList.add(strs.classIsOpen);
+        this.summary.classList.add(strs.classIsOpen);
     }
 
-    /** Close the collapsable menu. */
+    /** Close the collapsible menu. */
     close(doSetDuration:boolean = true, instant = false) {//this.debugCheck();
         if (doSetDuration) this.evaluateDuration(doSetDuration);
 
@@ -201,8 +284,8 @@ class bcd_collapsableParent {
         // Wrap `evaluateDuration` in two requestsAnimationFrames to allow the CSS to properly update
         if (instant) requestAnimationFrame(()=>{requestAnimationFrame(() => {this.evaluateDuration(true);});});
 
-        this.details.classList.remove(bcd_const_classIsOpen);
-        this.summary.classList.remove(bcd_const_classIsOpen);
+        this.details.classList.remove(strs.classIsOpen);
+        this.summary.classList.remove(strs.classIsOpen);
     }
 
     instantTransition():void {
@@ -215,7 +298,7 @@ class bcd_collapsableParent {
         }
     }
 
-    /* Determines what the transition and animation duration of the collapsable menu is */
+    /* Determines what the transition and animation duration of the collapsible menu is */
     evaluateDuration(doRun:boolean = true) {//this.debugCheck();
         if (doRun && this.details_inner) {
             this.details_inner.style.transitionDuration = `${200 + 1.25 * this.details_inner.offsetHeight * 1.04}ms`;
@@ -227,14 +310,7 @@ class bcd_collapsableParent {
     }
 }
 
-enum keycodes {
-    enter = 13,
-    escape = 27,
-    space = 32,
-    tab = 9,
-}
-
-export class BellCubicDetails extends bcd_collapsableParent {
+export class BellCubicDetails extends bcd_collapsibleParent {
     static cssClass = "bcd-details";
     static asString = "BellCubicDetails";
 
@@ -250,7 +326,7 @@ export class BellCubicDetails extends bcd_collapsableParent {
         // Create a container element to make animation go brrr
         // Slightly over-complicated because, uh, DOM didn't want to cooperate.
         this.details_inner = document.createElement('div');
-        this.details_inner.classList.add(bcd_const_classDetailsInner);
+        this.details_inner.classList.add(strs.classDetailsInner);
 
         //console.log(this.details_inner);
 
@@ -270,11 +346,11 @@ export class BellCubicDetails extends bcd_collapsableParent {
         //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.details_inner)});
         if (this.adjacent) {
             const temp_summary = this.self.previousElementSibling;
-            if (!(temp_summary && temp_summary.classList.contains(BellCubicSummary.cssClass))) {console.log(bcd_const_errItem, this); throw new TypeError("[BCD-DETAILS] Error: Adjacent Details element must be preceded by a Summary element.");}
+            if (!(temp_summary && temp_summary.classList.contains(BellCubicSummary.cssClass))) {console.log(strs.errItem, this); throw new TypeError("[BCD-DETAILS] Error: Adjacent Details element must be preceded by a Summary element.");}
             this.summary = temp_summary as HTMLElement;
         } else {
             const temp_summary = this.self.ownerDocument.querySelector(`.bcd-summary[for="${this.details.id}"`);
-            if (!temp_summary) {console.log(bcd_const_errItem, this); throw new TypeError("[BCD-DETAILS] Error: Non-adjacent Details elements must have a Summary element with a `for` attribute matching the Details element's id.");}
+            if (!temp_summary) {console.log(strs.errItem, this); throw new TypeError("[BCD-DETAILS] Error: Non-adjacent Details elements must have a Summary element with a `for` attribute matching the Details element's id.");}
             this.summary = temp_summary as HTMLElement;
         }
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
@@ -295,7 +371,7 @@ export class BellCubicDetails extends bcd_collapsableParent {
 }
 bcdComponents.push(BellCubicDetails);
 
-export class BellCubicSummary extends bcd_collapsableParent {
+export class BellCubicSummary extends bcd_collapsibleParent {
     static cssClass = 'bcd-summary';
     static asString = 'BellCubicSummary';
 
@@ -308,11 +384,11 @@ export class BellCubicSummary extends bcd_collapsableParent {
 
         if (this.adjacent) {
             const temp_details = this.self.nextElementSibling;
-            if (!(temp_details && temp_details.classList.contains(BellCubicDetails.cssClass))) {console.log(bcd_const_errItem, this); throw new TypeError("[BCD-SUMMARY] Error: Adjacent Summary element must be proceeded by a Details element.");}
+            if (!(temp_details && temp_details.classList.contains(BellCubicDetails.cssClass))) {console.log(strs.errItem, this); throw new TypeError("[BCD-SUMMARY] Error: Adjacent Summary element must be proceeded by a Details element.");}
             this.details = temp_details as HTMLElement;
         } else {
             const temp_details = this.self.ownerDocument.getElementById(this.summary.getAttribute('for') ?? '');
-            if (!temp_details) {console.log(bcd_const_errItem, this); throw new TypeError("[BCD-SUMMARY] Error: Non-adjacent Details elements must have a summary element with a `for` attribute matching the Details element's id.");}
+            if (!temp_details) {console.log(strs.errItem, this); throw new TypeError("[BCD-SUMMARY] Error: Non-adjacent Details elements must have a summary element with a `for` attribute matching the Details element's id.");}
             this.details = temp_details as HTMLElement;
         }
 
@@ -321,7 +397,7 @@ export class BellCubicSummary extends bcd_collapsableParent {
 
     divertedCompletion(){requestAnimationFrame(()=>{
 
-        const temp_inner = this.details.querySelector(`.${bcd_const_classDetailsInner}`);
+        const temp_inner = this.details.querySelector(`.${strs.classDetailsInner}`);
         if (!temp_inner) {this.divertedCompletion(); return;}
             else this.details_inner = temp_inner as HTMLElement;
 
@@ -370,6 +446,22 @@ export class bcd_prettyJSON {
     }
 }
 bcdComponents.push(bcd_prettyJSON);
+/*
+
+
+$$\      $$\                 $$\           $$\       $$\ $$$$$$$\  $$\           $$\
+$$$\    $$$ |                $$ |          $$ |     $$  |$$  __$$\ \__|          $$ |
+$$$$\  $$$$ | $$$$$$\   $$$$$$$ | $$$$$$\  $$ |    $$  / $$ |  $$ |$$\  $$$$$$\  $$ | $$$$$$\   $$$$$$\
+$$\$$\$$ $$ |$$  __$$\ $$  __$$ | \____$$\ $$ |   $$  /  $$ |  $$ |$$ | \____$$\ $$ |$$  __$$\ $$  __$$\
+$$ \$$$  $$ |$$ /  $$ |$$ /  $$ | $$$$$$$ |$$ |  $$  /   $$ |  $$ |$$ | $$$$$$$ |$$ |$$ /  $$ |$$ /  $$ |
+$$ |\$  /$$ |$$ |  $$ |$$ |  $$ |$$  __$$ |$$ | $$  /    $$ |  $$ |$$ |$$  __$$ |$$ |$$ |  $$ |$$ |  $$ |
+$$ | \_/ $$ |\$$$$$$  |\$$$$$$$ |\$$$$$$$ |$$ |$$  /     $$$$$$$  |$$ |\$$$$$$$ |$$ |\$$$$$$  |\$$$$$$$ |
+\__|     \__| \______/  \_______| \_______|\__|\__/      \_______/ \__| \_______|\__| \______/  \____$$ |
+                                                                                               $$\   $$ |
+                                                                                               \$$$$$$  |
+                                                                                                \_____*/
+
+
 
 export class bcdModalDialog extends EventTarget {
     static cssClass = 'bcd-modal';
@@ -379,11 +471,8 @@ export class bcdModalDialog extends EventTarget {
     static modalsToShow: bcdModalDialog[] = [];
     static shownModal: bcdModalDialog|null = null;
 
-    closeByClickOutside:boolean;
-
-    boundHideFunction = this.hide.bind(this);
-
     element_:HTMLDialogElement;
+    closeByClickOutside:boolean;
 
     constructor(element:HTMLDialogElement) {
         super();
@@ -401,7 +490,13 @@ export class bcdModalDialog extends EventTarget {
 
         this.closeByClickOutside = !this.element_.hasAttribute('no-click-outside');
 
-        setTimeout(function (this: bcdModalDialog) {
+        setTimeout(function (this: bcdModalDialog) { // Lets the DOM settle and gives JavaScript a chance to modify the element
+
+            const closeButtons = this.element_.getElementsByClassName('bcd-modal-close');
+            for (const button of closeButtons) {
+                button.addEventListener('click', this.boundHideFunction);
+            }
+
             if (this.element_.hasAttribute('open-by-default')) this.show();
         }.bind(this), 1000);
     }
@@ -436,14 +531,19 @@ export class bcdModalDialog extends EventTarget {
         console.log("[BCD-MODAL] Modals to show (after eval):", bcdModalDialog.modalsToShow);
     }
 
-    /**
-        Event sent just before the modal is shown
-        If this event is canceled or PreventDefault() is called, the modal will not be shown.
+    /** Event sent just before the modal is shown
+        If this event is canceled or `PreventDefault()` is called, the modal will not be shown.
+
+        The event is first sent for the class and, if not canceled and if `PreventDefault()` was not called, the event is sent for the element.
     */
     static beforeShowEvent = new CustomEvent('beforeShow', {cancelable: true, bubbles: false, composed: false});
 
-    /** Event sent just after the modal is shown */
+    /** Event sent just after the modal is shown
+
+        The event is first sent for the class and, if not canceled and if PreventDefault() was not called, the event is sent for the element.
+    */
     static afterShowEvent = new CustomEvent('afterShow', {cancelable: false, bubbles: false, composed: false});
+
     private show_forReal() {
         console.log("[BCD-MODAL] Showing modal:", this);
         /* 'Before' Event */ if (!this.dispatchEvent(bcdModalDialog.beforeShowEvent) || !this.element_.dispatchEvent(bcdModalDialog.beforeShowEvent)) return;
@@ -459,24 +559,25 @@ export class bcdModalDialog extends EventTarget {
         console.log("[BCD-MODAL] Modals to show (after show):", bcdModalDialog.modalsToShow);
     }
 
-    /**
-        Event sent just before the modal is hidden
-        If this event is canceled or PreventDefault() is called, the modal will not be shown.
+    /** Event sent just before the modal is hidden
+        If this event is canceled or `PreventDefault()` is called, the modal will not be shown.
 
-        The event is first sent for the class and, if not canceled and if PreventDefault() was not called, the event is sent for the element.
+        The event is first sent for the class and, if not canceled and if `PreventDefault()` was not called, the event is sent for the element.
     */
     static beforeHideEvent = new CustomEvent('beforeHide', {cancelable: true, bubbles: false, composed: false});
 
-    /**
-        Event sent just after the modal is hidden
+    /** Event sent just after the modal is hidden
 
         The event is first sent for the class and, if not canceled and if PreventDefault() was not called, the event is sent for the element.
     */
     static afterHideEvent = new CustomEvent('afterHide', {cancelable: false, bubbles: false, composed: false});
 
-    hide(event?: MouseEvent){
+    // Storing the bound function lets us remove the event listener from the obfuscator after the modal is hidden
+    boundHideFunction = this.hide.bind(this);
+
+    hide(evt?: Event){
         console.log("[BCD-MODAL] Hiding modal:", this);
-        if (event) event.stopImmediatePropagation();
+        if (evt) evt.stopImmediatePropagation();
         /* 'Before' Event */ if (!this.dispatchEvent(bcdModalDialog.beforeHideEvent) ||!this.element_.dispatchEvent(bcdModalDialog.beforeHideEvent)) return;
 
         this.element_.close();
@@ -493,6 +594,21 @@ export class bcdModalDialog extends EventTarget {
 
 }
 bcdComponents.push(bcdModalDialog);
+
+
+/*$$$$$\                                      $$\
+$$  __$$\                                     $$ |
+$$ |  $$ | $$$$$$\   $$$$$$\   $$$$$$\   $$$$$$$ | $$$$$$\  $$\  $$\  $$\ $$$$$$$\
+$$ |  $$ |$$  __$$\ $$  __$$\ $$  __$$\ $$  __$$ |$$  __$$\ $$ | $$ | $$ |$$  __$$\
+$$ |  $$ |$$ |  \__|$$ /  $$ |$$ /  $$ |$$ /  $$ |$$ /  $$ |$$ | $$ | $$ |$$ |  $$ |
+$$ |  $$ |$$ |      $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ | $$ | $$ |$$ |  $$ |
+$$$$$$$  |$$ |      \$$$$$$  |$$$$$$$  |\$$$$$$$ |\$$$$$$  |\$$$$$\$$$$  |$$ |  $$ |
+\_______/ \__|       \______/ $$  ____/  \_______| \______/  \_____\____/ \__|  \__|
+                              $$ |
+                              $$ |
+                              \_*/
+
+
 
 export enum menuCorners {
     unaligned = 'mdl-menu--unaligned',
@@ -604,6 +720,31 @@ export class bcdDropdown extends mdl.MaterialMenu {
         //console.debug('makeNotSelected: - finished on:', option);
     }
 }
+/*
+
+
+$$$$$$$\                                      $$\
+$$  __$$\                                     $$ |
+$$ |  $$ | $$$$$$\   $$$$$$\   $$$$$$\   $$$$$$$ | $$$$$$\  $$\  $$\  $$\ $$$$$$$\
+$$ |  $$ |$$  __$$\ $$  __$$\ $$  __$$\ $$  __$$ |$$  __$$\ $$ | $$ | $$ |$$  __$$\
+$$ |  $$ |$$ |  \__|$$ /  $$ |$$ /  $$ |$$ /  $$ |$$ /  $$ |$$ | $$ | $$ |$$ |  $$ |
+$$ |  $$ |$$ |      $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ | $$ | $$ |$$ |  $$ |
+$$$$$$$  |$$ |      \$$$$$$  |$$$$$$$  |\$$$$$$$ |\$$$$$$  |\$$$$$\$$$$  |$$ |  $$ |
+\_______/ \__|       \______/ $$  ____/  \_______| \______/  \_____\____/ \__|  \__|
+                              $$ |
+                              $$ |
+                              \__|
+
+$$\    $$\                     $$\                       $$\
+$$ |   $$ |                    \__|                      $$ |
+$$ |   $$ | $$$$$$\   $$$$$$\  $$\  $$$$$$\  $$$$$$$\  $$$$$$\    $$$$$$$\
+\$$\  $$  | \____$$\ $$  __$$\ $$ | \____$$\ $$  __$$\ \_$$  _|  $$  _____|
+ \$$\$$  /  $$$$$$$ |$$ |  \__|$$ | $$$$$$$ |$$ |  $$ |  $$ |    \$$$$$$\
+  \$$$  /  $$  __$$ |$$ |      $$ |$$  __$$ |$$ |  $$ |  $$ |$$\  \____$$\
+   \$  /   \$$$$$$$ |$$ |      $$ |\$$$$$$$ |$$ |  $$ |  \$$$$  |$$$$$$$  |
+    \_/     \_______|\__|      \__| \_______|\__|  \__|   \____/ \______*/
+
+
 
 export class bcdDropdown_AwesomeButton extends bcdDropdown {
     static asString = 'BCD - Debugger\'s All-Powerful Button';
@@ -620,7 +761,22 @@ export class bcdDropdown_AwesomeButton extends bcdDropdown {
     }
 }
 bcdComponents.push(bcdDropdown_AwesomeButton);
+/*
 
+
+
+$$$$$$$$\           $$\                        $$$$$$\    $$\                $$$$$$\   $$$$$$\
+\__$$  __|          $$ |                      $$  __$$\   $$ |              $$  __$$\ $$  __$$\
+   $$ |    $$$$$$\  $$$$$$$\   $$$$$$$\       $$ /  \__|$$$$$$\   $$\   $$\ $$ /  \__|$$ /  \__|
+   $$ |    \____$$\ $$  __$$\ $$  _____|      \$$$$$$\  \_$$  _|  $$ |  $$ |$$$$\     $$$$\
+   $$ |    $$$$$$$ |$$ |  $$ |\$$$$$$\         \____$$\   $$ |    $$ |  $$ |$$  _|    $$  _|
+   $$ |   $$  __$$ |$$ |  $$ | \____$$\       $$\   $$ |  $$ |$$\ $$ |  $$ |$$ |      $$ |
+   $$ |   \$$$$$$$ |$$$$$$$  |$$$$$$$  |      \$$$$$$  |  \$$$$  |\$$$$$$  |$$ |      $$ |
+   \__|    \_______|\_______/ \_______/        \______/    \____/  \______/ \__|      \__|
+
+
+
+*/
 export class bcdTabButton extends mdl.MaterialButton {
     static asString = 'BCD - Tab List Button';
     static cssClass = 'tab-list-button';
@@ -709,6 +865,34 @@ export class bcdTabButton extends mdl.MaterialButton {
 }
 bcdComponents.push(bcdTabButton);
 
+
+
+/*$$$$$\                                                                              $$\
+$$  __$$\                                                                             $$ |
+$$ /  \__| $$$$$$\  $$$$$$\$$$$\   $$$$$$\   $$$$$$\  $$$$$$$\   $$$$$$\  $$$$$$$\  $$$$$$\
+$$ |      $$  __$$\ $$  _$$  _$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ \_$$  _|
+$$ |      $$ /  $$ |$$ / $$ / $$ |$$ /  $$ |$$ /  $$ |$$ |  $$ |$$$$$$$$ |$$ |  $$ |  $$ |
+$$ |  $$\ $$ |  $$ |$$ | $$ | $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |  $$ |$$\
+\$$$$$$  |\$$$$$$  |$$ | $$ | $$ |$$$$$$$  |\$$$$$$  |$$ |  $$ |\$$$$$$$\ $$ |  $$ |  \$$$$  |
+ \______/  \______/ \__| \__| \__|$$  ____/  \______/ \__|  \__| \_______|\__|  \__|   \____/
+                                  $$ |
+                                  $$ |
+                                  \__|
+
+$$$$$$$\                      $$\             $$\                           $$\     $$\
+$$  __$$\                     \__|            $$ |                          $$ |    \__|
+$$ |  $$ | $$$$$$\   $$$$$$\  $$\  $$$$$$$\ $$$$$$\    $$$$$$\   $$$$$$\  $$$$$$\   $$\  $$$$$$\  $$$$$$$\
+$$$$$$$  |$$  __$$\ $$  __$$\ $$ |$$  _____|\_$$  _|  $$  __$$\  \____$$\ \_$$  _|  $$ |$$  __$$\ $$  __$$\
+$$  __$$< $$$$$$$$ |$$ /  $$ |$$ |\$$$$$$\    $$ |    $$ |  \__| $$$$$$$ |  $$ |    $$ |$$ /  $$ |$$ |  $$ |
+$$ |  $$ |$$   ____|$$ |  $$ |$$ | \____$$\   $$ |$$\ $$ |      $$  __$$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ |
+$$ |  $$ |\$$$$$$$\ \$$$$$$$ |$$ |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |  \$$$$  |$$ |\$$$$$$  |$$ |  $$ |
+\__|  \__| \_______| \____$$ |\__|\_______/    \____/ \__|       \_______|   \____/ \__| \______/ \__|  \__|
+                    $$\   $$ |
+                    \$$$$$$  |
+                     \_____*/
+
+
+
 export function registerBCDComponent(component:BCDComponent):void {
     try{
         mdl.componentHandler.register({
@@ -734,8 +918,33 @@ function registerComponents():void{
     }
     console.debug("[BCD-Components] Registered components:", bcdComponents);
 }
+/*
 
 
+
+$$$$$$$\   $$$$$$\  $$\      $$\         $$$$$$$\                            $$\
+$$  __$$\ $$  __$$\ $$$\    $$$ |        $$  __$$\                           $$ |
+$$ |  $$ |$$ /  $$ |$$$$\  $$$$ |        $$ |  $$ | $$$$$$\   $$$$$$\   $$$$$$$ |$$\   $$\
+$$ |  $$ |$$ |  $$ |$$\$$\$$ $$ |$$$$$$\ $$$$$$$  |$$  __$$\  \____$$\ $$  __$$ |$$ |  $$ |
+$$ |  $$ |$$ |  $$ |$$ \$$$  $$ |\______|$$  __$$< $$$$$$$$ | $$$$$$$ |$$ /  $$ |$$ |  $$ |
+$$ |  $$ |$$ |  $$ |$$ |\$  /$$ |        $$ |  $$ |$$   ____|$$  __$$ |$$ |  $$ |$$ |  $$ |
+$$$$$$$  | $$$$$$  |$$ | \_/ $$ |        $$ |  $$ |\$$$$$$$\ \$$$$$$$ |\$$$$$$$ |\$$$$$$$ |
+\_______/  \______/ \__|     \__|        \__|  \__| \_______| \_______| \_______| \____$$ |
+                                                                                 $$\   $$ |
+                                                                                 \$$$$$$  |
+                                                                                  \______/
+$$$$$$\           $$\   $$\     $$\           $$\ $$\                       $$\     $$\
+\_$$  _|          \__|  $$ |    \__|          $$ |\__|                      $$ |    \__|
+  $$ |  $$$$$$$\  $$\ $$$$$$\   $$\  $$$$$$\  $$ |$$\ $$$$$$$$\  $$$$$$\  $$$$$$\   $$\  $$$$$$\  $$$$$$$\
+  $$ |  $$  __$$\ $$ |\_$$  _|  $$ | \____$$\ $$ |$$ |\____$$  | \____$$\ \_$$  _|  $$ |$$  __$$\ $$  __$$\
+  $$ |  $$ |  $$ |$$ |  $$ |    $$ | $$$$$$$ |$$ |$$ |  $$$$ _/  $$$$$$$ |  $$ |    $$ |$$ /  $$ |$$ |  $$ |
+  $$ |  $$ |  $$ |$$ |  $$ |$$\ $$ |$$  __$$ |$$ |$$ | $$  _/   $$  __$$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ |
+$$$$$$\ $$ |  $$ |$$ |  \$$$$  |$$ |\$$$$$$$ |$$ |$$ |$$$$$$$$\ \$$$$$$$ |  \$$$$  |$$ |\$$$$$$  |$$ |  $$ |
+\______|\__|  \__|\__|   \____/ \__| \_______|\__|\__|\________| \_______|   \____/ \__| \______/ \__|  \__|
+
+
+
+*/
 export function bcd_universalJS_init():void {
 
     // Register all the things!
