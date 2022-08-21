@@ -27,7 +27,7 @@ window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
         if (!testFunct) unavailableAPIs.push(api);
     }
 
-    if (unavailableAPIs) {
+    if (unavailableAPIs && unavailableAPIs.length) {
         const noSupportModal = document.getElementById('no-support-modal');
         noSupportModal?.setAttribute('open-by-default', '');
 
@@ -38,11 +38,13 @@ window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
             const lastAPITested = unavailableAPIs.pop();
             replaceMeElem.innerHTML = unavailableAPIs.join(', ');
 
-            if (lastAPITested && unavailableAPIs.length > 1) replaceMeElem.innerHTML += `, and ${lastAPITested}`;
+            if (lastAPITested) {
+                if (unavailableAPIs.length > 1) replaceMeElem.innerHTML += `, and ${lastAPITested}`;
 
-            else if (lastAPITested && unavailableAPIs.length) replaceMeElem.innerHTML += ` and ${lastAPITested}`;
+                else if (unavailableAPIs.length) replaceMeElem.innerHTML += ` and ${lastAPITested}`;
 
-            else replaceMeElem.innerHTML += lastAPITested;
+                else replaceMeElem.innerHTML += lastAPITested;
+            }
 
         }
 
