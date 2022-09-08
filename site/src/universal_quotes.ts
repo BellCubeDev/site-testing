@@ -358,7 +358,7 @@ export function checkDateCondition(dateBounds: conditionDateBounds):boolean {
     }
 
     // Are we above the maximum? The condition is not met if so.
-    return !(maxDate != [0, 0, 0] && !(
+    return !(JSON.stringify(maxDate) != JSON.stringify([0, 0, 0]) && !(
             (currentDate[2] < maxDate[2]) ||
             (currentDate[2] == maxDate[2] && currentDate[0] < maxDate[0]) ||
             (currentDate[2] == maxDate[2] && currentDate[0] == maxDate[0] && currentDate[1] <= maxDate[1])
