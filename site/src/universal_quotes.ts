@@ -255,26 +255,28 @@ export const possibilities_Generic = [
     "What&rsquo;s the deal with airline food?", // - mxinformation
     "Lesbiab", // - chuckseven1
     "The Chip is my invention, my property, MINE.",
-    "We are writers, my love. We don't cry; we bleed on paper.", // - A.Y.
+    "We are writers, my love. We don&rsquo;t cry; we bleed on paper.", // - A.Y.
     "<code>79 + 1 = 80</code>", // - Sigismund
     "...the hit 2010 video game Fallout: New Vegas...", // - Sigismund
     "And He said to me, It is done! I am the Alpha and the Omega, the Beginning and the End. I will give of the fountain of the water of life freely to him who thirsts.",
     "28 STAB WOUNDS",
     "Now be a good courier and deliver it!",
-    "I know exactly what I'm doing. I just don&rsquo;t know what effect it&rsquo;s going to have.", 
+    "I know exactly what I&rsquo;m doing. I just don&rsquo;t know what effect it&rsquo;s going to have.", 
     "Quote me more<br /> &mdash; chuckseven1", 
     "It&rsquo;s ridiculous and unnecessary, but when has that ever stopped programmers?", // I love Tom Scott
 
     // xkcd has me covered on these!
     "This quote was taken out of context.", 
-    "I'm being quoted to [entertain you as part of something], but I have no idea what it is and certainly don&rsquo;t endorse it.", 
+    "I&rsquo;m being quoted to [entertain you as part of something], but I have no idea what it is and certainly don&rsquo;t endorse it.", 
     "Oooh, look at me, I looked up a quote!", 
     "This quote is often falsely attributed to Mark Twain", 
     "Websites that collect quotes are full of mistakes and never check original sources.", 
-    "If you're doing a text search in this document for the word &lsquo;butts,&rsquo; the good news is that it&rsquo;s here, but the bad news is that it only appears in this unrelated quote", 
+    "If you&rsquo;re doing a text search in this document for the word &lsquo;butts,&rsquo; the good news is that it&rsquo;s here, but the bad news is that it only appears in this unrelated quote", 
     "Sent from my iPhone", 
 
-    "What's a lumberjack's favorite button on a calculator? <code>LOG</code>.",
+    "What&rsquo;s a lumberjack&rsquo;s favorite button on a calculator? <code>LOG</code>.",
+    "What&rsquo;s the point?",
+    "I&rsquo;m calibrating this drone footage.",
 ];
 
 
