@@ -382,12 +382,12 @@ export class BellCubicSummary extends bcd_collapsibleParent {
         this.summary = element;
 
         const boundHandleClick = this.handleClick.bind(this);
-        this.summary.addEventListener('mouseup', (...args:unknown[]) => {if (wasMouseDown) boundHandleClick();} );
-        this.summary.addEventListener('mousedown', () => wasMouseDown = true, {capture: true});
+        this.summary.addEventListener('mouseup', (...args:unknown[]) => {if (this.wasMouseDown) boundHandleClick();} );
+        this.summary.addEventListener('mousedown', () => this.wasMouseDown = true, {capture: true});
 
-        document.addEventListener('mousedown', () => wasMouseDown = true, {});
+        document.addEventListener('mousedown', () => this.wasMouseDown = true, {});
 
-        this.summary.addEventListener('keypress', () => wasMouseDown = false);
+        this.summary.addEventListener('keypress', () => this.wasMouseDown = false);
 
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
 
