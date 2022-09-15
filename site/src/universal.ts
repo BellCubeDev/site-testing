@@ -375,20 +375,11 @@ export class BellCubicSummary extends bcd_collapsibleParent {
     static cssClass = 'bcd-summary';
     static asString = 'BellCubicSummary';
 
-    wasMouseDown = false
-
     constructor(element:HTMLElement) {
         super(element);
         this.summary = element;
-
-        const boundHandleClick = this.handleClick.bind(this);
-        this.summary.addEventListener('mouseup', (...args:unknown[]) => {if (this.wasMouseDown) boundHandleClick();} );
-        this.summary.addEventListener('mousedown', () => this.wasMouseDown = true, {capture: true});
-
-        document.addEventListener('mousedown', () => this.wasMouseDown = true, {});
-
-        this.summary.addEventListener('keypress', () => this.wasMouseDown = false);
-
+        this.summary.addEventListener('click', this.handleClick.bind(this));
+        this.summary.addEventListener('keypress', this.handleKey.bind(this));
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
 
         if (this.adjacent) {
@@ -421,8 +412,6 @@ export class BellCubicSummary extends bcd_collapsibleParent {
             this.summary.blur();
         });});
     }
-
-    
 
     handleClick(event?:MouseEvent){
         // @ts-expect-error: Property 'path' and 'pointerType' DO exist on type 'MouseEvent', but not in Firefox or presumably Safary
