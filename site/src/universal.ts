@@ -375,11 +375,20 @@ export class BellCubicSummary extends bcd_collapsibleParent {
     static cssClass = 'bcd-summary';
     static asString = 'BellCubicSummary';
 
+    wasMouseDown = false
+
     constructor(element:HTMLElement) {
         super(element);
         this.summary = element;
-        this.summary.addEventListener('click', this.handleClick.bind(this));
-        this.summary.addEventListener('keypress', this.handleKey.bind(this));
+
+        const boundHandleClick = this.handleClick.bind(this);
+        this.summary.addEventListener('mouseup', (...args:unknown[]) => {if (wasMouseDown) boundHandleClick();} );
+        this.summary.addEventListener('mousedown', () => wasMouseDown = true, {capture: true});
+
+        document.addEventListener('mousedown', () => wasMouseDown = true, {});
+
+        this.summary.addEventListener('keypress', () => wasMouseDown = false);
+
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
 
         if (this.adjacent) {
@@ -413,8 +422,10 @@ export class BellCubicSummary extends bcd_collapsibleParent {
         });});
     }
 
+    
+
     handleClick(event?:MouseEvent){
-        // @ts-expect-error: Property 'path' and 'pointerType' DO exist on type 'MouseEvent', but not in Firefox.
+        // @ts-expect-error: Property 'path' and 'pointerType' DO exist on type 'MouseEvent', but not in Firefox or presumably Safary
         if (!event || !('pointerType' in event) || !event.pointerType || !event.path || event.path?.slice(0, 5).map((el:HTMLElement) => el.tagName === 'A').includes(true)) return;
         this.toggle();
         this.correctFocus();
