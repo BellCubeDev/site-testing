@@ -3,7 +3,14 @@ layout: page
 use_docs_CSS: true
 ---
 
-{% if !page.disableNav %}
+{% if page.disableNav %}
+
+<div class="docs content">
+    {{ content }}
+</div>
+
+{% else %}
+
 <div class="docs sideBar_cont">
     <div class="docs sideBar nav-content">
         <div class="noOverflow">
@@ -20,12 +27,6 @@ use_docs_CSS: true
     <div class="docs content">
         {{ content }}
     </div>
-</div>
-
-{% else %}
-
-<div class="docs content">
-    {{ content }}
 </div>
 
 {% endif %}
