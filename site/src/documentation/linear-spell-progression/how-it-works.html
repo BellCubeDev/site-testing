@@ -1,0 +1,171 @@
+---
+layout: docs
+title: 'LSP - Creating a Plugin'
+permalink: /documentation/linear-spell-progression/creating-a-plugin/
+redirect_from:
+    - /documentation/linear-spell-progression/creating-a-plugin
+description: >
+    This page describes how to create a plugin for the Linear Spell Progression framework mod.
+    It runs through the basics, such as the structure, all the way down to the standard Editor IDs.
+
+    Linear Spell Progression is a Skyrim Special Edition framework mod that allows you to add prerequisites to spells
+    without creating compatibility issues.
+---
+
+<h1>The Format</h1>
+
+Linear Spell Progression has its own format for plugins. First, download the Plugin Development Kit from <a href="https://github.com/BellCubeDev/LinearSpellProgression/releases" target="_blank" rel="noopener noreferrer">releases</a>. Below is an overview of the plugin and a guide to editing it. For testing, use <a href="https://www.nexusmods.com/skyrimspecialedition/mods/43095/" target="_blank" rel="noopener noreferrer">Don't Eat Spell Tomes.</a>
+
+<h2>Plugin Structure</h2>
+
+The plugin is made of a Package and at least 4 FormLists, arranged in a tree structure.
+
+<div class="bcd-summary" for="docs_lsp_createPlugin_diagram_img">
+    <i class="material-icons open-icon-90CC">expand_more</i>
+    <h3>Image Diagram</h3>
+</div>
+<div class="bcd-details" id="docs_lsp_createPlugin_diagram_img">
+    <img src="https://raw.githubusercontent.com/BellCubeDev/LinearSpellProgression/main/Images/LSP%20Master%20List%20Format.svg"
+        loading="lazy" alt="an image-based diagram of the Linear Spell Progression plugin format" />
+</div>
+<div class="bcd-summary" for="docs_lsp_createPlugin_diagram_txt">
+    <i class="material-icons open-icon-90CC">expand_more</i>
+    <h3>Text Representation</h3>
+</div>
+<div class="bcd-details" id="docs_lsp_createPlugin_diagram_txt">
+    <ul class="docs_textDiagram">
+        <li>Master List (in LinearSpellProgression.esl)<ul type="disc">
+            <ul>
+                <li class="docs_textDiagram_repeatable">YOUR Plugin! (Repeatable)
+                    <ol type="1" start="0">
+                        <li>Spell Tomes
+                            <ol type="1" start="0">
+                                <li class="docs_textDiagram_repeatable">Some Spell Tome (Repeatable)</li>
+                                <li class="docs_textDiagram_repeatable">Some Spell Tome (Repeatable)</li>
+                                <li class="docs_textDiagram_repeatable">Some Spell Tome (Repeatable)</li>
+                            </ol>
+                        </li>
+                        <li>Spells
+                            <ol type="1" start="0">
+                                <li class="docs_textDiagram_repeatable">Matching Spell (repeatable)</li>
+                                <li class="docs_textDiagram_repeatable">Matching Spell (repeatable)</li>
+                                <li class="docs_textDiagram_repeatable">Matching Spell (repeatable)</li>
+                            </ol>
+                        </li>
+                        <li>Prerequisite Spells
+                            <ol type="1" start="0">
+                                <li>Spell 0's Prerequisites
+                                    <ul type="square">
+                                        <li>Single Spell</li>
+                                        <li>Requirements List
+                                            <ul type="circle">
+                                                <li class="docs_textDiagram_repeatable">Some Spell (Repeatable)</li>
+                                                <li class="docs_textDiagram_repeatable">Some Spell (Repeatable)</li>
+                                                <li class="docs_textDiagram_repeatable">Some Spell (Repeatable)</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>Spell 1's Prerequisites
+                                    <ul type="square">
+                                        <li>Single Spell</li>
+                                        <li>Requirements List
+                                            <ul type="circle">
+                                                <li class="docs_textDiagram_repeatable">Some Spell (Repeatable)</li>
+                                                <li class="docs_textDiagram_repeatable">Some Spell (Repeatable)</li>
+                                                <li class="docs_textDiagram_repeatable">Some Spell (Repeatable)</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li>Spell 2's Prerequisites
+                                    <ul type="square">
+                                        <li>Single Spell</li>
+                                        <li>Requirements List
+                                            <ul type="circle">
+                                                <li class="docs_textDiagram_repeatable">Some Spell (Repeatable)</li>
+                                                <li class="docs_textDiagram_repeatable">Some Spell (Repeatable)</li>
+                                                <li class="docs_textDiagram_repeatable">Some Spell (Repeatable)</li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ol>
+                        </li>
+                        <li>Spells
+                            <ol type="1" start="0">
+                                <li class="docs_textDiagram_repeatable">Skill Level Global (repeatable)</li>
+                                <li class="docs_textDiagram_repeatable">Skill Level Global (repeatable)</li>
+                                <li class="docs_textDiagram_repeatable">Skill Level Global (repeatable)</li>
+                            </ol>
+                        </li>
+                    </ol>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>
+
+<h2>Package??!</h2>
+<p>
+    A quick look in xEdit shows that the template includes an AI Package??! What in the world? Well, allow me to enlighten you. I've used the Package to hold the script needed to install your plugin. Why not use a Quest, you might ask. Well, I've heard reports about the OnInit() event having oddities and inconsistencies on Quests, and so I opted for another form that can hold scripts—and opted for packages. Because they're not a base object (like an Activator or Static), I don't expect xSE plugins to mess with it (causing a very minor performance hit). And because of its EditorID, I don't expect users to attempt to apply it to an NPC.
+</p>
+
+<h1>The Guide</h1>
+<p>
+    Alright, so now you know what that's all about. You may even understand this enough to jump in right now! But if you're not, here's what you do:
+    <ol>
+        <li>Rename the plugin file. Don't want a bunch of plugins all called <code>LinearSpellProgression Plugin Template.esp</code>, now do we?</li>
+        <li>Open the Plugin Template, alongside any plugins you want to add spell prerequisites to, in either <a href="https://www.nexusmods.com/skyrimspecialedition/mods/164/">SSEEdit</a> (Recommended) or the Creation Kit.</li>
+        <li>Navigate to the FormLists. If you're doing this in the Creation Kit, you can search by <code>LSP_</code></li>
+        <li>Rename the FormLists using the <a href="#editorid-scheme">EditorID Scheme</a> below</li>
+        <li>Balance to your heart's content! Here's how:
+            <ol type="1">
+                <li>Find your Spell Tome. Add it to the Tomes list.</li>
+                <li>Add its corresponding Spell to the Spells list</li>
+                <li>Add its prerequisites to the Prerequisites list. This can be <b><u>EITHER</u></b> a FormList <b>or</b> a single Spell</li>
+            </ol>
+            <br />
+            Do note these items' indexes must align. So if the Spell Tome for Fireball is at index 2, the spell Fireball should be at index 2 in the Spells list and the various prerequisites should be at index 2 in the Prerequisites lists.
+        </li>
+    </ol>
+    Simple enough, right? (if you don't think so, think of how annoying this would be to implement on your own)
+</p>
+
+<h1>EditorID Scheme</h1>
+
+It's a (relatively) simple system.
+{% raw %}
+<ul>
+
+<li>
+    Universal Ending: <span class=nested_code><code>[DLC/CC/MOD]</code>{{3-letter abbreviation for author, such as BGS}}<code>_</code>{{2-Digit Number}}{{Human-readable name}}</span><br />
+    <i>Example: <code>DLC_BGS_00Skyrim</code></i>
+    <br /><br />
+</li>
+<li>
+    Plugin-Level: <span class=nested_code><code>LSP_Main_</code> + Universal Ending</span><br />
+    <i>Example: <code>LSP_0Tomes_DLC_BGS_00Skyrim</code></i>
+    <br /><br />
+</li>
+<li>
+    Tome: <span class=nested_code><code>LSP_0Tomes_</code> + Universal Ending</span><br />
+    <i>Example: <code>LSP_0Tomes_DLC_BGS_00Skyrim</code></i>
+    <br /><br />
+</li>
+<li>
+    * Spells: <span class=nested_code><code>LSP_1Spells_</code> + Universal Ending</span><br />
+    <i>Example: <code>LSP_1Spells_DLC_BGS_00Skyrim</code></i>
+    <br /><br />
+</li>
+<li>
+    Prerequisites: <span class=nested_code><code>LSP_2Pre_</code> + Universal Ending</span><br />
+    <i>Example: <code>LSP_2Pre_DLC_BGS_00Skyrim</code></i>
+    <br /><br />
+</li>
+<li>
+    List of a single spell's prerequisites: <span class=nested_code><code>LSP_</code>{{Spell Name}}<code>_</code> + Universal Ending</span><br />
+    <i>Example: <code>LSP_FlameCloak_DLC_BGS_00Skyrim</code></i>
+</li>
+</ul>
+{% endraw %}
