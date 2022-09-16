@@ -1,4 +1,4 @@
-linearSpellProgression:
+LSProgression:
     -   type: header
         name: 'Linear Spell progression'
         level: 1
