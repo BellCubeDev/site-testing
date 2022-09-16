@@ -1,18 +1,18 @@
 LSProgression:
-    -   type: header
-        name: 'Linear Spell progression'
-        level: 1
-        children:
-            -   type: link
-                name: 'Linear Spell Progression'
-                url: '/documentation/linear-spell-progression/'
-                icon: 'home'
+    type: header
+    name: 'Linear Spell progression'
+    level: 1
+    children:
+        -   type: link
+            name: 'Linear Spell Progression'
+            url: '/documentation/linear-spell-progression/'
+            icon: 'home'
 
-            -   type: header
-                name: 'Developers'
-                level: 2
-                children:
-                    -   type: link
-                        name: 'Creating a Plugin'
-                        url: '/documentation/linear-spell-progression/creating-a-plugin/'
-                        icon: 'book'
+        -   type: header
+            name: 'Developers'
+            level: 2
+            children:
+                -   type: link
+                    name: 'Creating a Plugin'
+                    url: '/documentation/linear-spell-progression/creating-a-plugin/'
+                    icon: 'book'

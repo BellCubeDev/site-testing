@@ -15,12 +15,10 @@ use_docs_CSS: true
     <div class="docs sideBar nav-content">
         <div class="noOverflow">
             {% if page.navType and site.data.docs_nav[page.navType] %}
-                {% assign type = site.data.docs_nav[page.navType] %}
+                {% assign type = site.data.docs_nav[page.navType].children %}
                 {% include docs__side__item.html input=type %}
             {% else %}
-                {% for type in site.data.docs_nav %}
-                    {% include docs__side__item.html input=type %}
-                {% endfor %}
+                {% include docs__side__item.html input=type %}
             {% endif %}
         </div>
     </div>
