@@ -804,12 +804,12 @@ export class bcdTabButton extends mdl.MaterialButton {
         this.boundTab = boundTab;
         this.name = name;
 
-        if (this.findTabNumber() === 0) this.makeSelected(0);
 
         this.element_.addEventListener('click', this.onClick.bind(this));
         this.element_.addEventListener('keypress', this.onKeyPress.bind(this));
 
-        if (window.location.hash === `#tab-${name}`) this.makeSelected();
+        if (window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase()) this.makeSelected();
+        else if (this.findTabNumber() === 0) this.makeSelected(0);
     }
 
     /** @returns the index of this tab (0-based) or -1 if not found */
@@ -853,7 +853,7 @@ export class bcdTabButton extends mdl.MaterialButton {
             }
         }
 
-        requestAnimationFrame(()=>   window.location.hash = `tab-${this.name}`   );
+        window.location.hash = `tab-${this.name}`.toLowerCase();
     }
 
     onClick(event?: MouseEvent): void {
