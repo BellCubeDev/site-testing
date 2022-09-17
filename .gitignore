@@ -6,3 +6,7 @@ _generated
 #Gemfile.lock # The workflow wants this
 package-lock.json
 node_modules
+
+# Files kept around as a reference
+*.original.*
+*.reference.*

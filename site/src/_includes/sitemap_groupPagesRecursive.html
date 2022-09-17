@@ -40,11 +40,11 @@
         {% when nil, "", "/", "assets", "robots.txt", "redirects.json" %}
 
         {% else %}
-            <button class="bcd-summary adjacent" type="button" style="padding-left:0px">
+            <button class="js-bcd-summary adjacent" type="button" style="padding-left:0px">
                 <i class="material-icons open-icon-90CC">expand_more</i><h3>{{folder.name | capitalize}}</h3>
             </button>
 
-            <div class="bcd-details adjacent contPad01-left">
+            <div class="js-bcd-details adjacent contPad01-left">
                 {% assign temp_pages = folder.items | map: "url" %}
                 {% assign ___temp_currentPath = currentPath | append: folder.name | append: "/" %}
                 {% include sitemap_groupPagesRecursive.html pages=temp_pages currentPath=___temp_currentPath %}

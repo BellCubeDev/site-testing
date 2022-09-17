@@ -605,6 +605,9 @@ layout: compress_html
     {% if page.hljs_styles %}
         <link rel="stylesheet" href="{{site.baseurl}}{% link assets/site/highlight_js/styles/base16/atelier-lakeside.scss %}">
     {% endif %}
+    {% if page.fomod_styles %}
+        <link rel="stylesheet" href="{{site.baseurl}}{% link assets/site/css/vortex_fomod.scss %}">
+    {% endif %}
 
     <!--
         Appended to the bottom of site.css
@@ -639,10 +642,10 @@ layout: compress_html
                         <span>Sitemap</span>
                     </a>
 
-                    <button class="bcd-summary adjacent is-open" type="button">
+                    <button class="js-bcd-summary adjacent is-open" type="button">
                         <i class="material-icons open-icon-90CC">expand_more</i><h3>Tools</h3>
                     </button>
-                    <div class="bcd-details adjacent is-open">
+                    <div class="js-bcd-details adjacent is-open">
                         <a class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}{% link tools/fomod/fomod-builder.html %}">
                             <i class="material-icons">build_circle</i>
                             <span>FOMOD Builder</span>
@@ -654,10 +657,10 @@ layout: compress_html
                     </div>
 
                     <!-- Currently testing to see which of these two is broken OR if nesting is perfectly balanced with no exploits-->
-                    <button class="bcd-summary adjacent" type="button">
+                    <button class="js-bcd-summary adjacent" type="button">
                         <i class="material-icons open-icon-90CC">expand_more</i><h3>Documentation</h3>
                     </button>
-                    <div class="bcd-details adjacent contPad01-left">
+                    <div class="js-bcd-details adjacent contPad01-left">
                         <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link documentation/linear-spell-progression/linear-spell-progression.html %}"><div class="center-vert">
                             <i class="material-icons" style="padding-left: 0px;">book</i>
                             <span>Linear Spell<br />Progression</span>
@@ -706,7 +709,7 @@ layout: compress_html
             <button id="debuggers-all-powerful-button" type="button" style="margin-right:8px;margin-left:0px;width:24px;min-width:24px;height:24px;" class="bcd_debugButton mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
                 <i class="material-icons" style="font-size:75%">code</i>
             </button>
-                <ul for="debuggers-all-powerful-button" class="bcd-debuggers-all-powerful-button mdl-menu mdl-menu--top-right mdl-js-ripple-effect"></ul>
+                <ul for="debuggers-all-powerful-button" class="js-bcd-debuggers-all-powerful-button mdl-menu mdl-menu--top-right mdl-js-ripple-effect"></ul>
         </footer>
     </div>
 </body>

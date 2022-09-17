@@ -119,7 +119,7 @@ enum strs {
     marginTop = "margin-top",
     classIsOpen = "is-open",
     classAdjacent = "adjacent",
-    classDetailsInner = "bcd-details-inner",
+    classDetailsInner = "js-bcd-details-inner",
     errItem = "Error Item:"
 }
 
@@ -311,7 +311,7 @@ class bcd_collapsibleParent {
 }
 
 export class BellCubicDetails extends bcd_collapsibleParent {
-    static cssClass = "bcd-details";
+    static cssClass = "js-bcd-details";
     static asString = "BellCubicDetails";
 
     /** @param {HTMLElement} element */
@@ -349,7 +349,7 @@ export class BellCubicDetails extends bcd_collapsibleParent {
             if (!(temp_summary && temp_summary.classList.contains(BellCubicSummary.cssClass))) {console.log(strs.errItem, this); throw new TypeError("[BCD-DETAILS] Error: Adjacent Details element must be preceded by a Summary element.");}
             this.summary = temp_summary as HTMLElement;
         } else {
-            const temp_summary = this.self.ownerDocument.querySelector(`.bcd-summary[for="${this.details.id}"`);
+            const temp_summary = this.self.ownerDocument.querySelector(`.js-bcd-summary[for="${this.details.id}"`);
             if (!temp_summary) {console.log(strs.errItem, this); throw new TypeError("[BCD-DETAILS] Error: Non-adjacent Details elements must have a Summary element with a `for` attribute matching the Details element's id.");}
             this.summary = temp_summary as HTMLElement;
         }
@@ -372,7 +372,7 @@ export class BellCubicDetails extends bcd_collapsibleParent {
 bcdComponents.push(BellCubicDetails);
 
 export class BellCubicSummary extends bcd_collapsibleParent {
-    static cssClass = 'bcd-summary';
+    static cssClass = 'js-bcd-summary';
     static asString = 'BellCubicSummary';
 
     constructor(element:HTMLElement) {
@@ -430,7 +430,7 @@ export class BellCubicSummary extends bcd_collapsibleParent {
 bcdComponents.push(BellCubicSummary);
 
 export class bcd_prettyJSON {
-    static cssClass = 'bcd-prettyJSON';
+    static cssClass = 'js-bcd-prettyJSON';
     static asString = 'bcd_prettyJSON';
     element_:HTMLElement;
     constructor(element:HTMLElement) {
@@ -464,7 +464,7 @@ $$ | \_/ $$ |\$$$$$$  |\$$$$$$$ |\$$$$$$$ |$$ |$$  /     $$$$$$$  |$$ |\$$$$$$$ 
 
 
 export class bcdModalDialog extends EventTarget {
-    static cssClass = 'bcd-modal';
+    static cssClass = 'js-bcd-modal';
     static asString = 'BellCubic Modal';
 
     static obfuscator: HTMLDivElement;
@@ -484,7 +484,7 @@ export class bcdModalDialog extends EventTarget {
 
         if (!bcdModalDialog.obfuscator) {
             bcdModalDialog.obfuscator = document.createElement('div');
-            bcdModalDialog.obfuscator.classList.add(mdl.MaterialLayout.cssClasses.OBFUSCATOR, 'bcd-modal-obfuscator');
+            bcdModalDialog.obfuscator.classList.add(mdl.MaterialLayout.cssClasses.OBFUSCATOR, 'js-bcd-modal-obfuscator');
             document.documentElement.getElementsByTagName('body')[0].appendChild(bcdModalDialog.obfuscator);
         }
 
@@ -492,7 +492,7 @@ export class bcdModalDialog extends EventTarget {
 
         setTimeout(function (this: bcdModalDialog) { // Lets the DOM settle and gives JavaScript a chance to modify the element
 
-            const closeButtons = this.element_.getElementsByClassName('bcd-modal-close');
+            const closeButtons = this.element_.getElementsByClassName('js-bcd-modal-close');
             for (const button of closeButtons) {
                 button.addEventListener('click', this.boundHideFunction);
             }
@@ -748,7 +748,7 @@ $$ |   $$ | $$$$$$\   $$$$$$\  $$\  $$$$$$\  $$$$$$$\  $$$$$$\    $$$$$$$\
 
 export class bcdDropdown_AwesomeButton extends bcdDropdown {
     static asString = 'BCD - Debugger\'s All-Powerful Button';
-    static cssClass = 'bcd-debuggers-all-powerful-button';
+    static cssClass = 'js-bcd-debuggers-all-powerful-button';
 
     constructor(element: Element) {
         super(element, false);
@@ -779,7 +779,7 @@ $$$$$$$$\           $$\                        $$$$$$\    $$\                $$$
 */
 export class bcdTabButton extends mdl.MaterialButton {
     static asString = 'BCD - Tab List Button';
-    static cssClass = 'tab-list-button';
+    static cssClass = 'js-tab-list-button';
 
     element_: HTMLButtonElement;
     boundTab:HTMLDivElement;
@@ -864,6 +864,84 @@ export class bcdTabButton extends mdl.MaterialButton {
     }
 }
 bcdComponents.push(bcdTabButton);
+/*
+
+
+
+$$\      $$\ $$\                                $$$$$$\  $$\
+$$$\    $$$ |\__|                              $$  __$$\ $$ |
+$$$$\  $$$$ |$$\  $$$$$$$\  $$$$$$$\           $$ /  \__|$$ | $$$$$$\   $$$$$$$\  $$$$$$$\  $$$$$$\   $$$$$$$\
+$$\$$\$$ $$ |$$ |$$  _____|$$  _____|          $$ |      $$ | \____$$\ $$  _____|$$  _____|$$  __$$\ $$  _____|
+$$ \$$$  $$ |$$ |\$$$$$$\  $$ /                $$ |      $$ | $$$$$$$ |\$$$$$$\  \$$$$$$\  $$$$$$$$ |\$$$$$$\
+$$ |\$  /$$ |$$ | \____$$\ $$ |                $$ |  $$\ $$ |$$  __$$ | \____$$\  \____$$\ $$   ____| \____$$\
+$$ | \_/ $$ |$$ |$$$$$$$  |\$$$$$$$\ $$\       \$$$$$$  |$$ |\$$$$$$$ |$$$$$$$  |$$$$$$$  |\$$$$$$$\ $$$$$$$  |
+\__|     \__|\__|\_______/  \_______|\__|       \______/ \__| \_______|\_______/ \_______/  \_______|\______*/
+
+
+
+export class bcdDynamicTextArea_base {
+    element: HTMLElement;
+
+    constructor(element: HTMLElement) {
+        this.element = element;
+
+        this.adjust();
+
+        const boundAdjust = this.adjust.bind(this);
+        this.element.addEventListener('input', boundAdjust);
+        this.element.addEventListener('change', boundAdjust);
+    }
+
+    adjust() {return;}
+
+}
+
+export class bcdDynamicTextAreaHeight extends bcdDynamicTextArea_base {
+    static asString = 'BCD - Dynamic TextArea - Height';
+    static cssClass = 'js-dynamic-textarea-height';
+
+    constructor(element: HTMLElement) {
+        super(element);
+    }
+
+    adjust() {
+        this.element.style.height = '';
+        getComputedStyle(this.element).height; // Force the browser to recalculate the scroll height
+
+        const paddingPX = parseInt(this.element.getAttribute('paddingPX') ?? '0');
+        if (isNaN(paddingPX)) {
+            console.warn('The paddingPX attribute of the dynamic text area is not a number:', this);
+        }
+
+        this.element.style.height = `${this.element.scrollHeight + paddingPX}px`;
+    }
+
+}
+bcdComponents.push(bcdDynamicTextAreaHeight);
+
+export class bcdDynamicTextAreaWidth extends bcdDynamicTextArea_base {
+    static asString = 'BCD - Dynamic TextArea - Width';
+    static cssClass = 'js-dynamic-textarea-width';
+
+    constructor(element: HTMLElement) {
+        super(element);
+    }
+
+    adjust() {
+        this.element.style.width = '';
+        getComputedStyle(this.element).width; // Force the browser to recalculate the scroll height
+
+        const paddingPX = parseInt(this.element.getAttribute('paddingPX') ?? '0');
+        if (isNaN(paddingPX)) {
+            console.warn('The paddingPX attribute of the dynamic text area is not a number:', this);
+        }
+
+        this.element.style.width = `${this.element.scrollWidth + paddingPX}px`;
+    }
+
+}
+bcdComponents.push(bcdDynamicTextAreaWidth);
+
 
 
 

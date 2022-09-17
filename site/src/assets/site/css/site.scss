@@ -285,7 +285,7 @@ a {
     display: block;
 }
 
-.bcd-summary {
+.js-bcd-summary {
     color: #fff;
     background: none;
     border: none;
@@ -309,7 +309,7 @@ a {
     outline: none;
 }
 
-.bcd-summary :not(.material-icons) {
+.js-bcd-summary :not(.material-icons) {
     transition-duration: 100ms;
     transition-timing-function: ease-in-out;
     transition-property: text-shadow, text-decoration0color;
@@ -318,35 +318,35 @@ a {
     text-decoration: underline #fff0 7.5%;
 }
 
-.bcd-summary:is(:hover, :-ms-keyboard-active, :focus, :active) :not(.material-icons) {
+.js-bcd-summary:is(:hover, :-ms-keyboard-active, :focus, :active) :not(.material-icons) {
     text-decoration-color: #fff;
     text-shadow: #000b 2px 2px 5px;
 }
 
-.bcd-summary.min-padding {
+.js-bcd-summary.min-padding {
     padding: 6px;
     padding-bottom: 4px;
 }
 
-.bcd-summary * {
+.js-bcd-summary * {
     user-select: none;
 }
 
-.bcd-summary.is-open > .open-icon-90CC {
+.js-bcd-summary.is-open > .open-icon-90CC {
     transform: rotate(0deg);
     animation-name: rotate90CounterClockwiseReverse;
 }
 
-.bcd-summary > .open-icon-90CC {
+.js-bcd-summary > .open-icon-90CC {
     transform: rotate(-90deg);
     animation: rotate90CounterClockwise 300ms cubic-bezier(0.2, 0, 0.45, 1);
 }
 
-.bcd-summary .material-icons {
+.js-bcd-summary .material-icons {
     color:#ffffffbf;
 }
 
-.bcd-summary.noTopPad {
+.js-bcd-summary.noTopPad {
     padding-top: 0px;
 }
 
@@ -354,23 +354,23 @@ a {
     overflow-x: hidden;
 }
 
-.mdl-button--raised.mdl-button--colored.bcd-button-open {
+.mdl-button--raised.mdl-button--colored.bcd-button-open:is(:active, :not(:active), :focus) {
     background-color: #0084ff;
 }
 
-.mdl-button--raised.mdl-button--colored.bcd-button-openDir {
+.mdl-button--raised.mdl-button--colored.bcd-button-openDir:is(:active, :not(:active), :focus) {
     background-color: #00a2b8;
 }
 
-.mdl-button--raised.mdl-button--colored.bcd-button-openFile {
+.mdl-button--raised.mdl-button--colored.bcd-button-openFile:is(:active, :not(:active), :focus) {
     background-color: #3c60ff;
 }
 
-.mdl-button--raised.mdl-button--colored.bcd-button-save {
+.mdl-button--raised.mdl-button--colored.bcd-button-save:is(:active, :not(:active), :focus) {
     background-color: #009950;
 }
 
-.bcd-summary {
+.js-bcd-summary {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -382,21 +382,21 @@ a {
     pointer-events: all;
 }
 
-.bcd-summary > .open-icon-90CC + * {
+.js-bcd-summary > .open-icon-90CC + * {
     padding-left: 16px !important;
 }
 
-.bcd-details{
+.js-bcd-details{
     overflow: hidden;
     display: none;
 }
 
-.bcd-details.initialized, .bcd-details.is-open {
+.js-bcd-details.initialized, .js-bcd-details.is-open {
     display: block;
     visibility: unset;
 }
 
-.bcd-details > .bcd-details-inner {
+.js-bcd-details > .js-bcd-details-inner {
     visibility: hidden;
 
     transition-property: height, margin-top;
@@ -417,7 +417,7 @@ a {
     /* animation-duration is 15ms longer than transition-duration when set by universal.ts */
 }
 
-.bcd-details.is-open > .bcd-details-inner {
+.js-bcd-details.is-open > .js-bcd-details-inner {
     visibility: unset;
     animation-name: unhideStuff;
     position: unset;
@@ -447,23 +447,23 @@ a {
     }
 }
 
-.bcd-details.contPad01-left > .bcd-details-inner {
+.js-bcd-details.contPad01-left > .js-bcd-details-inner {
     padding-left: 12px;
 }
 
-.bcd-details.contPad02-left > .bcd-details-inner {
+.js-bcd-details.contPad02-left > .js-bcd-details-inner {
     padding-left: 16px;
 }
 
-.bcd-details.contPad03-left > .bcd-details-inner {
+.js-bcd-details.contPad03-left > .js-bcd-details-inner {
     padding-left: 24px;
 }
 
-.bcd-details.contPad04-left > .bcd-details-inner {
+.js-bcd-details.contPad04-left > .js-bcd-details-inner {
     padding-left: 32px;
 }
 
-.bcd-details.contPad05-left > .bcd-details-inner {
+.js-bcd-details.contPad05-left > .js-bcd-details-inner {
     padding-left: 48px;
 }
 
@@ -674,7 +674,7 @@ div.mdl-layout__drawer summary {
 }
 
 /* Header Size */
-div.mdl-layout__drawer .bcd-summary :is(h1, h2, h3){
+div.mdl-layout__drawer .js-bcd-summary :is(h1, h2, h3){
     margin-top: 0px;
     padding-left: 0px;
 }
@@ -796,12 +796,13 @@ div.mdl-layout__drawer h3{
 
 .tabs-content-container {
     padding: 0px;
-    overflow-x: visible;
+    overflow: visible;
     height: max-content;
 }
 
-.tabs-content-container > div {
+.tabs-content-container > * {
     padding: 0px;
+    padding-top: 16px;
 
     transition-property: margin-left;
     margin-left: 0px;
@@ -809,17 +810,19 @@ div.mdl-layout__drawer h3{
     height: max-content;
     width: max-content;
 
-    overflow: visible;
+    overflow: hidden;
+    overflow-y: visible;
 
     display: grid;
     justify-content: start;
     align-items: start;
-    grid-template-columns: repeat(16, 100vw);
+    grid-template-columns: repeat(16, calc(100vw - 52px));
     grid-template-rows: 100%;
+    gap: 52px;
 }
 
 .tab-content {
-    min-height: 100vw;
+    min-height: 70vh;
     min-width: 100%;
 }
 
@@ -837,10 +840,10 @@ div.mdl-layout__drawer h3{
 
     gap: 16px;
 
-    padding-left: 308px;
+    padding-left: 316px;
 
     height: max-content;
-    width: 100vw;
+    width: calc(100vw + 300px);
 
     overflow: hidden;
     overflow-x: auto;
@@ -850,11 +853,11 @@ div.mdl-layout__drawer h3{
 
     position:sticky;
     margin-top:-20px;
-    margin-left:-332px;
+    margin-left:-300px;
     z-index: 2;
 }
 
-.tab-list-button, .mdl-button.tab-list-button:focus:not(:active) {
+.js-tab-list-button, .mdl-button.js-tab-list-button:focus:not(:active) {
     padding: 0px 40px;
     margin: 6px 0px 5px;
     height: 40px;
@@ -868,7 +871,7 @@ div.mdl-layout__drawer h3{
     border-radius: 4px;
 }
 
-.tab-list-button:hover:not(:active, .active), .mdl-button.tab-list-button:focus:hover:not(:active) {
+.js-tab-list-button:hover:not(:active, .active), .mdl-button.js-tab-list-button:focus:hover:not(:active) {
     background-color: #587f;
     box-shadow: 3px 3px 4.5px #00000028;
 
@@ -882,7 +885,7 @@ div.mdl-layout__drawer h3{
     text-shadow: 1px 1px 10px #000f;
 }
 
-.bcd-modal {
+.js-bcd-modal {
     margin: auto;
     position: fixed;
     top: 64px;
@@ -909,22 +912,22 @@ div.mdl-layout__drawer h3{
     background-color: #0000;
 }
 
-.bcd-modal, .bcd-modal-obfuscator {
+.js-bcd-modal, .js-bcd-modal-obfuscator {
     opacity: 0;
     transition-property: opacity;
     transition-duration: 250ms;
     transition-timing-function: ease-in-out;
 }
 
-.bcd-modal-obfuscator {
+.js-bcd-modal-obfuscator {
     transition-duration: 400ms;
 }
 
-.bcd-modal[open], .bcd-modal-obfuscator.is-visible {
+.js-bcd-modal[open], .js-bcd-modal-obfuscator.is-visible {
     opacity: 1;
 }
 
-.bcd-modal-buttons {
+.js-bcd-modal-buttons {
     margin: 0px;
     margin-left: auto;
     display: flex;
@@ -933,4 +936,27 @@ div.mdl-layout__drawer h3{
     justify-content: flex-end;
     align-items: center;
     align-content: center;
+}
+
+.mdl-button.w128 {
+    width: 128px;
+}
+
+.mdl-button.w144 {
+    width: 144px;
+}
+
+.mdl-button.w192 {
+    width: 192px;
+}
+
+.mdl-button.mr8 {
+    margin-right: 8px;
+}
+
+.js-dynamic-textarea-height, .js-dynamic-textarea-width {
+    resize: none;
+    overflow: visible;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
 }

@@ -76,7 +76,9 @@
       "pretty": true,
 
     },
-    "exclude": [],
+    "include": [
+      "./src/**/*"
+    ],
 
     "watchOptions": {
       "watchFile": "useFsEvents",
