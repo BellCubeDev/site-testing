@@ -43,7 +43,7 @@
     --vortex-button-accent: #2c68fe;
 }
 
-#vortex-steps-container {
+.js-vortex-steps {
 
     // Cascading Stuff
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -61,6 +61,7 @@
     height: 75vh;
     margin-left: auto;
     margin-right: auto;
+    overflow: hidden;
 
     border: 1px solid gray;
     -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
@@ -116,6 +117,11 @@
             color: #fff;
             font: inherit;
         }
+    }
+
+    .vortex-modal-subtitle{
+        font-size: 12px;
+        line-height: 24px;
     }/*
 
 
@@ -345,7 +351,8 @@
     h3,
     h4,
     h5,
-    h6 {
+    h6,
+    .vortex-fake-header {
         font-family: "Bahnschrift SemiBold";
         font-weight: 500;
         line-height: 1.5;
@@ -357,7 +364,8 @@
     h3 small,
     h4 small,
     h5 small,
-    h6 small {
+    h6 small,
+    .vortex-fake-header small {
         font-weight: normal;
         line-height: 1;
         color: #4c4c4c
@@ -365,51 +373,61 @@
 
     h1,
     h2,
-    h3 {
+    h3,
+    .vortex-fake-header:is(.h1,.h2,.h3) {
         margin-top: 1.5;
         margin-bottom: .75
     }
 
     h1 small,
     h2 small,
-    h3 small {
+    h3 small,
+    .vortex-fake-header:is(.h1,.h2,.h3) small {
         font-size: 65%
     }
 
     h4,
     h5,
-    h6 {
+    h6,
+    .vortex-fake-header {
         margin-top: .75;
         margin-bottom: .75
     }
 
     h4 small,
     h5 small,
-    h6 small {
+    h6 small,
+    .vortex-fake-header small {
         font-size: 75%
     }
 
-    h1 {
+    h1,
+    .vortex-fake-header.h1 {
         font-size: 2.5rem
     }
 
-    h2 {
+    h2,
+    .vortex-fake-header.h2 {
         font-size: 2rem
     }
 
-    h3 {
+    h3,
+    .vortex-fake-header.h3 {
         font-size: 1.75rem
     }
 
-    h4 {
+    h4,
+    .vortex-fake-header.h4 {
         font-size: 1.2rem
     }
 
-    h5 {
+    h5,
+    .vortex-fake-header.h5 {
         font-size: 1.1rem
     }
 
-    h6 {
+    h6,
+    .vortex-fake-header.h6 {
         font-size: 1rem
     }
 
@@ -700,10 +718,6 @@
         transition: width .6s ease
     }
 
-    .vortex-modal-open {
-        overflow: hidden
-    }
-
     #vortex-steps-header {
         padding: 15px;
         border-bottom: 1px solid #dee2e6
@@ -720,8 +734,16 @@
     }
 
     #vortex-steps-title {
+        display: flex;
+        align-items: center;
         margin: 0px;
-        line-height: 1.4em
+        line-height: 1.4em;
+
+        svg {
+            width: 2em;
+            height: 2em;
+            margin-right: 1em
+        }
     }
 
     .vortex-modal-body {
@@ -1018,17 +1040,6 @@
             visibility: visible;
             opacity: 1
         }
-    }
-
-    #vortex-steps-title {
-        display: flex;
-        align-items: center
-    }
-
-    #vortex-steps-title svg {
-        width: 2em;
-        height: 2em;
-        margin-right: 1em
     }
 
     .vortex-progress {
