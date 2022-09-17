@@ -110,8 +110,25 @@ redirect_from:
         <p>Tab: Metadata</p>
         <div id="metadata-container"></div>
     </div>
+
+
+
     <div role="tabpanel" class="tab-content" name="Steps">
-        <p>Tab: Steps</p>
+
+        <div style="margin:0 auto;margin-bottom:24px;">
+            <button type="button" id="bcd-stepBTN-builder" onclick="window.FOMODBuilder.UI.setStepEditorType('Builder')" class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+                BellCubic Steps Editor
+            </button>
+
+            <button type="button" id="bcd-stepBTN-vortex" onclick="window.FOMODBuilder.UI.setStepEditorType('Vortex')" class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+                Vortex Steps Editor
+            </button>
+
+            <button type="button" id="bcd-stepBTN-mo2" onclick="window.FOMODBuilder.UI.setStepEditorType('MO2')" class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+                Mod Organizer Steps Editor
+            </button>
+        </div>
+
         <div id="steps-builder-container"></div>
 
 

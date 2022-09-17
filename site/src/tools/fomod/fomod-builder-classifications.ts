@@ -1,4 +1,5 @@
 import * as main from "./fomod-builder.js"; // Brings in global things
+import { objOf } from '../../universal';
 /* eslint-disable i18n-text/no-en */// FOMODs are XML files with a schema written in English, so disallowing English makes little sense.
 
 /*
@@ -9,6 +10,14 @@ import * as main from "./fomod-builder.js"; // Brings in global things
 
 export class XMLElement {
     instanceElement: Element | undefined;
+
+    objectsToUpdate: updatableObject[] = [];
+    updateObjects() {
+        this.objectsToUpdate.forEach(  (obj) => obj.update()  );
+    }
+    update() { this.updateObjects(); }
+
+
     constructor(instanceElement: Element | undefined = undefined) {
         this.instanceElement = instanceElement;
     }
@@ -17,6 +26,15 @@ export class XMLElement {
     }
     asInfoXML(document: XMLDocument): Comment | Element {
         /*throw new Error*/ return document.createComment(`This call of asInfoXML() was not overridden by a child class! ${this.constructor.name}`);
+    }
+}
+
+export class updatableObject {
+    constructor() {
+        this.update();
+    }
+    update() {
+        /*throw new Error*/ return;
     }
 }
 
@@ -30,16 +48,30 @@ $$ |  $$\ $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \
 \$$$$$$  |\$$$$$$  |$$ |  $$ |\$$$$$$$ |$$ |  \$$$$  |$$ |\$$$$$$  |$$ |  $$ |$$$$$$$  |
  \______/  \______/ \__|  \__| \_______|\__|   \____/ \__| \______/ \__|  \__|\______*/
 
+export const flags:objOf<flag> = {};
+
 export class flag {
     name = "";
-    value = "";
+    values = new Set<string>();
     getters:unknown[] = [];
     setters:unknown[] = [];
 
     constructor(name = "", value = "") {
         this.name = name;
-        this.value = value;
+        this.values.add(value);
+
+        flags[name] = this;
     }
+
+    /** @returns whether or not a vale was removed from the `values` Set */
+    removeValue(value:string): boolean {
+        return this.values.delete(value);
+    }
+}
+
+export function setNewFlagValue(name: string, value: string): flag {
+    if (!flags[name]) flags[name] = new flag(name, value);
+    return flags[name];
 }
 
 export class dependency extends XMLElement {
@@ -51,8 +83,11 @@ export class dependency extends XMLElement {
 export type dependency_file_state = "Active" | "Inactive" | "Missing";
 export type dependency_group_operator = "And" | "Or";
 export class dependency_group extends dependency {
-    operator: dependency_group_operator /*= 'And'*/;
-    children: dependency[] = [];
+    private _operator: dependency_group_operator = 'And';
+    set operator(value: dependency_group_operator) { this.updateObjects(); this._operator = value; } get operator(): dependency_group_operator { return this._operator; }
+
+    private _children: dependency[] = [];
+    set children(value: dependency[]) { this.updateObjects(); this._children = value; } get children(): dependency[] { return this._children; }
 
     constructor(
         instanceElement: Element | undefined = undefined,
@@ -62,7 +97,7 @@ export class dependency_group extends dependency {
         super(instanceElement);
         this.operator = operator;
         if (instanceElement) {
-            this.operator =
+            this._operator =
                 (instanceElement.getAttribute(
                     "operator"
                 ) as dependency_group_operator) || operator;
@@ -97,8 +132,11 @@ export class dependency_group extends dependency {
     }
 }
 export class dependency_flag extends dependency {
-    flag = "";
-    value = "";
+    private _flag = "";
+    set flag(value: string) { this.updateObjects(); this._flag = value; } get flag(): string { return this._flag; }
+
+    private _value = "";
+    set value(value: string) { this.updateObjects(); this._value = value; } get value(): string { return this._value; }
 
     // <flagDependency flag="" value="" />
     asModuleXML(document: XMLDocument): Element {
@@ -109,8 +147,11 @@ export class dependency_flag extends dependency {
     }
 }
 export class dependency_file extends dependency {
-    file = "";
-    state: dependency_file_state = "Active";
+    private _file = "";
+    set file(value: string) { this.updateObjects(); this._file = value; } get file(): string { return this._file; }
+
+    private _state: dependency_file_state = "Active";
+    set state(value: dependency_file_state) { this.updateObjects(); this._state = value; } get state(): dependency_file_state { return this._state; }
 
     // <fileDependency file="2" state="Active" />
     asModuleXML(document: XMLDocument): Element {
@@ -121,7 +162,8 @@ export class dependency_file extends dependency {
     }
 }
 export class dependency_versionCheck extends dependency {
-    version = "";
+    private _version = "";
+    set version(value: string) { this.updateObjects(); this._version = value; } get version(): string { return this._version; }
 }
 export class dependency_FOSE extends dependency_versionCheck {
     // <foseDependency version="" />
@@ -175,14 +217,25 @@ export type PluginType =
     | "Required"        // Permanently checked
     | "NotUseable";     // Permanently unchecked
 export class PluginTypeDescriptor extends XMLElement {
-    default: PluginType = "Optional";
+    private _default: PluginType = "Optional";
+    set default(value: PluginType) { this.updateObjects(); this._default = value; } get default(): PluginType { return this._default; }
 
-    dependencies: PluginTypeDescriptor_dependency[] = [];
+    private _dependencies: PluginTypeDescriptor_dependency[] = [];
+    set dependencies(value: PluginTypeDescriptor_dependency[]) { this.updateObjects(); this._dependencies = value; } get dependencies(): PluginTypeDescriptor_dependency[] { return this._dependencies; }
 
-    instanceElement_basic: Element | undefined = undefined;
-    instanceElement_complex: Element | undefined = undefined;
-    instanceElement_complex_type: Element | undefined = undefined;
-    instanceElement_complex_patterns: Element | undefined = undefined;
+
+    private _instanceElement_basic: Element | undefined = undefined;
+    set instanceElement_basic(value: Element | undefined) { this.updateObjects(); this._instanceElement_basic = value; } get instanceElement_basic(): Element | undefined { return this._instanceElement_basic; }
+
+    private _instanceElement_complex: Element | undefined = undefined;
+    set instanceElement_complex(value: Element | undefined) { this.updateObjects(); this._instanceElement_complex = value; } get instanceElement_complex(): Element | undefined { return this._instanceElement_complex; }
+
+    private _instanceElement_complex_type: Element | undefined = undefined;
+    set instanceElement_complex_type(value: Element | undefined) { this.updateObjects(); this._instanceElement_complex_type = value; } get instanceElement_complex_type(): Element | undefined { return this._instanceElement_complex_type; }
+
+    private _instanceElement_complex_patterns: Element | undefined = undefined;
+    set instanceElement_complex_patterns(value: Element | undefined) { this.updateObjects(); this._instanceElement_complex_patterns = value; } get instanceElement_complex_patterns(): Element | undefined { return this._instanceElement_complex_patterns; }
+
 
     constructor(
         element?: Element,
@@ -239,13 +292,16 @@ export class PluginTypeDescriptor extends XMLElement {
 }
 
 export class PluginTypeDescriptor_dependency extends XMLElement {
-    type: PluginType = "Optional";
-    instanceElement_type: Element | undefined = undefined;
+    private _type: PluginType = "Optional";
+    set type(value: PluginType) { this.updateObjects(); this._type = value; } get type(): PluginType { return this._type; }
 
-    dependency: dependency_group;
+    private _instanceElement_type: Element | undefined = undefined;
+    set instanceElement_type(value: Element | undefined) { this.updateObjects(); this._instanceElement_type = value; } get instanceElement_type(): Element | undefined { return this._instanceElement_type; }
 
-    constructor(dependency: dependency_group, type: PluginType = "Optional"
-    ) {
+    private _dependency!: dependency_group;
+    set dependency(value: dependency_group) { this.updateObjects(); this._dependency = value; } get dependency(): dependency_group { return this._dependency; }
+
+    constructor(dependency: dependency_group, type: PluginType = "Optional") {
         super();
         this.dependency = dependency;
         this.type = type;
@@ -277,7 +333,8 @@ export class PluginTypeDescriptor_dependency extends XMLElement {
 export class FOMOD_install extends XMLElement {
     static files: string[][] = [];
 
-    file!: string[];
+    private _file!: string[];
+    set file(value: string[]) { this.updateObjects(); this._file = value; } get file(): string[] { return this._file; }
 
     updateFile(file: string | string[] | FileSystemFileHandle): void {
         if (typeof file === "string") {
@@ -318,10 +375,10 @@ export type groupSortOrder =
     | "Descending" // Reverse Alphabetical
     | "Explicit";  // Explicit order
 
-export class FOMOD_step extends XMLElement {
+export class step extends XMLElement {
     name = "";
     order: groupSortOrder = "Explicit";
-    groups: FOMOD_group[] = [];
+    groups: group[] = [];
 }
 
 export type groupSelectType =
@@ -330,29 +387,58 @@ export type groupSelectType =
     | "SelectAtMostOne"
     | "SelectAtLeastOne"
     | "SelectExactlyOne";
-export class FOMOD_group extends XMLElement {
-    name = "";
-    type: groupSelectType = "SelectAny";
-    plugins: option[] = [];
+export class group extends XMLElement {
+    private _name = "";
+    set name(value: string) { this.updateObjects(); this._name = value; } get name(): string { return this._name; }
+
+    private _type: groupSelectType = "SelectAny";
+    set type(value: groupSelectType) { this.updateObjects(); this._type = value; } get type(): groupSelectType { return this._type; }
+
+    private _plugins: option[] = [];
+    set plugins(value: option[]) { this.updateObjects(); this._plugins = value; } get plugins(): option[] { return this._plugins; }
 }
 
 export class option extends XMLElement {
-    name = "";
+    // Actual Option Name
+    private _name = "";
+    set name(value: string) { this.updateObjects(); this._name = value; } get name(): string { return this._name; }
 
-    name_backend = "";
-    name_backend_node: Comment | undefined;
+    // Backend Name
+    private _name_backend = "";
+    set name_backend(value: string) { this.updateObjects(); this._name_backend = value; } get name_backend(): string { return this._name_backend; }
 
-    description: option_description;
+    private _name_backend_node: Comment | undefined;
+    set name_backend_node(value: Comment | undefined) { this.updateObjects(); this._name_backend_node = value; } get name_backend_node(): Comment | undefined { return this._name_backend_node; }
 
-    image: option_image;
 
-    conditionFlags: dependency_flag[] = [];
-    conditionFlags_container: Element | undefined;
+    // Description
+    private _description!: option_description;
+    set description(value: option_description) { this.updateObjects(); this._description = value; } get description(): option_description { return this._description; }
 
-    files: dependency_file[] = [];
-    files_container: Element | undefined;
 
-    typeDescriptor: PluginTypeDescriptor;
+    // Image
+    private _image!: option_image;
+    set image(value: option_image) { this.updateObjects(); this._image = value; } get image(): option_image { return this._image; }
+
+    // Flags
+    private _conditionFlags: dependency_flag[] = [];
+    set conditionFlags(value: dependency_flag[]) { this.updateObjects(); this._conditionFlags = value; } get conditionFlags(): dependency_flag[] { return this._conditionFlags; }
+
+    private _conditionFlags_container: Element | undefined;
+    set conditionFlags_container(value: Element | undefined) { this.updateObjects(); this._conditionFlags_container = value; } get conditionFlags_container(): Element | undefined { return this._conditionFlags_container; }
+
+
+    // Files
+    private _files: dependency_file[] = [];
+    set files(value: dependency_file[]) { this.updateObjects(); this._files = value; } get files(): dependency_file[] { return this._files; }
+
+    private _files_container: Element | undefined;
+    set files_container(value: Element | undefined) { this.updateObjects(); this._files_container = value; } get files_container(): Element | undefined { return this._files_container; }
+
+
+    // Type Descriptor
+    private _typeDescriptor!: PluginTypeDescriptor;
+    set typeDescriptor(value: PluginTypeDescriptor) { this.updateObjects(); this._typeDescriptor = value; } get typeDescriptor(): PluginTypeDescriptor { return this._typeDescriptor; }
 
     constructor(
         element?: Element,
@@ -372,16 +458,19 @@ export class option extends XMLElement {
         this.description =
             description instanceof option_description
                 ? description
-                : new option_description(undefined, description);
-        this.image =
-            image instanceof option_image
-                ? image
-                : new option_image(undefined, image);
+                : new option_description(undefined, description);   this.description.objectsToUpdate.push(this);
 
-        this.conditionFlags = conditionFlags;
-        this.files = files;
 
-        this.typeDescriptor = typeDescriptor;
+        this.image = image instanceof option_image
+                    ? image
+                    : new option_image(undefined, image);           this.image.objectsToUpdate.push(this);
+
+
+
+        this.conditionFlags = conditionFlags;                       this.conditionFlags.forEach(flag => flag.objectsToUpdate.push(this));
+        this.files = files;                                         this.files.forEach(file => file.objectsToUpdate.push(this));
+
+        this.typeDescriptor = typeDescriptor;                       this.typeDescriptor.objectsToUpdate.push(this);
     }
 
     asModuleXML(document: XMLDocument): Element {
@@ -412,7 +501,8 @@ export class option extends XMLElement {
 }
 
 export class option_description extends XMLElement {
-    description = "";
+    private _description = "";
+    set description(value: string) { this.updateObjects(); this._description = value; } get description(): string { return this._description; }
 
     constructor(element?: Element, description = "") {
         super(element);
@@ -428,7 +518,8 @@ export class option_description extends XMLElement {
 }
 
 export class option_image extends XMLElement {
-    image: string[] = [];
+    private _image: string[] = [];
+    set image(value: string[]) { this.updateObjects(); this._image = value; } get image(): string[] { return this._image; }
 
     constructor(element?: Element, image: string[] | FileSystemFileHandle = []) {
         super(element);
@@ -454,52 +545,6 @@ export class option_image extends XMLElement {
         return this.instanceElement;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -537,7 +582,7 @@ export class FOMOD extends XMLElement {
     installs: FOMOD_install[];
 
     conditions: dependency_group | undefined;
-    steps: FOMOD_step[];
+    steps: step[];
 
     constructor(
         instanceElement?: Element,
@@ -548,7 +593,7 @@ export class FOMOD extends XMLElement {
         meta_id: number = 0,
         meta_url: string = "",
         installs: FOMOD_install[] = [],
-        steps: FOMOD_step[] = [],
+        steps: step[] = [],
         conditions?: dependency_group
     ) {
         super(instanceElement);

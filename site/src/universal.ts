@@ -265,7 +265,7 @@ class bcd_collapsibleParent {
         if (!instant) this.evaluateDuration(doSetDuration);
 
         if (instant) this.instantTransition();
-        this.details_inner.style.marginTop = `0px`;
+        this.details_inner.style.marginTop = `0`;
 
         // Wrap `evaluateDuration` in two requestsAnimationFrames to allow the CSS to properly update
         if (instant) requestAnimationFrame(() => {requestAnimationFrame(() => {this.evaluateDuration(doSetDuration);});});
@@ -414,7 +414,7 @@ export class BellCubicSummary extends bcd_collapsibleParent {
     }
 
     handleClick(event?:MouseEvent){
-        // @ts-expect-error: Property 'path' and 'pointerType' DO exist on type 'MouseEvent', but not in Firefox or presumably Safary
+        // @ts-expect-error: Property 'path' and 'pointerType' DO exist on type 'MouseEvent', but not in Firefox or presumably Safari
         if (!event || !('pointerType' in event) || !event.pointerType || !event.path || event.path?.slice(0, 5).map((el:HTMLElement) => el.tagName === 'A').includes(true)) return;
         this.toggle();
         this.correctFocus();
@@ -808,8 +808,9 @@ export class bcdTabButton extends mdl.MaterialButton {
         this.element_.addEventListener('click', this.onClick.bind(this));
         this.element_.addEventListener('keypress', this.onKeyPress.bind(this));
 
-        if (window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase()) this.makeSelected();
-        else if (this.findTabNumber() === 0) this.makeSelected(0);
+        if (!window.location.hash) this.makeSelected(0);
+        else if (window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase()) this.makeSelected();
+        else this.makeSelected(0);
     }
 
     /** @returns the index of this tab (0-based) or -1 if not found */
@@ -894,6 +895,9 @@ export class bcdDynamicTextArea_base {
         const boundAdjust = this.adjust.bind(this);
         this.element.addEventListener('input', boundAdjust);
         this.element.addEventListener('change', boundAdjust);
+
+        // Hopefully resolve an edge-case causing the text area to not initially size itself properly
+        requestAnimationFrame(boundAdjust);
     }
 
     adjust() {return;}
