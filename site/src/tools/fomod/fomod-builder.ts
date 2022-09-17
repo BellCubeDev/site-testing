@@ -4,16 +4,66 @@ import * as bcdUniversal from '../../universal.js';
 
 declare global {interface Window {
     FOMODBuilder: {
-        UI?: {
+        UI: {
             openFolder: () => void;
             save: () => void;
             cleanSave: () => void;
             attemptRepair: () => void;
         }
         directory?: FileSystemDirectoryHandle;
+        storage: builderStorage;
     };
 }}
-window.FOMODBuilder = {};
+
+interface builderStorage {
+    settings: {
+        autoSaveAfterChange: boolean; // false
+        alwaysCleanSave: boolean; // false
+
+        includeInfoSchema: boolean; // true
+        optimizationUsingFlags: boolean; // true
+
+        saveConfigInXML: boolean; // false
+        brandingComment: boolean; // false
+
+        defaultGroupSortingOrder?: fomodClasses.groupSortOrder; // 'Explicit'
+        defaultGroupSelectType?: fomodClasses.groupSelectType; // 'SelectAtLeastOne'
+    }
+}
+
+const storageItem = localStorage.getItem(`BellCubeDev_FOMOD_BUILDER_DATA`);
+
+window.FOMODBuilder = {
+
+    UI: {
+        openFolder: () => {},
+        save: () => {},
+        cleanSave: () => {},
+        attemptRepair: () => {}
+    },
+
+    // Retrieves the browser storage entry if available, otherwise uses the defaults.
+    storage: storageItem ? JSON.parse(storageItem) : {
+        settings: {
+            autoSaveAfterChange: false,
+            alwaysCleanSave: false,
+            includeInfoSchema: true,
+            optimizationUsingFlags: true,
+            saveConfigInXML: false,
+            brandingComment: false,
+            defaultGroupSortingOrder: 'Explicit',
+            defaultGroupSelectType: 'SelectAtLeastOne',
+        }
+    },
+};
+
+function saveStorage() {
+    try {
+        localStorage.setItem(`BellCubeDev_FOMOD_BUILDER_DATA`, JSON.stringify(window.FOMODBuilder.storage));
+    } catch (e) {
+
+    }
+}
 
 window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
     console.debug('Initializing the FOMOD Builder!');

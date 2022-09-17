@@ -1,0 +1,1151 @@
+---
+---
+:root {
+    --vortex-white: #ffffff;
+    --vortex-gray-lighter: #2A2C2B;
+    --vortex-gray-light: #4C4C4C;
+    --vortex-gray: #A9A9A9;
+    --vortex-gray-dark: #DDDDDD;
+    --vortex-gray-darker: #DEE2E6;
+    --vortex-brand-primary: #00a557;
+    --vortex-brand-highlight: #2691b3;
+    --vortex-brand-success: #86B951;
+    --vortex-brand-info: #0099cc;
+    --vortex-brand-warning: #b44900;
+    --vortex-brand-danger: #be0700;
+    --vortex-brand-bg: #0b0b0b;
+    --vortex-brand-menu: #303030;
+    --vortex-brand-clickable: #00a5e6;
+    --vortex-brand-secondary: #1ba2b9;
+    --vortex-text-color: #efefec;
+    --vortex-text-color-disabled: #707070;
+    --vortex-border-color: gray;
+    --vortex-link-color: #10d0d8;
+    --vortex-link-hover-color: #ab6925;
+    --vortex-font-family-sans-serif: Roboto, sans-serif;
+    --vortex-font-family-serif: Georgia, Times New Roman, Times, serif;
+    --vortex-font-family-monospace: Menlo, Monaco, Consolas, Courier New, monospace;
+    --vortex-font-family-base: Roboto;
+    --vortex-font-family-headings: Bahnschrift SemiBold;
+    --vortex-font-size-base: 12px;
+    --vortex-headings-font-weight: 500;
+    --vortex-gutter-width: 30px;
+    --vortex-half-gutter: 15px;
+    --vortex-line-height-large: 1.5;
+    --vortex-line-height-small: 1.5;
+    --vortex-border-radius-base: 0;
+    --vortex-border-radius-large: 0;
+    --vortex-border-radius-small: 0;
+    --vortex-border-width: 1px;
+    --vortex-caret-width-base: 0.3em;
+    --vortex-caret-width-large: 0.3em;
+
+    --vortex-button-accent: #2c68fe;
+}
+
+#vortex-steps-container {
+
+    // Cascading Stuff
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    font-family: "Roboto", sans-serif;
+    font-size: 12px;
+    letter-spacing: .02em;
+    line-height: 1.5;
+    color: #efefec;
+    background-color: #303030;
+    color-scheme: light;
+    outline: 0;
+
+    // Box Stuff
+    width: 75vw;
+    height: 75vh;
+    margin-left: auto;
+    margin-right: auto;
+
+    border: 1px solid gray;
+    -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+    box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
+
+    display: flex;
+    flex-direction: column;
+
+    touch-action: none;
+    text-rendering: optimizeLegibility;/*
+
+
+
+        $$$$$$$\            $$\ $$\  $$$$$$\            $$\                 $$\
+        $$  __$$\           $$ |$$ |$$  __$$\           $$ |                $  |
+        $$ |  $$ | $$$$$$\  $$ |$$ |$$ /  \__|$$\   $$\ $$$$$$$\   $$$$$$\  \_/  $$$$$$$\
+        $$$$$$$\ |$$  __$$\ $$ |$$ |$$ |      $$ |  $$ |$$  __$$\ $$  __$$\     $$  _____|
+        $$  __$$\ $$$$$$$$ |$$ |$$ |$$ |      $$ |  $$ |$$ |  $$ |$$$$$$$$ |    \$$$$$$\
+        $$ |  $$ |$$   ____|$$ |$$ |$$ |  $$\ $$ |  $$ |$$ |  $$ |$$   ____|     \____$$\
+        $$$$$$$  |\$$$$$$$\ $$ |$$ |\$$$$$$  |\$$$$$$  |$$$$$$$  |\$$$$$$$\     $$$$$$$  |
+        \_______/  \_______|\__|\__| \______/  \______/ \_______/  \_______|    \_______/
+
+
+
+
+    */.bcd-vortex-input {
+        background: none;
+        border: none;
+        width: 100%;
+        height: min-content;
+
+        &.js-dynamic-textarea-width{
+            max-width: 100%;
+            width: 80px; // The functional min-width in this case
+        }
+
+        &:is(.option, .groupTitle):hover{
+            text-decoration: underline;
+        }
+
+        &.groupTitle {
+            font-weight: bold;
+        }
+
+        &.description {
+            @extend .vortex-control-label;
+            @extend label;
+
+            min-height: calc(100% - 20px);
+            padding: 0px;
+            margin: 0px !important;
+
+            color: #fff;
+            font: inherit;
+        }
+    }/*
+
+
+
+        $$$$$$$$\                               $$\           $$\
+        \__$$  __|                              \__|          $  |
+           $$ |    $$$$$$\  $$$$$$$\  $$$$$$$\  $$\ $$$$$$$\  \_/  $$$$$$$\
+           $$ |    \____$$\ $$  __$$\ $$  __$$\ $$ |$$  __$$\     $$  _____|
+           $$ |    $$$$$$$ |$$ |  $$ |$$ |  $$ |$$ |$$ |  $$ |    \$$$$$$\
+           $$ |   $$  __$$ |$$ |  $$ |$$ |  $$ |$$ |$$ |  $$ |     \____$$\
+           $$ |   \$$$$$$$ |$$ |  $$ |$$ |  $$ |$$ |$$ |  $$ |    $$$$$$$  |
+           \__|    \_______|\__|  \__|\__|  \__|\__|\__|  \__|    \_______/
+
+
+
+
+    */
+
+    article,
+    aside,
+    figcaption,
+    figure,
+    footer,
+    header,
+    hgroup,
+    main,
+    menu,
+    nav,
+    section {
+        display: block
+    }
+
+    [hidden],
+    template {
+        display: none
+    }
+
+    a {
+        background-color: transparent
+    }
+
+    a:active,
+    a:hover {
+        outline: 0
+    }
+
+    b {
+        font-weight: bold
+    }
+
+    h1 {
+        font-size: 2em;
+        margin: .67em 0
+    }
+
+    small {
+        font-size: 80%
+    }
+
+    img {
+        border: 0
+    }
+
+    svg:not(:root) {
+        overflow: hidden
+    }
+
+    figure {
+        margin: 1em 40px
+    }
+
+    hr {
+        box-sizing: content-box;
+        height: 0
+    }
+
+    pre {
+        overflow: auto
+    }
+
+    code,
+    pre {
+        font-family: monospace, monospace;
+        font-size: 1em
+    }
+
+    button,
+    input,
+    optgroup,
+    select {
+        color: inherit;
+        accent-color: var(--vortex-button-accent);
+        font: inherit;
+        margin: 0px
+    }
+
+    button {
+        overflow: visible
+    }
+
+    button,
+    select {
+        text-transform: none
+    }
+
+    button,
+    input[type="button"] {
+        -webkit-appearance: button;
+        background-color: var(--vortex-button-accent);
+        cursor: pointer
+    }
+
+    button[disabled],
+    input[disabled] {
+        cursor: default
+    }
+
+    button::-moz-focus-inner,
+    input::-moz-focus-inner {
+        border: 0;
+        padding: 0
+    }
+
+    input {
+        line-height: normal
+    }
+
+    input[type="checkbox"],
+    input[type="radio"] {
+        box-sizing: border-box;
+        padding: 0
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        height: auto
+    }
+
+    input[type="search"] {
+        -webkit-appearance: textfield;
+        box-sizing: content-box
+    }
+
+    input[type="search"]::-webkit-search-cancel-button,
+    input[type="search"]::-webkit-search-decoration {
+        -webkit-appearance: none
+    }
+
+    optgroup {
+        font-weight: bold
+    }
+
+    table {
+        border-collapse: collapse;
+        border-spacing: 0
+    }
+
+    td,
+    th {
+        padding: 0
+    }
+
+    @font-face {
+        font-family: "Glyphicons Halflings";
+        src: url("../fonts/bootstrap/glyphicons-halflings-regular.eot");
+        src: url("../fonts/bootstrap/glyphicons-halflings-regular.eot?#iefix") format("embedded-opentype"), url("../fonts/bootstrap/glyphicons-halflings-regular.woff2") format("woff2"), url("../fonts/bootstrap/glyphicons-halflings-regular.woff") format("woff"), url("../fonts/bootstrap/glyphicons-halflings-regular.ttf") format("truetype"), url("../fonts/bootstrap/glyphicons-halflings-regular.svg#glyphicons_halflingsregular") format("svg")
+    }
+
+    * {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box
+    }
+
+    *:before,
+    *:after {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box
+    }
+
+    input,
+    button,
+    select {
+        font-family: inherit;
+        font-size: inherit;
+        line-height: inherit
+    }
+
+    a {
+        color: #10d0d8;
+        text-decoration: none
+    }
+
+    a:hover,
+    a:focus {
+        color: #ab6925;
+        text-decoration: underline
+    }
+
+    a:focus {
+        outline: 5px auto -webkit-focus-ring-color;
+        outline-offset: -2px
+    }
+
+    figure {
+        margin: 0px
+    }
+
+    img {
+        vertical-align: middle
+    }
+
+    hr {
+        margin-top: 1.5;
+        margin-bottom: 1.5;
+        border: 0;
+        border-top: 1px solid #ddd
+    }
+
+    [role="button"] {
+        cursor: pointer
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: "Bahnschrift SemiBold";
+        font-weight: 500;
+        line-height: 1.5;
+        color: inherit
+    }
+
+    h1 small,
+    h2 small,
+    h3 small,
+    h4 small,
+    h5 small,
+    h6 small {
+        font-weight: normal;
+        line-height: 1;
+        color: #4c4c4c
+    }
+
+    h1,
+    h2,
+    h3 {
+        margin-top: 1.5;
+        margin-bottom: .75
+    }
+
+    h1 small,
+    h2 small,
+    h3 small {
+        font-size: 65%
+    }
+
+    h4,
+    h5,
+    h6 {
+        margin-top: .75;
+        margin-bottom: .75
+    }
+
+    h4 small,
+    h5 small,
+    h6 small {
+        font-size: 75%
+    }
+
+    h1 {
+        font-size: 2.5rem
+    }
+
+    h2 {
+        font-size: 2rem
+    }
+
+    h3 {
+        font-size: 1.75rem
+    }
+
+    h4 {
+        font-size: 1.2rem
+    }
+
+    h5 {
+        font-size: 1.1rem
+    }
+
+    h6 {
+        font-size: 1rem
+    }
+
+    p {
+        margin: 0 0 .75
+    }
+
+    small {
+        font-size: 90%
+    }
+
+    ul,
+    ol {
+        margin-top: 0;
+        margin-bottom: .75
+    }
+
+    ul ul,
+    ul ol,
+    ol ul,
+    ol ol {
+        margin-bottom: 0
+    }
+
+    dl {
+        margin-top: 0;
+        margin-bottom: 1.5
+    }
+
+    dt,
+    dd {
+        line-height: 1.5
+    }
+
+    dt {
+        font-weight: bold
+    }
+
+    dd {
+        margin-left: 0
+    }
+
+    blockquote {
+        padding: .75 1.5;
+        margin: 0 0 1.5;
+        font-size: 1.25em;
+        border-left: 5px solid #2a2c2b
+    }
+
+    blockquote p:last-child,
+    blockquote ul:last-child,
+    blockquote ol:last-child {
+        margin-bottom: 0
+    }
+
+    blockquote footer,
+    blockquote small {
+        display: block;
+        font-size: 80%;
+        line-height: 1.5;
+        color: #4c4c4c
+    }
+
+    blockquote footer:before,
+    blockquote small:before {
+        content: "—&nbsp;"
+    }
+
+    address {
+        margin-bottom: 1.5;
+        font-style: normal;
+        line-height: 1.5
+    }
+
+    code,
+    pre {
+        font-family: Menlo, Monaco, Consolas, "Courier New", monospace
+    }
+
+    code {
+        padding: 2px 4px;
+        font-size: 90%;
+        color: #efefec;
+        background-color: inherit;
+        border-radius: 0
+    }
+
+    pre {
+        display: block;
+        padding: .25;
+        margin: 0 0 .75;
+        font-size: .9em;
+        line-height: 1.5;
+        word-break: break-all;
+        word-wrap: break-word;
+        color: #efefec;
+        background-color: inherit;
+        border: 1px solid inherit;
+        border-radius: 0
+    }
+
+    pre code {
+        padding: 0;
+        font-size: inherit;
+        color: inherit;
+        white-space: pre-wrap;
+        background-color: transparent;
+        border-radius: 0
+    }
+
+    label {
+        display: inline-block;
+        width: 100%;
+        margin-bottom: 5px;
+        font-weight: bold
+    }
+
+    input[type="search"] {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box
+    }
+
+    input[type="radio"],
+    input[type="checkbox"] {
+        margin: 4px 0 0;
+        margin-top: 1px \9;
+        line-height: normal
+    }
+
+    input[type="file"] {
+        display: block
+    }
+
+    select[multiple],
+    select[size] {
+        height: auto
+    }
+
+    input[type="file"]:focus,
+    input[type="radio"]:focus,
+    input[type="checkbox"]:focus {
+        outline: 5px auto -webkit-focus-ring-color;
+        outline-offset: -2px
+    }
+
+    output {
+        display: block;
+        padding-top: 1.2em;
+        font-size: 1em;
+        line-height: 1.5;
+        color: #efefec
+    }
+
+    input[type="search"] {
+        -webkit-appearance: none
+    }
+
+    .vortex-form-group {
+        margin-bottom: 15px
+    }
+
+    .vortex-radio,
+    .vortex-checkbox {
+        position: relative;
+        display: block;
+        margin-top: 10px;
+        margin-bottom: 10px
+    }
+
+    .vortex-radio label,
+    .vortex-checkbox label {
+        min-height: 1.5;
+        padding-left: 20px;
+        margin-bottom: 0;
+        font-weight: normal;
+        cursor: pointer
+    }
+
+    :is(.vortex-radio, .vortex-radio-inline, .vortex-checkbox, .vortex-checkbox-inline) input:not(.bcd-vortex-input) {
+        position: absolute;
+        margin-left: -20px !important;
+        margin-top: 4px \9
+    }
+
+    .vortex-radio+.vortex-radio,
+    .vortex-checkbox+.vortex-checkbox {
+        margin-top: -5px
+    }
+
+    input[type="radio"][disabled],
+    input[type="checkbox"][disabled] {
+        cursor: not-allowed
+    }
+
+    .vortex-btn {
+        display: inline-block;
+        margin-bottom: 0;
+        font-weight: normal;
+        text-align: center;
+        vertical-align: middle;
+        touch-action: manipulation;
+        cursor: pointer;
+        background-image: none;
+        border: 1px solid transparent;
+        white-space: nowrap;
+        padding: .2em .5em;
+        font-size: 1em;
+        line-height: 1.5;
+        border-radius: 0;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none
+    }
+
+    .vortex-btn:focus,
+    .vortex-btn:active:focus {
+        outline: 5px auto -webkit-focus-ring-color;
+        outline-offset: -2px
+    }
+
+    .vortex-btn:hover,
+    .vortex-btn:focus {
+        color: #efefec;
+        text-decoration: none
+    }
+
+    .vortex-btn:active {
+        outline: 0;
+        background-image: none;
+        -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125);
+        box-shadow: inset 0 3px 5px rgba(0, 0, 0, .125)
+    }
+
+
+    .vortex-btn[disabled] {
+        cursor: not-allowed;
+        opacity: .65;
+        filter: alpha(opacity=65);
+        -webkit-box-shadow: none;
+        box-shadow: none
+    }
+
+    @-webkit-keyframes progress-bar-stripes {
+        from {
+            background-position: 40px 0
+        }
+
+        to {
+            background-position: 0 0
+        }
+    }
+
+    @keyframes progress-bar-stripes {
+        from {
+            background-position: 40px 0
+        }
+
+        to {
+            background-position: 0 0
+        }
+    }
+
+    .vortex-progress {
+        overflow: hidden;
+        height: 1.5;
+        margin-bottom: 1.5;
+        background-color: #2a2c2b;
+        border-radius: 0;
+        -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1)
+    }
+
+    .vortex-progress-bar {
+        float: left;
+        width: 0;
+        height: 100%;
+        font-size: .9em;
+        line-height: 1.5;
+        color: #efefec;
+        text-align: center;
+        background-color: #303030;
+        -webkit-box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);
+        box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);
+        -webkit-transition: width .6s ease;
+        -o-transition: width .6s ease;
+        transition: width .6s ease
+    }
+
+    .vortex-modal-open {
+        overflow: hidden
+    }
+
+    #vortex-steps-header {
+        padding: 15px;
+        border-bottom: 1px solid #dee2e6
+    }
+
+    #vortex-steps-header:before,
+    #vortex-steps-header:after {
+        content: " ";
+        display: table
+    }
+
+    #vortex-steps-header:after {
+        clear: both
+    }
+
+    #vortex-steps-title {
+        margin: 0px;
+        line-height: 1.4em
+    }
+
+    .vortex-modal-body {
+        position: relative;
+        padding: 15px
+    }
+
+    #vortex-steps-footer {
+        padding: 15px;
+        text-align: right;
+        border-top: 1px solid #dee2e6
+    }
+
+    #vortex-steps-footer:before,
+    #vortex-steps-footer:after {
+        content: " ";
+        display: table
+    }
+
+    #vortex-steps-footer:after {
+        clear: both
+    }
+
+    #vortex-steps-footer .vortex-btn+.vortex-btn {
+        margin-left: 5px;
+        margin-bottom: 0
+    }
+
+    @-ms-viewport {
+        width: device-width
+    }
+
+    @keyframes Select-animation-spin {
+        to {
+            transform: rotate(1turn)
+        }
+    }
+
+    @-webkit-keyframes Select-animation-spin {
+        to {
+            -webkit-transform: rotate(1turn)
+        }
+    }
+
+    @-webkit-keyframes Select-animation-fadeIn {
+        from {
+            opacity: 0
+        }
+
+        to {
+            opacity: 1
+        }
+    }
+
+    @keyframes Select-animation-fadeIn {
+        from {
+            opacity: 0
+        }
+
+        to {
+            opacity: 1
+        }
+    }
+
+    @keyframes Select-animation-spin {
+        to {
+            transform: rotate(1turn)
+        }
+    }
+
+    @-webkit-keyframes Select-animation-spin {
+        to {
+            -webkit-transform: rotate(1turn)
+        }
+    }
+
+    @keyframes Select-animation-spin {
+        to {
+            transform: rotate(1turn)
+        }
+    }
+
+    @-webkit-keyframes Select-animation-spin {
+        to {
+            -webkit-transform: rotate(1turn)
+        }
+    }
+
+    @keyframes arrow-pulse {
+        0% {
+            transform: translate(0, 0);
+            opacity: 0
+        }
+
+        30% {
+            transform: translate(0, 300%);
+            opacity: 1
+        }
+
+        70% {
+            transform: translate(0, 700%);
+            opacity: 1
+        }
+
+        100% {
+            transform: translate(0, 1000%);
+            opacity: 0
+        }
+    }
+
+    img,
+    a {
+        -webkit-user-drag: none
+    }
+
+    [role="button"] {
+        cursor: default
+    }
+
+    a,
+    .vortex-btn {
+        cursor: default
+    }
+
+
+    .vortex-btn[disabled] {
+        cursor: initial
+    }
+
+    :not(input):not(textarea),
+    :not(input):not(textarea)::after,
+    :not(input):not(textarea)::before {
+        -webkit-user-select: none;
+        user-select: none;
+        cursor: default
+    }
+
+    input,
+    button,
+    :focus {
+        outline: none
+    }
+
+    @keyframes pulseWarningText {
+        0% {
+            color: #efefec
+        }
+
+        50% {
+            color: #b44900
+        }
+
+        100% {
+            color: #efefec
+        }
+    }
+
+    @keyframes arrow-pulse {
+        0% {
+            transform: translate(0, 0);
+            opacity: 0
+        }
+
+        30% {
+            transform: translate(0, 300%);
+            opacity: 1
+        }
+
+        70% {
+            transform: translate(0, 700%);
+            opacity: 1
+        }
+
+        100% {
+            transform: translate(0, 1000%);
+            opacity: 0
+        }
+    }
+
+    .vortex-progress {
+        overflow: hidden;
+        height: 1.5;
+        margin-bottom: 1.5;
+        background-color: #909090;
+        border-radius: 0;
+        -webkit-box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1)
+    }
+
+    .vortex-progress .vortex-progress-bar {
+        white-space: nowrap;
+        overflow-x: hidden
+    }
+
+    h1,
+    h2,
+    h3 {
+        font-family: "Bahnschrift SemiBold";
+        margin-top: .5em;
+        margin-bottom: .25em
+    }
+
+    .vortex-radio,
+    .vortex-checkbox {
+        margin-top: 0;
+        margin-bottom: 0
+    }
+
+
+    input {
+        box-shadow: none
+    }
+
+
+    input:focus {
+        box-shadow: none
+    }
+
+    .vortex-btn:focus,
+    .vortex-btn:active:focus {
+        outline-width: 0
+    }
+
+    #vortex-steps-header,
+    #vortex-steps-footer {
+        margin: 0 30px
+    }
+
+    hr {
+        margin-top: 1.5em;
+        margin-bottom: 1.5em
+    }
+
+    .vortex-modal-body {
+        padding: 15px 30px
+    }
+
+    a,
+    button,
+    .vortex-btn {
+        -webkit-app-region: no-drag
+    }
+
+    ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #dee2e6;
+        border-radius: 4px
+    }
+
+    ::-webkit-scrollbar-corner {
+        background-color: #1ba2b9
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #c1c9d0
+    }
+
+    ::-webkit-input-placeholder {
+        color: #c0c0b5 !important;
+        font-style: italic
+    }
+
+    @font-face {
+        font-family: "Roboto";
+        font-style: normal;
+        font-weight: 400;
+        src: local("Roboto"), local("Roboto-Regular"), url(assets/fonts/roboto.woff2) format("woff2")
+    }
+
+    @font-face {
+        font-family: "Montserrat";
+        font-style: normal;
+        font-weight: 400;
+        src: local("Montserrat"), local("Montserrat-Regular"), url(assets/fonts/Montserrat-Regular.ttf) format("truetype")
+    }
+
+    @font-face {
+        font-family: "Montserrat";
+        font-style: normal;
+        font-weight: 300;
+        src: local("Montserrat-Light"), url(assets/fonts/Montserrat-Light.ttf) format("truetype")
+    }
+
+    @keyframes collapseIn {
+        0% {
+            opacity: 0
+        }
+
+        100% {
+            visibility: visible;
+            opacity: 1
+        }
+    }
+
+    #vortex-steps-title {
+        display: flex;
+        align-items: center
+    }
+
+    #vortex-steps-title svg {
+        width: 2em;
+        height: 2em;
+        margin-right: 1em
+    }
+
+    .vortex-progress {
+        margin: 6px
+    }
+
+    @keyframes icon-spin {
+        0% {
+            transform: rotate(0deg)
+        }
+
+        100% {
+            transform: rotate(359deg)
+        }
+    }
+
+    .vortex-layout-container {
+        display: flex
+    }
+
+    .vortex-layout-container.vortex-layout-fill {
+        width: 100%;
+        height: 100%
+    }
+
+    .vortex-layout-flex>.vortex-layout-flex-inner {
+        display: inline
+    }
+
+    .vortex-layout-flex>.vortex-layout-flex-inner.vortex-layout-flex-fill {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0
+    }
+
+    .vortex-layout-flex {
+        flex: 1 1 0;
+        position: relative;
+        overflow: hidden
+    }
+
+    .vortex-layout-fixed {
+        position: relative
+    }
+
+    .vortex-modal-body {
+        flex: 1 0%;
+        display: flex;
+        padding: 15px 30px
+    }
+
+    #vortex-steps-footer {
+        padding-top: 5px;
+        padding-bottom: 5px
+    }
+
+    .vortex-progress {
+        display: inline-block;
+        width: 200px;
+        height: 16px;
+        margin-bottom: 0;
+        background-color: #ddd;
+        height: 4px;
+        border-radius: 4px
+    }
+
+    .vortex-progress .vortex-progress-bar {
+        background-color: #1ba2b9
+    }
+
+    .vortex-description {
+        padding: 15px;
+        margin: 15px;
+        overflow-y: auto
+    }
+
+    .vortex-description>.vortex-control-label {
+        white-space: pre-wrap
+    }
+
+    #vortex-steps-footer {
+        display: flex
+    }
+
+    #vortex-steps-footer>* {
+        flex: 1 1 0;
+        text-align: center
+    }
+
+    #vortex-steps-footer>*:first-child {
+        text-align: left
+    }
+
+    #vortex-steps-footer>*:last-child {
+        text-align: right
+    }
+
+    .vortex-installer-image {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        position: absolute
+    }
+
+    .vortex-installer-image .vortex-zoomable-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain
+    }
+
+    .vortex-zoomable-image {
+        max-width: 100%;
+        max-height: 192px
+    }
+}

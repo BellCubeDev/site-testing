@@ -7,7 +7,7 @@ import * as main from "./fomod-builder.js"; // Brings in global things
     ...makes this code *so* much easier to maintain... you know, 'cuz I can find my functions in VSCode's Minimap
 */
 
-export class bcd_builder_XMLElement {
+export class XMLElement {
     instanceElement: Element | undefined;
     constructor(instanceElement: Element | undefined = undefined) {
         this.instanceElement = instanceElement;
@@ -30,7 +30,7 @@ $$ |  $$\ $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \
 \$$$$$$  |\$$$$$$  |$$ |  $$ |\$$$$$$$ |$$ |  \$$$$  |$$ |\$$$$$$  |$$ |  $$ |$$$$$$$  |
  \______/  \______/ \__|  \__| \_______|\__|   \____/ \__| \______/ \__|  \__|\______*/
 
-export class bcd_builder_flag {
+export class flag {
     name = "";
     value = "";
     getters:unknown[] = [];
@@ -42,21 +42,21 @@ export class bcd_builder_flag {
     }
 }
 
-export class bcd_builder_dependency extends bcd_builder_XMLElement {
+export class dependency extends XMLElement {
     constructor(instanceElement: Element | undefined = undefined) {
         super(instanceElement);
     }
 }
 
-type bcd_builder_dependency_file_state = "Active" | "Inactive" | "Missing";
-type bcd_builder_dependency_group_operator = "And" | "Or";
-export class bcd_builder_dependency_group extends bcd_builder_dependency {
-    operator: bcd_builder_dependency_group_operator /*= 'And'*/;
-    children: bcd_builder_dependency[] = [];
+export type dependency_file_state = "Active" | "Inactive" | "Missing";
+export type dependency_group_operator = "And" | "Or";
+export class dependency_group extends dependency {
+    operator: dependency_group_operator /*= 'And'*/;
+    children: dependency[] = [];
 
     constructor(
         instanceElement: Element | undefined = undefined,
-        operator: bcd_builder_dependency_group_operator = "And",
+        operator: dependency_group_operator = "And",
         parseChildren = false
     ) {
         super(instanceElement);
@@ -65,7 +65,7 @@ export class bcd_builder_dependency_group extends bcd_builder_dependency {
             this.operator =
                 (instanceElement.getAttribute(
                     "operator"
-                ) as bcd_builder_dependency_group_operator) || operator;
+                ) as dependency_group_operator) || operator;
         }
 
         if (!parseChildren || !instanceElement) return;
@@ -96,7 +96,7 @@ export class bcd_builder_dependency_group extends bcd_builder_dependency {
         return this.instanceElement;
     }
 }
-export class bcd_builder_dependency_flag extends bcd_builder_dependency {
+export class dependency_flag extends dependency {
     flag = "";
     value = "";
 
@@ -108,9 +108,9 @@ export class bcd_builder_dependency_flag extends bcd_builder_dependency {
         return thisElement;
     }
 }
-export class bcd_builder_dependency_file extends bcd_builder_dependency {
+export class dependency_file extends dependency {
     file = "";
-    state: bcd_builder_dependency_file_state = "Active";
+    state: dependency_file_state = "Active";
 
     // <fileDependency file="2" state="Active" />
     asModuleXML(document: XMLDocument): Element {
@@ -120,10 +120,10 @@ export class bcd_builder_dependency_file extends bcd_builder_dependency {
         return thisElement;
     }
 }
-export class bcd_builder_dependency_versionCheck extends bcd_builder_dependency {
+export class dependency_versionCheck extends dependency {
     version = "";
 }
-export class bcd_builder_dependency_FOSE extends bcd_builder_dependency_versionCheck {
+export class dependency_FOSE extends dependency_versionCheck {
     // <foseDependency version="" />
     asModuleXML(document: XMLDocument): Element {
         const thisElement = document.createElement("foseDependency");
@@ -131,7 +131,7 @@ export class bcd_builder_dependency_FOSE extends bcd_builder_dependency_versionC
         return thisElement;
     }
 }
-export class bcd_builder_dependency_game extends bcd_builder_dependency_versionCheck {
+export class dependency_game extends dependency_versionCheck {
     // <gameDependency version="" />
     asModuleXML(document: XMLDocument): Element {
         const thisElement = document.createElement("gameDependency");
@@ -139,7 +139,7 @@ export class bcd_builder_dependency_game extends bcd_builder_dependency_versionC
         return thisElement;
     }
 }
-export class bcd_builder_dependency_modManager extends bcd_builder_dependency_versionCheck {
+export class dependency_modManager extends dependency_versionCheck {
     // <fommDependency version="1" />
     asModuleXML(document: XMLDocument): Element {
         const thisElement = document.createElement("fommDependency");
@@ -148,36 +148,36 @@ export class bcd_builder_dependency_modManager extends bcd_builder_dependency_ve
     }
 }
 
-function parseDependency(dependency: Element): bcd_builder_dependency {
+function parseDependency(dependency: Element): dependency {
     const type = dependency.tagName;
     switch (type) {
         case "dependencies":
-            return new bcd_builder_dependency_group(dependency, undefined, true);
+            return new dependency_group(dependency, undefined, true);
         case "fileDependency":
-            return new bcd_builder_dependency_file(dependency);
+            return new dependency_file(dependency);
         case "flagDependency":
-            return new bcd_builder_dependency_flag(dependency);
+            return new dependency_flag(dependency);
         case "foseDependency":
-            return new bcd_builder_dependency_FOSE(dependency);
+            return new dependency_FOSE(dependency);
         case "gameDependency":
-            return new bcd_builder_dependency_game(dependency);
+            return new dependency_game(dependency);
         case "fommDependency":
-            return new bcd_builder_dependency_modManager(dependency);
+            return new dependency_modManager(dependency);
         default:
             throw new TypeError(`Unknown dependency type: ${type}`);
     }
 }
 
-type bcd_builder_PluginType =
+export type PluginType =
     | "Optional"        // Unchecked but checkable
     | "Recommended"     // Checked but uncheckable
     | "CouldBeUseable"  // TODO: Check if this has a use
     | "Required"        // Permanently checked
     | "NotUseable";     // Permanently unchecked
-export class bcd_builder_PluginTypeDescriptor extends bcd_builder_XMLElement {
-    default: bcd_builder_PluginType = "Optional";
+export class PluginTypeDescriptor extends XMLElement {
+    default: PluginType = "Optional";
 
-    dependencies: bcd_builder_PluginTypeDescriptor_dependency[] = [];
+    dependencies: PluginTypeDescriptor_dependency[] = [];
 
     instanceElement_basic: Element | undefined = undefined;
     instanceElement_complex: Element | undefined = undefined;
@@ -186,8 +186,8 @@ export class bcd_builder_PluginTypeDescriptor extends bcd_builder_XMLElement {
 
     constructor(
         element?: Element,
-        defaultType: bcd_builder_PluginType = "Optional",
-        dependencies: bcd_builder_PluginTypeDescriptor_dependency[] = []
+        defaultType: PluginType = "Optional",
+        dependencies: PluginTypeDescriptor_dependency[] = []
     ) {
         super(element);
         this.default = defaultType;
@@ -238,13 +238,13 @@ export class bcd_builder_PluginTypeDescriptor extends bcd_builder_XMLElement {
     }
 }
 
-export class bcd_builder_PluginTypeDescriptor_dependency extends bcd_builder_XMLElement {
-    type: bcd_builder_PluginType = "Optional";
+export class PluginTypeDescriptor_dependency extends XMLElement {
+    type: PluginType = "Optional";
     instanceElement_type: Element | undefined = undefined;
 
-    dependency: bcd_builder_dependency_group;
+    dependency: dependency_group;
 
-    constructor(dependency: bcd_builder_dependency_group, type: bcd_builder_PluginType = "Optional"
+    constructor(dependency: dependency_group, type: PluginType = "Optional"
     ) {
         super();
         this.dependency = dependency;
@@ -274,7 +274,7 @@ export class bcd_builder_PluginTypeDescriptor_dependency extends bcd_builder_XML
 -$$$$$$\ $$ |  $$ |$$$$$$$  |  \$$$$  |\$$$$$$$ |$$ |$$ |$$$$$$$  |
 \_______|\__|  \__|\_______/    \____/  \_______|\__|\__|\______*/
 
-export class bcd_builder_FOMOD_install extends bcd_builder_XMLElement {
+export class FOMOD_install extends XMLElement {
     static files: string[][] = [];
 
     file!: string[];
@@ -282,10 +282,10 @@ export class bcd_builder_FOMOD_install extends bcd_builder_XMLElement {
     updateFile(file: string | string[] | FileSystemFileHandle): void {
         if (typeof file === "string") {
             const filePath: string[] = file.split("/");
-            bcd_builder_FOMOD_install.files.push(filePath);
+            FOMOD_install.files.push(filePath);
             this.file = filePath;
         } else if (file instanceof Array) {
-            bcd_builder_FOMOD_install.files.push(file);
+            FOMOD_install.files.push(file);
             this.file = file;
         } else {
             window.FOMODBuilder.directory;
@@ -313,56 +313,56 @@ $$ |  $$ |$$ |  $$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \____$$\
           $$ |
           \_*/
 
-type bcd_builder_groupSortOrder =
+export type groupSortOrder =
     | "Ascending"  // Alphabetical
     | "Descending" // Reverse Alphabetical
     | "Explicit";  // Explicit order
 
-export class bcd_builder_FOMOD_step extends bcd_builder_XMLElement {
+export class FOMOD_step extends XMLElement {
     name = "";
-    order: bcd_builder_groupSortOrder = "Explicit";
-    groups: bcd_builder_FOMOD_group[] = [];
+    order: groupSortOrder = "Explicit";
+    groups: FOMOD_group[] = [];
 }
 
-type bcd_builder_GroupType =
+export type groupSelectType =
     | "SelectAll"
     | "SelectAny"
     | "SelectAtMostOne"
     | "SelectAtLeastOne"
     | "SelectExactlyOne";
-export class bcd_builder_FOMOD_group extends bcd_builder_XMLElement {
+export class FOMOD_group extends XMLElement {
     name = "";
-    type: bcd_builder_GroupType = "SelectAny";
-    plugins: bcd_builder_option[] = [];
+    type: groupSelectType = "SelectAny";
+    plugins: option[] = [];
 }
 
-export class bcd_builder_option extends bcd_builder_XMLElement {
+export class option extends XMLElement {
     name = "";
 
     name_backend = "";
     name_backend_node: Comment | undefined;
 
-    description: bcd_builder_option_description;
+    description: option_description;
 
-    image: bcd_builder_option_image;
+    image: option_image;
 
-    conditionFlags: bcd_builder_dependency_flag[] = [];
+    conditionFlags: dependency_flag[] = [];
     conditionFlags_container: Element | undefined;
 
-    files: bcd_builder_dependency_file[] = [];
+    files: dependency_file[] = [];
     files_container: Element | undefined;
 
-    typeDescriptor: bcd_builder_PluginTypeDescriptor;
+    typeDescriptor: PluginTypeDescriptor;
 
     constructor(
         element?: Element,
         name = "",
         name_backend = "",
-        description: bcd_builder_option_description | string = "",
-        image: bcd_builder_option_image | string[] | FileSystemFileHandle = [],
-        conditionFlags: bcd_builder_dependency_flag[] = [],
-        files: bcd_builder_dependency_file[] = [],
-        typeDescriptor: bcd_builder_PluginTypeDescriptor = new bcd_builder_PluginTypeDescriptor()
+        description: option_description | string = "",
+        image: option_image | string[] | FileSystemFileHandle = [],
+        conditionFlags: dependency_flag[] = [],
+        files: dependency_file[] = [],
+        typeDescriptor: PluginTypeDescriptor = new PluginTypeDescriptor()
     ) {
         super(element);
         this.name = name; // Stored as an attribute
@@ -370,13 +370,13 @@ export class bcd_builder_option extends bcd_builder_XMLElement {
         this.name_backend = name_backend; // Stored as a comment
 
         this.description =
-            description instanceof bcd_builder_option_description
+            description instanceof option_description
                 ? description
-                : new bcd_builder_option_description(undefined, description);
+                : new option_description(undefined, description);
         this.image =
-            image instanceof bcd_builder_option_image
+            image instanceof option_image
                 ? image
-                : new bcd_builder_option_image(undefined, image);
+                : new option_image(undefined, image);
 
         this.conditionFlags = conditionFlags;
         this.files = files;
@@ -411,7 +411,7 @@ export class bcd_builder_option extends bcd_builder_XMLElement {
     }
 }
 
-export class bcd_builder_option_description extends bcd_builder_XMLElement {
+export class option_description extends XMLElement {
     description = "";
 
     constructor(element?: Element, description = "") {
@@ -427,7 +427,7 @@ export class bcd_builder_option_description extends bcd_builder_XMLElement {
     }
 }
 
-export class bcd_builder_option_image extends bcd_builder_XMLElement {
+export class option_image extends XMLElement {
     image: string[] = [];
 
     constructor(element?: Element, image: string[] | FileSystemFileHandle = []) {
@@ -505,7 +505,7 @@ export class bcd_builder_option_image extends bcd_builder_XMLElement {
 
 
 
-export class bcd_builder_FOMOD extends bcd_builder_XMLElement {
+export class FOMOD extends XMLElement {
     meta_name;
     meta_image;
     meta_author;
@@ -534,10 +534,10 @@ export class bcd_builder_FOMOD extends bcd_builder_XMLElement {
     }
 
 
-    installs: bcd_builder_FOMOD_install[];
+    installs: FOMOD_install[];
 
-    conditions: bcd_builder_dependency_group | undefined;
-    steps: bcd_builder_FOMOD_step[];
+    conditions: dependency_group | undefined;
+    steps: FOMOD_step[];
 
     constructor(
         instanceElement?: Element,
@@ -547,9 +547,9 @@ export class bcd_builder_FOMOD extends bcd_builder_XMLElement {
         meta_version: string = "",
         meta_id: number = 0,
         meta_url: string = "",
-        installs: bcd_builder_FOMOD_install[] = [],
-        steps: bcd_builder_FOMOD_step[] = [],
-        conditions?: bcd_builder_dependency_group
+        installs: FOMOD_install[] = [],
+        steps: FOMOD_step[] = [],
+        conditions?: dependency_group
     ) {
         super(instanceElement);
         this.meta_name = meta_name;

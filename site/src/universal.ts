@@ -808,6 +808,8 @@ export class bcdTabButton extends mdl.MaterialButton {
 
         this.element_.addEventListener('click', this.onClick.bind(this));
         this.element_.addEventListener('keypress', this.onKeyPress.bind(this));
+
+        if (window.location.hash === `#tab-${name}`) this.makeSelected();
     }
 
     /** @returns the index of this tab (0-based) or -1 if not found */
@@ -850,6 +852,8 @@ export class bcdTabButton extends mdl.MaterialButton {
                 tab.setAttribute('aria-hidden', 'true');
             }
         }
+
+        requestAnimationFrame(()=>   window.location.hash = `tab-${this.name}`   );
     }
 
     onClick(event?: MouseEvent): void {
