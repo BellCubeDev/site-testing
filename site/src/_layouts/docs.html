@@ -18,7 +18,7 @@ use_docs_CSS: true
                 {% assign type = site.data.docs_nav[page.navType].children %}
                 {% include docs__side__item.html input=type %}
             {% else %}
-                {% include docs__side__item.html input=type %}
+                {% include docs__side__item.html input=site.data.docs_nav %}
             {% endif %}
         </div>
     </div>
