@@ -1,1 +1,1 @@
-*/{% for item in config %}const {item.name} = {item.value};{% endfor %}/*
+*/{% for item in include.config %}const {item.name} = {item.value};{% endfor %}/*
