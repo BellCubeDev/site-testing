@@ -261,18 +261,18 @@ export const possibilities_Generic = [
     "And He said to me, It is done! I am the Alpha and the Omega, the Beginning and the End. I will give of the fountain of the water of life freely to him who thirsts.",
     "28 STAB WOUNDS",
     "Now be a good courier and deliver it!",
-    "I know exactly what I&rsquo;m doing. I just don&rsquo;t know what effect it&rsquo;s going to have.", 
-    "Quote me more<br /> &mdash; chuckseven1", 
+    "I know exactly what I&rsquo;m doing. I just don&rsquo;t know what effect it&rsquo;s going to have.",
+    "Quote me more<br /> &mdash; chuckseven1",
     "It&rsquo;s ridiculous and unnecessary, but when has that ever stopped programmers?", // I love Tom Scott
 
     // xkcd has me covered on these!
-    "This quote was taken out of context.", 
-    "I&rsquo;m being quoted to [entertain you as part of something], but I have no idea what it is and certainly don&rsquo;t endorse it.", 
-    "Oooh, look at me, I looked up a quote!", 
-    "This quote is often falsely attributed to Mark Twain", 
-    "Websites that collect quotes are full of mistakes and never check original sources.", 
-    "If you&rsquo;re doing a text search in this document for the word &lsquo;butts,&rsquo; the good news is that it&rsquo;s here, but the bad news is that it only appears in this unrelated quote", 
-    "Sent from my iPhone", 
+    "This quote was taken out of context.",
+    "I&rsquo;m being quoted to [entertain you as part of something], but I have no idea what it is and certainly don&rsquo;t endorse it.",
+    "Oooh, look at me, I looked up a quote!",
+    "This quote is often falsely attributed to Mark Twain",
+    "Websites that collect quotes are full of mistakes and never check original sources.",
+    "If you&rsquo;re doing a text search in this document for the word &lsquo;butts,&rsquo; the good news is that it&rsquo;s here, but the bad news is that it only appears in this unrelated quote",
+    "Sent from my iPhone",
 
     "What&rsquo;s a lumberjack&rsquo;s favorite button on a calculator? <code>LOG</code>.",
     "What&rsquo;s the point?",

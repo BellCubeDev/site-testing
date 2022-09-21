@@ -763,7 +763,7 @@ section {
         padding-top: 16px;
 
         transition-property: margin-left;
-        margin-left: 0;
+        margin-left: 0; // overridden later in JavaScript
 
         height: max-content;
         width: max-content;
@@ -783,6 +783,11 @@ section {
 .tab-content {
     min-height: 70vh;
     min-width: 100%;
+
+    opacity: 0; &.active { opacity: 1; }
+
+    transition: inherit;
+    transition-property: opacity;
 }
 
 .mdl-layout__header-row {

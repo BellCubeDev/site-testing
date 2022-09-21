@@ -311,8 +311,8 @@ class bcd_collapsibleParent {
 }
 
 export class BellCubicDetails extends bcd_collapsibleParent {
-    static cssClass = "js-bcd-details";
-    static asString = "BellCubicDetails";
+    static readonly cssClass = "js-bcd-details";
+    static readonly asString = "BellCubicDetails";
 
     /** @param {HTMLElement} element */
     constructor(element:HTMLElement) {
@@ -372,8 +372,8 @@ export class BellCubicDetails extends bcd_collapsibleParent {
 bcdComponents.push(BellCubicDetails);
 
 export class BellCubicSummary extends bcd_collapsibleParent {
-    static cssClass = 'js-bcd-summary';
-    static asString = 'BellCubicSummary';
+    static readonly cssClass = 'js-bcd-summary';
+    static readonly asString = 'BellCubicSummary';
 
     constructor(element:HTMLElement) {
         super(element);
@@ -430,8 +430,8 @@ export class BellCubicSummary extends bcd_collapsibleParent {
 bcdComponents.push(BellCubicSummary);
 
 export class bcd_prettyJSON {
-    static cssClass = 'js-bcd-prettyJSON';
-    static asString = 'bcd_prettyJSON';
+    static readonly cssClass = 'js-bcd-prettyJSON';
+    static readonly asString = 'bcd_prettyJSON';
     element_:HTMLElement;
     constructor(element:HTMLElement) {
         this.element_ = element;
@@ -464,8 +464,8 @@ $$ | \_/ $$ |\$$$$$$  |\$$$$$$$ |\$$$$$$$ |$$ |$$  /     $$$$$$$  |$$ |\$$$$$$$ 
 
 
 export class bcdModalDialog extends EventTarget {
-    static cssClass = 'js-bcd-modal';
-    static asString = 'BellCubic Modal';
+    static readonly cssClass = 'js-bcd-modal';
+    static readonly asString = 'BellCubic Modal';
 
     static obfuscator: HTMLDivElement;
     static modalsToShow: bcdModalDialog[] = [];
@@ -747,8 +747,8 @@ $$ |   $$ | $$$$$$\   $$$$$$\  $$\  $$$$$$\  $$$$$$$\  $$$$$$\    $$$$$$$\
 
 
 export class bcdDropdown_AwesomeButton extends bcdDropdown {
-    static asString = 'BCD - Debugger\'s All-Powerful Button';
-    static cssClass = 'js-bcd-debuggers-all-powerful-button';
+    static readonly asString = 'BCD - Debugger\'s All-Powerful Button';
+    static readonly cssClass = 'js-bcd-debuggers-all-powerful-button';
 
     constructor(element: Element) {
         super(element, false);
@@ -777,9 +777,12 @@ $$$$$$$$\           $$\                        $$$$$$\    $$\                $$$
 
 
 */
+
 export class bcdTabButton extends mdl.MaterialButton {
-    static asString = 'BCD - Tab List Button';
-    static cssClass = 'js-tab-list-button';
+    static readonly asString = 'BCD - Tab List Button';
+    static readonly cssClass = 'js-tab-list-button';
+
+    static anchorToSet = '';
 
     element_: HTMLButtonElement;
     boundTab:HTMLDivElement;
@@ -808,20 +811,23 @@ export class bcdTabButton extends mdl.MaterialButton {
         this.element_.addEventListener('click', this.onClick.bind(this));
         this.element_.addEventListener('keypress', this.onKeyPress.bind(this));
 
-        if (!window.location.hash) this.makeSelected(0);
-        else if (window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase()) this.makeSelected();
+        console.debug('Created tab button:', this);
+        console.debug('Is this tag pre-selected by the anchor?', window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase());
+        if (window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase())  requestAnimationFrame( (() => {this.makeSelected();}).bind(this) );
         else this.makeSelected(0);
     }
 
     /** @returns the index of this tab (0-based) or -1 if not found */
     findTabNumber(button_?: Element): number {
         const button = button_ ?? this.element_;
+        console.debug('findTabNumber: - button:', button, 'array:', [...(button.parentElement?.children ?? [])], 'index:', [...(button.parentElement?.children ?? [])].indexOf(button));
         return [...(button.parentElement?.children ?? [])].indexOf(button);
     }
 
     makeSelected(tabNumber_?: number) {
         const tabNumber = tabNumber_ ?? this.findTabNumber();
         if (tabNumber === -1) throw new Error('Could not find the tab number.');
+        console.debug('makeSelected: tabNumber:', tabNumber);
 
         const siblingsAndSelf = [...(this.element_.parentElement?.children ?? [])];
         if (siblingsAndSelf[tabNumber].classList.contains('active')) return;
@@ -854,7 +860,15 @@ export class bcdTabButton extends mdl.MaterialButton {
             }
         }
 
-        window.location.hash = `tab-${this.name}`.toLowerCase();
+        bcdTabButton.anchorToSet = `#tab-${this.name}`.toLowerCase();
+        bcdTabButton.setAnchorIn3AnimFrames();
+    }
+
+    /** Sets `window.location.hash` to the value of `bcdTabButton.anchorToSet` in three animation frames. */
+    static setAnchorIn3AnimFrames() {
+        requestAnimationFrame( () => { requestAnimationFrame( () => { requestAnimationFrame( () => {
+                    window.location.hash = bcdTabButton.anchorToSet;
+        });                          });                            });
     }
 
     onClick(event?: MouseEvent): void {
@@ -905,8 +919,8 @@ export class bcdDynamicTextArea_base {
 }
 
 export class bcdDynamicTextAreaHeight extends bcdDynamicTextArea_base {
-    static asString = 'BCD - Dynamic TextArea - Height';
-    static cssClass = 'js-dynamic-textarea-height';
+    static readonly asString = 'BCD - Dynamic TextArea - Height';
+    static readonly cssClass = 'js-dynamic-textarea-height';
 
     constructor(element: HTMLElement) {
         super(element);
@@ -928,8 +942,8 @@ export class bcdDynamicTextAreaHeight extends bcdDynamicTextArea_base {
 bcdComponents.push(bcdDynamicTextAreaHeight);
 
 export class bcdDynamicTextAreaWidth extends bcdDynamicTextArea_base {
-    static asString = 'BCD - Dynamic TextArea - Width';
-    static cssClass = 'js-dynamic-textarea-width';
+    static readonly asString = 'BCD - Dynamic TextArea - Width';
+    static readonly cssClass = 'js-dynamic-textarea-width';
 
     constructor(element: HTMLElement) {
         super(element);
