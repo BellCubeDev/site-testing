@@ -2,8 +2,27 @@
 layout: page
 title: Sitemap
 permalink: /sitemap/
+sitemap: false
+bottom_pad: 224px
+extra_head: >
+    <script async type="module" src="sitemap.js" onload="window.bcd_init_functions.sitemap()"></script>
 ---
 
 <h1> Sitemap </h1>
 
-{% include sitemap_groupPagesRecursive.html pages=site.pages %}
+<div id="prefabs" hidden>
+    <li id="prefab-sitemap-item">
+        <a class="sitemap-item" href="" class="">TITLE</a>
+    </li>
+    <div id="prefab-sitemap-dir" class="sitemap-dir">
+        <button class="js-bcd-summary_ adjacent is-open" type="button">
+            <i class="material-icons open-icon-90CC">expand_more</i>
+            <h3 class="sitemap-dir-name">DIRECTORY</h3>
+        </button>
+        <div class="js-bcd-details_ contPad05-left adjacent is-open"><ul class="sitemap-dir-items"></ul></div>
+    </div>
+</div>
+
+<div id="sitemap">
+
+</div>

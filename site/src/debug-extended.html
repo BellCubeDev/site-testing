@@ -1,8 +1,9 @@
 ---
 layout: page
-title: Debug Page
+title: Debug Page - Extended
 description: Page for debugging stuff. Prints a bunch of variables that probably won't be useful to you.
 permalink: /debug/extended/
+sitemap: false
 redirect_from:
     -   /debug/extended
 ---
@@ -26,5 +27,6 @@ redirect_from:
     <br />site.html_files:<pre><code class="js-bcd-prettyJSON">{{ site.html_files | jsonify | escape }}</code></pre>
     <br />site.html_pages:<pre><code class="js-bcd-prettyJSON">{{ site.html_pages | jsonify | escape }}</code></pre>
     <br />site.plugins:<pre><code class="js-bcd-prettyJSON">{{ site.plugins | jsonify | escape }}</code></pre>
+    <br />site.pages:<code class="js-bcd-prettyJSON">{{ site.pages | jsonify | escape }}</code></pre>
     <br />site.static_files:<pre><code class="js-bcd-prettyJSON">{{ site.static_files | jsonify | escape }}</code></pre>
 </div>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" fill="none">
+   <!--
+      THIS VECTOR GRAPHIC IS THE INTELECTUAL PROPERTY OF MICROSOFT.
+      THIS IS NOT CREATED OR OWNED BY BELLCUBE.
+      THIS ASSET HAS BEEN MODIFIED TO FIT THE NEEDS OF BELLCUBE.
+      Copyright © 2019 Microsoft. CC-BY 4.0 International
+   -->
+  <defs>
+    <clipPath id="a" clipPathUnits="userSpaceOnUse">
+      <path d="M-5-5h522v522H-5Zm322 412v50c8 5 18 8 29 10a190 190 0 0 0 69 0c11-3 20-7 29-12a58 58 0 0 0 26-52 56 56 0 0 0-16-42c-5-5-11-10-18-14-7-5-15-9-24-12a305 305 0 0 1-31-16l-9-8c-2-3-3-7-3-11l3-9 7-7 12-5 16-1a99 99 0 0 1 53 15v-46c-7-3-16-5-25-7a203 203 0 0 0-65 2 70 70 0 0 0-47 33c-5 8-7 18-7 30 0 15 4 27 13 38 9 10 22 19 39 27a530 530 0 0 1 35 16c4 3 8 6 10 10a19 19 0 0 1 1 21c-1 2-3 5-7 7l-12 5-16 1a95 95 0 0 1-62-23zm-84-123h64v-41H118v41h64v183h51z" class="powerclip"/>
+    </clipPath>
+  </defs>
+  <rect width="512" height="512" fill="#fff" clip-path="url(#a)" rx="50"/>
+</svg>

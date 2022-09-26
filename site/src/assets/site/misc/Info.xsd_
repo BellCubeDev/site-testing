@@ -1,0 +1,5 @@
+---
+layout: compress_html
+permalink: /assets/site/misc/Info.xsd
+---
+{% include Info.xsd %}

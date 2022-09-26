@@ -46,7 +46,7 @@ html > body {
 
 * {
     transition-duration: 0.2s;
-    transition-property: color, background-color, border-color, fill, text-shadow, box-shadow, opacity, filter;
+    transition-property: color, background-color, border-color, fill, text-shadow, box-shadow, opacity, filter, text-decoration-color;
     transition-timing-function: ease-in-out;
 }
 
@@ -127,7 +127,6 @@ p {
 .mdl-layout__content {
     background: #1b1b1b;
     height: max-content;
-    padding-bottom: 128px;
 
     &:is(footer) {
         align-items: center;
@@ -210,7 +209,7 @@ h5 {
     margin: 21px 0 14px;
 }
 
-:not(pre) > code {
+:not(pre) > code, .code {
     background-color: #333c;
     border: 1px solid #eeeeee08;
     border-radius: 3px;
@@ -226,8 +225,25 @@ pre {
     color: #fff;
     display: block;
     overflow-x: scroll;
-    padding: 12px;
+    padding: 8px;
     scrollbar-gutter: stable both-edges;
+
+    min-height: 48px;
+
+    code {
+        margin-top: auto;
+        margin-bottom: calc(auto - 8px);
+    }
+
+    button:first-child {
+        position: absolute;
+        right: 32px;
+
+        +code {
+            //margin-left: -32px;
+            margin-top: -12px;
+        }
+    }
 }
 
 .mdl-button {
@@ -317,7 +333,6 @@ section {
     :not(.material-icons) {
         transition-duration: 100ms;
         transition-timing-function: ease-in-out;
-        transition-property: text-shadow, text-decoration0color;
 
         text-shadow: #fff0 0 0 1px;
         text-decoration: underline #fff0 7.5%;
@@ -638,8 +653,7 @@ section {
 
 .icon--nexus {
     .nexus-SVG-primary, .nexus-SVG-secondary {
-        /* VISH DID IT TO ME */
-        transition-property: fill;
+        // VISH DID IT TO ME
         transition-timing-function: cubic-bezier(0, 0, 1, 0.2);
         transition-duration: 250ms;
         transition-delay: 10ms;
@@ -787,7 +801,6 @@ section {
     opacity: 0; &.active { opacity: 1; }
 
     transition: inherit;
-    transition-property: opacity;
 }
 
 .mdl-layout__header-row {
@@ -898,7 +911,6 @@ section {
 
 .js-bcd-modal, .js-bcd-modal-obfuscator {
     opacity: 0;
-    transition-property: opacity;
     transition-duration: 250ms;
     transition-timing-function: ease-in-out;
 }

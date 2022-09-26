@@ -1,4 +1,3 @@
-import { request } from 'http';
 import * as mdl from './assets/site/mdl/material.js';
 import * as quotes from './universal_quotes.js';
 
@@ -89,6 +88,19 @@ export function focusAnyElement(element:HTMLElement|undefined, preventScrolling:
     });});
 }
 
+export function copyCode(elem: HTMLElement): void {
+    if (!elem) throw new Error("No element provided to copyCode with!");
+
+    console.debug("copyCode", elem);
+
+    const codeElem = elem.parentElement?.querySelector('code');
+    if (!codeElem) throw new Error("No code element found to copy from!");
+
+    navigator.clipboard.writeText(codeElem.textContent ?? '');
+}
+window.copyCode = copyCode;
+
+
 
 
 /*$$$$$\                      $$\                 $$$$$$\           $$\   $$\
@@ -111,6 +123,8 @@ declare global {interface Window {
 
     /** A special class used to track components across multiple module scripts */
     bcd_ComponentTracker: bcd_ComponentTracker;
+
+    copyCode(elem: HTMLElement): void;
 }}
 
 enum strs {
@@ -176,7 +190,6 @@ export interface trackableConstructor<TConstructor> extends Function {
     asString: string,
     new(...args: never[]): TConstructor,
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string|number|symbol]: any
 }
 

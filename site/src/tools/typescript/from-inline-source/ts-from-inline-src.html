@@ -1,0 +1,26 @@
+---
+layout: page
+title: Tools - Typescript From Inline Sources
+extra_head: >
+    <script async type="module" src="ts-from-inline-src.js" onload="window.bcd_init_functions.tsFromInline()"></script>
+bottom_pad: 224px
+hljs_styles: true
+description: >
+    A quick tool to quickly extract TypeScript source code that was emitted into a JavaScript file using the `inlineSources` compile option.
+permalink: /tools/typescript/from-inline-source/
+---
+
+
+<h1>Typescript From Inline Sources</h1>
+<p>When using the <code>inlineSources</code> compiler option, TypeScript will emit the source code of the file into the JavaScript file as a data URI. This tool will extract the source code from the data URI and display for you, allowing you to easily use it for other things.</p>
+
+<textarea placeholder="Data URI or JSON" style="width:100%;height:256px" class="code" oninput="window.fromInline.ui.dataUpdated(event)"></textarea>
+
+<div id="prefab-output" class="hidden" aria-hidden="true">
+    <h3>Example/File.ts</h3>
+
+    <pre><button onclick="window.copyCode(this);requestAnimationFrame(this.blur.bind(this));" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect" style='width:32px;min-width:32px;height:32px;'><i class="material-icons" style="font-size:75%;font-variation-settings:'FILL' 0,">content_copy</i></button><code class="language-typescript"><span class="hljs-section">ERROR: This text should not EVER show!</code></pre>
+</div>
+
+<h2>Output</h2>
+<div id="output-area" style="font-size:12px;transition-duration:100ms;"></div>

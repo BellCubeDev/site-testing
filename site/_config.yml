@@ -11,12 +11,11 @@ repourl: https://github.com/BellCubeDev/site-testing
 fullurl: https://bellcubedev.github.io/site-testing
 mainurl: https://bellcubedev.github.io
 
-
 # ============================
 # SEO
 # ============================
 title: BellCubeDev.GitHub.IO
-tagline: The open-source site for BellCube
+tagline: The open-source site for BellCube and the home of a decent hobbyist programmer
 author:
   name: BellCube
   picture: /site-testing/assets/site/images/icon.png
@@ -24,13 +23,10 @@ author:
 logo: /site-testing/assets/site/images/icon.png
 defaults:
   - scope:
-      path: "sitemap.xml"
+      path: "assets/site/images/SVGs"
     values:
       layout: compress_html
-  - scope:
-      path: "assets/site/misc/Info.xsd"
-    values:
-      layout: compress_html
+
 social:
   name: BellCube's Site
 description: >
@@ -52,7 +48,7 @@ source      : .
 
 # Handling Reading
 safe               : true
-markdown_ext       : "md"
+markdown_ext       : "mkd" # Stops Jekyll from processing .md so I can stop worrying about it
 strict_front_matter: true
 
 # Filtering Content
@@ -62,7 +58,7 @@ show_drafts: false
 whitelist:
   - jekyll-redirect-from
   - jekyll-brotli
-  # Default Plugins (loaded by GitHub)
+  # Default Plugins from GitHub Pages
   - jekyll-seo-tag
   - jekyll-coffeescript
   - jekyll-commonmark-ghpages
@@ -70,7 +66,6 @@ whitelist:
   - jekyll-github-metadata
   - jekyll-paginate
   - jekyll-relative-links
-  - jekyll-optional-front-matter
   - jekyll-readme-index
   - jekyll-default-layout
   - jekyll-titles-from-headings
@@ -78,7 +73,7 @@ whitelist:
 plugins:
   - jekyll-redirect-from
   - jekyll-brotli
-# Default Plugins (loaded by GitHub)
+  # Default Plugins from GitHub Pages
   - jekyll-seo-tag
   - jekyll-coffeescript
   - jekyll-commonmark-ghpages
@@ -86,7 +81,6 @@ plugins:
   - jekyll-github-metadata
   - jekyll-paginate
   - jekyll-relative-links
-  - jekyll-optional-front-matter
   - jekyll-readme-index
   - jekyll-default-layout
   - jekyll-titles-from-headings

@@ -3,9 +3,18 @@ layout: compress_html
 ---
 <?xml version="1.0" encoding="UTF-8"?><?xml-model href="https://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" type="application/xml" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>{{ site.fullurl }}/</loc>
-    <lastmod>{{ site.time | date_to_xmlschema }}</lastmod>
-    <priority>1</priority>
-  </url>
+  {% for page in site.html_pages %}
+    {% if page.sitemap != false and page.layout != 'compress_html' %}
+      <url>
+        <loc>{{ site.fullurl }}{{ page.url }}</loc>
+        <lastmod>{{ page.lastMod | date_to_xmlschema }}</lastmod>
+        {% if page.layout == 'docs' %}
+          <priority>{{ page.sm_priority | default: 1 }}</priority>
+        {% else %}
+          <priority>{{ page.sm_priority | default: 0.5 }}</priority>
+        {% endif %}
+      </url>
+    {% endif %}
+  {% endfor %}
+
 </urlset>

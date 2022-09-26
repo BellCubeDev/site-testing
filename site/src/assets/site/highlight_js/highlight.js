@@ -1,3 +1,4 @@
+/* eslint-disable import/first */
 /*!
   Highlight.js v11.5.1 (git: b8f233c8e2)
   (c) 2006-2022 Ivan Sagalaev and other contributors
@@ -2557,6 +2558,3 @@ export const hljs = (function () {
     return HLJS({});
 
 })();window.hljs = hljs; // Lets us access it in the console, for instance
-// eslint-disable-next-line import/first
-import {markdown} from './languages/markdown.min.js';
-hljs.registerLanguage('markdown', markdown);

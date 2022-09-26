@@ -1,0 +1,5 @@
+---
+layout: null
+sitemap: false
+---
+{"baseurl": {{ site.fullurl | jsonify }},"pages": {{ site.pages | jsonify }}}

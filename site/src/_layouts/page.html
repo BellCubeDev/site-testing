@@ -5,7 +5,7 @@ layout: compress_html
 <html lang="en">
 <head><meta charset='utf-8' /><meta name="charset" content="utf-8" /><meta name="google-site-verification" content="SfqBHB4cgh561S6fUtT2ENp0mLbrVrIb9kEb9bK922o" />
 
-    <title>BellCube: {{ page.title }}</title>
+    <title>BellCube: {{ page.title }} | BellCubeDev.GitHub.IO - The Home of A Decent Hobbyist Programmer</title>
     <meta property="og:title" content="{{ page.title }}">
 
 
@@ -45,7 +45,8 @@ layout: compress_html
     <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/mdl/css/material-blue.scss %}">
     <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/css/site.scss %}">
     <style>
-        /* https://fonts.googleapis.com/icon?family=Material+Icons */
+            .mdl-layout__content {padding-bottom: {{ page.bottom_pad | default: '128px' }};}
+       /* https://fonts.googleapis.com/icon?family=Material+Icons */
 
             /* fallback */
             @font-face {
@@ -654,6 +655,10 @@ layout: compress_html
                             <i class="material-icons">code</i>
                             <span>Auto Papyrus Docs</span>
                         </a>
+                        <a class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}{% link tools/typescript/from-inline-source/ts-from-inline-src.html %}">
+                            <i class="material-icons">compress</i>
+                            <span>TS&&nbsp; &lt;--&nbsp; Inline Source</span>
+                        </a>
                     </div>
 
                     <!-- Currently testing to see which of these two is broken OR if nesting is perfectly balanced with no exploits-->
@@ -682,7 +687,7 @@ layout: compress_html
                     </a>
                     <a class="mdl-navigation__link mdl-navigation__link--icon" target="_blank" rel="external noopener"
                         href="https://github.com/BellCubeDev">
-                        <img alt="" style="padding-left:0;max-width: 24px;" src="{{ site.baseurl }}{% link assets/site/images/third-party-icons/GitHub.svg %}">
+                        <img alt="" style="padding-left:0;max-width: 24px;" src="{{ site.baseurl }}{% link assets/site/images/SVGs/GitHub.svg %}">
                         <span>GitHub Page</span>
                     </a>
                 </div>
@@ -691,7 +696,7 @@ layout: compress_html
         <header class="mdl-layout__header">
             <div class="mdl-layout__header-row">
                 <span class="mdl-layout-title">
-                    {% if page.formattedTitle == nil %}{{ page.title }}{% else %}{{ page.formattedTitle }}{% endif %}
+                    {% if page.formatted_title == nil %}{{ page.title }}{% else %}{{ page.formatted_title }}{% endif %}
                 </span>
             </div>
         </header>
