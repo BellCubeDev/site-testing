@@ -106,11 +106,11 @@ function minifyFile(filePath) {
     if (minified.error?.name?.length > 2) throw new Error(`Minifying file "${filePath}" threw an error:\n${minified.error.name}\n${minified.error.message}\n${minified.error.stack}`);
 
     fs.writeFileSync(filePath, minified.code);
-    
+
     if (hasTS) fs.writeFileSync(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${hasTS ? urlFilePath.replace(/\.js$/, '.ts') : urlFilePath}"]`));
     else {
-        const newOriginalPath = filePath.replace(/\.js$/, '.original.js');
-        fs.writeFileSync(newOriginalPath, fileContents);
-        fs.writeFileSync(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${newOriginalPath}"]`));
+        const newOriginalFileURL = urlFilePath.replace(/\.js$/, '.original.js');
+        fs.writeFileSync(newOriginalFileURL, fileContents);
+        fs.writeFileSync(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${newOriginalFileURL}"]`));
     }
 }
