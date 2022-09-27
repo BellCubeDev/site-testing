@@ -40,11 +40,6 @@ if not "%~2" == "testing" (
     ECHO.
     ECHO [36mInstalling minifiers...[0m
     ECHO.
-    call npm install minify-all-js -g
-    if not errorlevel 0 (
-        ECHO  [101mInstalling the Miniy All JavaScript package failed.[0m
-        exit /b 1
-    )
 
     call npm install html-minifier-terser -g
     if not errorlevel 0 (
@@ -73,7 +68,13 @@ if "%~1" == "serve" (
     call npm install -g typescript tsc-watch
     start "TypeScript Compiler" /min "%~dp0\watch.bat"
 ) else (
-    call npx tsc --build --verbose tsconfig.json && exit
+    call npx tsc --build --verbose tsconfig.json
+    ECHO.
+    ECHO.
+    ECHO [36mMinifying JavaScript files...[0m
+    ECHO.
+    set "minifyDir=..\_generated\ts_out\"
+    call node "%~dp0\..\site\minify.mjs"
 )
 if not errorlevel 0 (
     ECHO  [101mTypeScript compilation failed ^(for reasons other than compile errors!^).[0m
@@ -81,14 +82,6 @@ if not errorlevel 0 (
 )
 
 timeout /t 5
-
-if not "%~2" == "testing" and not "%~1" == "serve" (
-    ECHO.
-    ECHO.
-    ECHO [36mMinifying JavaScript files...[0m
-    ECHO.
-    call npx minify-all-js ..\_generated\ts_out\ -j
-)
 
 if not "%~3" == "" (
     start %~3

@@ -25,7 +25,7 @@ BellCubeDev.GitHub.IO is a collection of ambitious projects under one ambitious 
   * [`eslint-plugin-github`](https://www.npmjs.com/package/eslint-plugin-github) - [MIT License](https://github.com/github/eslint-plugin-github/blob/main/LICENSE)
   * [`@mysticatea/eslint-plugin`](https://www.npmjs.com/package/@mysticatea/eslint-plugin) - [MIT License](https://github.com/mysticatea/eslint-plugin/blob/master/LICENSE)
   * [`@typescript-eslint`](https://www.npmjs.com/org/typescript-eslint)
-* [`@types`](https://www.npmjs.com/~types)
+* The DefinitelyTyped Project ([`@types`](https://www.npmjs.com/~types)) - [MIT License, held by individual contributors](https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/LICENSE)
 
 ## Review, Suggestions, and Feedback
 

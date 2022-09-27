@@ -586,6 +586,7 @@ export class FOMOD extends XMLElement {
 
     constructor(
         instanceElement?: Element,
+        infoInstanceElement?: Element,
         meta_name: string = "",
         meta_image: string = "",
         meta_author: string = "",

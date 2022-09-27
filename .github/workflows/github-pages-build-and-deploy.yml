@@ -78,8 +78,12 @@ jobs:
 
       - name: Minify JavaScript and JSON
         # Output dir: [in-place] $GITHUB_WORKSPACE/_generated/ts_out/
+        env:
+          minifyDir: $GITHUB_WORKSPACE/_generated/ts_out/
+
         run: |
-          minify-all-js $GITHUB_WORKSPACE/_generated/ts_out/ -j
+          cs $GITHUB_WORKSPACE/site
+          node minify.cjs
 
 
 

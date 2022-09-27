@@ -48,7 +48,7 @@ redirect_from:
     </div>
 </dialog>
 
-<div role="tablist" class="tabs-list-container"> <!-- Holds the Tab buttons, which are filled in by JavaScript magic -->
+<div role="tablist" do-tab-anchor class="tabs-list-container"> <!-- Holds the Tab buttons, which are filled in by JavaScript magic -->
     <button role="tab" class="js-tab-list-button mdl-button mdl-js-ripple-effect" name="Management"></button>
     <button role="tab" class="js-tab-list-button mdl-button mdl-js-ripple-effect" name="Metadata"></button>
     <button role="tab" class="js-tab-list-button mdl-button mdl-js-ripple-effect" name="Steps"></button>
@@ -59,13 +59,13 @@ redirect_from:
 
     <div role="tabpanel" class="tab-content" name="Management">
         <div id="manage-fomod-container">
-            <button onload="console.log(this);"
+            <button onclick="window.FOMODBuilder.ui.openFolder()"
                 type="button"
                 class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-openDir">
 
                 Select FOMOD Directory
             </button>
-                <div class="mdl-tooltip" for="fomod_FolderPicker" onclick="window.FOMODBuilder.UI.openFolder()"><p>
+                <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
                     This is the folder that you will put into an archive to be installed by users. If it is not set up for a FOMOD just yet, no worries!
                 </p></div>
 
@@ -86,7 +86,7 @@ redirect_from:
 
                 Clean Save
             </button>
-                    <div class="mdl-tooltip" for="fomod_saveButtonNUKE"><p>
+                    <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
                         Will nuke your current file and generate a new one from scratch. This can be dangerous if you've manually commented on the file, however it also ensures that the FOMOD is schema-compliant&mdash;which can fix most instances of Vortex rejecting the installer due to non-compliance.
                     </p></div>
 
@@ -98,7 +98,7 @@ redirect_from:
 
                 Attempt FOMOD Repair
             </button>
-                    <div class="mdl-tooltip" for="fomod_saveButtonNUKE"><p>
+                    <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
                         Will attempt to repair a FOMOD that is not schema-compliant. Will try to fix typos in the XML and remove elements that do not appear to be typos.
 
                         THIS IS DANGEROUS! MAKE A BACKUP AND USE AT YOUR OWN RISK!

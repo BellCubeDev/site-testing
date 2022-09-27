@@ -512,7 +512,8 @@ section {
     }
 }
 
-.mdl-tooltip {
+.mdl-tooltip, .js-bcd-tooltip {
+    pointer-events: none;
 
     animation: pulseBackward 350ms cubic-bezier(0, 0, .2, 1) forwards;
 
@@ -526,7 +527,7 @@ section {
     font-size: small;
     line-height: 150%;
 
-    &.is-active {
+    &.is-active, &.active {
         animation-duration: 350ms;
     }
 
@@ -540,12 +541,12 @@ section {
         font-weight: bold;
     }
 
-    .mdl-tooltip h3 {
+    h3 {
         font-size: 20px;
         font-weight: bold;
     }
 
-    .mdl-tooltip h4 {
+    h4 {
         font-size: 16px;
     }
 }
@@ -836,6 +837,12 @@ section {
 
 @mixin customColoredButton($hue, $sat, $lum, $alpha: 1, $satShiftIntensity: 1, $lumShiftIntensity: 1, $doAltRipple: false) {
 
+    @if $doAltRipple {
+        .mdl-ripple {
+            background-color: #0008;
+        }
+    }
+
     // Normal State
     &, &:focus:not(:active) {
         background-color: hsla($hue, $sat, $lum, $alpha - 0.15);
@@ -870,12 +877,16 @@ section {
     }
 }
 
-#bcd-stepBTN-vortex, #bcd-stepBTN-vortex:focus:not(:active) {
-    @include customColoredButton(31, 67, 50, 1, 0.2, 0.3, true);
+#bcd-stepBTN-builder {
+    @include customColoredButton(209, 100, 50, 1, 0.2, 0.1, true);
+}
 
-    .mdl-ripple {
-        background-color: #0008;
-    }
+#bcd-stepBTN-vortex {
+    @include customColoredButton(31, 67, 50, 1, 0.1, 0.6, true);
+}
+
+#bcd-stepBTN-mo2 {
+    @include customColoredButton(199, 82, 61, 1, 0.1, 0.1, true);
 }
 
 .js-tab-list-button, .js-tab-list-button.mdl-button:focus:not(:active) {

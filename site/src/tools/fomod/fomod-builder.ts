@@ -1,10 +1,11 @@
+import * as bcdFS from '../../filesystem-interface.js';
 import * as fomodUI from './fomod-builder-ui.js';
 import * as fomodClasses from  './fomod-builder-classifications.js';
 import * as bcdUniversal from '../../universal.js';
 
 declare global {interface Window {
     FOMODBuilder: {
-        UI: {
+        ui: {
             openFolder: () => void;
             save: () => void;
             cleanSave: () => void;
@@ -35,8 +36,8 @@ const storageItem = localStorage.getItem(`BellCubeDev_FOMOD_BUILDER_DATA`);
 
 window.FOMODBuilder = {
 
-    UI: {
-        openFolder: () => {},
+    ui: {
+        openFolder: openFolder_entry,
         save: () => {},
         cleanSave: () => {},
         attemptRepair: () => {}
@@ -101,6 +102,10 @@ window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
     }
 };
 
-if (window.FOMODBuilder.UI) window.FOMODBuilder.UI.openFolder = function openFolder() {
-    return;
-};
+async function openFolder_entry() {
+    console.debug('Opening a folder!');
+    const picked = await bcdFS.getUserPickedFolder(true);
+    console.debug('Picked folder:', picked);
+    console.debug('Picked folder name:', picked?.handle.name);
+    console.debug('Picked folder perms?', await picked?.handle.queryPermission({mode: 'readwrite'}));
+}

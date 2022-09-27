@@ -24,6 +24,25 @@
                 "clear": true,
                 "close": false
             }
+        },
+        {
+            "label": "Build Site",
+            "type": "shell",
+            "command": ".vscode\\build.bat",
+            "problemMatcher": [
+                "$tsc"
+            ],
+            "group": "build",
+            "detail": "Builds the Jekyll site.",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": false,
+                "clear": true,
+                "close": false
+            }
         }
     ]
 }

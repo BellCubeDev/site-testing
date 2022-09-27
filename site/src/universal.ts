@@ -23,6 +23,7 @@ $$ |  $$ |  $$ |$$\ $$ |$$ |$$ |  $$ |$$\ $$ |$$   ____| \____$$\
 // ======== TYPE UTILITIES ========
 // ================================
 
+/** Convenience type to quickly create an indexed Object with the specified type */
 export type objOf<T> = {[key:string]: T};
 
 
@@ -47,6 +48,10 @@ export function trimWhitespace(str: string): string {
 // ======== ARRAY UTILITIES ========
 // =================================
 
+/** Sorts the items in one array to match those in another. Items not included in the reference array are placed at the end of the result.
+    @param arr Array of items to sort
+    @param refArr Array to pull the order from
+*/
 export function sortArr<TUnknown>(arr: TUnknown[], refArr: TUnknown[]) {
     arr.sort(function(a, b){
         return refArr.indexOf(a) - refArr.indexOf(b);
@@ -57,9 +62,13 @@ export function sortArr<TUnknown>(arr: TUnknown[], refArr: TUnknown[]) {
 // ======== NUMBER UTILITIES ========
 // ==================================
 
+/** Returns a random integer between min (inclusive) and max (inclusive) with precision up to the specified number of decimal places
+    @param min The minimum value that this function should return
+    @param max The maximum value that this function should return
+    @param places The number of decimal places the returned number should include
+*/
 export function randomNumber(min = 0, max = 1, places = 0):number{
     const placesMult = Math.pow(10, places);
-    //console.log(`10^${places} = ${placesMult}`);
     return (
         Math.round(
             (
@@ -74,6 +83,10 @@ export function randomNumber(min = 0, max = 1, places = 0):number{
 // ======== DOM UTILITIES ========
 // ===============================
 
+/** Forces an HTMLElement to be focusable by the user and then focuses it
+    @param element The element to focus
+    @param preventScrolling Whether or not to prevent the page from scrolling to the element. Defaults to true.
+*/
 export function focusAnyElement(element:HTMLElement|undefined, preventScrolling: boolean = true):void{
     if (!element || !element.focus) return;
 
@@ -127,6 +140,7 @@ declare global {interface Window {
     copyCode(elem: HTMLElement): void;
 }}
 
+/** Quick-and-dirty enum of strings used often throughout the code */
 enum strs {
     transitionDur = "transition-duration",
     animDur = "animation-duration",
@@ -146,12 +160,13 @@ if (window.location.search[0] === '?')
 
 
 
+/** Interface defining the readonly properties cssClass and asString to make identifying MDL Classes set up for my custom, painless registration functions a breeze */
 interface BCDComponent extends Function {
-    asString:string;
-    cssClass:string;
+    readonly asString:string;
+    readonly cssClass:string;
 }
 
-// Used to store components that we'll be registering on DOM initialization
+/** Variable to store components that we'll be registering on DOM initialization */
 const bcdComponents:BCDComponent[] = [];
 
 console.log("%cHello and welcome to the JavaScript console! This is where wizards do their magic!\nAs for me? I'm the wizard you don't want to anger.", "color: #2d6");
@@ -180,26 +195,25 @@ $$$$$$$$\                               $$\
 
 
 
-export interface componentTrackingItem {
-    obj:objOf<unknown>,
-    arr:unknown[]
+/** A single item listed in the Component Tracker */
+export interface componentTrackingItem<TConstructor> {
+    obj:objOf<TConstructor>,
+    arr:TConstructor[]
 }
 
 
-export interface trackableConstructor<TConstructor> extends Function {
-    asString: string,
-    new(...args: never[]): TConstructor,
-
-    [key: string|number|symbol]: any
+export interface trackableConstructor<TClass> extends Function {
+    asString: string;
+    new(...args:any[]):TClass;
 }
 
 /** Wrapped in a class to get around the complexities of exporting. */
 export class bcd_ComponentTracker {
-    static registered_components:objOf<componentTrackingItem> = {};
+    static registered_components:objOf<componentTrackingItem<unknown>> = {};
 
 
-    static registerComponent<TConstructor>(component:TConstructor, constructor: trackableConstructor<TConstructor>, element:HTMLElement):void{
-        bcd_ComponentTracker.createComponent(constructor);
+    static registerComponent<TClass>(component:TClass, constructor: trackableConstructor<TClass>, element:HTMLElement):void{
+        bcd_ComponentTracker.createTrackedComponent(constructor);
 
         if (element.id !== '')
             bcd_ComponentTracker.registered_components[constructor.asString].obj[element.id] = component;
@@ -207,17 +221,24 @@ export class bcd_ComponentTracker {
             bcd_ComponentTracker.registered_components[constructor.asString].arr.push(component);
     }
 
-    static createComponent<TConstructor>(constructor:trackableConstructor<TConstructor>){
+    static createTrackedComponent(constructor:trackableConstructor<any>){
         if (typeof bcd_ComponentTracker.registered_components[constructor.asString] === 'undefined')
             bcd_ComponentTracker.registered_components[constructor.asString] = {obj: {}, arr: []};
     }
 
+    static getTrackedConstructor<TConstructor>(constructor:trackableConstructor<TConstructor>):componentTrackingItem<TConstructor>{
+        bcd_ComponentTracker.createTrackedComponent(constructor);
+        return bcd_ComponentTracker.registered_components[constructor.asString] as componentTrackingItem<TConstructor>;
+    }
 
-    static findItem<TConstructor>(constructor: trackableConstructor<TConstructor>, element:HTMLElement, findPredicate: (arg0:TConstructor) => boolean): TConstructor|undefined {
+
+    static findItem<TConstructor>(constructor: trackableConstructor<TConstructor>, element:HTMLElement, findPredicate?: (arg0:TConstructor) => boolean): TConstructor|undefined {
         if (element.id)
             return bcd_ComponentTracker.registered_components[constructor.asString].obj[element.id] as TConstructor;
+        else if (findPredicate)
+            return bcd_ComponentTracker.getTrackedConstructor(constructor).arr.find(findPredicate);
         else
-            return (bcd_ComponentTracker.registered_components[constructor.asString].arr as TConstructor[]).find(findPredicate);
+            return undefined;
     }
 }
 window.bcd_ComponentTracker = bcd_ComponentTracker;
@@ -260,7 +281,6 @@ class bcd_collapsibleParent {
 
     /** Toggle the collapsible menu. */
     toggle(doSetDuration:boolean = true) {//this.debugCheck();
-        /*console.log('[BCD-DETAILS] toggle() called on ',this)*/
         if (this.isOpen()) { this.close(doSetDuration); } else { this.open(doSetDuration); }
     }
 
@@ -332,19 +352,13 @@ export class BellCubicDetails extends bcd_collapsibleParent {
         super(element);
         this.details = element;
 
-        /*console.log("[BCD-DETAILS] Registering  component: ", this)*/
-
-        //console.log("Registering element:", this.element_);
-
         // Create a container element to make animation go brrr
         // Slightly over-complicated because, uh, DOM didn't want to cooperate.
         this.details_inner = document.createElement('div');
         this.details_inner.classList.add(strs.classDetailsInner);
 
-        //console.log(this.details_inner);
-
         // The `children` HTMLCollection is live, so we're fetching each element and throwing it into an array...
-        var temp_childrenArr:ChildNode[] = [];
+        const temp_childrenArr:ChildNode[] = [];
         for (const node of this.details.childNodes){
             temp_childrenArr.push(node);
         }
@@ -355,20 +369,16 @@ export class BellCubicDetails extends bcd_collapsibleParent {
 
         this.details.appendChild(this.details_inner);
 
-
-        //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.details_inner)});
         if (this.adjacent) {
             const temp_summary = this.self.previousElementSibling;
-            if (!(temp_summary && temp_summary.classList.contains(BellCubicSummary.cssClass))) {console.log(strs.errItem, this); throw new TypeError("[BCD-DETAILS] Error: Adjacent Details element must be preceded by a Summary element.");}
+            if (!(temp_summary && temp_summary.classList.contains(BellCubicSummary.cssClass))) /* Throw an error*/ {console.log(strs.errItem, this); throw new TypeError("[BCD-DETAILS] Error: Adjacent Details element must be preceded by a Summary element.");}
             this.summary = temp_summary as HTMLElement;
         } else {
             const temp_summary = this.self.ownerDocument.querySelector(`.js-bcd-summary[for="${this.details.id}"`);
-            if (!temp_summary) {console.log(strs.errItem, this); throw new TypeError("[BCD-DETAILS] Error: Non-adjacent Details elements must have a Summary element with a `for` attribute matching the Details element's id.");}
+            if (!temp_summary) /* Throw an error*/ {console.log(strs.errItem, this); throw new TypeError("[BCD-DETAILS] Error: Non-adjacent Details elements must have a Summary element with a `for` attribute matching the Details element's id.");}
             this.summary = temp_summary as HTMLElement;
         }
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
-        //console.log(this.element_, {parent: dumpCSSText(this.element_), child: dumpCSSText(this.details_inner)});
-
         new ResizeObserver(this.reEvalOnSizeChange.bind(this)).observe(this.details_inner);
 
         requestAnimationFrame(() => {
@@ -397,11 +407,11 @@ export class BellCubicSummary extends bcd_collapsibleParent {
 
         if (this.adjacent) {
             const temp_details = this.self.nextElementSibling;
-            if (!(temp_details && temp_details.classList.contains(BellCubicDetails.cssClass))) {console.log(strs.errItem, this); throw new TypeError("[BCD-SUMMARY] Error: Adjacent Summary element must be proceeded by a Details element.");}
+            if (!(temp_details && temp_details.classList.contains(BellCubicDetails.cssClass))) /* Throw an error*/ {console.log(strs.errItem, this); throw new TypeError("[BCD-SUMMARY] Error: Adjacent Summary element must be proceeded by a Details element.");}
             this.details = temp_details as HTMLElement;
         } else {
             const temp_details = this.self.ownerDocument.getElementById(this.summary.getAttribute('for') ?? '');
-            if (!temp_details) {console.log(strs.errItem, this); throw new TypeError("[BCD-SUMMARY] Error: Non-adjacent Details elements must have a summary element with a `for` attribute matching the Details element's id.");}
+            if (!temp_details) /* Throw an error*/ {console.log(strs.errItem, this); throw new TypeError("[BCD-SUMMARY] Error: Non-adjacent Details elements must have a summary element with a `for` attribute matching the Details element's id.");}
             this.details = temp_details as HTMLElement;
         }
 
@@ -442,6 +452,9 @@ export class BellCubicSummary extends bcd_collapsibleParent {
 }
 bcdComponents.push(BellCubicSummary);
 
+/** Simple MDL Class to handle making JSON pretty again
+    Takes the innerText of the element and parses it as JSON, then re-serializes it with 2 spaces per indent.
+*/
 export class bcd_prettyJSON {
     static readonly cssClass = 'js-bcd-prettyJSON';
     static readonly asString = 'bcd_prettyJSON';
@@ -451,7 +464,6 @@ export class bcd_prettyJSON {
 
         const raw_json = element.innerText;
         const json = JSON.parse(raw_json);
-        //console.log("Registered new Pretty JSON element:", element, json);
 
         this.element_.innerText = JSON.stringify(json, null, 2);
 
@@ -516,7 +528,7 @@ export class bcdModalDialog extends EventTarget {
 
     static evalQueue(delay: number = 100):void {
 
-        console.info("========================\nEvaluating modal queue...\n========================");
+        console.debug("========================\nEvaluating modal queue...\n========================");
 
         const willExit = {
             shownModal: this.shownModal,
@@ -525,23 +537,23 @@ export class bcdModalDialog extends EventTarget {
             shownModal_bool: !!this.modalsToShow.length,
             modalsToShow_lengthBool: !this.modalsToShow.length
         };
-        console.log('Will exit?', !!(this.shownModal || !this.modalsToShow.length), willExit);
+        console.debug('Will exit?', !!(this.shownModal || !this.modalsToShow.length), willExit);
 
         if (this.shownModal || !this.modalsToShow.length) return;
 
         const modal = bcdModalDialog.modalsToShow.shift(); if (!modal) return this.evalQueue();
         bcdModalDialog.shownModal = modal;
 
-        console.log("Showing modal:", modal);
+        console.debug("Showing modal:", modal);
 
         setTimeout(modal.show_forReal.bind(modal), delay);
     }
 
     show(){
         bcdModalDialog.modalsToShow.push(this);
-        console.log("[BCD-MODAL] Modals to show (after assignment):", bcdModalDialog.modalsToShow);
+        console.debug("[BCD-MODAL] Modals to show (after assignment):", bcdModalDialog.modalsToShow);
         bcdModalDialog.evalQueue();
-        console.log("[BCD-MODAL] Modals to show (after eval):", bcdModalDialog.modalsToShow);
+        console.debug("[BCD-MODAL] Modals to show (after eval):", bcdModalDialog.modalsToShow);
     }
 
     /** Event sent just before the modal is shown
@@ -558,18 +570,18 @@ export class bcdModalDialog extends EventTarget {
     static afterShowEvent = new CustomEvent('afterShow', {cancelable: false, bubbles: false, composed: false});
 
     private show_forReal() {
-        console.log("[BCD-MODAL] Showing modal:", this);
+        console.debug("[BCD-MODAL] Showing modal:", this);
         /* 'Before' Event */ if (!this.dispatchEvent(bcdModalDialog.beforeShowEvent) || !this.element_.dispatchEvent(bcdModalDialog.beforeShowEvent)) return;
 
         bcdModalDialog.obfuscator.classList.add(mdl.MaterialLayout.cssClasses.IS_DRAWER_OPEN);
         bcdModalDialog.obfuscator.addEventListener('click', this.boundHideFunction);
 
         this.element_.show();
-        console.log("[BCD-MODAL] Modal shown:", this);
+        console.debug("[BCD-MODAL] Modal shown:", this);
 
         /* 'After' Event */  if (this.dispatchEvent(bcdModalDialog.afterShowEvent)) this.element_.dispatchEvent(bcdModalDialog.afterShowEvent);
 
-        console.log("[BCD-MODAL] Modals to show (after show):", bcdModalDialog.modalsToShow);
+        console.debug("[BCD-MODAL] Modals to show (after show):", bcdModalDialog.modalsToShow);
     }
 
     /** Event sent just before the modal is hidden
@@ -589,7 +601,7 @@ export class bcdModalDialog extends EventTarget {
     boundHideFunction = this.hide.bind(this);
 
     hide(evt?: Event){
-        console.log("[BCD-MODAL] Hiding modal:", this);
+        console.debug("[BCD-MODAL] Hiding modal:", this);
         if (evt) evt.stopImmediatePropagation();
         /* 'Before' Event */ if (!this.dispatchEvent(bcdModalDialog.beforeHideEvent) ||!this.element_.dispatchEvent(bcdModalDialog.beforeHideEvent)) return;
 
@@ -673,7 +685,6 @@ export class bcdDropdown extends mdl.MaterialMenu {
 
     updateOptions() {
         const children: HTMLLIElement[] = [...(this.element_ as HTMLElement).getElementsByTagName('li') ];
-        //console.log('Updating options:', children);
 
         if (this.doReorder) {
             const goldenChild = children.find((elm) => (elm as HTMLLIElement).innerText === this.selectedOption);
@@ -728,9 +739,7 @@ export class bcdDropdown extends mdl.MaterialMenu {
     }
 
     makeNotSelected(option: HTMLLIElement) {
-        //console.debug('makeNotSelected - starting on:', option);
         option.classList.remove('mdl-menu__item--full-bleed-divider');
-        //console.debug('makeNotSelected: - finished on:', option);
     }
 }
 /*
@@ -800,6 +809,7 @@ export class bcdTabButton extends mdl.MaterialButton {
     element_: HTMLButtonElement;
     boundTab:HTMLDivElement;
     name:string = '';
+    setAnchor: boolean = false;
 
     constructor(element: HTMLButtonElement) {
         if (element.tagName !== 'BUTTON') throw new TypeError('A BellCubic Tab Button must be created directly from a <button> element.');
@@ -820,27 +830,30 @@ export class bcdTabButton extends mdl.MaterialButton {
         this.boundTab = boundTab;
         this.name = name;
 
+        this.setAnchor = element.parentElement?.hasAttribute('do-tab-anchor') ?? false;
 
         this.element_.addEventListener('click', this.onClick.bind(this));
         this.element_.addEventListener('keypress', this.onKeyPress.bind(this));
 
-        console.debug('Created tab button:', this);
-        console.debug('Is this tag pre-selected by the anchor?', window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase());
-        if (window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase())  requestAnimationFrame( (() => {this.makeSelected();}).bind(this) );
-        else this.makeSelected(0);
+        //console.debug('Created tab button:', this);
+        //console.debug('Is this tag pre-selected by the anchor?', window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase());
+        if (this.setAnchor && window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase())
+            requestAnimationFrame( (() => {this.makeSelected();}).bind(this) );
+        else
+            this.makeSelected(0);
     }
 
     /** @returns the index of this tab (0-based) or -1 if not found */
     findTabNumber(button_?: Element): number {
         const button = button_ ?? this.element_;
-        console.debug('findTabNumber: - button:', button, 'array:', [...(button.parentElement?.children ?? [])], 'index:', [...(button.parentElement?.children ?? [])].indexOf(button));
+        //console.debug('findTabNumber: - button:', button, 'array:', [...(button.parentElement?.children ?? [])], 'index:', [...(button.parentElement?.children ?? [])].indexOf(button));
         return [...(button.parentElement?.children ?? [])].indexOf(button);
     }
 
     makeSelected(tabNumber_?: number) {
         const tabNumber = tabNumber_ ?? this.findTabNumber();
         if (tabNumber === -1) throw new Error('Could not find the tab number.');
-        console.debug('makeSelected: tabNumber:', tabNumber);
+        //console.debug('makeSelected: tabNumber:', tabNumber);
 
         const siblingsAndSelf = [...(this.element_.parentElement?.children ?? [])];
         if (siblingsAndSelf[tabNumber].classList.contains('active')) return;
@@ -873,14 +886,18 @@ export class bcdTabButton extends mdl.MaterialButton {
             }
         }
 
-        bcdTabButton.anchorToSet = `#tab-${this.name}`.toLowerCase();
-        bcdTabButton.setAnchorIn3AnimFrames();
+        if (this.setAnchor) {
+            // Update the URL hash - if the tab is not the first tab, then add the tab name to the hash. Otherwise, remove the hash.
+            bcdTabButton.anchorToSet = tabNumber == 0 ? '' : `#tab-${this.name}`.toLowerCase();
+            bcdTabButton.setAnchorIn3AnimFrames();
+        }
     }
 
     /** Sets `window.location.hash` to the value of `bcdTabButton.anchorToSet` in three animation frames. */
     static setAnchorIn3AnimFrames() {
         requestAnimationFrame( () => { requestAnimationFrame( () => { requestAnimationFrame( () => {
-                    window.location.hash = bcdTabButton.anchorToSet;
+                    if (bcdTabButton.anchorToSet === '') window.history.replaceState(null, '', window.location.pathname);
+                    else window.location.hash = bcdTabButton.anchorToSet;
         });                          });                            });
     }
 
@@ -896,6 +913,160 @@ export class bcdTabButton extends mdl.MaterialButton {
     }
 }
 bcdComponents.push(bcdTabButton);
+
+
+
+
+/*$$$$$$*\                    $$\   $$\     $$\
+\__$$  __|                    $$ |  $$ |    \__|
+   $$ |    $$$$$$\   $$$$$$\  $$ |$$$$$$\   $$\  $$$$$$\   $$$$$$$\
+   $$ |   $$  __$$\ $$  __$$\ $$ |\_$$  _|  $$ |$$  __$$\ $$  _____|
+   $$ |   $$ /  $$ |$$ /  $$ |$$ |  $$ |    $$ |$$ /  $$ |\$$$$$$\
+   $$ |   $$ |  $$ |$$ |  $$ |$$ |  $$ |$$\ $$ |$$ |  $$ | \____$$\
+   $$ |   \$$$$$$  |\$$$$$$  |$$ |  \$$$$  |$$ |$$$$$$$  |$$$$$$$  |
+   \__|    \______/  \______/ \__|   \____/ \__|$$  ____/ \_______/
+                                                $$ |
+                                                $$ |
+                                                \_*/
+
+
+export class bcdTooltip {
+    static readonly asString = 'BCD - Tooltip';
+    static readonly cssClass = 'js-bcd-tooltip';
+
+    relation: 'preceding' | 'proceeding' | 'child' | 'selector';
+    position: 'top' | 'bottom' | 'left' | 'right' = 'top';
+
+    element: HTMLElement;
+    boundElement: HTMLElement;
+
+    constructor(element: HTMLElement) {
+        this.element = element;
+
+        const tempRelation = element.getAttribute('tooltip-relation') ?? 'proceeding';
+
+        let tempElement;
+
+        switch (tempRelation) {
+            case 'preceding': tempElement = element.nextElementSibling; break;
+            case 'proceeding': tempElement = element.previousElementSibling; break;
+            case 'child': tempElement = element.parentElement; break;
+
+            case 'selector': {
+                const selector = element.getAttribute('tooltip-selector') ?? '';
+                tempElement = element.parentElement?.querySelector(selector)
+                                         ?? document.querySelector(selector);
+            break; }
+
+            default: throw new Error('Invalid tooltip-relation attribute!');
+        }
+
+        this.relation = tempRelation;
+
+        if (!tempElement || !(tempElement instanceof HTMLElement) ) throw new Error('Could not find a valid HTML Element to bind to!');
+        this.boundElement = tempElement;
+
+        const tempPos = element.getAttribute('tooltip-position');
+
+        switch (tempPos) {
+            case 'top':  case 'bottom':  case 'left':  case 'right':
+                this.position = tempPos; break;
+
+            default: throw new Error('Invalid tooltip-position attribute!');
+        }
+
+        const boundEnter = this.handleHoverEnter.bind(this);
+        const boundLeave = this.handleHoverLeave.bind(this);
+        const boundTouch = this.handleTouch.bind(this);
+
+        this.boundElement.addEventListener('mouseenter', boundEnter);
+        this.boundElement.addEventListener('mouseleave', boundLeave);
+
+        window.addEventListener('contextmenu', boundLeave);
+
+        this.boundElement.addEventListener('touchstart', boundTouch);
+        this.boundElement.addEventListener('touchmove', boundTouch);
+        this.boundElement.addEventListener('touchend', boundTouch);
+        this.boundElement.addEventListener('touchcancel', boundTouch);
+    }
+
+    handleTouch(event: TouchEvent) {
+        if (event.targetTouches.length > 0) this.handleHoverEnter();
+        else this.handleHoverLeave();
+    }
+
+    handleHoverEnter(event?: MouseEvent|FocusEvent) {
+        this.setPosition();
+        this.element.classList.add('active');
+    }
+
+    handleHoverLeave(event?: MouseEvent|FocusEvent) {
+        this.element.classList.remove('active');
+    }
+
+    setPosition() {
+        console.log(`Setting position of tooltip to the ${this.position} of `, this.boundElement);
+
+        const elemRect = this.boundElement.getBoundingClientRect();
+
+        const top = elemRect.top  + (elemRect.height / 2);
+        const marginTop = this.element.offsetHeight / -2;
+
+        let left =  elemRect.left + (elemRect.width  / 2) - 256;
+        const marginLeft =   this.element.offsetWidth / -2;
+
+        console.log(`Left Position: ${left}, pushing? ${left < 16}; Right Position: ${left + this.element.offsetWidth}, pushing? ${left + this.element.offsetWidth > window.innerWidth - 16}`);
+
+        // Padding of 16px on the left and right of the document
+        left = Math.max(16,  Math.min(left, window.innerWidth - this.element.offsetWidth - 16)  );
+
+
+        switch (this.position) {
+            case 'top':
+            case 'bottom':
+                if (left + marginLeft < 0) {
+                    this.element.style.left = '0';
+                    this.element.style.marginLeft = '0';
+                } else {
+                    this.element.style.left = `${left}px`;
+                    this.element.style.marginLeft = `${marginLeft}px`;
+                }
+            break;
+
+            case 'left':
+            case 'right':
+                left = elemRect.width / 2;
+                if (top + marginTop < 0) {
+                    this.element.style.top = '0';
+                    this.element.style.marginTop = '0';
+
+                } else {
+                    this.element.style.top = `${top}px`;
+                    this.element.style.marginTop = `${marginTop}px`;
+                }
+            break;
+        }
+
+        console.log(`Final Left Position: ${left + marginLeft - (this.element.offsetWidth / 2)}`);
+
+        switch (this.position) {
+
+            case 'top':     this.element.style.top  = `${elemRect.top  - this.element.offsetHeight - 16}px`; break;
+
+            case 'bottom':   this.element.style.top  = `${elemRect.top  + elemRect.height + 16}px`; break;
+
+            case 'left':    this.element.style.left = `${elemRect.left - this.element.offsetWidth - 16}px`; break;
+
+            case 'right':  this.element.style.left = `${elemRect.left + elemRect.width + 16}px`;
+
+        }
+    }
+
+}
+bcdComponents.push(bcdTooltip);
+
+
+
 /*
 
 
@@ -1006,8 +1177,14 @@ $$ |  $$ |\$$$$$$$\ \$$$$$$$ |$$ |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |  \$$$
 
 
 
-export function registerBCDComponent(component:BCDComponent):void {
+/** Registers a single MDL component that has the static readonly properties `cssClass` and `asString` defined
+    @param component The BCDComponent to register
+    @throws nothing - this function gracefully handles errors in the form of `console.error` calls instead of throwing actual errors
+    @returns whether or not an error occurred with the error as the return value
+*/
+export function registerBCDComponent(component:BCDComponent):boolean|Error {
     try{
+
         mdl.componentHandler.register({
             constructor: component,
             classAsString: component.asString,
@@ -1015,21 +1192,27 @@ export function registerBCDComponent(component:BCDComponent):void {
             widget: false
         });
         mdl.componentHandler.upgradeElements(document.getElementsByClassName(component.cssClass));
+
     }catch(e:unknown){
         console.error("[BCD-Components] Error registering component", component.asString, "with class", component.cssClass, ":\n", e);
+        return e as Error;
+
     }
+
+    return false;
 }
 
 
-function registerComponents():void{
-    console.debug("[BCD-Components] Registering components...");
+/** Tell MDL about our shiny new components
+    @param components The components to register. Defaults to the global bcdComponents array if not specified.
+*/
+function registerComponents(components?:BCDComponent[]):void{
 
     // Tell mdl about our shiny new components
-
-    for (const component of bcdComponents) {
+    for (const component of components ?? bcdComponents) {
         registerBCDComponent(component);
     }
-    console.debug("[BCD-Components] Registered components:", bcdComponents);
+
 }
 /*
 
@@ -1071,15 +1254,10 @@ export function bcd_universalJS_init():void {
     if (!randomTextField) return;
 
     const toSetText = quotes.possibilities_conditionalized[randomNumber(0, quotes.possibilities_conditionalized.length - 1)];
-    /*console.log(`[BCD-RANDOM-TEXT] Text to set: ${JSON.stringify(toSetText)}`);*/
+
 
     // Check condition
-    if (quotes.checkCondition(toSetText[0])) {
-        randomTextField.innerHTML = toSetText[1];
-        /*console.log(`[BCD-RANDOM-TEXT] Condition passed. Using conditionalized text.`);*/
-    } else {
-        randomTextField.innerHTML = quotes.possibilities_Generic[randomNumber(0, quotes.possibilities_Generic.length - 1)];
-        /*console.log(`[BCD-RANDOM-TEXT] Condition failed. Using generic text.`);*/
-    }
+    if (quotes.checkCondition(toSetText[0])) randomTextField.innerHTML = toSetText[1];
+    else randomTextField.innerHTML = quotes.possibilities_Generic[randomNumber(0, quotes.possibilities_Generic.length - 1)];
 }
 window.bcd_init_functions.universal = bcd_universalJS_init;
