@@ -801,7 +801,8 @@ section {
 
     opacity: 0; &.active { opacity: 1; }
 
-    transition: inherit;
+    transition-duration: inherit;
+    transition-timing-function: inherit;
 }
 
 .mdl-layout__header-row {
