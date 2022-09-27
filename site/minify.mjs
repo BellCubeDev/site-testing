@@ -6,7 +6,7 @@ import * as fs from 'fs';
 
 const minifiedVarCache = {};
 
-const mapBase = process.env.sourceMapBase ?? 'https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/';
+const doInlineSources = process.env.doInlineSources.trim() === 'true';
 
 minifyJSInDir(process.env.minifyDir);
 
@@ -92,9 +92,9 @@ function minifyFile(filePath) {
         sourceMap: {
             filename: `${path.basename(filePath, '.js')}.ts`,
             content: "inline",
-            includeSources: false,
-            root: `${mapBase}`,
-            url: `${mapBase}${urlFilePath}.map`
+            includeSources: doInlineSources,
+            root: 'https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/',
+            url: doInlineSources ? 'inline' : `https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/${urlFilePath}.map`
         },
         module: true,
         toplevel: true,

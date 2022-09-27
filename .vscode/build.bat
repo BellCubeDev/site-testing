@@ -64,6 +64,8 @@ ECHO.
 ECHO.
 ECHO [36mCompiling TypeScript files...[0m
 ECHO.
+set "minifyDir=..\_generated\ts_out\"
+set "doInlineSources=true"
 if "%~1" == "serve" (
     call npm install -g typescript tsc-watch
     start "TypeScript Compiler" /min "%~dp0\watch.bat"
@@ -73,7 +75,6 @@ if "%~1" == "serve" (
     ECHO.
     ECHO [36mMinifying JavaScript files...[0m
     ECHO.
-    set "minifyDir=..\_generated\ts_out\"
     call node "%~dp0\..\site\minify.mjs"
 )
 if not errorlevel 0 (
