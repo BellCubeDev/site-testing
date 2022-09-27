@@ -23,9 +23,10 @@ function minifyJSInDir(dir) {
     }
 }
 
+/** @param {string} filePath */
 function minifyFile(filePath) {
     const file = fs.readFileSync(filePath, 'utf8');
-    const urlPath = filePath.replace(process.env.minifyDir, '').replaceAll('\\', '/');
+    const urlFilePath = filePath.replace(process.env.minifyDir, '').replace(/\\/g, '/');
 
     const minified = uglify.minify(file, {
         compress: {
@@ -87,8 +88,8 @@ function minifyFile(filePath) {
             filename: `${path.basename(filePath, '.js')}.ts`,
             content: "inline",
             includeSources: false,
-            root: `https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/${urlPath}/`,
-            url: `https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/${urlPath}.map`
+            root: `https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/`,
+            url: `https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/${urlFilePath}.map`
         },
         module: true,
         toplevel: true,
@@ -101,5 +102,5 @@ function minifyFile(filePath) {
     if (minified.error?.name?.length > 2) throw new Error(`Minifying file "${filePath}" threw an error:\n${minified.error.name}\n${minified.error.message}\n${minified.error.stack}`);
 
     fs.writeFileSync(filePath, minified.code);
-    fs.writeFileSync(`${filePath}.map`, minified.map);
+    fs.writeFileSync(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${urlFilePath}.ts"]`));
 }
