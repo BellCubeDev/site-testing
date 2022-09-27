@@ -6,7 +6,7 @@ import * as fs from 'fs';
 
 const minifiedVarCache = {};
 
-const mapBase = process.end.sourceMapBase ?? 'https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/';
+const mapBase = process.env.sourceMapBase ?? 'https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/';
 
 minifyJSInDir(process.env.minifyDir);
 
