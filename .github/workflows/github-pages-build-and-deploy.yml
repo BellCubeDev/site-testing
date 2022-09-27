@@ -82,7 +82,7 @@ jobs:
           minifyDir: $GITHUB_WORKSPACE/_generated/ts_out/
 
         run: |
-          cs $GITHUB_WORKSPACE/site
+          cd $GITHUB_WORKSPACE/site
           node minify.cjs
 
 
