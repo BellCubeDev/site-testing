@@ -83,7 +83,7 @@ jobs:
 
         run: |
           cd $GITHUB_WORKSPACE/site
-          node minify.cjs
+          node minify.mjs
 
 
 
