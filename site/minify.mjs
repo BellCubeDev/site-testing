@@ -27,6 +27,7 @@ function minifyJSInDir(dir) {
 
 /** @param {string} filePath */
 function minifyFile(filePath) {
+    if (filePath.endsWith('.min.js')) return;
     const fileContents = fs.readFileSync(filePath, 'utf8');
     const urlFilePath = filePath.replace(process.env.minifyDir, '').replace(/\\/g, '/');
 
