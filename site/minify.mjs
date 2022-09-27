@@ -27,12 +27,12 @@ function minifyJSInDir(dir) {
 
 /** @param {string} filePath */
 function minifyFile(filePath) {
-    const file = fs.readFileSync(filePath, 'utf8');
+    const fileContents = fs.readFileSync(filePath, 'utf8');
     const urlFilePath = filePath.replace(process.env.minifyDir, '').replace(/\\/g, '/');
 
-    const hasTS = file.includes('//# sourceMappingURL=');
+    const hasTS = fileContents.includes('//# sourceMappingURL=');
 
-    const minified = uglify.minify(file, {
+    const minified = uglify.minify(fileContents, {
         compress: {
             passes: 5,
 
@@ -106,5 +106,11 @@ function minifyFile(filePath) {
     if (minified.error?.name?.length > 2) throw new Error(`Minifying file "${filePath}" threw an error:\n${minified.error.name}\n${minified.error.message}\n${minified.error.stack}`);
 
     fs.writeFileSync(filePath, minified.code);
-    fs.writeFileSync(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${hasTS ? urlFilePath.replace(/\.js$/, '.ts') : urlFilePath}"]`));
+    
+    if (hasTS) fs.writeFileSync(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${hasTS ? urlFilePath.replace(/\.js$/, '.ts') : urlFilePath}"]`));
+    else {
+        const newOriginalPath = filePath.replace(/\.js$/, '.original.js');
+        fs.writeFileSync(newOriginalPath, fileContents);
+        fs.writeFileSync(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${newOriginalPath}"]`));
+    }
 }
