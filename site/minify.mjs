@@ -84,7 +84,7 @@ function minifyFile(filePath) {
         mangle: {
             eval: true,
             keep_fnames: false,
-            properties: true,
+            properties: false, // Yup, it broke my code 😊
             toplevel: true
         },
         output: {}, // Keep defaults
@@ -109,8 +109,7 @@ function minifyFile(filePath) {
 
     if (hasTS) fs.writeFileSync(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${hasTS ? urlFilePath.replace(/\.js$/, '.ts') : urlFilePath}"]`));
     else {
-        const newOriginalFileURL = urlFilePath.replace(/\.js$/, '.original.js');
-        fs.writeFileSync(newOriginalFileURL, fileContents);
-        fs.writeFileSync(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${newOriginalFileURL}"]`));
+        fs.writeFileSync(filePath.replace(/\.js$/, '.original.js'), fileContents);
+        fs.writeFileSync(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${urlFilePath.replace(/\.js$/, '.original.js')}"]`));
     }
 }
