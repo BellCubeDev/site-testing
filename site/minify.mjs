@@ -1,34 +1,42 @@
 import * as uglify from 'uglify-js';
 import * as path from 'path';
-import * as fs from 'fs';
+import * as afs from 'fs/promises';
 
 //console.log('environment:', JSON.stringify(process.env, undefined, 4));
 
+console.log('Minifying files...');
+
 const minifiedVarCache = {};
 
-const doInlineSources = process.env.doInlineSources.trim() === 'true';
+const doInlineSources = process.env.doInlineSources?.trim() === 'true';
 
 minifyJSInDir(process.env.minifyDir);
 
-/** @param {fs.Dirent[]} dir Directory to traverse */
-function minifyJSInDir(dir) {
-    const files = fs.readdirSync(dir);
+/** @param {string} dirPath Directory to traverse */
+async function minifyJSInDir(dirPath) {
+    const files = await afs.readdir(dirPath);
 
     for (let i = 0; i < files.length; i++) {
-
-        const filePath = path.join(dir, files[i]);
-        const stat = fs.lstatSync(filePath);
-
-        if (stat.isDirectory()) minifyJSInDir(filePath);
-        else if (filePath.endsWith('.js')) minifyFile(filePath);
-
+        evalFileOrDir(path.join(dirPath, files[i]));
     }
 }
 
-/** @param {string} filePath */
-function minifyFile(filePath) {
+/** Evaluates a single file or directory asynchronously
+    @param {string} filePath the path of the file or directory to evaluate
+*/
+async function evalFileOrDir(path) {
+    const stat = await afs.lstat(path);
+
+    if (stat.isDirectory()) minifyJSInDir(path);
+    else if (path.endsWith('.js')) minifyJSFile(path);
+}
+
+/** Minify a single JavaScript file asynchronously
+    @param {string} filePath
+*/
+async function minifyJSFile(filePath) {
     if (filePath.endsWith('.min.js')) return;
-    const fileContents = fs.readFileSync(filePath, 'utf8');
+    const fileContents = await afs.readFile(filePath, 'utf8');
     const urlFilePath = filePath.replace(process.env.minifyDir, '').replace(/\\/g, '/');
 
     const hasTS = fileContents.includes('//# sourceMappingURL=');
@@ -103,14 +111,19 @@ function minifyFile(filePath) {
         webkit: true
     });
 
-    if (minified.warnings) console.warn(`Minifying file "${filePath}" threw the warnings...\n${JSON.stringify(minified.warnings)}`);
+    if (minified.warnings) {
+        const filteredWarnings = minified.warnings.filter(msg => !msg.match(/inline source map not found/)).map(msg => msg.trim().replace(/^WARN:\s*/, ''));
+
+        if (filteredWarnings.length > 0)
+            console.warn(`\nMinifying file "${filePath}" threw the warnings...\n- ${filteredWarnings.join('\n- ')}`);
+    }
     if (minified.error?.name?.length > 2) throw new Error(`Minifying file "${filePath}" threw an error:\n${minified.error.name}\n${minified.error.message}\n${minified.error.stack}`);
 
-    fs.writeFileSync(filePath, minified.code);
+    afs.writeFile(filePath, minified.code);
 
-    if (hasTS) fs.writeFileSync(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${hasTS ? urlFilePath.replace(/\.js$/, '.ts') : urlFilePath}"]`));
+    if (hasTS) afs.writeFile(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${hasTS ? urlFilePath.replace(/\.js$/, '.ts') : urlFilePath}"]`));
     else {
-        fs.writeFileSync(filePath.replace(/\.js$/, '.original.js'), fileContents);
-        fs.writeFileSync(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${urlFilePath.replace(/\.js$/, '.original.js')}"]`));
+        afs.writeFile(filePath.replace(/\.js$/, '.original.js'), fileContents);
+        afs.writeFile(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${urlFilePath.replace(/\.js$/, '.original.js')}"]`));
     }
 }
