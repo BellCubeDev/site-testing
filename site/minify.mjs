@@ -6,11 +6,19 @@ import * as afs from 'fs/promises';
 
 console.log('Minifying files...');
 
-const minifiedVarCache = {};
+let minifiedVarCache = {};
+
+if (!process.env.minifyDir?.trim()) throw new Error('No minifyDir environment variable was provided');
 
 const doInlineSources = process.env.doInlineSources?.trim() === 'true';
 
-minifyJSInDir(process.env.minifyDir);
+// Code mostly taken from `minifyJSInDir()`
+const files = await afs.readdir(process.env.minifyDir);
+
+for (let i = 0; i < files.length; i++) {
+    evalFileOrDir(path.join(process.env.minifyDir, files[i]));
+}
+// End self-piracy
 
 /** @param {string} dirPath Directory to traverse */
 async function minifyJSInDir(dirPath) {
@@ -40,6 +48,8 @@ async function minifyJSFile(filePath) {
     const urlFilePath = filePath.replace(process.env.minifyDir, '').replace(/\\/g, '/');
 
     const hasTS = fileContents.includes('//# sourceMappingURL=');
+
+    const tempCache = {...minifiedVarCache};
 
     const minified = uglify.minify(fileContents, {
         compress: {
@@ -106,7 +116,7 @@ async function minifyJSFile(filePath) {
         },
         module: true,
         toplevel: true,
-        nameCache: minifiedVarCache,
+        nameCache: tempCache,
         warnings: true,
         webkit: true
     });
@@ -118,6 +128,8 @@ async function minifyJSFile(filePath) {
             console.warn(`\nMinifying file "${filePath}" threw the warnings...\n- ${filteredWarnings.join('\n- ')}`);
     }
     if (minified.error?.name?.length > 2) throw new Error(`Minifying file "${filePath}" threw an error:\n${minified.error.name}\n${minified.error.message}\n${minified.error.stack}`);
+
+    minifiedVarCache = {...minifiedVarCache, ...tempCache};
 
     afs.writeFile(filePath, minified.code);
 
