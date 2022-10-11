@@ -279,7 +279,8 @@ export const possibilities_Generic = [
     "I&rsquo;m calibrating this drone footage.",
     "I push buttons. I turn dials. I read numbers. Sometimes I make up little stories in my head about what the numbers mean.",
     "I am myself for tax purposes.", // HazakTheMad
-    "I mean the macaroni's soggy, the peas are mushed,<br />And the chicken tastes like wood",
+    "I mean the macaroni's soggy, the peas are mushed,<br />And the chicken tastes like wood", 
+    "Man, I just wanna make a boid simulation <i>smh</i>", // - Vuunyy
 ];
 
 
