@@ -281,6 +281,7 @@ export const possibilities_Generic = [
     "I am myself for tax purposes.", // HazakTheMad
     "I mean the macaroni's soggy, the peas are mushed,<br />And the chicken tastes like wood", 
     "Man, I just wanna make a boid simulation <i>smh</i>", // - Vuunyy
+    "I am at piece with my not-so-inner idiot.",
 ];
 
 
