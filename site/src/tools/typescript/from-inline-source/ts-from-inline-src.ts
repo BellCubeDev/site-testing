@@ -83,11 +83,11 @@ function parseFromJSON(obj: any) {
     const sources:outs = {};
 
     for (let i = 0; i < obj.sources.length; i++) {
-        const src = obj.sources[i];
-        const file = (obj.sourcesContent[i] as string).trim().replace(/\r\n?/g, '\n');
+        const file = obj.sources[i];
+        const contents = (obj.sourcesContent[i] as string).trim().replace(/[^\n\S]+(?:\r\n?|\n)/g, '\n') + '\n';
 
-        console.log('Source', i, {[`${src}`]: file});
-        sources[src] = file;
+        console.debug('Source', i, {[`${file}`]: contents});
+        sources[file] = contents;
     }
 
     setOutput(sources);
