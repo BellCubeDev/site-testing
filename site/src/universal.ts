@@ -1,3 +1,5 @@
+import { debug } from 'console';
+import { request } from 'http';
 import * as mdl from './assets/site/mdl/material.js';
 import * as quotes from './universal_quotes.js';
 
@@ -128,6 +130,15 @@ $$$$$$$  |\$$$$$$$ |$$$$$$$  |$$ |\$$$$$$$\       $$$$$$\ $$ |  $$ |$$ |  \$$$$ 
 
 
 declare global {interface Window {
+    /** Variables set by the page */
+    //bcdPageVars: Partial<{}>
+
+    /** Browser-Supported Click Event */
+    clickEvt: 'click'|'mousedown'
+
+    /** The MDL layout element */
+    layout: mdl.MaterialLayout
+
     /** A list of Query Parameters from the URI */
     queryParams: objOf<string>;
 
@@ -156,7 +167,7 @@ window.queryParams = {};
 if (window.location.search[0] === '?')
     window.location.search.substring(1).split('&')
                             .map(param => param.split('='))
-                            .forEach(param => window.queryParams[param[0].trim()] = param[1].trim());
+                            .forEach(param => window.queryParams[param[0]!.trim()] = param[1]?.trim() ?? '');
 
 
 
@@ -216,9 +227,9 @@ export class bcd_ComponentTracker {
         bcd_ComponentTracker.createTrackedComponent(constructor);
 
         if (element.id !== '')
-            bcd_ComponentTracker.registered_components[constructor.asString].obj[element.id] = component;
+            bcd_ComponentTracker.registered_components[constructor.asString]!.obj[element.id] = component;
         else
-            bcd_ComponentTracker.registered_components[constructor.asString].arr.push(component);
+            bcd_ComponentTracker.registered_components[constructor.asString]!.arr.push(component);
     }
 
     static createTrackedComponent(constructor:trackableConstructor<any>){
@@ -234,7 +245,7 @@ export class bcd_ComponentTracker {
 
     static findItem<TConstructor>(constructor: trackableConstructor<TConstructor>, element:HTMLElement, findPredicate?: (arg0:TConstructor) => boolean): TConstructor|undefined {
         if (element.id)
-            return bcd_ComponentTracker.registered_components[constructor.asString].obj[element.id] as TConstructor;
+            return bcd_ComponentTracker.registered_components[constructor.asString]!.obj[element.id] as TConstructor;
         else if (findPredicate)
             return bcd_ComponentTracker.getTrackedConstructor(constructor).arr.find(findPredicate);
         else
@@ -288,56 +299,89 @@ class bcd_collapsibleParent {
     reEval(doSetDuration?:false):void
     reEval(doSetDuration?:true, instant?:true):void
     reEval(doSetDuration:boolean = true, instant?:true):void {
-                requestAnimationFrame(() => {
-            if (this.isOpen()) { this.open(doSetDuration, instant); } else { this.close(doSetDuration, instant); }
-        });
+            requestAnimationFrame(() => {
+                if (this.isOpen()) this.open(doSetDuration, instant);
+                else this.close(doSetDuration, instant);
+
+                this.onTransitionEnd();
+            }
+        );
     }
 
     /** Open the collapsible menu. */
     open(doSetDuration:boolean = true, instant = false) {//this.debugCheck();
-        if (!instant) this.evaluateDuration(doSetDuration);
 
         if (instant) this.instantTransition();
-        this.details_inner.style.marginTop = `0`;
+        else if (doSetDuration) this.evaluateDuration(doSetDuration);
 
-        // Wrap `evaluateDuration` in two requestsAnimationFrames to allow the CSS to properly update
-        if (instant) requestAnimationFrame(() => {requestAnimationFrame(() => {this.evaluateDuration(doSetDuration);});});
+        this.details_inner.setAttribute('disabled', 'true');
+        this.details_inner.ariaHidden = 'false';
+        this.details_inner.style.visibility = 'none';
+
 
         this.details.classList.add(strs.classIsOpen);
         this.summary.classList.add(strs.classIsOpen);
+
+        requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=> {
+
+            this.details_inner.style.marginTop = '0';
+
+            if (instant) requestAnimationFrame(()=>requestAnimationFrame(()=>
+                this.evaluateDuration.bind(this, doSetDuration, true)
+            ));
+
+        }))));
     }
 
     /** Close the collapsible menu. */
     close(doSetDuration:boolean = true, instant = false) {//this.debugCheck();
-        if (doSetDuration) this.evaluateDuration(doSetDuration);
 
         if (instant) this.instantTransition();
-        this.details_inner.style.marginTop = `-${this.details_inner.offsetHeight * 1.04}px`;
+        else if (doSetDuration) this.evaluateDuration(doSetDuration, false);
 
-        // Wrap `evaluateDuration` in two requestsAnimationFrames to allow the CSS to properly update
-        if (instant) requestAnimationFrame(()=>{requestAnimationFrame(() => {this.evaluateDuration(true);});});
+        this.details_inner.style.marginTop = `-${this.details_inner.offsetHeight + 32}px`;
 
         this.details.classList.remove(strs.classIsOpen);
         this.summary.classList.remove(strs.classIsOpen);
+
+        if (instant) requestAnimationFrame(()=>requestAnimationFrame(() => {
+            this.evaluateDuration(doSetDuration, false);
+        }));
+    }
+
+    onTransitionEnd(event?:TransitionEvent):void {
+        if (event && event.propertyName !== 'margin-top') return;
+
+        if (this.isOpen()) {
+            this.details_inner.setAttribute('disabled', 'false');
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            this.details_inner.setAttribute('disabled', 'true');
+            this.details_inner.ariaHidden = 'true';
+            this.details_inner.style.visibility = 'none';
+        });
     }
 
     instantTransition():void {
         if (this.details_inner) {
             this.details_inner.style.transitionDuration = `0s`;
-            this.details_inner.style.animationDuration = `$0s`;
+            this.details_inner.style.animationDuration = `0s`;
             for (const icon of this.openIcons90deg) {
                 (icon as HTMLElement).style.animationDuration = `0s`;
             }
         }
+        this.onTransitionEnd();
     }
 
     /* Determines what the transition and animation duration of the collapsible menu is */
-    evaluateDuration(doRun:boolean = true) {//this.debugCheck();
+    evaluateDuration(doRun:boolean = true, opening:boolean=true) {//this.debugCheck();
         if (doRun && this.details_inner) {
-            this.details_inner.style.transitionDuration = `${200 + 1.25 * this.details_inner.offsetHeight * 1.04}ms`;
-            this.details_inner.style.animationDuration = `${215 + 1.25 * this.details_inner.offsetHeight * 1.04}ms`;
+            const contentHeight = this.details_inner.offsetHeight;
+            this.details_inner.style.transitionDuration = `${200 + (opening ? 1.1 : 1.4) * (contentHeight + 32)}ms`;
             for (const icon of this.openIcons90deg) {
-                (icon as HTMLElement).style.animationDuration = `${215 + 1.25 * this.details_inner.offsetHeight * 1.04}ms`;
+                (icon as HTMLElement).style.transitionDuration = `${ 215 + (0.9 * (contentHeight + 32)) }ms`;
             }
         }
     }
@@ -371,7 +415,7 @@ export class BellCubicDetails extends bcd_collapsibleParent {
 
         if (this.adjacent) {
             const temp_summary = this.self.previousElementSibling;
-            if (!(temp_summary && temp_summary.classList.contains(BellCubicSummary.cssClass))) /* Throw an error*/ {console.log(strs.errItem, this); throw new TypeError("[BCD-DETAILS] Error: Adjacent Details element must be preceded by a Summary element.");}
+            if (!temp_summary || !temp_summary.classList.contains(BellCubicSummary.cssClass)) /* Throw an error*/ {console.log(strs.errItem, this); throw new TypeError("[BCD-DETAILS] Error: Adjacent Details element must be preceded by a Summary element.");}
             this.summary = temp_summary as HTMLElement;
         } else {
             const temp_summary = this.self.ownerDocument.querySelector(`.js-bcd-summary[for="${this.details.id}"`);
@@ -381,11 +425,11 @@ export class BellCubicDetails extends bcd_collapsibleParent {
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
         new ResizeObserver(this.reEvalOnSizeChange.bind(this)).observe(this.details_inner);
 
-        requestAnimationFrame(() => {
-            bcd_ComponentTracker.registerComponent(this, BellCubicDetails, this.details);
-            this.reEval(true, true);
-            this.self.classList.add('initialized');
-        });
+        this.details_inner.addEventListener('transitionend', this.onTransitionEnd.bind(this));
+
+        bcd_ComponentTracker.registerComponent(this, BellCubicDetails, this.details);
+        this.reEval(true, true);
+        this.self.classList.add('initialized');
     }
 
     reEvalOnSizeChange(event: unknown) {
@@ -401,7 +445,7 @@ export class BellCubicSummary extends bcd_collapsibleParent {
     constructor(element:HTMLElement) {
         super(element);
         this.summary = element;
-        this.summary.addEventListener('click', this.handleClick.bind(this));
+        this.summary.addEventListener(window.clickEvt, this.handleClick.bind(this));
         this.summary.addEventListener('keypress', this.handleKey.bind(this));
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
 
@@ -504,13 +548,15 @@ export class bcdModalDialog extends EventTarget {
 
         this.element_ = element;
 
+        const body = document.documentElement.getElementsByTagName('body')[0] ?? document.body;
+
         // Move element to the root (so it shows above everything else)
-        document.documentElement.getElementsByTagName('body')[0].prepend(element);
+        body.prepend(element);
 
         if (!bcdModalDialog.obfuscator) {
             bcdModalDialog.obfuscator = document.createElement('div');
             bcdModalDialog.obfuscator.classList.add(mdl.MaterialLayout.cssClasses.OBFUSCATOR, 'js-bcd-modal-obfuscator');
-            document.documentElement.getElementsByTagName('body')[0].appendChild(bcdModalDialog.obfuscator);
+            body.appendChild(bcdModalDialog.obfuscator);
         }
 
         this.closeByClickOutside = !this.element_.hasAttribute('no-click-outside');
@@ -519,7 +565,7 @@ export class bcdModalDialog extends EventTarget {
 
             const closeButtons = this.element_.getElementsByClassName('js-bcd-modal-close');
             for (const button of closeButtons) {
-                button.addEventListener('click', this.boundHideFunction);
+                button.addEventListener(window.clickEvt, this.boundHideFunction);
             }
 
             if (this.element_.hasAttribute('open-by-default')) this.show();
@@ -574,7 +620,7 @@ export class bcdModalDialog extends EventTarget {
         /* 'Before' Event */ if (!this.dispatchEvent(bcdModalDialog.beforeShowEvent) || !this.element_.dispatchEvent(bcdModalDialog.beforeShowEvent)) return;
 
         bcdModalDialog.obfuscator.classList.add(mdl.MaterialLayout.cssClasses.IS_DRAWER_OPEN);
-        bcdModalDialog.obfuscator.addEventListener('click', this.boundHideFunction);
+        bcdModalDialog.obfuscator.addEventListener(window.clickEvt, this.boundHideFunction);
 
         this.element_.show();
         console.debug("[BCD-MODAL] Modal shown:", this);
@@ -608,7 +654,7 @@ export class bcdModalDialog extends EventTarget {
         this.element_.close();
 
         bcdModalDialog.obfuscator.classList.remove(mdl.MaterialLayout.cssClasses.IS_DRAWER_OPEN);
-        bcdModalDialog.obfuscator.removeEventListener('click', this.boundHideFunction);
+        bcdModalDialog.obfuscator.removeEventListener(window.clickEvt, this.boundHideFunction);
 
         bcdModalDialog.shownModal = null;
 
@@ -657,7 +703,7 @@ export class bcdDropdown extends mdl.MaterialMenu {
     unselectedOptions: string[] = [];
     selectedOption: string = '';
 
-    element_: HTMLElement;
+    override element_: HTMLElement;
 
     selectionElements: undefined | HTMLCollectionOf<HTMLElement>;
 
@@ -672,7 +718,7 @@ export class bcdDropdown extends mdl.MaterialMenu {
         this.options_keys = Object.keys(this.options_);
 
         this.unselectedOptions = this.doReorder ? this.options_keys.slice(1) : this.options_keys;
-        this.selectedOption = this.options_keys[0];
+        this.selectedOption = this.options_keys[0] ?? '';
 
         for (const option of this.options_keys) {
             this.element_.appendChild(this.createOption(option));
@@ -717,13 +763,13 @@ export class bcdDropdown extends mdl.MaterialMenu {
             this.options_[option] = temp_clickCallback;
         }
 
-        li.addEventListener('click', temp_clickCallback?.bind(this));
+        li.addEventListener(window.clickEvt, temp_clickCallback?.bind(this));
 
         this.onCreateOption(option);
         return li;
     }
 
-    onItemSelected(option: HTMLLIElement) {
+    override onItemSelected(option: HTMLLIElement) {
         this.selectedOption = option.innerText;
         this.updateOptions();
     }
@@ -776,7 +822,7 @@ export class bcdDropdown_AwesomeButton extends bcdDropdown {
         super(element, false);
     }
 
-    options(): objOf<Function|null> {
+    override options(): objOf<Function|null> {
         return {
             'View Debug Page': () => {document.getElementById('debug-link')?.click();}
         };
@@ -806,7 +852,7 @@ export class bcdTabButton extends mdl.MaterialButton {
 
     static anchorToSet = '';
 
-    element_: HTMLButtonElement;
+    override element_: HTMLButtonElement;
     boundTab:HTMLDivElement;
     name:string = '';
     setAnchor: boolean = false;
@@ -832,7 +878,7 @@ export class bcdTabButton extends mdl.MaterialButton {
 
         this.setAnchor = element.parentElement?.hasAttribute('do-tab-anchor') ?? false;
 
-        this.element_.addEventListener('click', this.onClick.bind(this));
+        this.element_.addEventListener(window.clickEvt, this.onClick.bind(this));
         this.element_.addEventListener('keypress', this.onKeyPress.bind(this));
 
         //console.debug('Created tab button:', this);
@@ -856,7 +902,7 @@ export class bcdTabButton extends mdl.MaterialButton {
         //console.debug('makeSelected: tabNumber:', tabNumber);
 
         const siblingsAndSelf = [...(this.element_.parentElement?.children ?? [])];
-        if (siblingsAndSelf[tabNumber].classList.contains('active')) return;
+        if (!siblingsAndSelf[tabNumber] || siblingsAndSelf[tabNumber]!.classList.contains('active')) return;
 
         for (const sibling of siblingsAndSelf) {
             if (sibling === this.element_) {
@@ -1110,7 +1156,7 @@ export class bcdDynamicTextAreaHeight extends bcdDynamicTextArea_base {
         super(element);
     }
 
-    adjust() {
+    override adjust() {
         this.element.style.height = '';
         getComputedStyle(this.element).height; // Force the browser to recalculate the scroll height
 
@@ -1133,7 +1179,7 @@ export class bcdDynamicTextAreaWidth extends bcdDynamicTextArea_base {
         super(element);
     }
 
-    adjust() {
+    override adjust() {
         this.element.style.width = '';
         getComputedStyle(this.element).width; // Force the browser to recalculate the scroll height
 
@@ -1246,6 +1292,12 @@ export function bcd_universalJS_init():void {
     // Register all the things!
     registerComponents();
 
+    // Modify links not in the main nav to not send a referrer (allows us to check if the drawer should be initially open or not)
+    for (const link of [...document.links]){
+        if (window.layout.drawer_?.contains(link)) continue;
+        link.rel += " noreferrer";
+    }
+
     // =============================================================
     // Random text time!
     // =============================================================
@@ -1257,7 +1309,7 @@ export function bcd_universalJS_init():void {
 
 
     // Check condition
-    if (quotes.checkCondition(toSetText[0])) randomTextField.innerHTML = toSetText[1];
-    else randomTextField.innerHTML = quotes.possibilities_Generic[randomNumber(0, quotes.possibilities_Generic.length - 1)];
+    if (quotes.checkCondition(toSetText![0])) randomTextField.innerHTML = toSetText![1];
+    else randomTextField.innerHTML = quotes.possibilities_Generic[randomNumber(0, quotes.possibilities_Generic.length - 1)]!;
 }
 window.bcd_init_functions.universal = bcd_universalJS_init;

@@ -71,7 +71,7 @@ export class flag {
 
 export function setNewFlagValue(name: string, value: string): flag {
     if (!flags[name]) flags[name] = new flag(name, value);
-    return flags[name];
+    return flags[name]!;
 }
 
 export class dependency extends XMLElement {
@@ -111,7 +111,7 @@ export class dependency_group extends dependency {
     }
 
     // <moduleDependencies operator="And">
-    asModuleXML(document: XMLDocument, nodeName = "dependencies"): Element {
+    override asModuleXML(document: XMLDocument, nodeName = "dependencies"): Element {
         if (!this.instanceElement)
             this.instanceElement = document.createElement(nodeName);
 
@@ -139,7 +139,7 @@ export class dependency_flag extends dependency {
     set value(value: string) { this.updateObjects(); this._value = value; } get value(): string { return this._value; }
 
     // <flagDependency flag="" value="" />
-    asModuleXML(document: XMLDocument): Element {
+    override asModuleXML(document: XMLDocument): Element {
         const thisElement = document.createElement("flagDependency");
         thisElement.setAttribute("flag", this.flag);
         thisElement.setAttribute("value", this.value);
@@ -154,7 +154,7 @@ export class dependency_file extends dependency {
     set state(value: dependency_file_state) { this.updateObjects(); this._state = value; } get state(): dependency_file_state { return this._state; }
 
     // <fileDependency file="2" state="Active" />
-    asModuleXML(document: XMLDocument): Element {
+    override asModuleXML(document: XMLDocument): Element {
         const thisElement = document.createElement("fileDependency");
         thisElement.setAttribute("file", this.file);
         thisElement.setAttribute("state", this.state);
@@ -167,7 +167,7 @@ export class dependency_versionCheck extends dependency {
 }
 export class dependency_FOSE extends dependency_versionCheck {
     // <foseDependency version="" />
-    asModuleXML(document: XMLDocument): Element {
+    override asModuleXML(document: XMLDocument): Element {
         const thisElement = document.createElement("foseDependency");
         thisElement.setAttribute("version", this.version);
         return thisElement;
@@ -175,7 +175,7 @@ export class dependency_FOSE extends dependency_versionCheck {
 }
 export class dependency_game extends dependency_versionCheck {
     // <gameDependency version="" />
-    asModuleXML(document: XMLDocument): Element {
+    override asModuleXML(document: XMLDocument): Element {
         const thisElement = document.createElement("gameDependency");
         thisElement.setAttribute("version", this.version);
         return thisElement;
@@ -183,7 +183,7 @@ export class dependency_game extends dependency_versionCheck {
 }
 export class dependency_modManager extends dependency_versionCheck {
     // <fommDependency version="1" />
-    asModuleXML(document: XMLDocument): Element {
+    override asModuleXML(document: XMLDocument): Element {
         const thisElement = document.createElement("fommDependency");
         thisElement.setAttribute("version", this.version);
         return thisElement;
@@ -247,7 +247,7 @@ export class PluginTypeDescriptor extends XMLElement {
         this.dependencies = dependencies;
     }
 
-    asModuleXML(document: XMLDocument): Element {
+    override asModuleXML(document: XMLDocument): Element {
         this.instanceElement =
             this.instanceElement ?? document.createElement("typeDescriptor");
 
@@ -307,7 +307,7 @@ export class PluginTypeDescriptor_dependency extends XMLElement {
         this.type = type;
     }
 
-    asModuleXML(document: XMLDocument): Element {
+    override asModuleXML(document: XMLDocument): Element {
         this.instanceElement =
             this.instanceElement ?? document.createElement("pattern");
 
@@ -473,7 +473,7 @@ export class option extends XMLElement {
         this.typeDescriptor = typeDescriptor;                       this.typeDescriptor.objectsToUpdate.push(this);
     }
 
-    asModuleXML(document: XMLDocument): Element {
+    override asModuleXML(document: XMLDocument): Element {
         this.instanceElement =
             this.instanceElement ?? document.createElement("option");
 
@@ -509,7 +509,7 @@ export class option_description extends XMLElement {
         this.description = description;
     }
 
-    asModuleXML(document: XMLDocument): Element {
+    override asModuleXML(document: XMLDocument): Element {
         this.instanceElement =
             this.instanceElement ?? document.createElement("description");
         this.instanceElement.textContent = this.description;
@@ -533,7 +533,7 @@ export class option_image extends XMLElement {
         else this.image = temp_img;
     }
 
-    asModuleXML(document: XMLDocument): Element {
+    override asModuleXML(document: XMLDocument): Element {
         this.instanceElement =
             this.instanceElement ?? document.createElement("image");
 
@@ -556,6 +556,7 @@ export class FOMOD extends XMLElement {
     meta_author;
     meta_version;
     meta_id: number;
+    infoInstanceElement: Element | undefined;
 
     meta_url:URL|string = ''; // Is actually set during the constructor, however TS is too static to understand that.
 
@@ -598,25 +599,26 @@ export class FOMOD extends XMLElement {
         conditions?: dependency_group
     ) {
         super(instanceElement);
-        this.meta_name = meta_name;
-        this.meta_image = meta_image;
-        this.meta_author = meta_author;
-        this.meta_version = meta_version;
-        this.meta_id = meta_id;
+        this.infoInstanceElement = infoInstanceElement;
+        this.meta_name = meta_name ?? instanceElement?.getAttribute("moduleName") ?? infoInstanceElement?.getElementsByTagName("Name")[0]?.textContent;
+        this.meta_image = meta_image ?? instanceElement;
+        this.meta_author = meta_author ?? instanceElement ?? infoInstanceElement?.getElementsByTagName("Author")[0]?.textContent;
+        this.meta_version = meta_version ?? instanceElement ?? infoInstanceElement?.getElementsByTagName("Version")[0]?.textContent;
+        this.meta_id = meta_id ?? instanceElement ?? infoInstanceElement?.getElementsByTagName("Id")[0]?.textContent;
         this.setURL(meta_url);
         this.installs = installs;
         this.conditions = conditions;
         this.steps = steps;
     }
 
-    asModuleXML(document: XMLDocument): Element {
+    override asModuleXML(document: XMLDocument): Element {
         this.instanceElement =
             this.instanceElement ?? document.createElement("fomod");
 
-        this.instanceElement.setAttribute("name", this.meta_name);
+        this.instanceElement.setAttribute("moduleName", this.meta_name);
         this.instanceElement.setAttribute("image", this.meta_image);
-        this.instanceElement.setAttribute("author", this.meta_author);
-        this.instanceElement.setAttribute("version", this.meta_version);
+        //this.instanceElement.setAttribute("author", this.meta_author);
+        //this.instanceElement.setAttribute("version", this.meta_version);
         this.instanceElement.setAttribute("id", this.meta_id.toString());
         this.instanceElement.setAttribute("url", this.getURLAsString());
 

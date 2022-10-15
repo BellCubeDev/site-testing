@@ -327,7 +327,7 @@ export function checkCondition(condition:conditionObj):boolean {
             const time = new Date();
 
             const currentTime = time.getHours() * 60 + time.getMinutes();
-            const conditionTime = [condition.time[0][0] * 60 + condition.time[0][1], condition.time[1][0] * 60 + condition.time[1][1]];
+            const conditionTime : [number, number] = [condition.time[0][0] * 60 + condition.time[0][1], condition.time[1][0] * 60 + condition.time[1][1]];
 
             /*console.log(`[BCD-RANDOM-TEXT] is ${currentTime} between ${conditionTime[0]} and ${conditionTime[1]}?`);*/
 
@@ -349,7 +349,7 @@ export function checkCondition(condition:conditionObj):boolean {
 export function checkDateCondition(dateBounds: conditionDateBounds):boolean {
     // Get the current date as the American [month, day, year]
     const date = new Date();
-    const currentDate = [date.getMonth() + 1, date.getDate(), date.getFullYear()];
+    const currentDate : [number, number, number] = [date.getMonth() + 1, date.getDate(), date.getFullYear()];
 
     const minDate = dateBounds[0];
     const maxDate = dateBounds[1];

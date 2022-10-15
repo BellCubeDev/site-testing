@@ -14,6 +14,8 @@
 * Some of the now-nonstandard properties used for legacy browser support (which I do not use) have been removed for micro-optimization.
 */
 
+// sass-lint:disable-all
+
 html {
     color: #000000de
 }
@@ -4712,7 +4714,7 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
     z-index: 5
 }
 
-.mdl-layout__drawer.is-visible {
+.mdl-layout__drawer.is-visible, .drawer-init-open .mdl-layout__drawer {
     -webkit-transform: translateX(0);
     transform: translateX(0)
 }
@@ -4874,10 +4876,12 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
 }
 
 @media screen and (min-width:1025px) {
-    .mdl-layout--fixed-drawer> .mdl-layout__drawer.is-visible + .mdl-layout__header {
+    .drawer-init-open .mdl-layout--fixed-drawer > .mdl-layout__drawer + .mdl-layout__header,
+    .mdl-layout--fixed-drawer > .mdl-layout__drawer.is-visible + .mdl-layout__header {
         padding-left: 500px;
     }
 
+     .drawer-init-open .mdl-layout__drawer~.mdl-layout__content,
     .mdl-layout__drawer.is-visible~.mdl-layout__content {
         margin-left: -60px
     }
@@ -5042,6 +5046,7 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
     transition-timing-function: cubic-bezier(.4, 0, .2, 1)
 }
 
+.drawer-init-open .mdl-layout__obfuscator,
 .mdl-layout__obfuscator.is-visible {
     background-color: #0008;
     visibility: visible
@@ -5056,6 +5061,7 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
         pointer-events: none
     }
 
+    .drawer-init-open .mdl-layout__obfuscator,
     .mdl-layout__obfuscator.is-visible {
         pointer-events: auto;
         opacity: 1
@@ -5474,7 +5480,7 @@ _:-ms-input-placeholder,
 }
 
 .mdl-slider.is-upgraded::-webkit-slider-thumb {
-    -webkit-appearance: none;
+    appearance: none;
     width: 12px;
     height: 12px;
     box-sizing: border-box;
@@ -6592,7 +6598,7 @@ fieldset[disabled] .mdl-switch .mdl-switch__ripple-container .mdl-ripple,
 
 .mdl-textfield__input[type="number"]::-webkit-inner-spin-button,
 .mdl-textfield__input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
+    appearance: none;
     margin: 0
 }
 

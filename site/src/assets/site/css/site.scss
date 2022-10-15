@@ -1,6 +1,11 @@
 ---
 ---
 
+.preload * {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+}
+
 [aria-hidden="true"], [aria-hidden="true"] * {
     pointer-events: none !important;
     -webkit-user-select: none !important;
@@ -126,7 +131,10 @@ p {
 
 .mdl-layout__content {
     background: #1b1b1b;
-    height: max-content;
+
+    &:not(footer) {
+        min-height: calc(100vh - 152px);
+    }
 
     &:is(footer) {
         align-items: center;
@@ -315,17 +323,21 @@ section {
     justify-content: flex-start;
     align-items: center;
 
+    padding: 16px 24px;
+    padding-bottom: 4px;
 
-    padding: 24px;
-    padding-bottom: 8px;
+    &.noTopPad, &:first-child {
+        padding-top: 0;
+    }
 
     &.min-padding {
         padding: 6px;
         padding-bottom: 4px;
     }
 
-    &.noTopPad {
-        padding-top: 0;
+    > :is(h1, h2, h3, h4, h5, h6) {
+        margin: 0;
+        padding: 0;
     }
 
     outline: none;
@@ -348,14 +360,13 @@ section {
         user-select: none;
     }
 
-    > .open-icon-90CC {
-        transform: rotate(-90deg);
-        animation: rotate90CounterClockwise 300ms cubic-bezier(0.2, 0, 0.45, 1);
-    }
 
-    &.is-open > .open-icon-90CC {
-        transform: rotate(0deg);
-        animation-name: rotate90CounterClockwiseReverse;
+    &.is-open > .open-icon-90CC { rotate: 0deg; }
+    > .open-icon-90CC {
+        transition: rotate;
+        transition-duration: 0ms; // Overridden by JS
+
+        rotate: -90deg;
     }
 
     .open-icon-90CC + * {
@@ -431,39 +442,22 @@ section {
 
 .js-bcd-details {
     overflow: hidden;
-    display: none;
+    outline: none;
 
-    &.initialized, &.is-open {
-        display: block;
-        visibility: unset;
-    }
-
+    &.is-open > .js-bcd-details-inner { transition-timing-function: cubic-bezier(0, 0.3, 0.8, 1); }
     > .js-bcd-details-inner {
-        visibility: hidden;
-
         transition-property: height, margin-top;
-        transition-timing-function: ease-in-out;
+        transition-timing-function: cubic-bezier(0.1, 0, 0.6, 1);
 
-        margin-top: -100%;
+        margin-top: -200vh;
 
-        height: calc(100% * 1px);
-
-        animation-name: hideDelay;
-        animation-timing-function: steps(1, end);
+        height: max-content;
 
         outline: none;
 
         /* Defaults (overridden by universal.ts) */
         animation-duration: 0ms;
         transition-duration: 0ms;
-        /* animation-duration is 15ms longer than transition-duration when set by universal.ts */
-    }
-
-    &.is-open > .js-bcd-details-inner {
-        visibility: unset;
-        animation-name: unhideStuff;
-        position: unset;
-        pointer-events: unset;
     }
 
     &.contPad01-left > .js-bcd-details-inner {
@@ -484,31 +478,6 @@ section {
 
     &.contPad05-left > .js-bcd-details-inner {
         padding-left: 48px;
-    }
-}
-
-/* Used to change non-transitionable properties after a delay */
-@keyframes hideDelay{
-    0% {
-        visibility: unset;
-        position: unset;
-        pointer-events: none;
-    }
-
-    100% {
-        visibility: hidden;
-        position: absolute;
-        pointer-events: none;
-    }
-}
-
-@keyframes unhideStuff {
-    0% {
-        pointer-events: none;
-    }
-
-    100% {
-        pointer-events: all;
     }
 }
 
@@ -597,30 +566,6 @@ section {
 
 .wide05 {
     max-width: 1000px !important;
-}
-
-@keyframes rotate90CounterClockwiseReverse {
-    100% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-
-    0% {
-        -webkit-transform: rotate(-90deg);
-        transform: rotate(-90deg);
-    }
-}
-
-@keyframes rotate90CounterClockwise {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-
-    100% {
-        -webkit-transform: rotate(-90deg);
-        transform: rotate(-90deg);
-    }
 }
 
 .mdl-navigation {
@@ -845,7 +790,7 @@ section {
     }
 
     // Normal State
-    &, &:focus:not(:active) {
+    &, &:focus:not(:active, .active) {
         background-color: hsla($hue, $sat, $lum, $alpha - 0.15);
         color: #ffffff;
 
@@ -968,4 +913,10 @@ section {
     overflow: visible;
     overflow-wrap: break-word;
     white-space: pre-wrap;
+}
+
+
+.drawer-init-open .mdl-layout__obfuscator {
+    background-color: #0008 !important;
+    visibility: visible !important;
 }

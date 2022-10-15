@@ -3,12 +3,12 @@ import * as files from '../../filesystem-interface.js';
 
 interface IFomodFolder {
     fomodDir: files.folderDirectoryEntry;
-    infoFile: files.folderEntry;
-    moduleFile: files.folderEntry;
+    infoFile: files.folderEntry | undefined;
+    moduleFile: files.folderEntry | undefined;
 }
 export function getFomodFilesFromFolder(folder: files.folder) : IFomodFolder {
-    const fomodFolder = folder.childrenInsensitive['fomod']
-    if (!('children' in fomodFolder)) throw new TypeError('The folder contains a folder named "fomod" - not a file!');
+    const fomodFolder = folder.childrenInsensitive['fomod'];
+    if (!fomodFolder || !('children' in fomodFolder)) throw new TypeError('The folder contains a folder named "fomod" - not a file!');
     return {
         fomodDir: fomodFolder,
         infoFile: fomodFolder.children['info.xml'],

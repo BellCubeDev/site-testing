@@ -1,5 +1,8 @@
 import {componentHandler} from '../assets/site/mdl/material.js';
 
+const cssDetails_ = 'js-bcd-details_';
+const cssSummary_ = 'js-bcd-summary_';
+
 interface jekyllPages {
     baseurl: string;
     pages: Array<{
@@ -35,12 +38,12 @@ let prefabItem:HTMLDivElement;
 /** Prefabricated template for a directory in the sitemap
     ```html
         <div id="prefab-sitemap-dir" class="sitemap-dir">
-            <button class="js-bcd-summary_ adjacent is-open" type="button">
+            <button class="cssSummary_ adjacent is-open" type="button">
                 <i class="material-icons open-icon-90CC">expand_more</i>
                 <h3 class="sitemap-dir-name">DIRECTORY</h3>
             </button>
 
-            <div class="js-bcd-details_ adjacent is-open"><ul class="sitemap-dir-items">
+            <div class="cssDetails_ adjacent is-open"><ul class="sitemap-dir-items">
             </ul></div>
         </div>
     ```
@@ -112,36 +115,36 @@ async function sitemapInit(){
 
         console.debug('===================');
         console.debug('Adding item', item, 'to', lastDir);
-        console.debug('Appending to...', lastDir.querySelector('.js-bcd-details_'));
+        console.debug('Appending to...', lastDir.querySelector(`.${cssDetails_}`));
 
-        const appendPoint = lastDir.id === 'sitemap' ? lastDir : lastDir.querySelector('.js-bcd-details_') ?? lastDir;
+        const appendPoint = lastDir.id === 'sitemap' ? lastDir : lastDir.querySelector(`.${cssDetails_}`) ?? lastDir;
         appendPoint.appendChild(item);
 
         lastDir = null;
     }
 
-    const tempDetails = sitemapContainer.querySelectorAll('.js-bcd-details_');
+    const tempDetails = sitemapContainer.querySelectorAll(`.${cssDetails_}`);
     tempDetails.forEach(d => {
         d.classList.remove('js-bcd-details_');
         d?.classList.add('js-bcd-details');
     });
 
-    const tempSummaries = sitemapContainer.querySelectorAll('.js-bcd-summary_');
+    const tempSummaries = sitemapContainer.querySelectorAll(`.${cssSummary_}`);
     tempSummaries.forEach(s => {
-        s.classList.remove('js-bcd-summary_');
+        s.classList.remove(cssSummary_);
         s.classList.add('js-bcd-summary');
     });
 
-    componentHandler.upgradeElements(elementsToUpgrade);
+    setTimeout((componentHandler.upgradeElements as Function).bind(undefined, elementsToUpgrade));
 }
 
 function findOrCreateDir(dir:string, entryPoint:Element):HTMLDivElement{
     console.debug('Looking for dir', dir);
     const children : Element[] = entryPoint.id === 'sitemap' ?
                                 [ ...entryPoint.getElementsByClassName('sitemap-dir') ] :
-                                [ ...(entryPoint.getElementsByClassName('js-bcd-details_')[0]?.getElementsByClassName('sitemap-dir') ??[]) ];
+                                [ ...(entryPoint.getElementsByClassName(cssDetails_)[0]?.getElementsByClassName('sitemap-dir') ??[]) ];
 
-    const existingDir = children.find(e => [...e.children].find(c => c.classList.contains('js-bcd-summary_'))?.querySelector('.sitemap-dir-name')?.textContent === dir);
+    const existingDir = children.find(e => [...e.children].find(c => c.classList.contains(cssSummary_))?.querySelector('.sitemap-dir-name')?.textContent === dir);
     console.debug('Existing dir:', existingDir);
     if (existingDir) return existingDir as HTMLDivElement;
     console.debug('Creating new dir:', dir);
@@ -149,10 +152,10 @@ function findOrCreateDir(dir:string, entryPoint:Element):HTMLDivElement{
     const newDir = prefabDir.cloneNode(true) as HTMLDivElement;
     newDir.removeAttribute('id');
 
-    const thisSummary = newDir.querySelector('.js-bcd-summary_');
+    const thisSummary = newDir.querySelector(`.${cssSummary_}`);
     (thisSummary ?? entryPoint).querySelector('.sitemap-dir-name')!.textContent = dir;
 
-    const appendPoint = entryPoint.id === 'sitemap' ? entryPoint : entryPoint.querySelector('.js-bcd-details_') ?? entryPoint;
+    const appendPoint = entryPoint.id === 'sitemap' ? entryPoint : entryPoint.querySelector(cssDetails_) ?? entryPoint;
     appendPoint.appendChild(newDir);
 
     elementsToUpgrade.push(...newDir.children as HTMLCollectionOf<HTMLElement>);

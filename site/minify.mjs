@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 import * as uglify from 'uglify-js';
 import * as path from 'path';
 import * as afs from 'fs/promises';
@@ -7,17 +8,22 @@ import * as afs from 'fs/promises';
 console.log('Minifying files...');
 
 let minifiedVarCache = {};
+const processedFiles = [];
 
 if (!process.env.minifyDir?.trim()) throw new Error('No minifyDir environment variable was provided');
 
 const doInlineSources = process.env.doInlineSources?.trim() === 'true';
 
 // Code mostly taken from `minifyJSInDir()`
-const files = await afs.readdir(process.env.minifyDir);
+setTimeout(async () => {
+        const files = await afs.readdir(process.env.minifyDir);
 
-for (let i = 0; i < files.length; i++) {
-    evalFileOrDir(path.join(process.env.minifyDir, files[i]));
-}
+        for (let i = 0; i < files.length; i++) {
+            evalFileOrDir(path.join(process.env.minifyDir, files[i]));
+        }
+    },
+    100
+);
 // End self-piracy
 
 /** @param {string} dirPath Directory to traverse */
@@ -37,14 +43,24 @@ async function evalFileOrDir(path) {
 
     if (stat.isDirectory()) minifyJSInDir(path);
     else if (path.endsWith('.js')) minifyJSFile(path);
+    //else if (path.endsWith('.html')) minifyHTMLFile(path);
 }
 
 /** Minify a single JavaScript file asynchronously
     @param {string} filePath
 */
 async function minifyJSFile(filePath) {
-    if (filePath.endsWith('.min.js')) return;
+    if (filePath.endsWith('.min.js') || filePath.endsWith('.original.js')) return;
+
+    // Check if we've already processed this file
+    const stat = await afs.stat(filePath);
+    if (stat.birthtime.getTime() > stat.mtime.getTime() + 4000) return;
+
+    console.log('Minifying', filePath);
+
     const fileContents = await afs.readFile(filePath, 'utf8');
+    afs.writeFile(filePath.replace(/\.js$/, '.original.js'), fileContents);
+
     const urlFilePath = filePath.replace(process.env.minifyDir, '').replace(/\\/g, '/');
 
     const hasTS = fileContents.includes('//# sourceMappingURL=');
@@ -76,7 +92,7 @@ async function minifyJSFile(filePath) {
             inline: true,
             join_vars: true,
             imports: true,
-            keep_fargs: false,
+            keep_fargs: true,
             keep_fnames: false,
             keep_infinity: true, // Most target runners will likely be using Chromium or otherwise implementing V8, so let's not bork its performance
             loops: true,
@@ -94,7 +110,7 @@ async function minifyJSFile(filePath) {
             strings: true,
             switches: true,
             toplevel: false,
-            top_retain: null,
+            top_retain: false,
             typeofs: true,
             unsafe_regexp: true,
             varify: false,
@@ -131,11 +147,15 @@ async function minifyJSFile(filePath) {
 
     minifiedVarCache = {...minifiedVarCache, ...tempCache};
 
-    afs.writeFile(filePath, minified.code);
+    afs.writeFile(filePath, minified.code)
+
+        // Change the dates of the file to allow us to check if it has been modified since last minification
+        .then(() => {
+            afs.utimes(path.join(filePath), new Date(Date.now()), new Date(stat.birthtime.getTime() - 5000));
+        });
 
     if (hasTS) afs.writeFile(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${hasTS ? urlFilePath.replace(/\.js$/, '.ts') : urlFilePath}"]`));
     else {
-        afs.writeFile(filePath.replace(/\.js$/, '.original.js'), fileContents);
         afs.writeFile(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${urlFilePath.replace(/\.js$/, '.original.js')}"]`));
     }
 }

@@ -158,6 +158,7 @@
 			"t",
 			"uncompiled",
 			"unfill"
-		]
+		],
+		"liquid.format.enable": true
 	}
 }

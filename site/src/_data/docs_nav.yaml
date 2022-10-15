@@ -15,4 +15,8 @@ LSProgression:
                 -   type: link
                     name: 'Creating a Plugin'
                     url: '/documentation/linear-spell-progression/creating-a-plugin/'
-                    icon: 'book'
+                    icon: book
+                -   type: link
+                    name: 'How It Works'
+                    url: '/documentation/linear-spell-progression/how-it-works/'
+                    icon: code

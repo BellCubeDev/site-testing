@@ -1373,10 +1373,10 @@ export class MaterialLayout {
        * Initialize element.
        */
     init(): void;
-    header_: any;
-    drawer_: any;
-    content_: any;
-    tabBar_: any;
+    header_: HTMLDivElement|undefined;
+    drawer_: HTMLDivElement|undefined;
+    content_: HTMLDivElement|undefined;
+    tabBar_: HTMLDivElement|undefined;
     obfuscator_: HTMLDivElement;
     screenSizeMediaQuery_: MediaQueryList;
     /**

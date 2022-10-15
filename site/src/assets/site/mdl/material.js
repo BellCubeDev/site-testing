@@ -419,32 +419,6 @@ function basicConstructor(element, _this){
     _this.init();
 }
 
-export function materialInit() {
-  'use strict';
-
-  /**
-   * Performs a "Cutting the mustard" test. If the browser supports the features
-   * tested, adds a mdl-js class to the <html> element. It then upgrades all MDL
-   * components requiring JavaScript.
-   */
-  if ('classList' in document.createElement('div') &&
-      'querySelector' in document &&
-      'addEventListener' in window && Array.prototype.forEach) {
-    document.documentElement.classList.add('mdl-js');
-    componentHandler.upgradeAllRegistered();
-  } else {
-    /**
-     * Dummy function to avoid JS errors.
-     */
-    componentHandler.upgradeElement = function() {return;};
-    /**
-     * Dummy function to avoid JS errors.
-     */
-    componentHandler.register = function() {return;};
-  }
-}
-window.bcd_init_functions.material = materialInit;
-
 // Source: https://github.com/darius/requestAnimationFrame/blob/master/requestAnimationFrame.js
 // Adapted from https://gist.github.com/paulirish/1579671 which derived from
 // http://paulirish.com/2011/requestanimationframe-for-smart-animating/
@@ -552,13 +526,13 @@ export class MaterialButton {
 
                 this.rippleElement_ = document.createElement('span');
                 this.rippleElement_.classList.add(this.cssClasses_.RIPPLE);
-                this.rippleElement_.addEventListener('click', this.boundRippleBlurHandler);
+                this.rippleElement_.addEventListener(window.clickEvt, this.boundRippleBlurHandler);
 
                 rippleContainer.appendChild(this.rippleElement_);
                 this.element_.appendChild(rippleContainer);
             }
 
-            this.element_.addEventListener('click', this.boundButtonBlurHandler);
+            this.element_.addEventListener(window.clickEvt, this.boundButtonBlurHandler);
             this.element_.addEventListener('mouseleave', this.boundButtonBlurHandler);
         }
     }
@@ -790,7 +764,7 @@ export class MaterialCheckbox {
                 this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_EFFECT);
                 this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_CENTER);
                 this.boundRippleMouseUp = this.onMouseUp_.bind(this);
-                this.rippleContainerElement_.addEventListener('click', this.boundRippleMouseUp);
+                this.rippleContainerElement_.addEventListener(window.clickEvt, this.boundRippleMouseUp);
                 var ripple = document.createElement('span');
                 ripple.classList.add(this.cssClasses_.RIPPLE);
                 this.rippleContainerElement_.appendChild(ripple);
@@ -803,7 +777,7 @@ export class MaterialCheckbox {
             this.inputElement_.addEventListener('change', this.boundInputOnChange);
             this.inputElement_.addEventListener('focus', this.boundInputOnFocus);
             this.inputElement_.addEventListener('blur', this.boundInputOnBlur);
-            this.element_.addEventListener('click', this.boundElementMouseUp);
+            this.element_.addEventListener(window.clickEvt, this.boundElementMouseUp);
             this.updateClasses_();
             this.element_.classList.add(this.cssClasses_.IS_UPGRADED);
         }
@@ -938,7 +912,7 @@ export class MaterialIconToggle {
                 this.rippleContainerElement_.classList.add(this.cssClasses_.JS_RIPPLE_EFFECT);
                 this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_CENTER);
                 this.boundRippleMouseUp = this.onMouseUp_.bind(this);
-                this.rippleContainerElement_.addEventListener('click', this.boundRippleMouseUp);
+                this.rippleContainerElement_.addEventListener(window.clickEvt, this.boundRippleMouseUp);
                 var ripple = document.createElement('span');
                 ripple.classList.add(this.cssClasses_.RIPPLE);
                 this.rippleContainerElement_.appendChild(ripple);
@@ -951,7 +925,7 @@ export class MaterialIconToggle {
             this.inputElement_.addEventListener('change', this.boundInputOnChange);
             this.inputElement_.addEventListener('focus', this.boundInputOnFocus);
             this.inputElement_.addEventListener('blur', this.boundInputOnBlur);
-            this.element_.addEventListener('click', this.boundElementOnMouseUp);
+            this.element_.addEventListener(window.clickEvt, this.boundElementOnMouseUp);
             this.updateClasses_();
             this.element_.classList.add('is-upgraded');
         }
@@ -1062,7 +1036,7 @@ export class MaterialMenu {
                 forEl = document.getElementById(forElId);
                 if (forEl) {
                     this.forElement_ = forEl;
-                    forEl.addEventListener('click', this.handleForClick_.bind(this));
+                    forEl.addEventListener(window.clickEvt, this.handleForClick_.bind(this));
                     forEl.addEventListener('keydown', this.handleForKeyboardEvent_.bind(this));
                 }
             }
@@ -1102,7 +1076,7 @@ export class MaterialMenu {
         item.tabIndex = '-1';
 
         // Add interact listeners to the menu item.
-        item.addEventListener('click', this.boundItemClick_);
+        item.addEventListener(window.clickEvt, this.boundItemClick_);
         item.addEventListener('keydown', this.boundItemKeydown_);
 
         if (this.element_.classList.contains(MaterialMenu.cssClasses_.RIPPLE_EFFECT)) {
@@ -1199,9 +1173,9 @@ export class MaterialMenu {
                 } else if (evt.keyCode === MaterialMenu.Keycodes_.SPACE || evt.keyCode === MaterialMenu.Keycodes_.ENTER) {
                     evt.preventDefault();
                     // Send mousedown and mouseup to trigger ripple.
-                    var e = new MouseEvent('mousedown');
+                    var e = new MouseEvent(window.clickEvt);
                     evt.target.dispatchEvent(e);
-                    e = new MouseEvent('click');
+                    e = new MouseEvent(window.clickEvt);
                     evt.target.dispatchEvent(e);
                     // Send click.
                     evt.target.click();
@@ -1333,11 +1307,11 @@ export class MaterialMenu {
                 // Also check if the clicked element is a menu item
                 // if so, do nothing.
                 if (e !== evt && !this.closing_ && e.target.parentNode !== this.element_) {
-                    document.removeEventListener('click', callback);
+                    document.removeEventListener(window.clickEvt, callback);
                     this.hide();
                 }
             }.bind(this);
-            document.addEventListener('click', callback);
+            document.addEventListener(window.clickEvt, callback);
         }
     }
     /**
@@ -1716,7 +1690,7 @@ export class MaterialRadio {
                 rippleContainer.classList.add(this.cssClasses_.RIPPLE_CONTAINER);
                 rippleContainer.classList.add(this.cssClasses_.RIPPLE_EFFECT);
                 rippleContainer.classList.add(this.cssClasses_.RIPPLE_CENTER);
-                rippleContainer.addEventListener('click', this.boundMouseUpHandler_);
+                rippleContainer.addEventListener(window.clickEvt, this.boundMouseUpHandler_);
                 var ripple = document.createElement('span');
                 ripple.classList.add(this.cssClasses_.RIPPLE);
                 rippleContainer.appendChild(ripple);
@@ -1725,7 +1699,7 @@ export class MaterialRadio {
             this.btnElement_.addEventListener('change', this.boundChangeHandler_);
             this.btnElement_.addEventListener('focus', this.boundFocusHandler_);
             this.btnElement_.addEventListener('blur', this.boundBlurHandler_);
-            this.element_.addEventListener('click', this.boundMouseUpHandler_);
+            this.element_.addEventListener(window.clickEvt, this.boundMouseUpHandler_);
             this.updateClasses_();
             this.element_.classList.add(this.cssClasses_.IS_UPGRADED);
         }
@@ -1849,7 +1823,7 @@ export class MaterialSlider {
         // Discard the original event and create a new event that
         // is on the slider element.
         event.preventDefault();
-        var newEvent = new MouseEvent('mousedown', {
+        var newEvent = new MouseEvent(window.clickEvt, {
             target: event.target,
             buttons: event.buttons,
             clientX: event.clientX,
@@ -1945,8 +1919,8 @@ export class MaterialSlider {
             this.boundContainerMouseDownHandler = this.onContainerMouseDown_.bind(this);
             this.element_.addEventListener('input', this.boundInputHandler);
             this.element_.addEventListener('change', this.boundChangeHandler);
-            this.element_.addEventListener('click', this.boundMouseUpHandler);
-            this.element_.parentElement.addEventListener('mousedown', this.boundContainerMouseDownHandler);
+            this.element_.addEventListener(window.clickEvt, this.boundMouseUpHandler);
+            this.element_.parentElement.addEventListener(window.clickEvt, this.boundContainerMouseDownHandler);
             this.updateValueStyles_();
             this.element_.classList.add(this.cssClasses_.IS_UPGRADED);
         }
@@ -2035,7 +2009,7 @@ export class MaterialSnackbar {
         this.element_.setAttribute('aria-hidden', 'true');
         if (this.actionHandler_) {
             this.actionElement_.textContent = this.actionText_;
-            this.actionElement_.addEventListener('click', this.actionHandler_);
+            this.actionElement_.addEventListener(window.clickEvt, this.actionHandler_);
             this.setActionHidden_(false);
         }
         this.textElement_.textContent = this.message_;
@@ -2102,7 +2076,7 @@ export class MaterialSnackbar {
             if (!this.actionElement_.getAttribute('aria-hidden')) {
                 this.setActionHidden_(true);
                 this.actionElement_.textContent = '';
-                this.actionElement_.removeEventListener('click', this.actionHandler_);
+                this.actionElement_.removeEventListener(window.clickEvt, this.actionHandler_);
             }
             this.actionHandler_ = undefined;
             this.message_ = undefined;
@@ -2409,7 +2383,7 @@ export class MaterialSwitch {
                 this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_CONTAINER);
                 this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_EFFECT);
                 this.rippleContainerElement_.classList.add(this.cssClasses_.RIPPLE_CENTER);
-                this.rippleContainerElement_.addEventListener('click', this.boundMouseUpHandler);
+                this.rippleContainerElement_.addEventListener(window.clickEvt, this.boundMouseUpHandler);
                 var ripple = document.createElement('span');
                 ripple.classList.add(this.cssClasses_.RIPPLE);
                 this.rippleContainerElement_.appendChild(ripple);
@@ -2421,7 +2395,7 @@ export class MaterialSwitch {
             this.inputElement_.addEventListener('change', this.boundChangeHandler);
             this.inputElement_.addEventListener('focus', this.boundFocusHandler);
             this.inputElement_.addEventListener('blur', this.boundBlurHandler);
-            this.element_.addEventListener('click', this.boundMouseUpHandler);
+            this.element_.addEventListener(window.clickEvt, this.boundMouseUpHandler);
             this.updateClasses_();
             this.element_.classList.add('is-upgraded');
         }
@@ -2598,7 +2572,7 @@ window['MaterialTabs'] = MaterialTabs;
 export class MaterialTab{
     constructor(tab, ctx) {
         if (!tab) return;
-        tab.addEventListener('click', function (e) {
+        tab.addEventListener(window.clickEvt, function (e) {
             if (tab.getAttribute('href').charAt(0) === '#') {
                 e.preventDefault();
                 var href = tab.href.split('#')[1];
@@ -3167,6 +3141,7 @@ export class MaterialLayout {
         }
 
         this.drawer_.setAttribute('aria-hidden', 'false');
+        this.drawer_.removeAttribute('disabled', 'false');
         this.drawer_.removeAttribute('tabindex');
 
         var drawerButton = this.element_.querySelector(`.${MaterialLayout.cssClasses.DRAWER_BTN}`);
@@ -3183,222 +3158,235 @@ export class MaterialLayout {
 
     closeDrawer(doNewClass = true) {
         if (doNewClass) {
-            if (this.drawer_.classList.contains(MaterialLayout.cssClasses.IS_DRAWER_OPEN)) return;
+            if (!this.drawer_.classList.contains(MaterialLayout.cssClasses.IS_DRAWER_OPEN)) return;
             this.drawer_.classList.remove(MaterialLayout.cssClasses.IS_DRAWER_OPEN);
             this.obfuscator_.classList.remove(MaterialLayout.cssClasses.IS_DRAWER_OPEN);
         }
 
         this.drawer_.setAttribute('aria-hidden', 'true');
         this.drawer_.setAttribute('tabindex', '-256');
+        this.drawer_.setAttribute('disabled', 'true');
 
         var drawerButton = this.element_.querySelector(`.${MaterialLayout.cssClasses.DRAWER_BTN}`);
         drawerButton.setAttribute('aria-expanded', 'false');
         drawerButton.focus({preventScroll:true});
+
+        document.documentElement.classList.remove('drawer-init-open');
     }
     /**
        * Initialize element.
        */
     init() {
-        if (this.element_) {
-            var container = document.createElement('div');
-            container.classList.add(MaterialLayout.cssClasses.CONTAINER);
-            var focusedElement = this.element_.querySelector(':focus');
-            this.element_.parentElement.insertBefore(container, this.element_);
-            this.element_.parentElement.removeChild(this.element_);
-            container.appendChild(this.element_);
-            if (focusedElement) {
-                focusedElement.focus();
-            }
-            var directChildren = this.element_.childNodes;
-            var numChildren = directChildren.length;
-            for (var c = 0; c < numChildren; c++) {
-                var child = directChildren[c];
-                if (child.classList && child.classList.contains(MaterialLayout.cssClasses.HEADER)) {
-                    this.header_ = child;
-                }
-                if (child.classList && child.classList.contains(MaterialLayout.cssClasses.DRAWER)) {
-                    this.drawer_ = child;
-                }
-                if (child.classList && child.classList.contains(MaterialLayout.cssClasses.CONTENT)) {
-                    this.content_ = child;
-                }
-            }
-            window.addEventListener('pageshow', function (e) {
-                if (e.persisted) {
-                    // when page is loaded from back/forward cache
-                    // trigger repaint to let layout scroll in safari
-                    this.element_.style.overflowY = 'hidden';
-                    requestAnimationFrame(function () {
-                        this.element_.style.overflowY = '';
-                    }.bind(this));
-                }
-            }.bind(this), false);
-            if (this.header_) {
-                this.tabBar_ = this.header_.querySelector(`.${MaterialLayout.cssClasses.TAB_BAR}`);
-            }
-            var mode = this.Mode_.STANDARD;
-            if (this.header_) {
-                if (this.header_.classList.contains(MaterialLayout.cssClasses.HEADER_SEAMED)) {
-                    mode = this.Mode_.SEAMED;
-                } else if (this.header_.classList.contains(MaterialLayout.cssClasses.HEADER_WATERFALL)) {
-                    mode = this.Mode_.WATERFALL;
-                    this.header_.addEventListener('transitionend', this.headerTransitionEndHandler_.bind(this));
-                    this.header_.addEventListener('click', this.headerClickHandler_.bind(this));
-                } else if (this.header_.classList.contains(MaterialLayout.cssClasses.HEADER_SCROLL)) {
-                    mode = this.Mode_.SCROLL;
-                    container.classList.add(MaterialLayout.cssClasses.HAS_SCROLLING_HEADER);
-                }
-                if (mode === this.Mode_.STANDARD) {
-                    this.header_.classList.add(MaterialLayout.cssClasses.CASTING_SHADOW);
-                    if (this.tabBar_) {
-                        this.tabBar_.classList.add(MaterialLayout.cssClasses.CASTING_SHADOW);
-                    }
-                } else if (mode === this.Mode_.SEAMED || mode === this.Mode_.SCROLL) {
-                    this.header_.classList.remove(MaterialLayout.cssClasses.CASTING_SHADOW);
-                    if (this.tabBar_) {
-                        this.tabBar_.classList.remove(MaterialLayout.cssClasses.CASTING_SHADOW);
-                    }
-                } else if (mode === this.Mode_.WATERFALL) {
-                    // Add and remove shadows depending on scroll position.
-                    // Also add/remove auxiliary class for styling of the compact version of
-                    // the header.
-                    this.content_.addEventListener('scroll', this.contentScrollHandler_.bind(this));
-                    this.contentScrollHandler_();
-                }
-            }
-            // Add drawer toggling button to our layout, if we have an openable drawer.
-            if (this.drawer_) {
-                var drawerButton = this.element_.querySelector(`.${MaterialLayout.cssClasses.DRAWER_BTN}`);
-                if (!drawerButton) {
-                    drawerButton = document.createElement('div');
-                    drawerButton.setAttribute('aria-expanded', 'false');
-                    drawerButton.setAttribute('role', 'button');
-                    drawerButton.setAttribute('tabindex', '0');
-                    drawerButton.classList.add(MaterialLayout.cssClasses.DRAWER_BTN);
-                    var drawerButtonIcon = document.createElement('i');
-                    drawerButtonIcon.classList.add(MaterialLayout.cssClasses.ICON);
-                    drawerButtonIcon.innerHTML = this.Constant_.MENU_ICON;
-                    drawerButton.appendChild(drawerButtonIcon);
-                }
-
-                const titleElement = this.element_.querySelector('.mdl-layout-title');
-                console.debug('titleElement', titleElement);
-                if (titleElement) {
-                    titleElement.setAttribute('role', 'button');
-                    titleElement.setAttribute('tabindex', '-1');
-                    titleElement.addEventListener('click', this.drawerToggleHandler_.bind(this));
-                    titleElement.addEventListener('keydown', this.drawerToggleHandler_.bind(this));
-                }
-
-                if (this.drawer_.classList.contains(MaterialLayout.cssClasses.ON_LARGE_SCREEN)) {
-                    //If drawer has ON_LARGE_SCREEN class then add it to the drawer toggle button as well.
-                    drawerButton.classList.add(MaterialLayout.cssClasses.ON_LARGE_SCREEN);
-                } else if (this.drawer_.classList.contains(MaterialLayout.cssClasses.ON_SMALL_SCREEN)) {
-                    //If drawer has ON_SMALL_SCREEN class then add it to the drawer toggle button as well.
-                    drawerButton.classList.add(MaterialLayout.cssClasses.ON_SMALL_SCREEN);
-                }
-                // Add a class if the layout has a drawer, for altering the left padding.
-                // Adds the HAS_DRAWER to the elements since this.header_ may or may
-                // not be present.
-                this.element_.classList.add(MaterialLayout.cssClasses.HAS_DRAWER);
-                // If we have a fixed header, add the button to the header rather than
-                // the layout.
-                if (this.element_.classList.contains(MaterialLayout.cssClasses.FIXED_HEADER)) {
-                    this.header_.insertBefore(drawerButton, this.header_.firstChild);
-                } else {
-                    this.element_.insertBefore(drawerButton, this.content_);
-                }
-                var obfuscator = document.createElement('div');
-                obfuscator.classList.add(MaterialLayout.cssClasses.OBFUSCATOR);
-                this.element_.appendChild(obfuscator);
-                this.obfuscator_ = obfuscator;
-
-                this.drawer_.setAttribute('aria-hidden', 'true');
-                this.drawer_.setAttribute('tabindex', '-256');
-
-                drawerButton.addEventListener('click', this.drawerToggleHandler_.bind(this));
-                drawerButton.addEventListener('keydown', this.drawerToggleHandler_.bind(this));
-
-                obfuscator.addEventListener('click', this.drawerToggleHandler_.bind(this));
-
-                document.addEventListener('keydown', this.keyboardEventHandler_.bind(this));
-            }
-            // Keep an eye on screen size, and add/remove auxiliary class for styling
-            // of small screens.
-            this.screenSizeMediaQuery_ = window.matchMedia(this.Constant_.MAX_WIDTH);
-            this.screenSizeMediaQuery_.addListener(this.screenSizeHandler_.bind(this));
-            this.screenSizeHandler_();
-            // Initialize tabs, if any.
-            if (this.header_ && this.tabBar_) {
-                this.element_.classList.add(MaterialLayout.cssClasses.HAS_TABS);
-                var tabContainer = document.createElement('div');
-                tabContainer.classList.add(MaterialLayout.cssClasses.TAB_CONTAINER);
-                this.header_.insertBefore(tabContainer, this.tabBar_);
-                this.header_.removeChild(this.tabBar_);
-                var leftButton = document.createElement('div');
-                leftButton.classList.add(MaterialLayout.cssClasses.TAB_BAR_BUTTON);
-                leftButton.classList.add(MaterialLayout.cssClasses.TAB_BAR_LEFT_BUTTON);
-                var leftButtonIcon = document.createElement('i');
-                leftButtonIcon.classList.add(MaterialLayout.cssClasses.ICON);
-                leftButtonIcon.textContent = this.Constant_.CHEVRON_LEFT;
-                leftButton.appendChild(leftButtonIcon);
-                leftButton.addEventListener('click', function () {
-                    this.tabBar_.scrollLeft -= this.Constant_.TAB_SCROLL_PIXELS;
-                }.bind(this));
-                var rightButton = document.createElement('div');
-                rightButton.classList.add(MaterialLayout.cssClasses.TAB_BAR_BUTTON);
-                rightButton.classList.add(MaterialLayout.cssClasses.TAB_BAR_RIGHT_BUTTON);
-                var rightButtonIcon = document.createElement('i');
-                rightButtonIcon.classList.add(MaterialLayout.cssClasses.ICON);
-                rightButtonIcon.textContent = this.Constant_.CHEVRON_RIGHT;
-                rightButton.appendChild(rightButtonIcon);
-                rightButton.addEventListener('click', function () {
-                    this.tabBar_.scrollLeft += this.Constant_.TAB_SCROLL_PIXELS;
-                }.bind(this));
-                tabContainer.appendChild(leftButton);
-                tabContainer.appendChild(this.tabBar_);
-                tabContainer.appendChild(rightButton);
-                // Add and remove tab buttons depending on scroll position and total
-                // window size.
-                var tabUpdateHandler = function () {
-                    if (this.tabBar_.scrollLeft > 0) {
-                        leftButton.classList.add(MaterialLayout.cssClasses.IS_ACTIVE);
-                    } else {
-                        leftButton.classList.remove(MaterialLayout.cssClasses.IS_ACTIVE);
-                    }
-                    if (this.tabBar_.scrollLeft < this.tabBar_.scrollWidth - this.tabBar_.offsetWidth) {
-                        rightButton.classList.add(MaterialLayout.cssClasses.IS_ACTIVE);
-                    } else {
-                        rightButton.classList.remove(MaterialLayout.cssClasses.IS_ACTIVE);
-                    }
-                }.bind(this);
-                this.tabBar_.addEventListener('scroll', tabUpdateHandler);
-                tabUpdateHandler();
-                // Update tabs when the window resizes.
-                var windowResizeHandler = function () {
-                    // Use timeouts to make sure it doesn't happen too often.
-                    if (this.resizeTimeoutId_) {
-                        clearTimeout(this.resizeTimeoutId_);
-                    }
-                    this.resizeTimeoutId_ = setTimeout(function () {
-                        tabUpdateHandler();
-                        this.resizeTimeoutId_ = null;
-                    }.bind(this), this.Constant_.RESIZE_TIMEOUT);
-                }.bind(this);
-                window.addEventListener('resize', windowResizeHandler);
-                if (this.tabBar_.classList.contains(MaterialLayout.cssClasses.JS_RIPPLE_EFFECT)) {
-                    this.tabBar_.classList.add(MaterialLayout.cssClasses.RIPPLE_IGNORE_EVENTS);
-                }
-                // Select element tabs, document panels
-                var tabs = this.tabBar_.querySelectorAll(`.${MaterialLayout.cssClasses.TAB}`);
-                var panels = this.content_.querySelectorAll(`.${MaterialLayout.cssClasses.PANEL}`);
-                // Create new tabs for each tab element
-                for (var i_ = 0; i_ < tabs.length; i_++) {
-                    new MaterialLayoutTab(tabs[i_], tabs, panels, this);
-                }
-            }
-            this.element_.classList.add(MaterialLayout.cssClasses.IS_UPGRADED);
+        if (!this.element_) return;
+        window.layout = this;
+        var container = document.createElement('div');
+        container.classList.add(MaterialLayout.cssClasses.CONTAINER);
+        var focusedElement = this.element_.querySelector(':focus');
+        this.element_.parentElement.insertBefore(container, this.element_);
+        this.element_.parentElement.removeChild(this.element_);
+        container.appendChild(this.element_);
+        if (focusedElement) {
+            focusedElement.focus();
         }
+        var directChildren = this.element_.childNodes;
+        var numChildren = directChildren.length;
+        for (var c = 0; c < numChildren; c++) {
+            var child = directChildren[c];
+            if (child.classList && child.classList.contains(MaterialLayout.cssClasses.HEADER)) {
+                this.header_ = child;
+            }
+            if (child.classList && child.classList.contains(MaterialLayout.cssClasses.DRAWER)) {
+                this.drawer_ = child;
+            }
+            if (child.classList && child.classList.contains(MaterialLayout.cssClasses.CONTENT)) {
+                this.content_ = child;
+            }
+        }
+        window.addEventListener('pageshow', function (e) {
+            if (e.persisted) {
+                // when page is loaded from back/forward cache
+                // trigger repaint to let layout scroll in safari
+                this.element_.style.overflowY = 'hidden';
+                requestAnimationFrame(function () {
+                    this.element_.style.overflowY = '';
+                }.bind(this));
+            }
+        }.bind(this), false);
+        if (this.header_) {
+            this.tabBar_ = this.header_.querySelector(`.${MaterialLayout.cssClasses.TAB_BAR}`);
+        }
+        var mode = this.Mode_.STANDARD;
+        if (this.header_) {
+            if (this.header_.classList.contains(MaterialLayout.cssClasses.HEADER_SEAMED)) {
+                mode = this.Mode_.SEAMED;
+            } else if (this.header_.classList.contains(MaterialLayout.cssClasses.HEADER_WATERFALL)) {
+                mode = this.Mode_.WATERFALL;
+                this.header_.addEventListener('transitionend', this.headerTransitionEndHandler_.bind(this));
+                this.header_.addEventListener(window.clickEvt, this.headerClickHandler_.bind(this));
+            } else if (this.header_.classList.contains(MaterialLayout.cssClasses.HEADER_SCROLL)) {
+                mode = this.Mode_.SCROLL;
+                container.classList.add(MaterialLayout.cssClasses.HAS_SCROLLING_HEADER);
+            }
+            if (mode === this.Mode_.STANDARD) {
+                this.header_.classList.add(MaterialLayout.cssClasses.CASTING_SHADOW);
+                if (this.tabBar_) {
+                    this.tabBar_.classList.add(MaterialLayout.cssClasses.CASTING_SHADOW);
+                }
+            } else if (mode === this.Mode_.SEAMED || mode === this.Mode_.SCROLL) {
+                this.header_.classList.remove(MaterialLayout.cssClasses.CASTING_SHADOW);
+                if (this.tabBar_) {
+                    this.tabBar_.classList.remove(MaterialLayout.cssClasses.CASTING_SHADOW);
+                }
+            } else if (mode === this.Mode_.WATERFALL) {
+                // Add and remove shadows depending on scroll position.
+                // Also add/remove auxiliary class for styling of the compact version of
+                // the header.
+                this.content_.addEventListener('scroll', this.contentScrollHandler_.bind(this));
+                this.contentScrollHandler_();
+            }
+        }
+        // Add drawer toggling button to our layout, if we have an openable drawer.
+        if (this.drawer_) {
+            var drawerButton = this.element_.querySelector(`.${MaterialLayout.cssClasses.DRAWER_BTN}`);
+            if (!drawerButton) {
+                drawerButton = document.createElement('div');
+                drawerButton.setAttribute('aria-expanded', 'false');
+                drawerButton.setAttribute('role', 'button');
+                drawerButton.setAttribute('tabindex', '0');
+                drawerButton.classList.add(MaterialLayout.cssClasses.DRAWER_BTN);
+                var drawerButtonIcon = document.createElement('i');
+                drawerButtonIcon.classList.add(MaterialLayout.cssClasses.ICON);
+                drawerButtonIcon.innerHTML = this.Constant_.MENU_ICON;
+                drawerButton.appendChild(drawerButtonIcon);
+            }
+
+            const titleElement = this.element_.querySelector('.mdl-layout-title');
+            console.debug('titleElement', titleElement);
+            if (titleElement) {
+                titleElement.setAttribute('role', 'button');
+                titleElement.setAttribute('tabindex', '-1');
+                titleElement.addEventListener(window.clickEvt, this.drawerToggleHandler_.bind(this));
+                titleElement.addEventListener('keydown', this.drawerToggleHandler_.bind(this));
+            }
+
+            if (this.drawer_.classList.contains(MaterialLayout.cssClasses.ON_LARGE_SCREEN)) {
+                //If drawer has ON_LARGE_SCREEN class then add it to the drawer toggle button as well.
+                drawerButton.classList.add(MaterialLayout.cssClasses.ON_LARGE_SCREEN);
+            } else if (this.drawer_.classList.contains(MaterialLayout.cssClasses.ON_SMALL_SCREEN)) {
+                //If drawer has ON_SMALL_SCREEN class then add it to the drawer toggle button as well.
+                drawerButton.classList.add(MaterialLayout.cssClasses.ON_SMALL_SCREEN);
+            }
+            // Add a class if the layout has a drawer, for altering the left padding.
+            // Adds the HAS_DRAWER to the elements since this.header_ may or may
+            // not be present.
+            this.element_.classList.add(MaterialLayout.cssClasses.HAS_DRAWER);
+            // If we have a fixed header, add the button to the header rather than
+            // the layout.
+            if (this.element_.classList.contains(MaterialLayout.cssClasses.FIXED_HEADER)) {
+                this.header_.insertBefore(drawerButton, this.header_.firstChild);
+            } else {
+                this.element_.insertBefore(drawerButton, this.content_);
+            }
+
+            this.obfuscator_ = document.querySelector('* .mdl-layout__obfuscator');
+            if (!this.obfuscator_) throw new Error('MDL: No obfuscator found!');
+
+
+            this.drawer_.setAttribute('aria-hidden', 'true');
+            this.drawer_.setAttribute('tabindex', '-256');
+            this.drawer_.setAttribute('disabled', 'true');
+
+            drawerButton.addEventListener(window.clickEvt, this.drawerToggleHandler_.bind(this));
+            drawerButton.addEventListener('keydown', this.drawerToggleHandler_.bind(this));
+
+            this.obfuscator_.addEventListener(window.clickEvt, this.drawerToggleHandler_.bind(this));
+
+            document.addEventListener('keydown', this.keyboardEventHandler_.bind(this));
+
+            // Start with drawer open or closed depending on a global (Window) variable
+            if (window.startWithDrawer) {
+                this.openDrawer();
+            }
+            else this.closeDrawer(false);
+            setTimeout(()=>{
+                if (window.startWithDrawer) this.closeDrawer(false);
+            }, 100);
+        }
+        // Keep an eye on screen size, and add/remove auxiliary class for styling
+        // of small screens.
+        this.screenSizeMediaQuery_ = window.matchMedia(this.Constant_.MAX_WIDTH);
+        this.screenSizeMediaQuery_.addListener(this.screenSizeHandler_.bind(this));
+        this.screenSizeHandler_();
+        // Initialize tabs, if any.
+        if (this.header_ && this.tabBar_) {
+            this.element_.classList.add(MaterialLayout.cssClasses.HAS_TABS);
+            var tabContainer = document.createElement('div');
+            tabContainer.classList.add(MaterialLayout.cssClasses.TAB_CONTAINER);
+            this.header_.insertBefore(tabContainer, this.tabBar_);
+            this.header_.removeChild(this.tabBar_);
+            var leftButton = document.createElement('div');
+            leftButton.classList.add(MaterialLayout.cssClasses.TAB_BAR_BUTTON);
+            leftButton.classList.add(MaterialLayout.cssClasses.TAB_BAR_LEFT_BUTTON);
+            var leftButtonIcon = document.createElement('i');
+            leftButtonIcon.classList.add(MaterialLayout.cssClasses.ICON);
+            leftButtonIcon.textContent = this.Constant_.CHEVRON_LEFT;
+            leftButton.appendChild(leftButtonIcon);
+            leftButton.addEventListener(window.clickEvt, function () {
+                this.tabBar_.scrollLeft -= this.Constant_.TAB_SCROLL_PIXELS;
+            }.bind(this));
+            var rightButton = document.createElement('div');
+            rightButton.classList.add(MaterialLayout.cssClasses.TAB_BAR_BUTTON);
+            rightButton.classList.add(MaterialLayout.cssClasses.TAB_BAR_RIGHT_BUTTON);
+            var rightButtonIcon = document.createElement('i');
+            rightButtonIcon.classList.add(MaterialLayout.cssClasses.ICON);
+            rightButtonIcon.textContent = this.Constant_.CHEVRON_RIGHT;
+            rightButton.appendChild(rightButtonIcon);
+            rightButton.addEventListener(window.clickEvt, function () {
+                this.tabBar_.scrollLeft += this.Constant_.TAB_SCROLL_PIXELS;
+            }.bind(this));
+            tabContainer.appendChild(leftButton);
+            tabContainer.appendChild(this.tabBar_);
+            tabContainer.appendChild(rightButton);
+            // Add and remove tab buttons depending on scroll position and total
+            // window size.
+            var tabUpdateHandler = function () {
+                if (this.tabBar_.scrollLeft > 0) {
+                    leftButton.classList.add(MaterialLayout.cssClasses.IS_ACTIVE);
+                } else {
+                    leftButton.classList.remove(MaterialLayout.cssClasses.IS_ACTIVE);
+                }
+                if (this.tabBar_.scrollLeft < this.tabBar_.scrollWidth - this.tabBar_.offsetWidth) {
+                    rightButton.classList.add(MaterialLayout.cssClasses.IS_ACTIVE);
+                } else {
+                    rightButton.classList.remove(MaterialLayout.cssClasses.IS_ACTIVE);
+                }
+            }.bind(this);
+            this.tabBar_.addEventListener('scroll', tabUpdateHandler);
+            tabUpdateHandler();
+            // Update tabs when the window resizes.
+            var windowResizeHandler = function () {
+                // Use timeouts to make sure it doesn't happen too often.
+                if (this.resizeTimeoutId_) {
+                    clearTimeout(this.resizeTimeoutId_);
+                }
+                this.resizeTimeoutId_ = setTimeout(function () {
+                    tabUpdateHandler();
+                    this.resizeTimeoutId_ = null;
+                }.bind(this), this.Constant_.RESIZE_TIMEOUT);
+            }.bind(this);
+            window.addEventListener('resize', windowResizeHandler);
+            if (this.tabBar_.classList.contains(MaterialLayout.cssClasses.JS_RIPPLE_EFFECT)) {
+                this.tabBar_.classList.add(MaterialLayout.cssClasses.RIPPLE_IGNORE_EVENTS);
+            }
+            // Select element tabs, document panels
+            var tabs = this.tabBar_.querySelectorAll(`.${MaterialLayout.cssClasses.TAB}`);
+            var panels = this.content_.querySelectorAll(`.${MaterialLayout.cssClasses.PANEL}`);
+            // Create new tabs for each tab element
+            for (var i_ = 0; i_ < tabs.length; i_++) {
+                new MaterialLayoutTab(tabs[i_], tabs, panels, this);
+            }
+        }
+        this.element_.classList.add(MaterialLayout.cssClasses.IS_UPGRADED);
     }
     /**
        * Store constants in one place so they can be updated easily.
@@ -3515,7 +3503,7 @@ export class MaterialLayoutTab{
             tab.appendChild(rippleContainer);
         }
         if (!layout.tabBar_.classList.contains(layout.cssClasses_.TAB_MANUAL_SWITCH)) {
-            tab.addEventListener('click', function (e) {
+            tab.addEventListener(window.clickEvt, function (e) {
                 if (tab.getAttribute('href').charAt(0) === '#') {
                     e.preventDefault();
                     selectTab();
@@ -3733,7 +3721,7 @@ export class MaterialRipple {
             }
             this.rippleElement_.classList.add(this.cssClasses_.IS_VISIBLE);
         }
-        if (event.type === 'mousedown' && this.ignoringMouseDown_) {
+        if (event.type === window.clickEvt && this.ignoringMouseDown_) {
             this.ignoringMouseDown_ = false;
         } else {
             if (event.type === 'touchstart') {
@@ -3797,10 +3785,10 @@ export class MaterialRipple {
                 // mouse down after a touch start.
                 this.ignoringMouseDown_ = false;
                 this.boundDownHandler = this.downHandler_.bind(this);
-                this.element_.addEventListener('mousedown', this.boundDownHandler);
+                this.element_.addEventListener(window.clickEvt, this.boundDownHandler);
                 this.element_.addEventListener('touchstart', this.boundDownHandler, { passive: true });
                 this.boundUpHandler = this.upHandler_.bind(this);
-                this.element_.addEventListener('click', this.boundUpHandler);
+                this.element_.addEventListener(window.clickEvt, this.boundUpHandler);
                 this.element_.addEventListener('mouseleave', this.boundUpHandler);
                 this.element_.addEventListener('touchend', this.boundUpHandler);
                 this.element_.addEventListener('blur', this.boundUpHandler);
@@ -3916,3 +3904,33 @@ componentHandler.register({
     cssClass: 'mdl-js-ripple-effect',
     widget: false
 });
+
+
+//* INIT
+
+export function materialInit() {
+  'use strict';
+
+  /**
+   * Performs a "Cutting the mustard" test. If the browser supports the features
+   * tested, adds a mdl-js class to the <html> element. It then upgrades all MDL
+   * components requiring JavaScript.
+   */
+  if ('classList' in document.createElement('div') &&
+      'querySelector' in document &&
+      'addEventListener' in window && Array.prototype.forEach) {
+    document.documentElement.classList.add('mdl-js');
+    componentHandler.upgradeAllRegistered();
+  } else {
+    /**
+     * Dummy function to avoid JS errors.
+     */
+    componentHandler.upgradeElement = function() {return;};
+    /**
+     * Dummy function to avoid JS errors.
+     */
+    componentHandler.register = function() {return;};
+  }
+}
+materialInit();
+//window.bcd_init_functions.material = materialInit;

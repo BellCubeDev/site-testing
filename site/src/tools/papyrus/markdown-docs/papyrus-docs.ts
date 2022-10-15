@@ -39,10 +39,10 @@ export function ___bcdLoad_autoPapyDocsInit() { //@ts-ignore Cannot find name 'a
     elem_papy_docs_mdOutput = temp_elements[3]!;
 
     elem_papy_docs_filePicker = temp_elements[4]!;
-    elem_papy_docs_filePicker.addEventListener('click', generateDocs_file);
+    elem_papy_docs_filePicker.addEventListener(window.clickEvt, generateDocs_file);
 
     elem_papy_docs_folderPicker = temp_elements[5]!;
-    elem_papy_docs_folderPicker.addEventListener('click', generateDocs_folder);
+    elem_papy_docs_folderPicker.addEventListener(window.clickEvt, generateDocs_folder);
 
 } //@ts-ignore: Property 'bcd_init_functions' does not exist on type 'Window & typeof globalThis'.
 window.bcd_init_functions.papyDocs = ___bcdLoad_autoPapyDocsInit;
@@ -410,7 +410,7 @@ function parseScriptName(scriptStr:string): papyrus_Script {
         native: false
     };
     return {
-        name: parsed[1],
+        name: parsed[1] ?? '',
 
         included_documentation: typeof parsed[6] === 'undefined' ? '' : parsed[6],
 
@@ -437,9 +437,9 @@ function parseEvents(scriptStr:string):papyrus_Event[] {
         // Parse Event Parameters
 
         events.push({
-            name: _event[2],
-            description: bcdUniversal.trimWhitespace(_event[1]).replace(/^\s*;\s*/gm, ''),
-            parameters: parseParameters(_event[3]),
+            name: _event[2] ?? '',
+            description: bcdUniversal.trimWhitespace(_event[1] ?? '').replace(/^\s*;\s*/gm, ''),
+            parameters: parseParameters(_event[3] ?? ''),
             body: typeof _event[4] === 'undefined' ? '' : bcdUniversal.trimWhitespace(_event[4]),
             global: false,
             native: false,
@@ -450,22 +450,18 @@ function parseEvents(scriptStr:string):papyrus_Event[] {
     return events;
 }
 
-/** Parses a string of parameters
-    @param {string} paramStr - The string to parse
-    @returns {Array<{type: string, is_array: boolean, name: string, default: string}>} - An array of parameter objects
-*/
 function parseParameters(paramStr:string):papyrus_Parameter[] {
     if (typeof paramStr !== 'string') return [];
 
-    var result_arr = [];
-    var params = paramStr.matchAll(regex_EventParams);
+    const result_arr : papyrus_Parameter[] = [];
+    const params = paramStr.matchAll(regex_EventParams);
 
     for (var _param of params){
         result_arr.push({
-            type: bcdUniversal.capitalizeFirstLetter(_param[1]),
+            type: bcdUniversal.capitalizeFirstLetter(_param[1] ?? ''),
             is_array: _param[2] !== undefined,
-            name: _param[3],
-            default: typeof _param[4] === 'undefined' ? '' : _param[3]
+            name: _param[3] ?? '',
+            default: typeof _param[4] === 'undefined' ? '' : _param[3] ?? ''
         });
     }
 
@@ -478,23 +474,23 @@ function parseParameters(paramStr:string):papyrus_Parameter[] {
 */
 
 function parseFunctions(scriptStr:string):papyrus_Function[] {
-    var functions = [];
-    var parsed = scriptStr.matchAll(regex_Functions);
-    for (var _function of parsed){
+    const functions:papyrus_Function[] = [];
+    const parsed = scriptStr.matchAll(regex_Functions);
+    for (const _function of parsed){
         functions.push({
             returns: {type: typeof _function[2] === 'undefined' ? '' : bcdUniversal.capitalizeFirstLetter(_function[2]), is_array: typeof _function[3] !== 'undefined'},
-            name: _function[4],
+            name: _function[4] ?? '',
             description: // Concatenate the various possible description matches
                 (typeof _function[1] === 'undefined' ? '' : bcdUniversal.trimWhitespace(_function[1]).replace(/^\s*;\s*/gm, '')) +
                     (typeof _function[1] === 'undefined' || typeof _function[8] === 'undefined' ? '' : '\n\n') +
-                (typeof _function[8] === 'undefined' ? '' : bcdUniversal.trimWhitespace(_function[1]).replace(/^\s*;\s*/gm, '')) +
+                (typeof _function[8] === 'undefined' ? '' : bcdUniversal.trimWhitespace(_function[8]).replace(/^\s*;\s*/gm, '')) +
                     (typeof _function[8] === 'undefined' || typeof _function[9] === 'undefined' ? '' : '\n\n') +
                 (typeof _function[9] === 'undefined' ? '' : bcdUniversal.trimWhitespace(_function[9]).replace(/^\s*;\s*/gm, '')),
 
-            parameters: parseParameters(_function[5]),
+            parameters: parseParameters(_function[5] ?? ''),
             global: typeof _function[6] !== 'undefined' || typeof _function[8] !== 'undefined',
             native: typeof _function[7] !== 'undefined',
-            body: _function[11] === 'string' ? bcdUniversal.trimWhitespace(_function[9]) : ''
+            body: _function[11] === 'string' ? bcdUniversal.trimWhitespace(_function[9] ?? '') : ''
         });
     }
     return functions;

@@ -7,6 +7,8 @@ plugin_gems: []
 # Default severity of all linters.
 severity: warning
 
+
+
 linters:
   BangFormat:
     enabled: true

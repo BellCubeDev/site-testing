@@ -2,11 +2,12 @@
 layout: compress_html
 ---
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="preload">
 <head><meta charset='utf-8' /><meta name="charset" content="utf-8" /><meta name="google-site-verification" content="SfqBHB4cgh561S6fUtT2ENp0mLbrVrIb9kEb9bK922o" />
 
     <title>BellCube: {{ page.title }} | BellCubeDev.GitHub.IO - The Home of A Decent Hobbyist Programmer</title>
     <meta property="og:title" content="{{ page.title }}">
+
 
 
     <link rel="shortcut icon" type="image/ico" href="{{ site.baseurl }}{% link /favicon.ico %}">
@@ -32,20 +33,34 @@ layout: compress_html
     <meta name="generator" content="Jekyll+TypeScript" />
     <meta name="theme-color" content="#1b1b1b" /><meta name="color-scheme" content="dark" />
 
+    <meta name="referrer" content="strict-origin" />
+    <meta name="opener" content="noopener" />
 
+    <!-- Script Init Stuff -->
+    <!-- window.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent); -->
+    <script>
+        window.bcd_init_functions={};
 
-    <!-- Script Configuration -->
-    <!-- the setTimeout was taken from https://stackoverflow.com/a/38296629/13076790 -->
-    <script>window.bcd_init_functions={};setTimeout(()=>{document.body.className="";},1000);</script>
-    <script async type="module" src="{{ site.baseurl }}{% link assets/site/mdl/material.js %}" onload="window.bcd_init_functions.material()"></script>
-    <script async type="module" src="{{ site.baseurl }}{% link universal.js %}" onload="window.bcd_init_functions.universal()"></script>
+        window.clickEvt = ('onclick' in window) ? 'click' : 'mousedown';
 
+        try   {window.startWithDrawer=performance.getEntriesByType("navigation").find(e => e.type=='navigate') && new URL(document.referrer).host === window.location.host;}
+        catch {window.startWithDrawer=false}
 
+        if (window.startWithDrawer) document.documentElement.classList.add('drawer-init-open');
+
+        requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>
+            document.documentElement.classList.remove('preload')
+        ))));
+    </script>
+
+    <script       type="module" src="{{ site.baseurl }}{% link assets/site/mdl/material.js %}"></script> <!--onload="window.bcd_init_functions.material()"-->
+    <script async type="module" src="{{ site.baseurl }}{% link universal.js %}" onload="window.bcd_init_functions.universal()"></script> <!-- the setTimeout was taken from https://stackoverflow.com/a/38296629/13076790 -->
 
     <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/mdl/css/material-blue.scss %}">
     <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/css/site.scss %}">
+
+    <!-- Require fonts at page load -->
     <style>
-            .mdl-layout__content {padding-bottom: {{ page.bottom_pad | default: '128px' }};}
        /* https://fonts.googleapis.com/icon?family=Material+Icons */
 
             /* fallback */
@@ -610,16 +625,11 @@ layout: compress_html
         <link rel="stylesheet" href="{{site.baseurl}}{% link assets/site/css/vortex_fomod.scss %}">
     {% endif %}
 
-    <!--
-        Appended to the bottom of site.css
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en">
-    -->
     {{ page.extra_head }}
 
 </head>
-<body class="preload">
-    <a class="hidden" aria-hidden="true" id="debug-link" href="{{ site.baseurl }}{% link debug.html %}">PAY NO ATTENTION TO ME. I'M USED IN THE JAVASCRIPT CONTROLLING THE SITE.</a>
+<body>
+    <a class="hidden" hidden disabled tab-index='-999' aria-hidden="true" id="debug-link" href="{{ site.baseurl }}{% link debug.html %}">PAY NO ATTENTION TO ME. I'M USED IN THE JAVASCRIPT CONTROLLING THE SITE.</a>
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
         <div class="mdl-layout__drawer" tabindex="-256">
             <span class="mdl-layout-title">
@@ -716,6 +726,8 @@ layout: compress_html
             </button>
                 <ul for="debuggers-all-powerful-button" class="js-bcd-debuggers-all-powerful-button mdl-menu mdl-menu--top-right mdl-js-ripple-effect"></ul>
         </footer>
+
+        <div class="mdl-layout__obfuscator"></div> <!-- Obfuscator that MDL would've created -->
     </div>
 </body>
 </html>

@@ -7,7 +7,7 @@ export class bcdDropdownSortingOrder extends bcdUniversal.bcdDropdown {
     static asString = 'BCD - Sorting Order Dropdown';
     static cssClass = 'bcd-dropdown-sorting-order';
 
-    options(): bcdUniversal.objOf<Function|null> {
+    override options(): bcdUniversal.objOf<Function|null> {
         return {'Explicit':null, 'Ascending':null, 'Descending':null};
     }
 }

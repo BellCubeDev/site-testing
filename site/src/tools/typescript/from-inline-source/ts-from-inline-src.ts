@@ -34,7 +34,7 @@ window.bcd_init_functions.tsFromInline = function tsFromInline(){
 function parseData(str: string){
 
     // Extract data url from the full file or, barring that, use the input as-is
-    [,str] = str.match(/^\/\/# sourceMappingURL=(.*)/mi) ?? [str];
+    [,str] = str.match(/^\/\/# sourceMappingURL=(.*)/mi) ?? [undefined, str];
 
     console.debug('Parsing data:', str);
 
@@ -115,7 +115,7 @@ async function setOutput(outs_: outs) {
     outputArea.style.opacity = '1'; // Don't worry, this isn't a race condition - thank you, Event Loop!
 
     for (let i = 0; i < outs.length; i++) {
-        const [file, data] = outs[i];
+        const [file, data] = outs[i]!;
 
         const output = prefabOutput.cloneNode(true) as HTMLDivElement;
         output.id = `output-${i}`;
