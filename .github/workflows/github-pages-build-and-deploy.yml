@@ -70,7 +70,7 @@ jobs:
         # Output dir: $GITHUB_WORKSPACE/_generated/ts_out/
         run: |
           cd $GITHUB_WORKSPACE/site/src/
-          rm -f -r *.ts *.js
+          rm -f -r *.js
 
           rsync -t -r -v $GITHUB_WORKSPACE/site/src/* $GITHUB_WORKSPACE/_generated/ts_out/
 

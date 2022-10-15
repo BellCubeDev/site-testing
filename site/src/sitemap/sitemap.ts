@@ -17,7 +17,8 @@ interface jekyllPages {
         sitemap?: boolean;
         formatted_title?: string;
         title?: string;
-    }>
+    }>,
+    translation: Record<string, string>;
 }
 
 window.bcd_init_functions.sitemap = sitemapInit;
@@ -49,11 +50,12 @@ let prefabItem:HTMLDivElement;
     ```
 */
 let prefabDir:HTMLDivElement;
+let obj:jekyllPages;
 
 async function sitemapInit(){
 
     const data = await fetch(`${window.location.href}sitemap.json`);
-    const obj = await data.json() as jekyllPages;
+    obj = await data.json() as jekyllPages;
 
     console.debug('Working with object:\n', obj);
 
@@ -109,8 +111,13 @@ async function sitemapInit(){
 
         const item = prefabItem.cloneNode(true) as HTMLDivElement;
         item.removeAttribute('id');
+
         const a = item.querySelector('.sitemap-item') as HTMLAnchorElement;
-        a.textContent = page.formatted_title ?? page.title ?? page.name;
+
+        const tempTextCont = (page.formatted_title ?? page.title ?? page.name).trim();
+        if (tempTextCont in obj.translation) a.textContent = obj.translation[tempTextCont]!;
+        else a.textContent = tempTextCont;
+
         a.setAttribute('href', obj.baseurl + page.url);
 
         console.debug('===================');
@@ -153,7 +160,10 @@ function findOrCreateDir(dir:string, entryPoint:Element):HTMLDivElement{
     newDir.removeAttribute('id');
 
     const thisSummary = newDir.querySelector(`.${cssSummary_}`);
-    (thisSummary ?? entryPoint).querySelector('.sitemap-dir-name')!.textContent = dir;
+
+    let tempTextCont = dir.trim();
+    if (tempTextCont in obj.translation) tempTextCont = obj.translation[tempTextCont]!;
+    (thisSummary ?? entryPoint).querySelector('.sitemap-dir-name')!.textContent = tempTextCont;
 
     const appendPoint = entryPoint.id === 'sitemap' ? entryPoint : entryPoint.querySelector(cssDetails_) ?? entryPoint;
     appendPoint.appendChild(newDir);
