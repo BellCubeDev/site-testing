@@ -3172,6 +3172,7 @@ export class MaterialLayout {
         drawerButton.focus({preventScroll:true});
 
         document.documentElement.classList.remove('drawer-init-open');
+        window.startWithDrawer = false;
     }
     /**
        * Initialize element.
@@ -3305,10 +3306,11 @@ export class MaterialLayout {
 
             // Start with drawer open or closed depending on a global (Window) variable
             if (window.startWithDrawer) {
-                this.openDrawer();
+                this.openDrawer(true);
             }
             else this.closeDrawer(false);
             setTimeout(()=>{
+                if (window.startWithDrawer) this.closeDrawer(true);
                 if (window.startWithDrawer) this.closeDrawer(false);
             }, 100);
         }
