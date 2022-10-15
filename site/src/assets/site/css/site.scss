@@ -444,12 +444,14 @@ section {
     overflow: hidden;
     outline: none;
 
+    > :not(.js-bcd-details-inner) { display:none; }
+
     &.is-open > .js-bcd-details-inner { transition-timing-function: cubic-bezier(0, 0.3, 0.8, 1); }
     > .js-bcd-details-inner {
         transition-property: height, margin-top;
         transition-timing-function: cubic-bezier(0.1, 0, 0.6, 1);
 
-        margin-top: -200vh;
+        margin-top: -9999vh;
 
         height: max-content;
 
