@@ -23,6 +23,10 @@
                 "showReuseMessage": false,
                 "clear": true,
                 "close": false
+            },
+            "icon": {
+                "color": "terminal.ansiGreen",
+                "id": "code"
             }
         },
         {
@@ -42,6 +46,10 @@
                 "showReuseMessage": false,
                 "clear": true,
                 "close": false
+            },
+            "icon": {
+                "color": "terminal.ansiGreen",
+                "id": "tools"
             }
         }
     ]

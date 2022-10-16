@@ -84,6 +84,8 @@ function parseFromJSON(obj: any) {
 
     for (let i = 0; i < obj.sources.length; i++) {
         const file = obj.sources[i];
+        
+        // eslint-disable-next-line prefer-template
         const contents = (obj.sourcesContent[i] as string).trim().replace(/[^\n\S]+(?:\r\n?|\n)/g, '\n') + '\n';
 
         console.debug('Source', i, {[`${file}`]: contents});

@@ -1,5 +1,8 @@
 ---
 ---
+
+// sass-lint:disable-all
+
 /*
 * material-design-lite - Material Design Components in CSS, JS and HTML
 * @version v1.3.0
@@ -13,8 +16,6 @@
 * The document's source CSS file has been formatted automatically to improve developer sanity.
 * Some of the now-nonstandard properties used for legacy browser support (which I do not use) have been removed for micro-optimization.
 */
-
-// sass-lint:disable-all
 
 html {
     color: #000000de
@@ -4728,6 +4729,7 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
     line-height: 64px;
     padding-left: 40px;
     cursor: context-menu;
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -6732,7 +6734,7 @@ fieldset[disabled] .mdl-textfield .mdl-textfield__label,
     bottom: 0
 }
 
-.mdl-tooltip, .js-bcd-tooltip {
+.mdl-tooltip {
     -webkit-transform: scale(0);
     transform: scale(0);
     -webkit-transform-origin: top center;
@@ -6753,7 +6755,7 @@ fieldset[disabled] .mdl-textfield .mdl-textfield__label,
     text-align: center
 }
 
-.mdl-tooltip.is-active, .js-bcd-tooltip.active {
+.mdl-tooltip.is-active {
     -webkit-animation: pulse 200ms cubic-bezier(0, 0, .2, 1) forwards;
     animation: pulse 200ms cubic-bezier(0, 0, .2, 1) forwards
 }

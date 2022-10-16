@@ -1,5 +1,3 @@
-import { debug } from 'console';
-import { request } from 'http';
 import * as mdl from './assets/site/mdl/material.js';
 import * as quotes from './universal_quotes.js';
 
@@ -45,6 +43,13 @@ export function trimWhitespace(str: string): string {
                 .replace(/[^\S\n]*$/gm, '') // Trim whitespace at the end of each line
 ;}
 
+// ================================
+// ======= EVENT  UTILITIES =======
+// ================================
+
+export function preventPropagation(event: Event): void {
+    event.stopPropagation();
+}
 
 // =================================
 // ======== ARRAY UTILITIES ========
@@ -114,6 +119,10 @@ export function copyCode(elem: HTMLElement): void {
     navigator.clipboard.writeText(codeElem.textContent ?? '');
 }
 window.copyCode = copyCode;
+
+export function getInputValue(input: HTMLInputElement): string {
+    return input.value || input.getAttribute('bcdPlaceholder') || input.placeholder || '';
+}
 
 
 
@@ -985,9 +994,15 @@ export class bcdTooltip {
 
     element: HTMLElement;
     boundElement: HTMLElement;
+    gapBridgeElement: HTMLElement;
 
     constructor(element: HTMLElement) {
         this.element = element;
+
+        this.gapBridgeElement = document.createElement('div');
+        this.gapBridgeElement.classList.add('js-bcd-tooltip_gap-bridge');
+        this.element.appendChild(this.gapBridgeElement);
+
 
         const tempRelation = element.getAttribute('tooltip-relation') ?? 'proceeding';
 
@@ -1025,87 +1040,138 @@ export class bcdTooltip {
         const boundLeave = this.handleHoverLeave.bind(this);
         const boundTouch = this.handleTouch.bind(this);
 
-        this.boundElement.addEventListener('mouseenter', boundEnter);
-        this.boundElement.addEventListener('mouseleave', boundLeave);
-
         window.addEventListener('contextmenu', boundLeave);
+        this.element.addEventListener('contextmenu', preventPropagation);
 
-        this.boundElement.addEventListener('touchstart', boundTouch);
-        this.boundElement.addEventListener('touchmove', boundTouch);
-        this.boundElement.addEventListener('touchend', boundTouch);
-        this.boundElement.addEventListener('touchcancel', boundTouch);
+        this.boundElement.addEventListener('mouseenter',  boundEnter);                  this.element.addEventListener('mouseenter',  boundEnter);
+        this.boundElement.addEventListener('mouseleave',  boundLeave);                  this.element.addEventListener('mouseleave',  boundLeave);
+
+        this.boundElement.addEventListener('touchstart',  boundTouch, {passive: true}); this.element.addEventListener('touchstart',  boundTouch, {passive: true});
+        this.boundElement.addEventListener('touchmove',   boundTouch, {passive: true}); this.element.addEventListener('touchmove',   boundTouch, {passive: true});
+        this.boundElement.addEventListener('touchend',    boundTouch, {passive: true}); this.element.addEventListener('touchend',    boundTouch, {passive: true});
+        this.boundElement.addEventListener('touchcancel', boundTouch, {passive: true}); this.element.addEventListener('touchcancel', boundTouch, {passive: true});
     }
 
     handleTouch(event: TouchEvent) {
-        if (event.targetTouches.length > 0) this.handleHoverEnter();
-        else this.handleHoverLeave();
+        if (event.targetTouches.length > 0) this.handleHoverEnter(undefined, true);
+        else this.handleHoverLeave(undefined, true);
     }
 
-    handleHoverEnter(event?: MouseEvent|FocusEvent) {
-        this.setPosition();
-        this.element.classList.add('active');
+    handleHoverEnter(event?: MouseEvent|FocusEvent, bypassWait? : true) {
+        this.element.classList.add('active_');
+
+        setTimeout(()=> {
+            if (!this.element.classList.contains('active_')) return;
+            this.setPosition();
+            this.element.classList.add('active');
+        }, 600);
+
     }
 
-    handleHoverLeave(event?: MouseEvent|FocusEvent) {
-        this.element.classList.remove('active');
+    handleHoverLeave(event?: MouseEvent|FocusEvent, bypassWait? : true) {
+        this.element.classList.remove('active_');
+        setTimeout(() => {
+            if (!this.element.classList.contains('active_')) this.element.classList.remove('active');
+        }, 10);
     }
 
     setPosition() {
         console.log(`Setting position of tooltip to the ${this.position} of `, this.boundElement);
 
+        this.element.style.transform = 'none !important';
+        this.element.style.transition = 'none !important';
+
+        // Force recalc of styles
+        const tipStyle = window.getComputedStyle(this.element);
+
+        const tipPaddingRight =  parseInt(tipStyle.paddingRight);
+        const tipPaddingLeft =   parseInt(tipStyle.paddingLeft);
+        const tipPaddingTop =    parseInt(tipStyle.paddingTop);
+        const tipPaddingBottom = parseInt(tipStyle.paddingBottom);
+
+        console.debug('Recalculated styles:', {transform: tipStyle.transform, transition: tipStyle.transition, width: tipStyle.width, height: tipStyle.height, offsetLeft: this.element.offsetLeft, offsetTop: this.element.offsetTop, offsetWidth: this.element.offsetWidth, offsetHeight: this.element.offsetHeight});
+
         const elemRect = this.boundElement.getBoundingClientRect();
+        const tipRect = {width: this.element.offsetWidth, height: this.element.offsetHeight};
 
-        const top = elemRect.top  + (elemRect.height / 2);
-        const marginTop = this.element.offsetHeight / -2;
+        console.debug('Element rect:', elemRect);
+        console.debug('Element rects:', this.boundElement.getClientRects());
+        console.debug('Tooltip rect:', tipRect);
+        console.debug('Tooltip rects:', this.element.getClientRects());
 
-        let left =  elemRect.left + (elemRect.width  / 2) - 256;
-        const marginLeft =   this.element.offsetWidth / -2;
+        /** The top position - set to the middle of the Bound Element */
+        let top = elemRect.top  + (elemRect.height / 2);
+        /** The top margin - the negative height of the tooltip */
+        const marginTop = tipRect.height / -2;
 
-        console.log(`Left Position: ${left}, pushing? ${left < 16}; Right Position: ${left + this.element.offsetWidth}, pushing? ${left + this.element.offsetWidth > window.innerWidth - 16}`);
+        /** The left position - set to the middle of the Bound Element */
+        let left =  elemRect.left + (elemRect.width  / 2);
+        /** The left margin - the negative width of the tooltip */
+        const marginLeft =   tipRect.width / -2;
+
+        console.log(`Left Position: ${left + marginLeft}, pushing? ${left + marginLeft < 8}; Right Position: ${left + marginLeft + tipRect.width}, pushing? ${left + marginLeft + tipRect.width > window.innerWidth - 8}`);
 
         // Padding of 16px on the left and right of the document
-        left = Math.max(16,  Math.min(left, window.innerWidth - this.element.offsetWidth - 16)  );
-
 
         switch (this.position) {
             case 'top':
             case 'bottom':
-                if (left + marginLeft < 0) {
-                    this.element.style.left = '0';
-                    this.element.style.marginLeft = '0';
-                } else {
-                    this.element.style.left = `${left}px`;
-                    this.element.style.marginLeft = `${marginLeft}px`;
-                }
+
+
+
+                this.gapBridgeElement.style.height = '17px';
+                this.gapBridgeElement.style.width = `${Math.max(tipRect.width, elemRect.width)}px`;
+                this.gapBridgeElement.style.left = `${Math.min(elemRect.left, left + marginLeft) - left - marginLeft}px`;
+
+                if (left + marginLeft < 8) left += 8 - left - marginLeft;
+
+                this.element.style.left = `${left}px`;
+                this.element.style.marginLeft = `${marginLeft}px`;
+
             break;
 
             case 'left':
             case 'right':
-                left = elemRect.width / 2;
-                if (top + marginTop < 0) {
-                    this.element.style.top = '0';
-                    this.element.style.marginTop = '0';
 
-                } else {
-                    this.element.style.top = `${top}px`;
-                    this.element.style.marginTop = `${marginTop}px`;
-                }
+                top += 8 - top - marginTop;
+
+                this.gapBridgeElement.style.height = `${Math.max(tipRect.height, elemRect.height)}px`;
+                this.gapBridgeElement.style.width = '17px';
+                this.gapBridgeElement.style.top = `${Math.min(elemRect.top, top + marginTop) - top - marginTop}px`;
+
+                if (top + marginTop < 8) top += 8 - top - marginTop;
+
+                this.element.style.top = `${top}px`;
+                this.element.style.marginTop = `${marginTop}px`;
+
             break;
         }
 
-        console.log(`Final Left Position: ${left + marginLeft - (this.element.offsetWidth / 2)}`);
+        console.log(`Final Left Position: ${left + marginLeft - (tipRect.width / 2)}`);
 
         switch (this.position) {
 
-            case 'top':     this.element.style.top  = `${elemRect.top  - this.element.offsetHeight - 16}px`; break;
+            case 'top':     this.element.style.top  = `${elemRect.top  - tipRect.height - 16}px`;
+                            this.gapBridgeElement.style.top  = `${16  + tipRect.height}px`;
+            break;
 
-            case 'bottom':   this.element.style.top  = `${elemRect.top  + elemRect.height + 16}px`; break;
+            case 'bottom': this.element.style.top  = `${elemRect.top  + elemRect.height + 16}px`;
+                            this.gapBridgeElement.style.top  = `-16px`;
 
-            case 'left':    this.element.style.left = `${elemRect.left - this.element.offsetWidth - 16}px`; break;
+            break;
+
+            case 'left':   this.element.style.left = `${elemRect.left - tipRect.width - 16}px`;
+                            this.gapBridgeElement.style.left = `${16 + tipRect.width}px`;
+
+            break;
 
             case 'right':  this.element.style.left = `${elemRect.left + elemRect.width + 16}px`;
+                            this.gapBridgeElement.style.left = `-16px`;
 
         }
+
+        this.element.style.transform = '';
+        this.element.style.transition = '';
     }
 
 }
@@ -1295,7 +1361,7 @@ export function bcd_universalJS_init():void {
     // Modify links not in the main nav to not send a referrer (allows us to check if the drawer should be initially open or not)
     for (const link of [...document.links]){
         if (window.layout.drawer_?.contains(link)) continue;
-        link.rel += " noreferrer";
+        link.rel += " noopener noreferrer";
     }
 
     // =============================================================

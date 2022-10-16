@@ -82,11 +82,11 @@ html > body {
     flex-wrap: nowrap;
 
     .material-icons {
-        height: 24px;
+        width: 24px;
     }
 
     > :not(.material-icons, .center-vert) {
-        height: 24px;
+        width: 24px;
         padding-left: 24px;
     }
 }
@@ -256,6 +256,7 @@ pre {
 
 .mdl-button {
     text-transform: none;
+    -webkit-user-select: none;
     user-select: none;
 }
 
@@ -357,6 +358,7 @@ section {
 
 
     * {
+        -webkit-user-select: none;
         user-select: none;
     }
 
@@ -444,7 +446,7 @@ section {
     overflow: hidden;
     outline: none;
 
-    > :not(.js-bcd-details-inner) { display:none; }
+    > :not(.js-bcd-details-inner) { display: none; }
 
     &.is-open > .js-bcd-details-inner { transition-timing-function: cubic-bezier(0, 0.3, 0.8, 1); }
     > .js-bcd-details-inner {
@@ -483,11 +485,9 @@ section {
     }
 }
 
+.mdl-tooltip {pointer-events: none;}
+
 .mdl-tooltip, .js-bcd-tooltip {
-    pointer-events: none;
-
-    animation: pulseBackward 350ms cubic-bezier(0, 0, .2, 1) forwards;
-
     background: #111111ee;
 
     max-width: 500px;
@@ -498,9 +498,23 @@ section {
     font-size: small;
     line-height: 150%;
 
-    &.is-active, &.active {
-        animation-duration: 350ms;
-    }
+    transform-origin: top center;
+    z-index: 999;
+    border-radius: 2px;
+    color: #fff;
+    display: inline-block;
+    font-weight: 500;
+    position: fixed;
+    top: -500px;
+    left: -500px;
+    padding: 8px;
+    text-align: center;
+
+    transform: scale(0);
+    &.is-active, &.active { transform: scale(1); }
+
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: none !important;
 
     > * {
         padding: 0;
@@ -519,6 +533,13 @@ section {
 
     h4 {
         font-size: 16px;
+    }
+
+    > .js-bcd-tooltip_gap-bridge {
+        position: absolute;
+        display: block;
+        //background-color: red;
+        visibility: none;
     }
 }
 
