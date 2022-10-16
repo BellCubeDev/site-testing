@@ -1,4 +1,4 @@
-import * as bcdUniversal from '../../../universal.js';
+import { trimWhitespace, capitalizeFirstLetter } from '../../../universal';
 import {hljs} from  '../../../assets/site/highlight_js/highlight.js';
 
 // HLJS Language Definition
@@ -80,7 +80,7 @@ const regex_Functions =
 /** Sets the output area's text with syntax highlighting*/
 function setMarkdownOutput(str:string){
     //console.log(str);
-    elem_papy_docs_mdOutput.innerHTML = hljs.highlight(bcdUniversal.trimWhitespace(str), {language: 'md'}).value;
+    elem_papy_docs_mdOutput.innerHTML = hljs.highlight(str, {language: 'md'}).value;
 }
 
 /*
@@ -350,7 +350,7 @@ function parseScript(scriptStr:string):string {
         functionTable += funcTableRow;
     }
 
-    return `# ${scriptname.name}
+    return trimWhitespace(`# ${scriptname.name}
 
 | :-: | :-- |
 | Engine-Bound Type | <!-- **USER-INPUTTED** --> | <!-- e.g. \`_NPC\` (Actor) -->
@@ -394,7 +394,7 @@ Scripts extending this script
 <!-- **MUST BE CREATED MANUALLY** -->
 | Script Name | Has Engine-Bound Type? | <!-- Scripts with engine-bound types should come first -->
 |     :-:     |          :-:           |
-`;
+`, true);
 }
 
 
@@ -438,9 +438,9 @@ function parseEvents(scriptStr:string):papyrus_Event[] {
 
         events.push({
             name: _event[2] ?? '',
-            description: bcdUniversal.trimWhitespace(_event[1] ?? '').replace(/^\s*;\s*/gm, ''),
+            description: trimWhitespace(_event[1] ?? '').replace(/^\s*;\s*/gm, ''),
             parameters: parseParameters(_event[3] ?? ''),
-            body: typeof _event[4] === 'undefined' ? '' : bcdUniversal.trimWhitespace(_event[4]),
+            body: typeof _event[4] === 'undefined' ? '' : trimWhitespace(_event[4]),
             global: false,
             native: false,
             returns: {type: 'None', is_array: false}
@@ -458,7 +458,7 @@ function parseParameters(paramStr:string):papyrus_Parameter[] {
 
     for (var _param of params){
         result_arr.push({
-            type: bcdUniversal.capitalizeFirstLetter(_param[1] ?? ''),
+            type: capitalizeFirstLetter(_param[1] ?? ''),
             is_array: _param[2] !== undefined,
             name: _param[3] ?? '',
             default: typeof _param[4] === 'undefined' ? '' : _param[3] ?? ''
@@ -478,19 +478,19 @@ function parseFunctions(scriptStr:string):papyrus_Function[] {
     const parsed = scriptStr.matchAll(regex_Functions);
     for (const _function of parsed){
         functions.push({
-            returns: {type: typeof _function[2] === 'undefined' ? '' : bcdUniversal.capitalizeFirstLetter(_function[2]), is_array: typeof _function[3] !== 'undefined'},
+            returns: {type: typeof _function[2] === 'undefined' ? '' : capitalizeFirstLetter(_function[2]), is_array: typeof _function[3] !== 'undefined'},
             name: _function[4] ?? '',
             description: // Concatenate the various possible description matches
-                (typeof _function[1] === 'undefined' ? '' : bcdUniversal.trimWhitespace(_function[1]).replace(/^\s*;\s*/gm, '')) +
+                (typeof _function[1] === 'undefined' ? '' : trimWhitespace(_function[1]).replace(/^\s*;\s*/gm, '')) +
                     (typeof _function[1] === 'undefined' || typeof _function[8] === 'undefined' ? '' : '\n\n') +
-                (typeof _function[8] === 'undefined' ? '' : bcdUniversal.trimWhitespace(_function[8]).replace(/^\s*;\s*/gm, '')) +
+                (typeof _function[8] === 'undefined' ? '' : trimWhitespace(_function[8]).replace(/^\s*;\s*/gm, '')) +
                     (typeof _function[8] === 'undefined' || typeof _function[9] === 'undefined' ? '' : '\n\n') +
-                (typeof _function[9] === 'undefined' ? '' : bcdUniversal.trimWhitespace(_function[9]).replace(/^\s*;\s*/gm, '')),
+                (typeof _function[9] === 'undefined' ? '' : trimWhitespace(_function[9]).replace(/^\s*;\s*/gm, '')),
 
             parameters: parseParameters(_function[5] ?? ''),
             global: typeof _function[6] !== 'undefined' || typeof _function[8] !== 'undefined',
             native: typeof _function[7] !== 'undefined',
-            body: _function[11] === 'string' ? bcdUniversal.trimWhitespace(_function[9] ?? '') : ''
+            body: _function[11] === 'string' ? trimWhitespace(_function[9] ?? '') : ''
         });
     }
     return functions;

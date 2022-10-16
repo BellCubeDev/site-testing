@@ -58,7 +58,7 @@ async function parseFromURL(uri: URL){
 
     if (uri.protocol !== 'data:') throw new Error('Only `data:` URIs are supported');
 
-    const [,ext, data] = uri.pathname.trim().match(/^(.+?);base64,(.*)$/) ?? [];
+    const [,ext, data] = uri.pathname.trim().match(/^(.+?);(?:[^,]*?;)*base64,(.*)$/) ?? [];
 
     if (ext !== 'application/json' || !data) {
         console.error(uri);
@@ -84,7 +84,7 @@ function parseFromJSON(obj: any) {
 
     for (let i = 0; i < obj.sources.length; i++) {
         const file = obj.sources[i];
-        
+
         // eslint-disable-next-line prefer-template
         const contents = (obj.sourcesContent[i] as string).trim().replace(/[^\n\S]+(?:\r\n?|\n)/g, '\n') + '\n';
 

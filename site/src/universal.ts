@@ -18,6 +18,11 @@ $$ |  $$ |  $$ |$$\ $$ |$$ |$$ |  $$ |$$\ $$ |$$   ____| \____$$\
  \______/    \____/ \__|\__|\__|   \____/ \__| \_______|\______*/
 
 
+/** Rearranged and better-typed parameters for `setTimeout` */
+export function afterDelay<TCallback extends (...args: any) => any = any>(timeout: number, callback: TCallback|string, ...args: Parameters<TCallback>):void {
+    // @ts-ignore: the `Parameters` utility type returns a tuple, which inherently has an iterator function--regardless of what TypeScript thinks
+    window.setTimeout(callback, timeout, ...(args || []));
+}
 
 // ================================
 // ======== TYPE UTILITIES ========
@@ -37,10 +42,11 @@ export function capitalizeFirstLetter(str: string): string {
 }
 
 /** Removes whitespace at the beginning and end of a string and at the end of every included line*/
-export function trimWhitespace(str: string): string {
-    return  str.trimStart()                // Trim whitespace at the start of the string
-                .trimEnd()                  // Trim whitespace at the end of the string
-                .replace(/[^\S\n]*$/gm, '') // Trim whitespace at the end of each line
+export function trimWhitespace(str: string, trailingNewline = false): string {
+    return  str.trimStart()                     // Trim whitespace at the start of the string
+                .trimEnd()                      // Trim whitespace at the end of the string
+                .replace(/[^\S\n]*$/gm, '')     // Trim whitespace at the end of each line
+                + (trailingNewline ? '\n' : '') // Add a trailing newline if requested
 ;}
 
 // ================================
@@ -113,10 +119,18 @@ export function copyCode(elem: HTMLElement): void {
 
     console.debug("copyCode", elem);
 
+    // Get code
     const codeElem = elem.parentElement?.querySelector('code');
     if (!codeElem) throw new Error("No code element found to copy from!");
 
-    navigator.clipboard.writeText(codeElem.textContent ?? '');
+    // Write code to clipboard (after trimming the whitespace)
+    navigator.clipboard.writeText(trimWhitespace(codeElem.textContent ?? '', true));
+
+    // Select text (UX stunt)
+    const selection = window.getSelection()!;
+    const tempRange = new Range();
+    tempRange.selectNode(codeElem);
+    selection.removeAllRanges(); selection.addRange(tempRange);
 }
 window.copyCode = copyCode;
 
@@ -570,7 +584,7 @@ export class bcdModalDialog extends EventTarget {
 
         this.closeByClickOutside = !this.element_.hasAttribute('no-click-outside');
 
-        setTimeout(function (this: bcdModalDialog) { // Lets the DOM settle and gives JavaScript a chance to modify the element
+        afterDelay(1000, function (this: bcdModalDialog) { // Lets the DOM settle and gives JavaScript a chance to modify the element
 
             const closeButtons = this.element_.getElementsByClassName('js-bcd-modal-close');
             for (const button of closeButtons) {
@@ -578,7 +592,7 @@ export class bcdModalDialog extends EventTarget {
             }
 
             if (this.element_.hasAttribute('open-by-default')) this.show();
-        }.bind(this), 1000);
+        }.bind(this));
     }
 
     static evalQueue(delay: number = 100):void {
@@ -601,7 +615,7 @@ export class bcdModalDialog extends EventTarget {
 
         console.debug("Showing modal:", modal);
 
-        setTimeout(modal.show_forReal.bind(modal), delay);
+        afterDelay(delay, modal.show_forReal.bind(modal));
     }
 
     show(){
@@ -1060,19 +1074,19 @@ export class bcdTooltip {
     handleHoverEnter(event?: MouseEvent|FocusEvent, bypassWait? : true) {
         this.element.classList.add('active_');
 
-        setTimeout(()=> {
+        afterDelay(600, ()=> {
             if (!this.element.classList.contains('active_')) return;
             this.setPosition();
             this.element.classList.add('active');
-        }, 600);
+        });
 
     }
 
     handleHoverLeave(event?: MouseEvent|FocusEvent, bypassWait? : true) {
         this.element.classList.remove('active_');
-        setTimeout(() => {
+        afterDelay(10, () => {
             if (!this.element.classList.contains('active_')) this.element.classList.remove('active');
-        }, 10);
+        });
     }
 
     setPosition() {
@@ -1355,13 +1369,18 @@ $$$$$$\ $$ |  $$ |$$ |  \$$$$  |$$ |\$$$$$$$ |$$ |$$ |$$$$$$$$\ \$$$$$$$ |  \$$$
 */
 export function bcd_universalJS_init():void {
 
+    // =============================================================
     // Register all the things!
+    // =============================================================
     registerComponents();
 
-    // Modify links not in the main nav to not send a referrer (allows us to check if the drawer should be initially open or not)
+    // =============================================================
+    // Modify links not in the main nav to not send a referrer
+    // (allows for fancy drawer stuff)
+    // =============================================================
     for (const link of [...document.links]){
-        if (window.layout.drawer_?.contains(link)) continue;
-        link.rel += " noopener noreferrer";
+        if (window.layout.drawer_?.contains(link)) link.rel += " noopener";
+        else link.rel += " noopener noreferrer";
     }
 
     // =============================================================
