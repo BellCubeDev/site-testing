@@ -1257,6 +1257,7 @@ export class bcdDynamicTextAreaWidth extends bcdDynamicTextArea_base {
 
     constructor(element: HTMLElement) {
         super(element);
+        new ResizeObserver(this.adjust.bind(this)).observe(this.element);
     }
 
     override adjust() {
@@ -1396,5 +1397,19 @@ export function bcd_universalJS_init():void {
     // Check condition
     if (quotes.checkCondition(toSetText![0])) randomTextField.innerHTML = toSetText![1];
     else randomTextField.innerHTML = quotes.possibilities_Generic[randomNumber(0, quotes.possibilities_Generic.length - 1)]!;
+
+    // =============================================================
+    // Import Lazy-Loaded Styles
+    // =============================================================
+    afterDelay(100, () => {
+        const lazyStyles = JSON.parse(`[${document.getElementById('lazy-styles')?.innerText ?? ''}]`) as string[];
+        for (const style of lazyStyles) {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = style;
+            document.head.appendChild(link);
+        }
+        document.documentElement.classList.remove('lazy-styles-not-loaded');
+    });
 }
 window.bcd_init_functions.universal = bcd_universalJS_init;

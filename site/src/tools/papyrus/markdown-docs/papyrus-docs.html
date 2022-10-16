@@ -3,7 +3,6 @@ layout: page
 title: Tools - Papyrus Auto Docs
 extra_head: >
     <script async type="module" src="papyrus-docs.js" onload="window.bcd_init_functions.papyDocs()"></script>
-hljs_styles: true
 # day-month-year
 lastMod: 6-10-2022
 description: >
@@ -34,6 +33,9 @@ redirect_from:
   - /tools/papy/md-docs/
 ---
 
+<div hidden id="lazy-styles">
+    "{{site.baseurl}}{% link assets/site/highlight_js/styles/base16/atelier-lakeside.scss %}"
+</div>
 
 <h1>Papyrus Markdown Docs Generator</h1>
 <p>This page is a utility for generating bare-bones Markdown documentation for Papyrus scripts.

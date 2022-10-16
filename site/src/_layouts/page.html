@@ -2,7 +2,7 @@
 layout: compress_html
 ---
 <!DOCTYPE html>
-<html lang="en" class="preload">
+<html lang="en" class="preload lazy-styles-not-loaded">
 <head><meta charset='utf-8' /><meta name="charset" content="utf-8" /><meta name="google-site-verification" content="SfqBHB4cgh561S6fUtT2ENp0mLbrVrIb9kEb9bK922o" />
 
     <title>BellCube: {{ page.title }} | BellCubeDev.GitHub.IO - The Home of A Decent Hobbyist Programmer</title>
@@ -633,14 +633,6 @@ layout: compress_html
                 font-display: swap;
             }
     </style>
-
-    {% if page.use_docs_CSS or layout.use_docs_CSS %}<link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/css/docs.scss %}" />{% endif %}
-    {% if page.hljs_styles %}
-        <link rel="stylesheet" href="{{site.baseurl}}{% link assets/site/highlight_js/styles/base16/atelier-lakeside.scss %}">
-    {% endif %}
-    {% if page.fomod_styles %}
-        <link rel="stylesheet" href="{{site.baseurl}}{% link assets/site/css/vortex_fomod.scss %}">
-    {% endif %}
 
     {{ page.extra_head }}
 

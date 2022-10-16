@@ -3,7 +3,6 @@ layout: page
 title: Tools - FOMOD Builder
 extra_head: >
     <script async type="module" src="fomod-builder.js" onload="window.bcd_init_functions.fomodBuilder()"></script>
-fomod_styles: true
 description: >
     The FOMOD Builder is a tool for creating FOMOD installers, a popular XML-based format for video game mod installers. It is the first of its kind to feature intuitive tooltips, dark mode, and eventually more. It is, at this time, incomplete.
 # , full schema support, Real-time renders, auditing
@@ -17,6 +16,10 @@ redirect_from:
 
 {% capture vortexSVG %}{{site.baseurl}}{% link assets/site/images/SVGs/Vortex.svg %}{% endcapture %}
 {% capture mo2SVG %}{{site.baseurl}}{% link assets/site/images/SVGs/MO2.svg %}{% endcapture %}
+
+<div hidden id="lazy-styles">
+    "{{site.baseurl}}{% link assets/site/css/vortex_fomod.scss %}"
+</div>
 
 <!--
     MO2 - Info.xml
@@ -164,7 +167,7 @@ redirect_from:
 
 
 
-        <div class="js-vortex-steps">
+        <div class="js-vortex-steps needs-lazy">
             <div id="vortex-steps-header">
                 <input class="bcd-vortex-input vortex-steps-title vortex-fake-header h4 js-dynamic-textarea-width" paddingPX=20 placeholder="Mod Name" value="Retexture for The Scroll" />
                 <br /><input class="bcd-vortex-input vortex-modal-subtitle js-dynamic-textarea-width" paddingPX=20 placeholder="Step Name" value="Choose Version (1/2)" />
