@@ -1,4 +1,4 @@
-import { trimWhitespace, capitalizeFirstLetter } from '../../../universal';
+import { trimWhitespace, capitalizeFirstLetter } from '../../../universal.js';
 import {hljs} from  '../../../assets/site/highlight_js/highlight.js';
 
 // HLJS Language Definition

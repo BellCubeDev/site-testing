@@ -1,5 +1,5 @@
 import * as main from "./fomod-builder.js"; // Brings in global things
-import { objOf } from '../../universal';
+import { objOf } from '../../universal.js';
 /* eslint-disable i18n-text/no-en */// FOMODs are XML files with a schema written in English, so disallowing English makes little sense.
 
 /*
