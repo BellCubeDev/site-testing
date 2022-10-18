@@ -104,7 +104,7 @@ export function focusAnyElement(element:HTMLElement|undefined, preventScrolling:
     if (!element || !element.focus) return;
 
     const hadTabIndex = element.hasAttribute('tabindex');
-    if (!hadTabIndex) element.setAttribute('tabindex', '0');
+    if (!hadTabIndex) element.setAttribute('tabindex', '-8311');
 
     element.focus({preventScroll: preventScrolling});
 
@@ -504,8 +504,11 @@ export class BellCubicSummary extends bcd_collapsibleParent {
     }
 
     handleClick(event?:MouseEvent){
+        console.log(event);
+
         // @ts-expect-error: Property 'path' and 'pointerType' DO exist on type 'MouseEvent', but not in Firefox or presumably Safari
-        if (!event || !('pointerType' in event) || !event.pointerType || !event.path || event.path?.slice(0, 5).map((el:HTMLElement) => el.tagName === 'A').includes(true)) return;
+        if (!event || (('pointerType' in event) && !event.pointerType) || (event.path && event.path?.slice(0, 5).map((el:HTMLElement) => el.tagName === 'A').includes(true))) return;
+
         this.toggle();
         this.correctFocus();
     }
@@ -938,20 +941,23 @@ export class bcdTabButton extends mdl.MaterialButton {
             }
         }
 
-        if (!this.boundTab.parentElement) return; // I would worry about race conditions, but JavaScript executes synchronous code one function at a time
+        if (!this.boundTab.parentElement) return; // I would worry about race conditions, but browsers run websites in an Event Loop.
 
         const tab_siblingsAndTab = [...this.boundTab.parentElement.children];
         for (const tab of tab_siblingsAndTab) {
             if (tab === this.boundTab) {
                 tab.classList.add('active');
                 tab.setAttribute('aria-hidden', 'false');
+                tab.removeAttribute('disabled');
+                tab.removeAttribute('tabindex');
 
-                // TypeScript doesn't get that we wouldn't be iterating if parentElement were undefined, so a non-null assertion is necessary
                 this.boundTab.parentElement.style.marginLeft = `-${tabNumber}00vw`;
             }
             else {
                 tab.classList.remove('active');
                 tab.setAttribute('aria-hidden', 'true');
+                tab.setAttribute('disabled', '');
+                tab.setAttribute('tabindex', '-1');
             }
         }
 
@@ -1010,12 +1016,16 @@ export class bcdTooltip {
     boundElement: HTMLElement;
     gapBridgeElement: HTMLElement;
 
+    openDelayMS: number;
+
     constructor(element: HTMLElement) {
         this.element = element;
 
         this.gapBridgeElement = document.createElement('div');
         this.gapBridgeElement.classList.add('js-bcd-tooltip_gap-bridge');
         this.element.appendChild(this.gapBridgeElement);
+
+        this.openDelayMS =  parseInt(element.getAttribute('open-delay-ms') ?? '400');
 
 
         const tempRelation = element.getAttribute('tooltip-relation') ?? 'proceeding';
@@ -1076,8 +1086,9 @@ export class bcdTooltip {
 
         afterDelay(600, ()=> {
             if (!this.element.classList.contains('active_')) return;
-            this.setPosition();
             this.element.classList.add('active');
+            this.element.addEventListener('transitionend', this.setPosition.bind(this), {once: true});
+            this.setPosition();
         });
 
     }
