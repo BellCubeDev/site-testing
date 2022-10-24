@@ -955,3 +955,13 @@ section {
     background-color: #0008 !important;
     visibility: visible !important;
 }
+
+
+.builderStep {
+    &:not(.active_) { display: none; }
+
+    opacity: 0; &.active { opacity: 1; }
+    transition-duration: 100ms;
+    transition-timing-function: ease-in-out;
+    transition-property: opacity;
+}

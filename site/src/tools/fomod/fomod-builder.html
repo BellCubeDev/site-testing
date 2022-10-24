@@ -120,15 +120,15 @@ redirect_from:
     <div role="tabpanel" class="tab-content" name="Steps">
 
         <div style="margin:0 auto;margin-bottom:24px;">
-            <button type="button" id="bcd-stepBTN-builder" onclick="window.FOMODBuilder.UI.setStepEditorType('builder')" class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+            <button type="button" id="bcd-stepBTN-builder" onclick="window.FOMODBuilder.ui.setStepEditorType('builder')" class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
                 BellCubic Steps Editor
             </button>
 
-            <button type="button" id="bcd-stepBTN-vortex" onclick="window.FOMODBuilder.UI.setStepEditorType('vortex')" class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+            <button type="button" id="bcd-stepBTN-vortex" onclick="window.FOMODBuilder.ui.setStepEditorType('vortex')" class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
                 Vortex Steps Editor
             </button>
 
-            <button type="button" id="bcd-stepBTN-mo2" onclick="window.FOMODBuilder.UI.setStepEditorType('mo2')" class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
+            <button type="button" id="bcd-stepBTN-mo2" onclick="window.FOMODBuilder.ui.setStepEditorType('mo2')" class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
                 Mod Organizer Steps Editor
             </button>
         </div>
@@ -139,6 +139,7 @@ redirect_from:
 
 
 
+        <div id="steps-builder-container" class="builderStep"></div>
 
 
 
@@ -146,48 +147,7 @@ redirect_from:
 
 
 
-
-
-
-
-
-
-
-        <div id="steps-builder-container"></div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        <div id="steps-vortex-container" class="js-vortex-steps needs-lazy">
+        <div id="steps-vortex-container" class="builderStep js-vortex-steps">
             <div id="vortex-steps-header">
                 <input class="bcd-vortex-input vortex-steps-title vortex-fake-header h4 js-dynamic-textarea-width" paddingPX=20 placeholder="Mod Name" value="Retexture for The Scroll" />
                 <br /><input class="bcd-vortex-input vortex-modal-subtitle js-dynamic-textarea-width" paddingPX=20 placeholder="Step Name" value="Choose Version (1/2)" />
@@ -354,45 +314,7 @@ redirect_from:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        <div id="steps-mo2-container"></div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        <div id="steps-mo2-container" class="builderStep needs-lazy"></div>
 
 
 

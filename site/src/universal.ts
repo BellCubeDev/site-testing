@@ -172,6 +172,8 @@ declare global {interface Window {
     bcd_ComponentTracker: bcd_ComponentTracker;
 
     copyCode(elem: HTMLElement): void;
+
+    lazyStylesLoaded: true|undefined;
 }}
 
 /** Quick-and-dirty enum of strings used often throughout the code */
@@ -1425,6 +1427,7 @@ export function bcd_universalJS_init():void {
             document.head.appendChild(link);
         }
         document.documentElement.classList.remove('lazy-styles-not-loaded');
+        window.lazyStylesLoaded = true;
     });
 
     // =============================================================
