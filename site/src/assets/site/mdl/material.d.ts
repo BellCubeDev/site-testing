@@ -1274,6 +1274,7 @@ export class MaterialTooltip {
    * @param {HTMLElement} element The element that will be upgraded.
    */
 export class MaterialLayout {
+   element_: HTMLElement;
     /**
        * Store strings for class names defined by this component that are used in
        * JavaScript. This allows us to simply change it in one place should we

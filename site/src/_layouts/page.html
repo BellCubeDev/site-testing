@@ -648,7 +648,7 @@ layout: compress_html
                 </picture>
                 <span>BellCube Dev</span>
             </span>
-            <nav class="mdl-navigation" style="flex-direction:column-reverse;min-height: calc(100% - 64px);gap:16px">
+            <nav id="nav" class="mdl-navigation" style="flex-direction:column-reverse;min-height: calc(100% - 64px);gap:16px">
                 <p id="randomized-text-field" style="max-width:100%;margin:16px;margin-top:auto;"></p>
                 <div class="nav-content" style="height:max-content;display:flex;flex-direction:column;flex-wrap:nowrap;align-content:center;align-items:stretch;">
                     <!-- https://fonts.google.com/icons -->
@@ -719,10 +719,10 @@ layout: compress_html
                 </span>
             </div>
         </header>
-        <main class="mdl-layout__content">
+        <main id="cont" class="mdl-layout__content">
             {{ content }}
         </main>
-        <footer class="mdl-layout__content">
+        <footer id="footer" class="mdl-layout__content">
             <div style="margin-right:auto;margin-left:auto;">
                 {% assign _current_year = 'now' | date: "%Y" | plus: 0 %}
                 {% assign _first_year = site.first_publication_year | plus: 0 %}

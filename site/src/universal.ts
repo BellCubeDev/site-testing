@@ -1379,6 +1379,10 @@ $$$$$$\ $$ |  $$ |$$ |  \$$$$  |$$ |\$$$$$$$ |$$ |$$ |$$$$$$$$\ \$$$$$$$ |  \$$$
 
 
 */
+let main: HTMLDivElement|undefined;
+let footer: HTMLDivElement|undefined;
+
+
 export function bcd_universalJS_init():void {
 
     // =============================================================
@@ -1422,5 +1426,28 @@ export function bcd_universalJS_init():void {
         }
         document.documentElement.classList.remove('lazy-styles-not-loaded');
     });
+
+    // =============================================================
+    // Set main content div to respect the footer for mobile
+    // =============================================================
+
+    main = document.getElementById('cont') as HTMLDivElement;
+    footer = document.getElementById('footer') as HTMLDivElement;
+
+    function resizeMain() {
+        const footerHeight = footer!.offsetHeight ?? 0;
+        const headerHeight = window.layout.header_?.offsetHeight ?? 0;
+        const mainComputedStyle = window.getComputedStyle(main!);
+        const mainContentPaddingHeight = parseFloat(mainComputedStyle.paddingTop) + parseFloat(mainComputedStyle.paddingBottom);
+
+        main!.style.minHeight = `calc(100vh - ${footerHeight + headerHeight + mainContentPaddingHeight + 0}px)`;
+    }
+
+    resizeMain();
+
+    const contResizeObserver = new ResizeObserver(resizeMain);
+
+    contResizeObserver.observe(footer);
+    if (window.layout.header_) contResizeObserver.observe(window.layout.header_);
 }
 window.bcd_init_functions.universal = bcd_universalJS_init;
