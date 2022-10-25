@@ -780,7 +780,7 @@ section {
     min-width: 100%;
 
     opacity: 0; &.active { opacity: 1; }
-
+    &.tab-content__hidden { visibility: none; }
     transition-duration: inherit;
     transition-timing-function: inherit;
 }
@@ -899,6 +899,7 @@ section {
 
 .mdl-layout__header .mdl-layout__drawer-button {
     background-color: #0000;
+    user-select: none;
 }
 
 .js-bcd-modal, .js-bcd-modal-obfuscator {

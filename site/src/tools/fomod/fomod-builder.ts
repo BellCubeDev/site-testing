@@ -3,23 +3,15 @@ import * as fomodUI from './fomod-builder-ui.js';
 import * as fomodClasses from  './fomod-builder-classifications.js';
 import * as bcdUniversal from '../../universal.js';
 
-type bcdBuilderType = 'builder'|'vortex'|'mo2';
-
 declare global {interface Window {
     FOMODBuilder: {
-        ui: {
-            openFolder: () => void;
-            save: () => void;
-            cleanSave: () => void;
-            attemptRepair: () => void;
-            setStepEditorType: (type: bcdBuilderType) => void;
-        }
+        ui: fomodUI.windowUI
         directory?: FileSystemDirectoryHandle;
         storage: builderStorage;
     };
 }}
 
-interface builderStorage {
+export interface builderStorage {
     settings: {
         autoSaveAfterChange: boolean; // false
         alwaysCleanSave: boolean; // false
@@ -34,7 +26,7 @@ interface builderStorage {
         defaultGroupSelectType: fomodClasses.groupSelectType; // 'SelectAtLeastOne'
     }
     preferences: {
-        stepsBuilder: bcdBuilderType
+        stepsBuilder: fomodUI.bcdBuilderType
     }
 }
 
@@ -66,35 +58,7 @@ window.FOMODBuilder = {
         save: () => {},
         cleanSave: () => {},
         attemptRepair: () => {},
-        setStepEditorType(type: bcdBuilderType) {
-            const thisElem = document.getElementById(`steps-${type}-container`)!;
-            const activeElem = thisElem.parentElement?.querySelector('.active');
-
-            if (thisElem === activeElem) return;
-
-            if (type !== 'builder') {
-                if (!window.lazyStylesLoaded) thisElem.classList.add('needs-lazy');
-                else thisElem.classList.remove('needs-lazy');
-            }
-
-            function transitionPhaseTwo() {
-                activeElem?.classList.remove('active_');
-                thisElem.classList.add('active_');
-                requestAnimationFrame(requestAnimationFrame.bind(window,()=>{
-                    thisElem.classList.add('active');
-                }));
-            }
-
-            if (!activeElem) transitionPhaseTwo();
-            else {
-                activeElem.classList.remove('active');
-
-                activeElem.addEventListener('transitionend', transitionPhaseTwo, {once: true});
-                setTimeout(transitionPhaseTwo, 200);
-            }
-
-            window.FOMODBuilder.storage.preferences!.stepsBuilder = type;
-        }
+        setStepEditorType: fomodUI.setStepEditorType,
     },
 
     // Retrieves the browser storage entry if available, otherwise uses the defaults.

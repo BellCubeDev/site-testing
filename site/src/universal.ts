@@ -947,20 +947,40 @@ export class bcdTabButton extends mdl.MaterialButton {
 
         const tab_siblingsAndTab = [...this.boundTab.parentElement.children];
         for (const tab of tab_siblingsAndTab) {
+
             if (tab === this.boundTab) {
                 tab.classList.add('active');
+                tab.classList.remove('tab-content__hidden');
+                if ('inert' in (tab as HTMLElement)) (tab as HTMLElement).inert = false;
+
                 tab.setAttribute('aria-hidden', 'false');
+
                 tab.removeAttribute('disabled');
                 tab.removeAttribute('tabindex');
 
                 this.boundTab.parentElement.style.marginLeft = `-${tabNumber}00vw`;
-            }
-            else {
+
+            } else {
+
                 tab.classList.remove('active');
+
+                function addHidden() {
+                    if (tab.classList.contains('active')) return;
+                    tab.classList.add('tab-content__hidden');
+                    if ('inert' in (tab as HTMLElement)) (tab as HTMLElement).inert = true;
+                }
+                tab.parentElement!.addEventListener('transitionend', addHidden, {once: true});
+                afterDelay(250, () => {
+                    tab.parentElement?.removeEventListener('transitionend', addHidden);
+                    addHidden();
+                });
+
                 tab.setAttribute('aria-hidden', 'true');
+
                 tab.setAttribute('disabled', '');
                 tab.setAttribute('tabindex', '-1');
             }
+
         }
 
         if (this.setAnchor) {

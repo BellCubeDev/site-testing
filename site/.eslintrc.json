@@ -78,6 +78,7 @@
         "import/no-namespace": "off",
         "github/array-foreach": "off",
         "@typescript-eslint/no-explicit-any": "off",
-        "@typescript-eslint/no-non-null-assertion": "off"
+        "@typescript-eslint/no-non-null-assertion": "off",
+        "no-inner-declarations": "off"
     }
 }
