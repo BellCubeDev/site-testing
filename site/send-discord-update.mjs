@@ -35,7 +35,7 @@ hook.send({
             title: commitTitle,
             timestamp: new Date().toISOString(),        // eslint-disable-next-line prefer-template
             description: (deploymentURL ? commitDescription ?`${commitDescription}\n\nCheck it out at <${deploymentURL}>!` : `Check it out at <${deploymentURL}>!` : commitDescription) +
-                            `\nCommit ID [\`${gh.event.head_commit?.id?.slice(0, 7) ?? '< NO COMMIT >'}\`](${gh.event.head_commit?.url ?? gh.event.repository.html_url})`,
+                            `\n\n*Commit ID [\`${gh.event.head_commit?.id?.slice(0, 7) ?? '< NO COMMIT >'}\`](${gh.event.head_commit?.url ?? gh.event.repository.html_url})*`,
             provider: { name: `GitHub: ${gh.repository}`, url: gh.event.repository.html_url },
             author: {
                 name: `@${gh.event.sender.login} - GitHub`,
