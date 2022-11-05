@@ -25,7 +25,7 @@ async function getDeploymentURL() {
 }
 const hook = new discord.WebhookClient(hookOpts);
 const deploymentURL = await getDeploymentURL();
-const [, commitTitle, commitMessage] = gh.event.head_commit?.message.replace(/\r\n?/g, '\n').match(/^(.*)(?:\n+([\s\S]*))?$/) ?? ['', '< No commit message >', ''];
+const [, commitTitle, commitDescription] = gh.event.head_commit?.message.replace(/\r\n?/g, '\n').match(/^(.*)(?:\n+([\s\S]*))?$/) ?? ['', '< No Commit Message >', ''];
 hook.send({
     content: `New site version!`,
     tts: false,
@@ -33,15 +33,15 @@ hook.send({
         {
             color: Number(BigInt(`0x${gh.event.head_commit?.id ?? '0'}`) % 0xffffffn),
             title: commitTitle,
-            timestamp: new Date().toISOString(),
-            description: deploymentURL ? commitMessage ?`${commitMessage}\n\nCheck it out at <${deploymentURL}>!` : `Check it out at <${deploymentURL}>!` : commitMessage,
+            timestamp: new Date().toISOString(),        // eslint-disable-next-line prefer-template
+            description: (deploymentURL ? commitDescription ?`${commitDescription}\n\nCheck it out at <${deploymentURL}>!` : `Check it out at <${deploymentURL}>!` : commitDescription) +
+                            `\nCommit ID [\`${gh.event.head_commit?.id?.slice(0, 7) ?? '< NO COMMIT >'}\`](${gh.event.head_commit?.url ?? gh.event.repository.html_url})`,
             provider: { name: `GitHub: ${gh.repository}`, url: gh.event.repository.html_url },
             author: {
                 name: `@${gh.event.sender.login} - GitHub`,
                 url: gh.event.sender.html_url,
                 icon_url: gh.event.sender.avatar_url
-            },
-            footer: { text: `Commit [\`${gh.event.head_commit?.id?.slice(0, 7) ?? '< NO COMMIT >'}\`](${gh.event.head_commit?.url ?? gh.event.repository.html_url})` },
+            }
         }
     ],
     username: `GitHub - ${gh.repository} Updates`,
