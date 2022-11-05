@@ -5,6 +5,7 @@ const threadID = process.env.threadID?.replace(/^"|"$/g, '');
 const gh = JSON.parse(process.env.githubENV?.replace(/^"|"$/g, '') ?? 'undefined');
 if (!(gh && 'event' in gh))
     throw new Error('No `githubENV` found in environment');
+console.log(`Sending Discord update for event:\n${JSON.stringify(gh.event, null, 4)}`);
 const hookOpts = discord.parseWebhookURL(`https://discord.com/api/webhooks/${hookID}/${hookToken}`);
 if (!hookOpts)
     throw new Error(`Invalid webhook URL: "${hookOpts}"`);
