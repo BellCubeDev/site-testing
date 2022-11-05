@@ -32,6 +32,8 @@ jobs:
 
       - name: Install NPM
         uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
 
 
 
@@ -178,6 +180,8 @@ jobs:
 
       - name: Install NPM
         uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
 
       - name: Install NPM Packages
         run: |
