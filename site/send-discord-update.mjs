@@ -34,7 +34,7 @@ hook.send({
             color: Number(BigInt(`0x${gh.event.head_commit?.id ?? '0'}`) % 0xffffffn),
             title: commitTitle,
             timestamp: new Date().toISOString(),
-            description: deploymentURL ? `${commitMessage}\n\nCheck it out at <${deploymentURL}>!` : commitMessage,
+            description: deploymentURL ? commitMessage ?`${commitMessage}\n\nCheck it out at <${deploymentURL}>!` : `Check it out at <${deploymentURL}>!` : commitMessage,
             provider: { name: `GitHub: ${gh.repository}`, url: gh.event.repository.html_url },
             author: {
                 name: `@${gh.event.sender.login} - GitHub`,
