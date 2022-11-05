@@ -25,7 +25,7 @@ async function getDeploymentURL() {
 }
 const hook = new discord.WebhookClient(hookOpts);
 const deploymentURL = await getDeploymentURL();
-const [, commitTitle, commitMessage] = gh.event.head_commit?.message.replace(/\r\n?/g, '\n').match(/^(.+?)\n(.+)$/s) ?? ['', '< No commit message >', ''];
+const [, commitTitle, commitMessage] = gh.event.head_commit?.message.replace(/\r\n?/g, '\n').match(/^(.+?)\n?(.+)?$/s) ?? ['', '< No commit message >', ''];
 hook.send({
     content: `New site version!`,
     tts: false,
