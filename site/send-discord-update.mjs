@@ -5,7 +5,7 @@ const threadID = process.env.threadID?.replace(/^"|"$/g, '');
 const gh = JSON.parse(process.env.githubENV?.replace(/^"|"$/g, '') ?? 'undefined');
 if (!(gh && 'event' in gh))
     throw new Error('No `githubENV` found in environment');
-console.log(`Sending Discord update for event:\n${JSON.stringify(gh.event, null, 4)}`);
+//console.log(`Sending Discord update for event:\n${JSON.stringify(gh.event, null, 4)}`);
 const hookOpts = discord.parseWebhookURL(`https://discord.com/api/webhooks/${hookID}/${hookToken}`);
 if (!hookOpts)
     throw new Error(`Invalid webhook URL: "${hookOpts}"`);
@@ -25,7 +25,7 @@ async function getDeploymentURL() {
 }
 const hook = new discord.WebhookClient(hookOpts);
 const deploymentURL = await getDeploymentURL();
-const [, commitTitle, commitMessage] = gh.event.head_commit?.message.replace(/\r\n?/g, '\n').match(/^(.+?)\n?(.+)?$/s) ?? ['', '< No commit message >', ''];
+const [, commitTitle, commitMessage] = gh.event.head_commit?.message.replace(/\r\n?/g, '\n').match(/^(.*)(?:\n+([\s\S]*))?$/) ?? ['', '< No commit message >', ''];
 hook.send({
     content: `New site version!`,
     tts: false,
