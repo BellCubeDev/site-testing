@@ -40,7 +40,8 @@ hook.send({
                 name: `@${gh.event.sender.login} - GitHub`,
                 url: gh.event.sender.html_url,
                 icon_url: gh.event.sender.avatar_url
-            }
+            },
+            footer: { text: `Commit [\`${gh.event.head_commit?.id?.slice(0, 7) ?? '< NO COMMIT >'}\`](${gh.event.head_commit?.url ?? gh.event.repository.html_url})` },
         }
     ],
     username: `GitHub - ${gh.repository} Updates`,
