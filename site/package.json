@@ -13,6 +13,7 @@
     "@types/highlightjs": "^9.12.2",
     "@types/wicg-entries-api": "^2020.8.2",
     "@types/wicg-file-system-access": "^2020.9.5",
+    "discord.js": "^14.6.0",
     "typescript": "^4.7.4",
     "uglify-js": "^3.17.2"
   }
