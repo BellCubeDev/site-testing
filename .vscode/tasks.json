@@ -4,16 +4,78 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "Set Up Environment",
+            "type": "shell",
+            "command": ".vscode\\setupEnv.bat",
+            "presentation": {
+                "reveal": "never",
+                "echo": false,
+                "focus": false,
+                "panel": "dedicated",
+                "close": false,
+                "revealProblems": "never",
+                "clear": false,
+                "showReuseMessage": true
+            },
+
+            "group": "build",
+
+            "icon": {
+                "id": "package",
+                "color": "terminal.ansiYellow"
+            }
+        },
+        {
+
+            // TypeScript Watch from custom .bat
+            "label": "TypeScript Watch",
+            "type": "shell",
+            "command": ".vscode\\watch.bat",
+
+            "problemMatcher": "$tsc-watch",
+            "isBackground": true,
+
+            "group": "build",
+
+            "presentation": {
+                "reveal": "never",
+                "echo": false,
+                "focus": false,
+                "panel": "dedicated",
+                "close": true,
+                "revealProblems": "onProblem",
+                "clear": false,
+                "showReuseMessage": true
+            },
+
+            "icon": {
+                "id": "wrench",
+                "color": "terminal.ansiBlue"
+            },
+
+            "dependsOn": [
+                "Set Up Environment"
+            ]
+
+        },
+        {
             "label": "Serve Site",
             "type": "shell",
-            "command": ".vscode\\build.bat serve testing http://127.0.0.1:4000/site-testing/",
-            "problemMatcher": [
-                "$tsc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "command": ".vscode\\serve.bat",
+            "isBackground": true,
+
+            "problemMatcher": [{
+                "pattern": {
+                    "regexp": "^FAKE MATCHER$"
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "^[^\\n\\S]*Generating...|^[^\\n\\S]*Regenerating: \\d+ file(s) changed at .*^",
+                    "endsPattern": "^[^\\n\\S]*(?:...)?done in [\\d\\.]+ seconds."
+                }
+            }],
+
+            "group": "test",
             "detail": "Runs the Jekyll site host and serves it locally.",
             "presentation": {
                 "echo": true,
@@ -27,8 +89,42 @@
             "icon": {
                 "color": "terminal.ansiGreen",
                 "id": "code"
-            }
+            },
+
+            "dependsOn": [
+                "TypeScript Watch"
+            ]
         },
+
+        {
+            "label": "Open Site Locally (SERVE)",
+            "type": "shell",
+            "command": "start http://127.0.0.1:4000/site-testing/",
+
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "detail": "Runs the Jekyll site host and serves it locally.",
+            "presentation": {
+                "echo": false,
+                "reveal": "never",
+                "focus": false,
+                "panel": "dedicated",
+                "showReuseMessage": false,
+                "clear": true,
+                "close": true
+            },
+            "icon": {
+                "color": "terminal.ansiMagenta",
+                "id": "globe"
+            },
+
+            "dependsOn": [
+                "Serve Site"
+            ]
+        },
+
         {
             "label": "Build Site",
             "type": "shell",
@@ -50,7 +146,11 @@
             "icon": {
                 "color": "terminal.ansiGreen",
                 "id": "tools"
-            }
+            },
+
+            "dependsOn": [
+                "Set Up Environment",
+            ]
         }
     ]
 }
