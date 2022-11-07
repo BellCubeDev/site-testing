@@ -22,7 +22,7 @@ export interface builderStorage {
         saveConfigInXML: boolean; // false
         brandingComment: boolean; // false
 
-        defaultGroupSortingOrder: fomodClasses.groupSortOrder; // 'Explicit'
+        defaultGroupSortingOrder: fomodClasses.sortOrder; // 'Explicit'
         defaultGroupSelectType: fomodClasses.groupSelectType; // 'SelectAtLeastOne'
     }
     preferences: {

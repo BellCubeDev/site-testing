@@ -1,6 +1,6 @@
 import * as main from "./fomod-builder.js"; // Brings in global things
 import { objOf } from '../../universal.js';
-/* eslint-disable i18n-text/no-en */// FOMODs are XML files with a schema written in English, so disallowing English makes little sense.
+/*x eslint-disable i18n-text/no-en */// FOMODs are XML files with a schema written in English, so disallowing English makes little sense.
 
 /*
     Thanks to Patrick Gillespie for the great ASCII art generator!
@@ -8,35 +8,58 @@ import { objOf } from '../../universal.js';
     ...makes this code *so* much easier to maintain... you know, 'cuz I can find my functions in VSCode's Minimap
 */
 
-export class XMLElement {
+ /*$$$$\  $$\                   $$\                                     $$\
+$$  __$$\ $$ |                  $$ |                                    $$ |
+$$ /  $$ |$$$$$$$\   $$$$$$$\ $$$$$$\    $$$$$$\   $$$$$$\   $$$$$$$\ $$$$$$\    $$$$$$$\
+$$$$$$$$ |$$  __$$\ $$  _____|\_$$  _|  $$  __$$\  \____$$\ $$  _____|\_$$  _|  $$  _____|
+$$  __$$ |$$ |  $$ |\$$$$$$\    $$ |    $$ |  \__| $$$$$$$ |$$ /        $$ |    \$$$$$$\
+$$ |  $$ |$$ |  $$ | \____$$\   $$ |$$\ $$ |      $$  __$$ |$$ |        $$ |$$\  \____$$\
+$$ |  $$ |$$$$$$$  |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |\$$$$$$$\   \$$$$  |$$$$$$$  |
+\__|  \__|\_______/ \_______/    \____/ \__|       \_______| \_______|   \____/ \______*/
+
+export abstract class XMLElement implements updatableObject {
     instanceElement: Element | undefined;
 
     objectsToUpdate: updatableObject[] = [];
+
     updateObjects() {
         this.objectsToUpdate.forEach(  (obj) => obj.update()  );
     }
-    update() { this.updateObjects(); }
 
+    update() { this.updateObjects(); }
 
     constructor(instanceElement: Element | undefined = undefined) {
         this.instanceElement = instanceElement;
     }
-    asModuleXML(document: XMLDocument): Comment | Element {
-        /*throw new Error*/ return document.createComment(`This call of asModuleXML() was not overridden by a child class! ${this.constructor.name}`);
-    }
-    asInfoXML(document: XMLDocument): Comment | Element {
-        /*throw new Error*/ return document.createComment(`This call of asInfoXML() was not overridden by a child class! ${this.constructor.name}`);
-    }
+
+    asModuleXML?(document: XMLDocument): Element;
+    asInfoXML?(document: XMLDocument): Element;
 }
 
-export class updatableObject {
+export abstract class updatableObject {
     constructor() {
         this.update();
     }
-    update() {
-        /*throw new Error*/ return;
-    }
+    abstract update(): any;
 }
+
+
+
+export abstract class dependency extends XMLElement {
+    constructor(instanceElement: Element | undefined = undefined) {
+        super(instanceElement);
+    }
+
+    abstract override asModuleXML(document: XMLDocument): Element;
+}
+
+
+
+export abstract class dependency_versionCheck extends dependency {
+    private _version = "";
+    set version(value: string) { this.updateObjects(); this._version = value; } get version(): string { return this._version; }
+}
+
 
 
 /*$$$$$\                            $$\ $$\   $$\     $$\
@@ -72,12 +95,6 @@ export class flag {
 export function setNewFlagValue(name: string, value: string): flag {
     if (!flags[name]) flags[name] = new flag(name, value);
     return flags[name]!;
-}
-
-export class dependency extends XMLElement {
-    constructor(instanceElement: Element | undefined = undefined) {
-        super(instanceElement);
-    }
 }
 
 export type dependency_file_state = "Active" | "Inactive" | "Missing";
@@ -161,10 +178,8 @@ export class dependency_file extends dependency {
         return thisElement;
     }
 }
-export class dependency_versionCheck extends dependency {
-    private _version = "";
-    set version(value: string) { this.updateObjects(); this._version = value; } get version(): string { return this._version; }
-}
+
+
 export class dependency_FOSE extends dependency_versionCheck {
     // <foseDependency version="" />
     override asModuleXML(document: XMLDocument): Element {
@@ -330,23 +345,33 @@ export class PluginTypeDescriptor_dependency extends XMLElement {
 -$$$$$$\ $$ |  $$ |$$$$$$$  |  \$$$$  |\$$$$$$$ |$$ |$$ |$$$$$$$  |
 \_______|\__|  \__|\_______/    \____/  \_______|\__|\__|\______*/
 
+
+
 export class FOMOD_install extends XMLElement {
-    static files: string[][] = [];
+    static paths: string[][] = [];
 
-    private _file!: string[];
-    set file(value: string[]) { this.updateObjects(); this._file = value; } get file(): string[] { return this._file; }
+    private _path!: string[];
+    set path(value: string[]) { this.updateObjects(); this._path = value; } get path(): string[] { return this._path; }
 
-    updateFile(file: string | string[] | FileSystemFileHandle): void {
-        if (typeof file === "string") {
-            const filePath: string[] = file.split("/");
-            FOMOD_install.files.push(filePath);
-            this.file = filePath;
-        } else if (file instanceof Array) {
-            FOMOD_install.files.push(file);
-            this.file = file;
-        } else {
-            window.FOMODBuilder.directory;
+    async updateFile(pathOrFile: string|string[] | FileSystemHandle): Promise<void> {
+
+        if (typeof pathOrFile === "string") {
+            const filePath: string[] = pathOrFile.split("/");
+            FOMOD_install.paths.push(filePath);
+            this.path = filePath;
         }
+
+        else if (pathOrFile instanceof FileSystemHandle) {
+            pathOrFile = await window.FOMODBuilder.directory?.resolve(pathOrFile) ?? '';
+        }
+
+        if (pathOrFile instanceof Array) {
+            FOMOD_install.paths.push(pathOrFile);
+            this.path = pathOrFile;
+            return;
+        }
+
+        throw new Error("Could not resolve path - most likely outside of the root directory");
     }
 
     constructor(
@@ -356,7 +381,23 @@ export class FOMOD_install extends XMLElement {
         super(element);
         this.updateFile(file);
     }
+
+    override asModuleXML(document: XMLDocument): Element {
+        this.instanceElement =
+            this.instanceElement ?? document.createElement("install");
+
+        const path = this.path.join("/");
+        const isFolder = this.path[this.path.length - 1] === "";
+
+        this.instanceElement.appendChild(
+            document.createElement(isFolder ? 'folder' : 'file')
+        ).textContent = isFolder ? path.slice(0, -1) : path;
+
+        return this.instanceElement;
+    }
 }
+
+
 
 /*$$$$$\              $$\     $$\
 $$  __$$\             $$ |    \__|
@@ -370,23 +411,42 @@ $$ |  $$ |$$ |  $$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \____$$\
           $$ |
           \_*/
 
-export type groupSortOrder =
+export type sortOrder =
     | "Ascending"  // Alphabetical
     | "Descending" // Reverse Alphabetical
     | "Explicit";  // Explicit order
 
-export class step extends XMLElement {
+export abstract class step extends XMLElement {
     name = "";
-    order: groupSortOrder = "Explicit";
+    order: sortOrder = "Explicit";
     groups: group[] = [];
+
+    // <installStep name="THE FIRST OF MANY STEPS">
+    // <optionalFileGroups order="Explicit">
+
+    override asModuleXML(document: XMLDocument): Element {
+        this.instanceElement =
+            this.instanceElement ?? document.createElement("installStep");
+
+        this.instanceElement.setAttribute("name", this.name);
+
+        const optionalFileGroups = this.instanceElement.appendChild(
+            document.createElement("optionalFileGroups")
+        );
+        optionalFileGroups.setAttribute("order", this.order);
+
+        for (const group of this.groups) optionalFileGroups.appendChild(group.asModuleXML(document));
+
+        return this.instanceElement;
+    }
 }
 
 export type groupSelectType =
-    | "SelectAll"
-    | "SelectAny"
-    | "SelectAtMostOne"
-    | "SelectAtLeastOne"
-    | "SelectExactlyOne";
+    | "SelectAll"           // Force-selects all options
+    | "SelectAny"           // Allows users to select any number of options
+    | "SelectAtMostOne"     // Requires users to select one or no options
+    | "SelectAtLeastOne"    // Requires users to select at least one option
+    | "SelectExactlyOne";   // Requires users to select exactly one option
 export class group extends XMLElement {
     private _name = "";
     set name(value: string) { this.updateObjects(); this._name = value; } get name(): string { return this._name; }
@@ -394,8 +454,32 @@ export class group extends XMLElement {
     private _type: groupSelectType = "SelectAny";
     set type(value: groupSelectType) { this.updateObjects(); this._type = value; } get type(): groupSelectType { return this._type; }
 
+    private _sortOrder: sortOrder = "Explicit";
+    set sortOrder(value: sortOrder) { this.updateObjects(); this._sortOrder = value; } get sortOrder(): sortOrder { return this._sortOrder; }
+
     private _plugins: option[] = [];
     set plugins(value: option[]) { this.updateObjects(); this._plugins = value; } get plugins(): option[] { return this._plugins; }
+
+
+    // <group name="Banana Types" type="SelectAny">
+    // <plugins order="Explicit">
+
+    override asModuleXML(document: XMLDocument): Element {
+        this.instanceElement =
+            this.instanceElement ?? document.createElement("group");
+
+        this.instanceElement.setAttribute("name", this.name);
+        this.instanceElement.setAttribute("type", this.type);
+
+        const plugins = this.instanceElement.appendChild(
+            document.createElement("plugins")
+        );
+        plugins.setAttribute("order", this.sortOrder);
+
+        for (const plugin of this.plugins) plugins.appendChild(plugin.asModuleXML(document));
+
+        return this.instanceElement;
+    }
 }
 
 export class option extends XMLElement {
