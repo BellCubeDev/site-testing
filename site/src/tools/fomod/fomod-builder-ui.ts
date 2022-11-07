@@ -24,6 +24,7 @@ export interface windowUI {
     cleanSave: () => void;
     attemptRepair: () => void;
     setStepEditorType: (type: bcdBuilderType) => void;
+    openTypeConditions: (elem: HTMLElement) => void;
 }
 
 
@@ -31,9 +32,9 @@ export type bcdBuilderType = 'builder'|'vortex'|'mo2';
 
 export function setStepEditorType(type: bcdBuilderType) {
     const thisElem = document.getElementById(`steps-${type}-container`)!;
-    const activeElem = thisElem.parentElement?.querySelector('.active');
+    const otherSteps = thisElem.parentElement!.querySelectorAll(`.builderStep:not(#steps-${type}-container).active`)!;
 
-    if (thisElem === activeElem) return;
+    if (thisElem.classList.contains('.active')) return;
 
     if (type !== 'builder') {
         if (!window.lazyStylesLoaded) thisElem.classList.add('needs-lazy');
@@ -41,18 +42,23 @@ export function setStepEditorType(type: bcdBuilderType) {
     }
 
     function transitionPhaseTwo() {
-        activeElem?.classList.remove('active_');
+        otherSteps.forEach(e => {
+            e.classList.remove('active_');
+            e.removeEventListener('transitionend', transitionPhaseTwo);
+        });
+
         thisElem.classList.add('active_');
         requestAnimationFrame(requestAnimationFrame.bind(window,()=>{
             thisElem.classList.add('active');
         }));
     }
 
-    if (!activeElem) transitionPhaseTwo();
+    if (otherSteps.length === 0) transitionPhaseTwo();
     else {
-        activeElem.classList.remove('active');
-
-        activeElem.addEventListener('transitionend', transitionPhaseTwo, {once: true});
+        otherSteps.forEach(e => {
+            e.classList.remove('active');
+            e.addEventListener('transitionend', transitionPhaseTwo, {once: true});
+        });
         setTimeout(transitionPhaseTwo, 200);
     }
 

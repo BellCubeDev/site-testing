@@ -1,7 +1,5 @@
 @echo off
 
-title TypeScript Compiler
-
 ECHO.
 ECHO.
 ECHO [36mRemoving previously-generated files...[0m
@@ -27,9 +25,10 @@ set "doInlineSources=true"
 
 :watch
 
-title TypeScript Compiler
-cd %~dp0\..\
-call npx tsc-watch --build --verbose --onCompilationStarted "title TypeScript Compiler && call robocopy site\src\ _generated\ts_out\ /s /xf *.js *.ts" --onCompilationComplete "title TypeScript Compiler && cd site\ && node minify.mjs && cd .. && title TypeScript Compiler" site\tsconfig.json
+cd %~dp0\..\site
+call npx tsc-watch --build --verbose --onCompilationStarted "call robocopy src\ ..\_generated\ts_out\ /s /xf *.js *.ts" --onCompilationComplete "node minify.mjs" tsconfig.json
+
+timeout /t 5 /nobreak >nul
 
 goto :watch
 exit /b 1

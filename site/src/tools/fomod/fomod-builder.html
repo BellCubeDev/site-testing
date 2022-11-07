@@ -76,7 +76,7 @@ redirect_from:
 
 
             <button
-                type="button" onclick="window.FOMODBuilder.UI.save()"
+                type="button" onclick="window.FOMODBuilder.ui.save()"
                 class="mdl-button w144 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-save">
 
                 Save
@@ -85,7 +85,7 @@ redirect_from:
 
 
             <button
-                type="button" onclick="window.FOMODBuilder.UI.cleanSave()"
+                type="button" onclick="window.FOMODBuilder.ui.cleanSave()"
                 class="mdl-button w144 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-save">
 
                 Clean Save
@@ -97,7 +97,7 @@ redirect_from:
 
 
             <button
-                type="button" onclick="window.FOMODBuilder.UI.attemptRepair()"
+                type="button" onclick="window.FOMODBuilder.ui.attemptRepair()"
                 class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
 
                 Attempt FOMOD Repair
@@ -121,15 +121,15 @@ redirect_from:
 
         <div style="margin:0 auto;margin-bottom:24px;">
             <button type="button" id="bcd-stepBTN-builder" onclick="window.FOMODBuilder.ui.setStepEditorType('builder')" class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
-                BellCubic Steps Editor
+                FOMOD Builder
             </button>
 
             <button type="button" id="bcd-stepBTN-vortex" onclick="window.FOMODBuilder.ui.setStepEditorType('vortex')" class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
-                Vortex Steps Editor
+                Vortex
             </button>
 
             <button type="button" id="bcd-stepBTN-mo2" onclick="window.FOMODBuilder.ui.setStepEditorType('mo2')" class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
-                Mod Organizer Steps Editor
+                Mod Organizer 2
             </button>
         </div>
 
@@ -139,7 +139,83 @@ redirect_from:
 
 
 
-        <div id="steps-builder-container" class="builderStep"></div>
+        <div id="steps-builder-container" class="builderStep">
+            <!-- Mod Name -->
+            <h2 class="builder-steps-mod-name"><input class="bcd-builder-input js-dynamic-textarea-width" placeholder="Mod Name" value="Retexture for The Scroll" /></h2>
+
+            <!-- Steps Container -->
+            <div class="builder-steps-step">
+
+                <!-- Step Summary -->
+                <div class="builder-steps-step-sum js-bcd-summary adjacent">
+                    <i class="material-icons open-icon-90CC">expand_more</i>
+                    <h3 class="builder-steps-step-title"><input class="bcd-builder-input js-dynamic-textarea-width" placeholder="Step Name" value="Choose Version (1/2)" /></h3>
+                    <sub><span class="builder-steps-step-group-count" unitWord="Group">6 Groups</span> , <span class="builder-steps-step-option-count" unitWord="Option">17 Options</span></sub>
+                </div>
+
+                <!-- Step Body -->
+                <div class="builder-steps-step-body js-bcd-details adjacent">
+
+                    <!-- Group Summary -->
+                    <div class="builder-steps-group-sum js-bcd-summary adjacent">
+                        <i class="material-icons open-icon-90CC">expand_more</i>
+                        <h4 class="builder-steps-group-title"><input class="bcd-builder-input js-dynamic-textarea-width" placeholder="Group Name" value="Choose Version" /></h4>
+                        <sub><span class="builder-steps-step-option-count" unitWord="Option">17 Options</span></sub>
+                        </div>
+
+                    <!-- Group Body -->
+                    <div class="builder-steps-group-body js-bcd-details adjacent">
+
+                        <!-- Option Summary -->
+                        <div class="builder-steps-opt-sum js-bcd-summary adjacent">
+                            <i class="material-icons open-icon-90CC">expand_more</i>
+                            <h5 class="builder-steps-opt-title"><input class="bcd-builder-input js-dynamic-textarea-width" placeholder="Option Name" value="Single Texture" /></h5>
+                            <sub><span class="builder-steps-opt-file-count" unitWord="Install">1 Install</span>, <span class="builder-steps-opt-flag-count" unitWord="Flag">0 Flags</span></sub>
+                        </div>
+
+                        <!-- Option Body -->
+                        <div class="builder-steps-opt-body js-bcd-details adjacent">
+                            <!--
+                                _name_backend = "";
+
+                                _description!: option_description;
+                                _image!: option_image;
+
+                                _conditionFlags: dependency_flag[] = [];
+                                _conditionFlags_container: Element | undefined;
+
+                                _files: dependency_file[] = [];
+                                _files_container: Element | undefined;
+                                _typeDescriptor!: PluginTypeDescriptor;
+                            -->
+                            <!-- The Backend Name will identify the plugin entirely on its own in the XML, so it better be good! -->
+                            <input class="bcd-builder-input js-dynamic-textarea-width" placeholder="Backend Name" value="vers_singleTexture" />
+
+                            <!-- Option Description -->
+                            <textarea class="bcd-builder-input js-dynamic-textarea-height" placeholder="Option Description" rows="1">This is the single texture version of the mod. It will replace the texture of the scroll with a single texture.</textarea>
+
+                            <!-- Option Image -->
+                            <img class="builder-steps-opt-image" src="/site-testing/assets/site/images/example-image.png" />
+
+                            <!-- Plugin Type -->
+                            <label>Default Type: <div class="bcd-dropdown-sorting-order builder-steps-opt-default-type"></div></label>
+                            <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect" onclick="window.FOMODBuilder.ui.openTypeConditions(this)">
+                                Edit Type Conditions
+                            </button>
+
+                            <!-- Condition Flags -->
+                            <div class="builder-steps-opt-set-flags"></div>
+
+                            <!-- Files -->
+                            <div class="builder-steps-opt-files"></div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
 
 
 

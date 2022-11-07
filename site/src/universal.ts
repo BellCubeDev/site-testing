@@ -295,7 +295,7 @@ $$ |  $$\ $$ |  $$ |$$ |$$ |$$  __$$ |$$ |  $$ | \____$$\ $$ |$$ |  $$ |$$ |$$  
 
 
 
-class bcd_collapsibleParent {
+abstract class bcd_collapsibleParent {
     // For children to set
     details!:HTMLElement;
     details_inner!:HTMLElement;
@@ -404,9 +404,9 @@ class bcd_collapsibleParent {
     evaluateDuration(doRun:boolean = true, opening:boolean=true) {//this.debugCheck();
         if (doRun && this.details_inner) {
             const contentHeight = this.details_inner.offsetHeight;
-            this.details_inner.style.transitionDuration = `${200 + (opening ? 1.1 : 1.4) * (contentHeight + 32)}ms`;
+            this.details_inner.style.transitionDuration = `${250 + ((opening ? 0.2 : 0.4) * (contentHeight + 32))}ms`;
             for (const icon of this.openIcons90deg) {
-                (icon as HTMLElement).style.transitionDuration = `${ 215 + (0.9 * (contentHeight + 32)) }ms`;
+                (icon as HTMLElement).style.transitionDuration = `${ 250 + (0.15 * (contentHeight + 32)) }ms`;
             }
         }
     }
@@ -1241,7 +1241,7 @@ $$ | \_/ $$ |$$ |$$$$$$$  |\$$$$$$$\ $$\       \$$$$$$  |$$ |\$$$$$$$ |$$$$$$$  
 
 
 
-export class bcdDynamicTextArea_base {
+export abstract class bcdDynamicTextArea_base {
     element: HTMLElement;
 
     constructor(element: HTMLElement) {
@@ -1253,11 +1253,14 @@ export class bcdDynamicTextArea_base {
         this.element.addEventListener('input', boundAdjust);
         this.element.addEventListener('change', boundAdjust);
 
+        const resizeObserver = new ResizeObserver(boundAdjust);
+        resizeObserver.observe(this.element);
+
         // Hopefully resolve an edge-case causing the text area to not initially size itself properly
         requestAnimationFrame(boundAdjust);
     }
 
-    adjust() {return;}
+    abstract adjust(): any;
 
 }
 
@@ -1460,10 +1463,11 @@ export function bcd_universalJS_init():void {
     function resizeMain() {
         const footerHeight = footer!.offsetHeight ?? 0;
         const headerHeight = window.layout.header_?.offsetHeight ?? 0;
+
         const mainComputedStyle = window.getComputedStyle(main!);
         const mainContentPaddingHeight = parseFloat(mainComputedStyle.paddingTop) + parseFloat(mainComputedStyle.paddingBottom);
 
-        main!.style.minHeight = `calc(100vh - ${footerHeight + headerHeight + mainContentPaddingHeight + 0}px)`;
+        main!.style.minHeight = `calc(100vh - ${footerHeight + headerHeight + mainContentPaddingHeight + 1}px)`;
     }
 
     resizeMain();

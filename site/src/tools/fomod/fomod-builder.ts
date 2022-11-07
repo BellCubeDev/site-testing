@@ -59,6 +59,7 @@ window.FOMODBuilder = {
         cleanSave: () => {},
         attemptRepair: () => {},
         setStepEditorType: fomodUI.setStepEditorType,
+        openTypeConditions: () => {},
     },
 
     // Retrieves the browser storage entry if available, otherwise uses the defaults.

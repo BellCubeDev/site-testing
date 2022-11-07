@@ -49,7 +49,7 @@ img {
     the spec.
 */
 
-html > body {
+html > body, textarea {
     color: #fafafa;
     font-family: Roboto, 'Helvetica', 'Arial', sans-serif;
     font-weight: 400;
@@ -142,6 +142,7 @@ p {
 }
 
 .mdl-layout__content {
+    overflow: hidden !important;
     background: #1b1b1b;
 
     &:not(footer) {
@@ -463,7 +464,8 @@ section {
     &.is-open > .js-bcd-details-inner { transition-timing-function: cubic-bezier(0, 0.3, 0.8, 1); }
     > .js-bcd-details-inner {
         transition-property: height, margin-top;
-        transition-timing-function: cubic-bezier(0.1, 0, 0.6, 1);
+
+        transition-timing-function: cubic-bezier(0.15, 0, 0.2, 1.15);
 
         margin-top: -9999vh;
 
@@ -965,4 +967,15 @@ section {
     transition-duration: 100ms;
     transition-timing-function: ease-in-out;
     transition-property: opacity;
+}
+
+.bcd-builder-input {
+    background-color: #222;
+    border-radius: 4px;
+    border: #444 solid 2px;
+    border-style: ridge;
+    border-left: #fff solid 4px;
+    padding: 8px;
+    padding-left: 16px;
+    margin-right: 16px;
 }

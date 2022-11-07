@@ -34,7 +34,7 @@
 
             "problemMatcher": {
                 "base": "$tsc-watch",
-                "applyTo": "closedDocuments"
+                "fileLocation": [ "relative", "${workspaceFolder}\\site"],
             },
             "isBackground": true,
 
@@ -45,7 +45,7 @@
                 "echo": false,
                 "focus": false,
                 "panel": "dedicated",
-                "close": true,
+                "close": false,
                 "revealProblems": "never",
                 "clear": false,
                 "showReuseMessage": true
@@ -78,8 +78,10 @@
                 }
             }],
 
-            "group": "test",
+            "group": "build",
+
             "detail": "Runs the Jekyll site host and serves it locally.",
+
             "presentation": {
                 "echo": true,
                 "reveal": "always",
