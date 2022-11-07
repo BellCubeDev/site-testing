@@ -32,7 +32,10 @@
             "type": "shell",
             "command": ".vscode\\watch.bat",
 
-            "problemMatcher": "$tsc-watch",
+            "problemMatcher": {
+                "base": "$tsc-watch",
+                "applyTo": "closedDocuments"
+            },
             "isBackground": true,
 
             "group": "build",
@@ -43,7 +46,7 @@
                 "focus": false,
                 "panel": "dedicated",
                 "close": true,
-                "revealProblems": "onProblem",
+                "revealProblems": "never",
                 "clear": false,
                 "showReuseMessage": true
             },
