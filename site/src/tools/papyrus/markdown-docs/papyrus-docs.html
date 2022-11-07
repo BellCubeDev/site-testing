@@ -56,14 +56,14 @@ This page was build with generating documentation for <a href="https://modding.w
 <button id="papy_docs_folder-picker" type="button" style="width:160px;margin-right:8px;" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-openDir">
     Select Directory
 </button>
-<div class="mdl-tooltip mdl-tooltip--bottom small01" for="papy_docs_folder-picker"><p>
+<div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
     Select an entire directory for batch processing. <code>.psc</code> files will be parsed and the documentation will be outputted as <code>.psc.md</code> files alongside the original files. WILL overwrite existing files.
 </p></div>
 
 <button id="papy_docs_file-picker" type="button" style="width:118px" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-openFile">
     Select File
 </button>
-<div class="mdl-tooltip mdl-tooltip--bottom small01" for="papy_docs_file-picker"><p>
+<div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
     Select a single file for processing. The documentation will be outputted in the below text area.
 </p></div>
 
@@ -73,7 +73,7 @@ This page was build with generating documentation for <a href="https://modding.w
     <input id="papy_docs_lib-Name" class="mdl-textfield__input" type="text" placeholder="Vanilla">
     <label class="mdl-textfield__label" for="papy_docs_lib-Name">Library Name</label>
 </div>
-<div class="mdl-tooltip mdl-tooltip--bottom small01" for="papy_docs_lib-Name_cont"><p>
+<div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
     The name of the library. For instance, <code>Vanilla</code>.
 </p></div>
 
@@ -83,7 +83,7 @@ This page was build with generating documentation for <a href="https://modding.w
         placeholder="/skyrim/developers/papyrus/concepts/libraries">
     <label class="mdl-textfield__label" for="papy_docs_lib-Link">Library URL</label>
 </div>
-<div class="mdl-tooltip mdl-tooltip--bottom small01" for="papy_docs_lib-Link_cont"><p>
+<div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
     <i>Modding.wiki</i>-relative URL to the library's folder page.
 </p></div>
 
@@ -93,7 +93,7 @@ This page was build with generating documentation for <a href="https://modding.w
         placeholder="RegisterFor%e%"> <!-- pattern="^.*?%e%.*$" -->
     <label class="mdl-textfield__label" for="papy_docs_register-pattern">Register Function Scheme</label>
 </div>
-<div class="mdl-tooltip mdl-tooltip--bottom small01" for="papy_docs_register-pattern_cont"><p>
+<div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
     Case-insensitive scheme to look for when trying to detect Event Registration functions. <code>%e%</code> is substituted for the event's name (with some words, common prefixes, and common suffixes removed).
     <br /><br />
     The default (<code>RegisterFor%e%</code>) will serve just fine for vanilla.
