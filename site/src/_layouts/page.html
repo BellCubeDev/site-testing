@@ -57,6 +57,11 @@ layout: compress_html
 
     <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/mdl/css/material-blue.scss %}">
     <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/css/site.scss %}">
+    
+    {% if layout.use_docs_CSS || page.use_docs_CSS %}
+        <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/css/docs.scss %}">
+    {% endif %}
+
 
     <!-- Require fonts at page load -->
 
