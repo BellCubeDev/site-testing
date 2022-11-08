@@ -8,11 +8,13 @@ import * as afs from 'fs/promises';
 console.log('Minifying files...');
 
 let minifiedVarCache = {};
-const processedFiles = [];
 
-if (!process.env.minifyDir?.trim()) throw new Error('No minifyDir environment variable was provided');
+if (!process.env.minifyDir?.trim().replace(/^"(.*)"$/, '$1')) throw new Error('No minifyDir environment variable was provided');
 
-const doInlineSources = process.env.doInlineSources?.trim() === 'true';
+const doInlineSources = process.env.doInlineSources?.trim().replace(/^"(.*)"$/, '$1') === 'true';
+//console.log('doInlineSources:', process.env.doInlineSources);
+//console.log('doInlineSources:', process.env.doInlineSources?.trim().replace(/^"(.*)"$/, '$1'));
+//console.log('doInlineSources:', process.env.doInlineSources?.trim().replace(/^"(.*)"$/, '$1') === 'true');
 
 // Code mostly taken from `minifyJSInDir()`
 setTimeout(async () => {
@@ -127,7 +129,7 @@ async function minifyJSFile(filePath) {
             filename: `${path.basename(filePath, '.js')}.ts`,
             content: "inline",
             includeSources: doInlineSources,
-            root: 'https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/',
+            root:  doInlineSources ? '' : 'https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/',
             url: doInlineSources ? 'inline' : `https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/${urlFilePath}.map`
         },
         module: true,

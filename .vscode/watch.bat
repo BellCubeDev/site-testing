@@ -1,5 +1,7 @@
 @echo off
 
+cd %~dp0\..\site
+
 ECHO.
 ECHO.
 ECHO [36mRemoving previously-generated files...[0m
@@ -20,12 +22,11 @@ if not errorlevel 0 (
     exit /b 1
 )
 
+:watch
+
 set "minifyDir=..\_generated\ts_out\"
 set "doInlineSources=true"
 
-:watch
-
-cd %~dp0\..\site
 call npx tsc-watch --build --verbose --onCompilationStarted "call robocopy src\ ..\_generated\ts_out\ /s /xf *.js *.ts" --onCompilationComplete "node minify.mjs" tsconfig.json
 
 timeout /t 5 /nobreak >nul

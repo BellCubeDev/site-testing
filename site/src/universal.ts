@@ -404,7 +404,7 @@ abstract class bcd_collapsibleParent {
     evaluateDuration(doRun:boolean = true, opening:boolean=true) {//this.debugCheck();
         if (doRun && this.details_inner) {
             const contentHeight = this.details_inner.offsetHeight;
-            this.details_inner.style.transitionDuration = `${250 + ((opening ? 0.2 : 0.4) * (contentHeight + 32))}ms`;
+            this.details_inner.style.transitionDuration = `${(opening ? 250 : 500) + ((opening ? 0.2 : 0.5) * (contentHeight + 32))}ms`;
             for (const icon of this.openIcons90deg) {
                 (icon as HTMLElement).style.transitionDuration = `${ 250 + (0.15 * (contentHeight + 32)) }ms`;
             }
@@ -1443,12 +1443,14 @@ export function bcd_universalJS_init():void {
     // =============================================================
     afterDelay(100, () => {
         const lazyStyles = JSON.parse(`[${document.getElementById('lazy-styles')?.innerText ?? ''}]`) as string[];
+
         for (const style of lazyStyles) {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
             link.href = style;
             document.head.appendChild(link);
         }
+
         document.documentElement.classList.remove('lazy-styles-not-loaded');
         window.lazyStylesLoaded = true;
     });
@@ -1460,21 +1462,21 @@ export function bcd_universalJS_init():void {
     main = document.getElementById('cont') as HTMLDivElement;
     footer = document.getElementById('footer') as HTMLDivElement;
 
-    function resizeMain() {
-        const footerHeight = footer!.offsetHeight ?? 0;
-        const headerHeight = window.layout.header_?.offsetHeight ?? 0;
+    //function resizeMain() {
+    //    const footerHeight = footer!.offsetHeight ?? 0;
+    //    const headerHeight = window.layout.header_?.offsetHeight ?? 0;
 
-        const mainComputedStyle = window.getComputedStyle(main!);
-        const mainContentPaddingHeight = parseFloat(mainComputedStyle.paddingTop) + parseFloat(mainComputedStyle.paddingBottom);
+    //    const mainComputedStyle = window.getComputedStyle(main!);
+    //    const mainContentPaddingHeight = parseFloat(mainComputedStyle.paddingTop) + parseFloat(mainComputedStyle.paddingBottom);
 
-        main!.style.minHeight = `calc(100vh - ${footerHeight + headerHeight + mainContentPaddingHeight + 1}px)`;
-    }
+    //    main!.style.minHeight = `calc(100vh - ${Math.max(footerHeight, 24) + headerHeight + mainContentPaddingHeight + 1}px)`;
+    //}
 
-    resizeMain();
+    //resizeMain();
 
-    const contResizeObserver = new ResizeObserver(resizeMain);
+    //const contResizeObserver = new ResizeObserver(resizeMain);
 
-    contResizeObserver.observe(footer);
-    if (window.layout.header_) contResizeObserver.observe(window.layout.header_);
+    //contResizeObserver.observe(footer);
+    //if (window.layout.header_) contResizeObserver.observe(window.layout.header_);
 }
 window.bcd_init_functions.universal = bcd_universalJS_init;

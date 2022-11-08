@@ -50,6 +50,9 @@ let prefabItem:HTMLDivElement;
     ```
 */
 let prefabDir:HTMLDivElement;
+
+let prefabParent:HTMLTemplateElement;
+
 let obj:jekyllPages;
 
 async function sitemapInit(){
@@ -61,8 +64,10 @@ async function sitemapInit(){
 
     const sitemapContainer = document.getElementById('sitemap') as HTMLDivElement;
 
-    prefabItem = document.getElementById('prefab-sitemap-item') as HTMLDivElement;
-    prefabDir = document.getElementById('prefab-sitemap-dir') as HTMLDivElement;
+    prefabParent = document.getElementById('prefabs') as HTMLTemplateElement;
+
+    prefabItem = prefabParent.content.getElementById('prefab-sitemap-item') as HTMLDivElement;
+    prefabDir = prefabParent.content.getElementById('prefab-sitemap-dir') as HTMLDivElement;
 
     const filteredPages = obj.pages.filter(page => page.layout && page.layout !== 'compress_html' && page.sitemap !== false);
 
@@ -100,7 +105,6 @@ async function sitemapInit(){
         console.debug('======================================================');
         console.debug('Current file:', page.name);
         console.debug('Working with path:\n', JSON.stringify(page.path));
-        console.debug('======================================================');
 
         // Navigate down the tree to the correct directory
         let lastDir:HTMLDivElement|null = sitemapContainer;
@@ -120,14 +124,17 @@ async function sitemapInit(){
 
         a.setAttribute('href', obj.baseurl + page.url);
 
-        console.debug('===================');
-        console.debug('Adding item', item, 'to', lastDir);
-        console.debug('Appending to...', lastDir.querySelector(`.${cssDetails_}`));
 
-        const appendPoint = lastDir.id === 'sitemap' ? lastDir : lastDir.querySelector(`.${cssDetails_}`) ?? lastDir;
+        console.debug('Directory to append within:', lastDir);
+        const appendPoint = lastDir.querySelector(':scope > .js-bcd-details_ > .sitemap-dir-items') ?? lastDir;
+
+        console.debug('Adding item', item, 'to', lastDir);
+        console.debug('Appending to...', appendPoint);
+
         appendPoint.appendChild(item);
 
         lastDir = null;
+        console.debug('======================================================');
     }
 
     const tempDetails = sitemapContainer.querySelectorAll(`.${cssDetails_}`);
@@ -147,26 +154,35 @@ async function sitemapInit(){
 
 function findOrCreateDir(dir:string, entryPoint:Element):HTMLDivElement{
     console.debug('Looking for dir', dir);
-    const children : Element[] = entryPoint.id === 'sitemap' ?
-                                [ ...entryPoint.getElementsByClassName('sitemap-dir') ] :
-                                [ ...(entryPoint.getElementsByClassName(cssDetails_)[0]?.getElementsByClassName('sitemap-dir') ??[]) ];
 
-    const existingDir = children.find(e => [...e.children].find(c => c.classList.contains(cssSummary_))?.querySelector('.sitemap-dir-name')?.textContent === dir);
+    const existingDir = entryPoint.querySelector(entryPoint.id === 'sitemap' ?
+              `:scope                    > .sitemap-dir > .js-bcd-summary_ > .sitemap-dir-name[data-dir="${dir}"]`
+            : `:scope > .js-bcd-details_ > .sitemap-dir > .js-bcd-summary_ > .sitemap-dir-name[data-dir="${dir}"]`
+    )?.parentElement!.parentElement as HTMLDivElement;
+
+
     console.debug('Existing dir:', existingDir);
-    if (existingDir) return existingDir as HTMLDivElement;
+    if (existingDir) return existingDir;
+
     console.debug('Creating new dir:', dir);
 
     const newDir = prefabDir.cloneNode(true) as HTMLDivElement;
     newDir.removeAttribute('id');
 
-    const thisSummary = newDir.querySelector(`.${cssSummary_}`);
+    const thisSummary = newDir.querySelector(':scope > .js-bcd-summary_')!;
 
     let tempTextCont = dir.trim();
     if (tempTextCont in obj.translation) tempTextCont = obj.translation[tempTextCont]!;
-    (thisSummary ?? entryPoint).querySelector('.sitemap-dir-name')!.textContent = tempTextCont;
 
-    const appendPoint = entryPoint.id === 'sitemap' ? entryPoint : entryPoint.querySelector(cssDetails_) ?? entryPoint;
-    appendPoint.appendChild(newDir);
+    const thisName = thisSummary.querySelector(':scope > .sitemap-dir-name') as HTMLHeadingElement;
+    thisName.textContent = tempTextCont;
+    thisName.setAttribute('data-dir', dir);
+
+    const appendPoint = entryPoint.querySelector(':scope > .js-bcd-details_') ?? entryPoint;
+
+    const existingItems = appendPoint.querySelector(':scope > .sitemap-dir-items');
+    if (existingItems)  appendPoint.insertBefore(newDir, existingItems);
+    else                appendPoint.appendChild(newDir);
 
     elementsToUpgrade.push(...newDir.children as HTMLCollectionOf<HTMLElement>);
 
