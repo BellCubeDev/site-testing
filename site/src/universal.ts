@@ -349,7 +349,7 @@ abstract class bcd_collapsibleParent {
 
         requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=> {
 
-            this.details_inner.style.marginTop = '0';
+            this.details_inner.style.marginTop = this.details.getAttribute('data-margin-top') || '0';
 
             if (instant) requestAnimationFrame(()=>requestAnimationFrame(()=>
                 this.evaluateDuration.bind(this, doSetDuration, true)

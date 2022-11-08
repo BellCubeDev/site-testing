@@ -978,3 +978,30 @@ section {
     padding-left: 16px;
     margin-right: 16px;
 }
+
+#steps-builder-container,
+.builder-steps-step,
+.builder-steps-step-body > .js-bcd-details-inner,
+.builder-steps-group-body > .js-bcd-details-inner,
+.builder-steps-opt-body > .js-bcd-details-inner {
+    background: #0e6369;
+    border-radius: 16px;
+    padding: 24px;
+    border-left: #2a9bff 16px solid;
+}
+
+.builder-steps-step {
+    background: #0e3469;
+}
+
+.builder-steps-step-body > .js-bcd-details-inner {
+    background: #21510a;
+}
+
+.builder-steps-group-body > .js-bcd-details-inner {
+    background: #610d46;
+}
+
+.builder-steps-opt-body > .js-bcd-details-inner {
+    background: #1b1b1b;
+}

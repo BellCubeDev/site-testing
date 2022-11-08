@@ -3289,7 +3289,10 @@ export class MaterialLayout {
                 this.element_.insertBefore(drawerButton, this.content_);
             }
 
-            this.obfuscator_ = document.querySelector('* .mdl-layout__obfuscator');
+            this.obfuscator_ = document.querySelector('.mdl-layout__obfuscator') ?? document.createElement('div');
+            this.obfuscator_.classList.add('mdl-layout__obfuscator');
+            this.element_.appendChild(this.obfuscator_);
+            
             if (!this.obfuscator_) throw new Error('MDL: No obfuscator found!');
 
 
