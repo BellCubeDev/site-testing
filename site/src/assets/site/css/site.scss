@@ -983,8 +983,8 @@ section {
 @mixin fomodStepsBuilderCard($hue, $sat, $val) {
     //          184°, 87%, 41%
     background: hsl($hue, $sat, $val);
-    //          208°, 84%, 100%
-    border-left: hsl($hue + 24, $sat - 3%, $val + 55%) 16px solid;
+    //          208°, 100%, 58%
+    border-left: hsl($hue + 48, $sat + 13%, $val + 17%) 16px solid;
 }
 
 #steps-builder-container,
@@ -1010,5 +1010,5 @@ section {
 }
 
 .builder-steps-opt-body > .js-bcd-details-inner {
-    @include fomodStepsBuilderCard(180, 0%, 11%);
+    @include fomodStepsBuilderCard(160, 0%, 11%);
 }
