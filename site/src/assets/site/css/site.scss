@@ -980,29 +980,33 @@ section {
     margin-right: 16px;
 }
 
+@mixin fomodStepsBuilderCard($hue, $sat, $val) {
+    background: hsl($hue, $sat, $val);
+    border-left: hsl($hue + 24, $sat - 3, $val + 55%) 16px solid;
+}
+
 #steps-builder-container,
 .builder-steps-step,
 .builder-steps-step-body > .js-bcd-details-inner,
 .builder-steps-group-body > .js-bcd-details-inner,
 .builder-steps-opt-body > .js-bcd-details-inner {
-    background: #0e6369;
     border-radius: 16px;
     padding: 24px;
-    border-left: #2a9bff 16px solid;
+    @include fomodStepsBuilderCard(184, 87%, 41%)
 }
 
 .builder-steps-step {
-    background: #0e3469;
+    @include fomodStepsBuilderCard(215, 76%, 23%);
 }
 
 .builder-steps-step-body > .js-bcd-details-inner {
-    background: #21510a;
+    @include fomodStepsBuilderCard(101, 78%, 18%);
 }
 
 .builder-steps-group-body > .js-bcd-details-inner {
-    background: #610d46;
+    @include fomodStepsBuilderCard(319, 76%, 22%);
 }
 
 .builder-steps-opt-body > .js-bcd-details-inner {
-    background: #1b1b1b;
+    @include fomodStepsBuilderCard(180, 0%, 11%);
 }
