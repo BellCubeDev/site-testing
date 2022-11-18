@@ -981,8 +981,10 @@ section {
 }
 
 @mixin fomodStepsBuilderCard($hue, $sat, $val) {
+    //          184°, 87%, 41%
     background: hsl($hue, $sat, $val);
-    border-left: hsl($hue + 24, $sat - 3, $val + 55%) 16px solid;
+    //          208°, 84%, 100%
+    border-left: hsl($hue + 24, $sat - 3%, $val + 55%) 16px solid;
 }
 
 #steps-builder-container,
