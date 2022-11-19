@@ -1044,7 +1044,7 @@ export class bcdTabButton extends mdl.MaterialButton {
 
             if (tab === this.boundTab) {
                 tab.classList.add('active');
-                tab.classList.remove('tab-content__hidden');
+                tab.classList.remove('tab-content--hidden');
                 if ('inert' in (tab as HTMLElement)) (tab as HTMLElement).inert = false;
 
                 tab.setAttribute('aria-hidden', 'false');
@@ -1060,7 +1060,7 @@ export class bcdTabButton extends mdl.MaterialButton {
 
                 function addHidden() {
                     if (tab.classList.contains('active')) return;
-                    tab.classList.add('tab-content__hidden');
+                    tab.classList.add('tab-content--hidden');
                     if ('inert' in (tab as HTMLElement)) (tab as HTMLElement).inert = true;
                 }
                 tab.parentElement!.addEventListener('transitionend', addHidden, {once: true});

@@ -13,7 +13,7 @@
 
 .needs-lazy {
     // Animate the lazy-loaded content in via opacity
-    animation: fadeIn 1.5s cubic-bezier(0.55, 0, 0.4, 1) !important;
+    animation: fadeIn .5s cubic-bezier(0.55, 0, 0.4, 1) !important;
 }
 
 @keyframes fadeIn { 0% { display: none; opacity: 0; } 25% { opacity: 0; } 100% { opacity: 1; } }
@@ -783,7 +783,8 @@ section {
     min-width: 100%;
 
     opacity: 0; &.active { opacity: 1; }
-    &.tab-content__hidden { visibility: none; }
+    &--hidden { visibility: none; }
+
     transition-duration: inherit;
     transition-timing-function: inherit;
 }
