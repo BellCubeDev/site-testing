@@ -978,7 +978,7 @@ section {
     border-style: ridge;
     border-left: #fff solid 4px;
     padding: 8px;
-    padding-left: 16px;
+    padding-left: 8px;
 
     margin-right: 16px;
 }
@@ -991,7 +991,7 @@ section {
     //          184°, 87%, 41%
     background: hsl($hue, $sat, $val);
     //          208°, 100%, 58%
-    border-left: hsl($hue + ($hueShiftMult * 48), $sat + 13%, $val + 17%) 16px solid;
+    border-left: hsl($hue + ($hueShiftMult * 48), $sat + 13%, $val + 17%) 8px solid;
 }
 
 #steps-builder-container,
@@ -999,8 +999,8 @@ section {
 .builder-steps-step-body > .js-bcd-details-inner,
 .builder-steps-group-body > .js-bcd-details-inner,
 .builder-steps-opt-body > .js-bcd-details-inner {
-    border-radius: 16px;
-    padding: 24px;
+    border-radius: 8px;
+    padding: 12px;
     @include fomodStepsBuilderCard(184, 87%, 41%)
 }
 
@@ -1075,4 +1075,8 @@ section {
         background: #0d365e;
         color: #fff;
     }
+}
+
+.builder-steps-step-sum {
+    padding-left: 8px;
 }

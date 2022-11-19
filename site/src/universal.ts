@@ -1396,7 +1396,7 @@ export class bcdDynamicTextAreaWidth extends bcdDynamicTextArea_base {
             console.warn('The paddingPX attribute of the dynamic text area is not a number:', this);
         }
 
-        this.element.style.width = `${this.element.scrollWidth + paddingPX}px`;
+        this.element.style.width = `min(${this.element.scrollWidth + paddingPX}px, 100cqmin)`;
     }
 
 }
