@@ -755,13 +755,12 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
 
     override element_: HTMLElement;
 
-    selectionElements: undefined | HTMLCollectionOf<HTMLElement>;
+    selectionTextElements: undefined | HTMLCollectionOf<HTMLElement>;
 
     constructor(element: Element, buttonElement?: Element, doReorder: boolean = true) {
         super(element);
         this.element_ = element as HTMLElement;
         this.doReorder = doReorder;
-
 
         if (this.forElement_) {
             this.forElement_?.removeEventListener(window.clickEvt, this.boundForClick_);
@@ -793,9 +792,15 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
             this.element_.appendChild(this.createOption(option));
         }
 
-        this.selectionElements = this.forElement_?.getElementsByClassName('bcd-dropdown_value') as HTMLCollectionOf<HTMLElement>;
+        this.selectionTextElements = this.forElement_?.getElementsByClassName('bcd-dropdown_value') as HTMLCollectionOf<HTMLElement>;
 
         this.updateOptions();
+
+        this.element_.addEventListener('focusout', this.focusOutHandler.bind(this));
+    }
+
+    focusOutHandler(evt: FocusEvent){
+        if ((evt.relatedTarget as Element).parentElement !== this.element_) this.hide();
     }
 
     updateOptions() {
@@ -847,14 +852,59 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
 
     makeSelected(option: HTMLLIElement) {
         if (this.doReorder) option.classList.add('mdl-menu__item--full-bleed-divider');
+        option.blur();
 
-        for (const elm of this.selectionElements ?? []) {
+        for (const elm of this.selectionTextElements ?? []) {
             elm.innerText = option.innerText;
         }
     }
 
     makeNotSelected(option: HTMLLIElement) {
         option.classList.remove('mdl-menu__item--full-bleed-divider');
+    }
+
+    private _optionElements: undefined | HTMLCollectionOf<HTMLLIElement>;
+    get optionElements(): HTMLCollectionOf<HTMLLIElement> { return this._optionElements ??= this.element_.getElementsByTagName('li') as HTMLCollectionOf<HTMLLIElement>; }
+
+    hasShownOrHiddenThisFrame: boolean = false;
+
+    override show(evt: any){
+        if (this.hasShownOrHiddenThisFrame) return;
+        this.hasShownOrHiddenThisFrame = true;
+        requestAnimationFrame(() => this.hasShownOrHiddenThisFrame = false);
+
+        if (this.element_.ariaHidden === 'false') return;
+
+        console.log("[BCD-DROPDOWN] Showing dropdown:", this, evt);
+
+        if (evt instanceof KeyboardEvent || evt instanceof PointerEvent && evt.pointerId === -1 || evt.mozInputSource !== 1)
+            this.optionElements[0]?.focus();
+
+        this.element_.ariaHidden = 'false';
+        this.element_.removeAttribute('disabled');
+
+        for (const item of this.optionElements) item.tabIndex = 0;
+
+        super.show(evt);
+    }
+
+    override hide(){
+        if (this.hasShownOrHiddenThisFrame) return;
+        this.hasShownOrHiddenThisFrame = true;
+        requestAnimationFrame(() => this.hasShownOrHiddenThisFrame = false);
+
+        if (this.element_.ariaHidden === 'true') return;
+
+        console.log("[BCD-DROPDOWN] Hiding dropdown:", this);
+
+        this.optionElements[0]?.blur();
+
+        this.element_.ariaHidden = 'true';
+        this.element_.setAttribute('disabled', '');
+
+        for (const item of this.optionElements) item.tabIndex = -1;
+
+        super.hide();
     }
 }
 /*

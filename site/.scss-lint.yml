@@ -102,9 +102,9 @@ linters:
 
   NestingDepth:
     enabled: false
-
+    
   PlaceholderInExtend:
-    enabled: true
+    enabled: false
 
   PrivateNamingConvention:
     enabled: true

@@ -49,7 +49,7 @@ img {
     the spec.
 */
 
-html > body, textarea {
+html > body, textarea, input {
     color: #fafafa;
     font-family: Roboto, 'Helvetica', 'Arial', sans-serif;
     font-weight: 400;
@@ -1059,5 +1059,20 @@ section {
 
     > h4 {
         margin: 0;
+    }
+}
+
+// Don't mind the fact that I subtly stole this from VS Code's context menu
+.mdl-menu__outline {
+    background: #303031;
+    color: #ccc;
+}
+
+.mdl-menu__item {
+    @extend .mdl-menu__outline;
+
+    &:hover, &:focus {
+        background: #0d365e;
+        color: #fff;
     }
 }
