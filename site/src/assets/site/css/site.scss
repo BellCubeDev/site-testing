@@ -883,7 +883,7 @@ section {
     right: 32px;
     bottom: 128px;
     overflow-wrap: break-word;
-    overflowing: scroll;
+    overflow: scroll;
 
     min-width: 40%;
     min-height: 40%;
@@ -1011,4 +1011,40 @@ section {
 
 .builder-steps-opt-body > .js-bcd-details-inner {
     @include fomodStepsBuilderCard(160, 0%, 11%);
+
+    >* {
+        display: grid;
+        justify-content: space-between;
+        gap: 32px;
+        align-items: start;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 40vw);
+    }
+
+}
+
+.builder-steps-opt-image {
+    max-width: 40vw;
+}
+
+.builder-steps-opt-body-left {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: auto;
+    grid-row: 1;
+    gap: 24px;
+}
+
+.builder-steps-opt-label {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 8px;
+    
+    width: 100%;
+
+    > h4 {
+        margin: 0;
+    }
 }

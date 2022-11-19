@@ -175,7 +175,7 @@ redirect_from:
                         </div>
 
                         <!-- Option Body -->
-                        <div class="builder-steps-opt-body js-bcd-details adjacent" data-margin-top="16px">
+                        <div class="builder-steps-opt-body js-bcd-details adjacent" data-margin-top="16px"><div>
                             <!--
                                 _name_backend = "";
 
@@ -189,29 +189,48 @@ redirect_from:
                                 _files_container: Element | undefined;
                                 _typeDescriptor!: PluginTypeDescriptor;
                             -->
-                            <!-- The Backend Name will identify the plugin entirely on its own in the XML, so it better be good! -->
-                            <input class="bcd-builder-input js-dynamic-textarea-width" placeholder="Backend Name" value="vers_singleTexture" />
-
-                            <!-- Option Description -->
-                            <textarea class="bcd-builder-input js-dynamic-textarea-height" placeholder="Option Description" rows="1">This is the single texture version of the mod. It will replace the texture of the scroll with a single texture.</textarea>
 
                             <!-- Option Image -->
                             <img class="builder-steps-opt-image" src="/site-testing/assets/site/images/example-image.png" />
 
-                            <!-- Plugin Type -->
-                            <label>Default Type: <div class="bcd-dropdown-sorting-order builder-steps-opt-default-type"></div></label>
-                            <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect" onclick="window.FOMODBuilder.ui.openTypeConditions(this)">
-                                Edit Type Conditions
-                            </button>
+                            <div class="builder-steps-opt-body-left">
 
-                            <!-- Condition Flags -->
-                            <div class="builder-steps-opt-set-flags"></div>
+                                <!-- The Backend Name will identify the plugin entirely on its own in the XML, so it better be good! -->
+                                <label class="builder-steps-opt-label"><h4>Backend Name</h4>
+                                    <input class="bcd-builder-input" placeholder="Backend Name" value="vers_singleTexture" />
+                                </label>
 
-                            <!-- Files -->
-                            <div class="builder-steps-opt-files"></div>
+
+                                <!-- Option Description -->
+                                <label class="builder-steps-opt-label"><h4>Description</h4>
+                                    <textarea class="bcd-builder-input js-dynamic-textarea-height" placeholder="Option Description" rows="1">This is the single texture version of the mod. It will replace the texture of the scroll with a single texture.</textarea>
+                                </label>
+
+                                <!-- Plugin Type -->
+                                <label class="builder-steps-opt-label"><h4>Default Type:</h4>
+                                    <div class="bcd-dropdown-sorting-order builder-steps-opt-default-type"></div>
+                                </label>
+
+                                <label class="builder-steps-opt-label"><h4>Type Conditions</h4>
+                                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect" onclick="window.FOMODBuilder.ui.openTypeConditions(this)">
+                                        Edit
+                                    </button>
+                                </label>
+
+                                <!-- Condition Flags -->
+                                <label class="builder-steps-opt-label"><h4>Condition Flags</h4>
+                                    <div class="builder-steps-opt-set-flags"></div>
+                                </label>
+
+                                <!-- Files -->
+                                <label class="builder-steps-opt-label"><h4>File Installs</h4>
+                                    <div class="builder-steps-opt-files"></div>
+                                </label>
+
+                            </div>
 
                         </div>
-                    </div>
+                    </div></div>
 
                 </div>
 
