@@ -759,8 +759,11 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
 
     constructor(element: Element, buttonElement?: Element, doReorder: boolean = true) {
         super(element);
+
         this.element_ = element as HTMLElement;
+
         this.doReorder = doReorder;
+        if (doReorder) this.Constant_.CLOSE_TIMEOUT = 0;
 
         if (this.forElement_) {
             this.forElement_?.removeEventListener(window.clickEvt, this.boundForClick_);
@@ -877,7 +880,7 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
 
         console.log("[BCD-DROPDOWN] Showing dropdown:", this, evt);
 
-        if (evt instanceof KeyboardEvent || evt instanceof PointerEvent && evt.pointerId === -1 || evt.mozInputSource !== 1)
+        if (evt instanceof KeyboardEvent || evt instanceof PointerEvent && evt.pointerId === -1 || 'mozInputSource' in evt && evt.mozInputSource !== 1)
             this.optionElements[0]?.focus();
 
         this.element_.ariaHidden = 'false';

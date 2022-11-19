@@ -43,7 +43,7 @@
     --vortex-button-accent: #2c68fe;
 }
 
-.js-vortex-steps {
+#steps-vortex-container {
 
     // Cascading Stuff
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
@@ -62,6 +62,8 @@
     margin-left: auto;
     margin-right: auto;
     overflow: hidden;
+
+    margin-bottom: 48px;
 
     border: 1px solid gray;
     -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, .5);
