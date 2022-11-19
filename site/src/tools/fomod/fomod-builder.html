@@ -196,36 +196,36 @@ redirect_from:
                             <div class="builder-steps-opt-body-left">
 
                                 <!-- The Backend Name will identify the plugin entirely on its own in the XML, so it better be good! -->
-                                <label class="builder-steps-opt-label"><h4>Backend Name</h4>
+                                <div class="item-with-fake-label"><h4>Backend Name</h4>
                                     <input class="bcd-builder-input" placeholder="Backend Name" value="vers_singleTexture" />
-                                </label>
-
+                                </div>
 
                                 <!-- Option Description -->
-                                <label class="builder-steps-opt-label"><h4>Description</h4>
+                                <div class="item-with-fake-label"><h4>Description</h4>
                                     <textarea class="bcd-builder-input js-dynamic-textarea-height" placeholder="Option Description" rows="1">This is the single texture version of the mod. It will replace the texture of the scroll with a single texture.</textarea>
-                                </label>
+                                </div>
 
                                 <!-- Plugin Type -->
-                                <label class="builder-steps-opt-label"><h4>Default Type:</h4>
-                                    <div class="bcd-dropdown-sorting-order builder-steps-opt-default-type"></div>
-                                </label>
+                                <div class="item-with-fake-label item-with-fake-label--one-liner"><h4>Default Type:</h4>
+                                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
+                                    <menu class="bcd-dropdown-option-state mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect mdl-js-ripple-effect--ignore-events"></menu>
+                                </div>
 
-                                <label class="builder-steps-opt-label"><h4>Type Conditions</h4>
+                                <div class="item-with-fake-label"><h4>Type Conditions</h4>
                                     <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect" onclick="window.FOMODBuilder.ui.openTypeConditions(this)">
                                         Edit
                                     </button>
-                                </label>
+                                </div>
 
                                 <!-- Condition Flags -->
-                                <label class="builder-steps-opt-label"><h4>Condition Flags</h4>
+                                <div class="item-with-fake-label"><h4>Condition Flags</h4>
                                     <div class="builder-steps-opt-set-flags"></div>
-                                </label>
+                                </div>
 
                                 <!-- Files -->
-                                <label class="builder-steps-opt-label"><h4>File Installs</h4>
+                                <div class="item-with-fake-label"><h4>File Installs</h4>
                                     <div class="builder-steps-opt-files"></div>
-                                </label>
+                                </div>
 
                             </div>
 

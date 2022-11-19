@@ -3,11 +3,17 @@ import * as fomodUI from './fomod-builder-ui.js';
 import * as fomodClasses from  './fomod-builder-classifications.js';
 import * as bcdUniversal from '../../universal.js';
 
+const domParser = new DOMParser();
+
 declare global {interface Window {
     FOMODBuilder: {
         ui: fomodUI.windowUI
         directory?: FileSystemDirectoryHandle;
         storage: builderStorage;
+        fomodClass: typeof fomodClasses.FOMOD;
+        testingFomod: fomodClasses.FOMOD;
+        testingInfoDoc: XMLDocument;
+        testingModuleDoc: XMLDocument;
     };
 }}
 
@@ -63,7 +69,13 @@ window.FOMODBuilder = {
     },
 
     // Retrieves the browser storage entry if available, otherwise uses the defaults.
-    storage: 'settings' in fetchedStorage ? fetchedStorage : defaultStorage
+    storage: 'settings' in fetchedStorage ? fetchedStorage : defaultStorage,
+
+    fomodClass: fomodClasses.FOMOD,
+
+    testingFomod: new fomodClasses.FOMOD(),
+    testingInfoDoc: domParser.parseFromString('<fomod></fomod>', 'text/xml'),
+    testingModuleDoc: domParser.parseFromString('<config></config>', 'text/xml'),
 };
 
 function saveStorage() {
@@ -101,7 +113,7 @@ window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
 
     console.debug('Initializing the FOMOD Builder!');
 
-    bcdUniversal.registerBCDComponent(fomodUI.bcdDropdownSortingOrder);
+    bcdUniversal.registerBCDComponents(fomodUI.bcdDropdownSortingOrder, fomodUI.bcdDropdownOptionState);
 
     window.FOMODBuilder.ui.setStepEditorType(window.FOMODBuilder.storage.preferences.stepsBuilder);
 

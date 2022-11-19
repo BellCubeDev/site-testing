@@ -5,7 +5,10 @@ import * as afs from 'fs/promises';
 
 //console.log('environment:', JSON.stringify(process.env, undefined, 4));
 
-console.log('Minifying files...');
+console.log('\n====================\nMinifying files...\n');
+
+let minifiedAnyFile = false;
+process.on('exit', ()=>    console.log(`${minifiedAnyFile ? '\n' : ''}Minification complete.\n====================\n`)    );
 
 let minifiedVarCache = {};
 
@@ -59,6 +62,7 @@ async function minifyJSFile(filePath) {
     if (stat.birthtime.getTime() > stat.mtime.getTime() + 4000) return;
 
     console.log('Minifying', filePath);
+    minifiedAnyFile = true;
 
     const fileContents = await afs.readFile(filePath, 'utf8');
     afs.writeFile(filePath.replace(/\.js$/, '.original.js'), fileContents);

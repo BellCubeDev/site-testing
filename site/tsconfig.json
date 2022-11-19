@@ -86,18 +86,20 @@
       "strictNullChecks": true,
       "strictPropertyInitialization": true,
     },
-    
+
     "include": [
       "./src/**/*"
     ],
 
     "watchOptions": {
-      "watchFile": "useFsEvents",
+      "watchFile": "useFsEventsOnParentDirectory",
       "watchDirectory": "useFsEvents",
       "fallbackPolling": "dynamicPriority",
 
       // Don't coalesce watch notification
       "synchronousWatchDirectory": true,
+
+      "excludeDirectories": ["**/node_modules"],
     },
     "compileOnSave": true,
     "buildOptions": {

@@ -1,3 +1,4 @@
+// Reference browser types
 export function materialInit(): void;
 export const componentHandler: any;
 /**
@@ -356,9 +357,15 @@ export class MaterialMenu {
     init(): void;
     container_: HTMLDivElement;
     outline_: HTMLDivElement;
-    forElement_: HTMLElement;
-    boundItemKeydown_: any;
-    boundItemClick_: any;
+    forElement_?: HTMLElement;
+
+
+    boundItemClick_: OmitThisParameter<this['handleItemClick_']>;
+    boundItemKeydown_: OmitThisParameter<this['handleItemKeyboardEvent_']>;
+    boundForClick_: OmitThisParameter<this['handleForClick_']>;
+    boundForKeydown_: OmitThisParameter<this['handleForKeyboardEvent_']>;
+
+
     registerItem(item: any): void;
     /**
        * Handles a click on the "for" element, by positioning the menu and then

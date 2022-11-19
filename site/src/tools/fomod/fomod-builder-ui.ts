@@ -7,14 +7,32 @@ import * as bcdUniversal from '../../universal.js';
 
 
 export class bcdDropdownSortingOrder extends bcdUniversal.bcdDropdown {
-    static asString = 'BCD - Sorting Order Dropdown';
+    static asString = 'FOMOD Builder - Sorting Order Dropdown';
     static cssClass = 'bcd-dropdown-sorting-order';
 
-    override options(): bcdUniversal.objOf<Function|null> {
+    override options() {
         return {'Explicit':null, 'Ascending':null, 'Descending':null};
     }
 }
 
+export class bcdDropdownOptionState extends bcdUniversal.bcdDropdown {
+    static asString = 'FOMOD Builder - Option State Dropdown';
+    static cssClass = 'bcd-dropdown-option-state';
+
+    constructor(element: Element) {
+        super(element, element.previousElementSibling!, true);
+    }
+
+    override options() {
+        return {
+            "Optional": null,
+            "Recommended": null,
+            "Could Be Useable": null,
+            "Required": null,
+            "Not Useable": null
+        };
+    }
+}
 
 
 

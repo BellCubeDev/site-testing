@@ -1011,12 +1011,21 @@ componentHandler.register({
    */
 export class MaterialMenu {
     element_;
-    constructor(element) { basicConstructor(element, this); this.element_ = element; }
+    constructor(element) {
+        this.boundItemKeydown_ = this.handleItemKeyboardEvent_.bind(this);
+        this.boundItemClick_ = this.handleItemClick_.bind(this);
+        
+        this.boundForKeydown_ = this.handleForKeyboardEvent_.bind(this);
+        this.boundForClick_ = this.handleForClick_.bind(this);
+
+        basicConstructor(element, this); this.element_ = element;
+    }
     /**
        * Initialize element.
        */
     init() {
         if (this.element_) {
+
             // Create container for the menu.
             var container = document.createElement('div');
             container.classList.add(MaterialMenu.cssClasses_.CONTAINER);
@@ -1031,18 +1040,16 @@ export class MaterialMenu {
             container.insertBefore(outline, this.element_);
             // Find the "for" element and bind events to it.
             var forElId = this.element_.getAttribute('for') || this.element_.getAttribute('data-mdl-for');
-            var forEl = null;
+            var forEl = undefined;
             if (forElId) {
                 forEl = document.getElementById(forElId);
                 if (forEl) {
-                    this.forElement_ = forEl;
-                    forEl.addEventListener(window.clickEvt, this.handleForClick_.bind(this));
-                    forEl.addEventListener('keydown', this.handleForKeyboardEvent_.bind(this));
+                    forEl.addEventListener(window.clickEvt, this.boundForKeydown_);
+                    forEl.addEventListener('keydown', this.boundForClick_);
                 }
             }
+            this.forElement_ = forEl;
             var items = this.element_.querySelectorAll(`.${MaterialMenu.cssClasses_.ITEM}`);
-            this.boundItemKeydown_ = this.handleItemKeyboardEvent_.bind(this);
-            this.boundItemClick_ = this.handleItemClick_.bind(this);
             for (const item of items) {
                 this.registerItem(item);
             }
@@ -3292,7 +3299,7 @@ export class MaterialLayout {
             this.obfuscator_ = document.querySelector('.mdl-layout__obfuscator') ?? document.createElement('div');
             this.obfuscator_.classList.add('mdl-layout__obfuscator');
             this.element_.appendChild(this.obfuscator_);
-            
+
             if (!this.obfuscator_) throw new Error('MDL: No obfuscator found!');
 
 

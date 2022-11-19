@@ -37,9 +37,6 @@ export abstract class XMLElement implements updatableObject {
 }
 
 export abstract class updatableObject {
-    constructor() {
-        this.update();
-    }
     abstract update(): any;
 }
 
@@ -225,18 +222,18 @@ function parseDependency(dependency: Element): dependency {
     }
 }
 
-export type PluginType =
+export type OptionType =
     | "Optional"        // Unchecked but checkable
     | "Recommended"     // Checked but uncheckable
     | "CouldBeUseable"  // TODO: Check if this has a use
     | "Required"        // Permanently checked
     | "NotUseable";     // Permanently unchecked
-export class PluginTypeDescriptor extends XMLElement {
-    private _default: PluginType = "Optional";
-    set default(value: PluginType) { this.updateObjects(); this._default = value; } get default(): PluginType { return this._default; }
+export class OptionTypeDescriptor extends XMLElement {
+    private _default: OptionType = "Optional";
+    set default(value: OptionType) { this.updateObjects(); this._default = value; } get default(): OptionType { return this._default; }
 
-    private _dependencies: PluginTypeDescriptor_dependency[] = [];
-    set dependencies(value: PluginTypeDescriptor_dependency[]) { this.updateObjects(); this._dependencies = value; } get dependencies(): PluginTypeDescriptor_dependency[] { return this._dependencies; }
+    private _dependencies: OptionTypeDescriptor_dependency[] = [];
+    set dependencies(value: OptionTypeDescriptor_dependency[]) { this.updateObjects(); this._dependencies = value; } get dependencies(): OptionTypeDescriptor_dependency[] { return this._dependencies; }
 
 
     private _instanceElement_basic: Element | undefined = undefined;
@@ -254,8 +251,8 @@ export class PluginTypeDescriptor extends XMLElement {
 
     constructor(
         element?: Element,
-        defaultType: PluginType = "Optional",
-        dependencies: PluginTypeDescriptor_dependency[] = []
+        defaultType: OptionType = "Optional",
+        dependencies: OptionTypeDescriptor_dependency[] = []
     ) {
         super(element);
         this.default = defaultType;
@@ -306,9 +303,9 @@ export class PluginTypeDescriptor extends XMLElement {
     }
 }
 
-export class PluginTypeDescriptor_dependency extends XMLElement {
-    private _type: PluginType = "Optional";
-    set type(value: PluginType) { this.updateObjects(); this._type = value; } get type(): PluginType { return this._type; }
+export class OptionTypeDescriptor_dependency extends XMLElement {
+    private _type: OptionType = "Optional";
+    set type(value: OptionType) { this.updateObjects(); this._type = value; } get type(): OptionType { return this._type; }
 
     private _instanceElement_type: Element | undefined = undefined;
     set instanceElement_type(value: Element | undefined) { this.updateObjects(); this._instanceElement_type = value; } get instanceElement_type(): Element | undefined { return this._instanceElement_type; }
@@ -316,7 +313,7 @@ export class PluginTypeDescriptor_dependency extends XMLElement {
     private _dependency!: dependency_group;
     set dependency(value: dependency_group) { this.updateObjects(); this._dependency = value; } get dependency(): dependency_group { return this._dependency; }
 
-    constructor(dependency: dependency_group, type: PluginType = "Optional") {
+    constructor(dependency: dependency_group, type: OptionType = "Optional") {
         super();
         this.dependency = dependency;
         this.type = type;
@@ -457,26 +454,23 @@ export class group extends XMLElement {
     private _sortOrder: sortOrder = "Explicit";
     set sortOrder(value: sortOrder) { this.updateObjects(); this._sortOrder = value; } get sortOrder(): sortOrder { return this._sortOrder; }
 
-    private _plugins: option[] = [];
-    set plugins(value: option[]) { this.updateObjects(); this._plugins = value; } get plugins(): option[] { return this._plugins; }
+    private _options: option[] = [];
+    set options(value: option[]) { this.updateObjects(); this._options = value; } get options(): option[] { return this._options; }
 
 
     // <group name="Banana Types" type="SelectAny">
     // <plugins order="Explicit">
 
     override asModuleXML(document: XMLDocument): Element {
-        this.instanceElement =
-            this.instanceElement ?? document.createElement("group");
+        this.instanceElement = this.instanceElement ?? document.createElement("group");
 
         this.instanceElement.setAttribute("name", this.name);
         this.instanceElement.setAttribute("type", this.type);
 
-        const plugins = this.instanceElement.appendChild(
-            document.createElement("plugins")
-        );
-        plugins.setAttribute("order", this.sortOrder);
+        const options = this.instanceElement.appendChild(document.getOrCreateChild("plugins"));
+        options.setAttribute("order", this.sortOrder);
 
-        for (const plugin of this.plugins) plugins.appendChild(plugin.asModuleXML(document));
+        for (const option of this.options) options.appendChild(option.asModuleXML(document));
 
         return this.instanceElement;
     }
@@ -521,8 +515,8 @@ export class option extends XMLElement {
 
 
     // Type Descriptor
-    private _typeDescriptor!: PluginTypeDescriptor;
-    set typeDescriptor(value: PluginTypeDescriptor) { this.updateObjects(); this._typeDescriptor = value; } get typeDescriptor(): PluginTypeDescriptor { return this._typeDescriptor; }
+    private _typeDescriptor!: OptionTypeDescriptor;
+    set typeDescriptor(value: OptionTypeDescriptor) { this.updateObjects(); this._typeDescriptor = value; } get typeDescriptor(): OptionTypeDescriptor { return this._typeDescriptor; }
 
     constructor(
         element?: Element,
@@ -532,7 +526,7 @@ export class option extends XMLElement {
         image: option_image | string[] | FileSystemFileHandle = [],
         conditionFlags: dependency_flag[] = [],
         files: dependency_file[] = [],
-        typeDescriptor: PluginTypeDescriptor = new PluginTypeDescriptor()
+        typeDescriptor: OptionTypeDescriptor = new OptionTypeDescriptor()
     ) {
         super(element);
         this.name = name; // Stored as an attribute
@@ -633,16 +627,28 @@ export class option_image extends XMLElement {
 
 
 
-
 export class FOMOD extends XMLElement {
-    meta_name;
-    meta_image;
-    meta_author;
-    meta_version;
-    meta_id: number;
-    infoInstanceElement: Element | undefined;
+    private _meta_name: string = "";
+    set meta_name(value: string) { this.updateObjects(); this._meta_name = value; } get meta_name(): string { return this._meta_name; }
 
-    meta_url:URL|string = ''; // Is actually set during the constructor, however TS is too static to understand that.
+    private _meta_image: string = "";
+    set meta_image(value: string) { this.updateObjects(); this._meta_image = value; } get meta_image(): string { return this._meta_image; }
+
+    private _meta_author: string = "";
+    set meta_author(value: string) { this.updateObjects(); this._meta_author = value; } get meta_author(): string { return this._meta_author; }
+
+    private _meta_version: string = "";
+    /** The metadata version of this mod */
+    set meta_version(value: string) { this.updateObjects(); this._meta_version = value; } get meta_version(): string { return this._meta_version; }
+
+    private _meta_id: number = 0;
+    set meta_id(value: number) { this.updateObjects(); this._meta_id = value; } get meta_id(): number { return this._meta_id; }
+
+    private _infoInstanceElement: Element | undefined;
+    set infoInstanceElement(value: Element | undefined) { this.updateObjects(); this._infoInstanceElement = value; } get infoInstanceElement(): Element | undefined { return this._infoInstanceElement; }
+
+    _meta_url:URL|string = ''; // Is actually set during the constructor, however TS is too static to understand that.
+    set meta_url(value:URL|string) { this.updateObjects(); this._meta_url = value; } get meta_url():URL|string { return this._meta_url; }
 
     setURL(url:URL|string, doWarn:boolean=true):void{
         if (url instanceof URL) this.meta_url = url;
@@ -696,15 +702,11 @@ export class FOMOD extends XMLElement {
     }
 
     override asModuleXML(document: XMLDocument): Element {
-        this.instanceElement =
-            this.instanceElement ?? document.createElement("fomod");
+        this.instanceElement = this.instanceElement ?? document.getOrCreateChild("config");
+        document.appendChild(this.instanceElement);
 
-        this.instanceElement.setAttribute("moduleName", this.meta_name);
-        this.instanceElement.setAttribute("image", this.meta_image);
-        //this.instanceElement.setAttribute("author", this.meta_author);
-        //this.instanceElement.setAttribute("version", this.meta_version);
-        this.instanceElement.setAttribute("id", this.meta_id.toString());
-        this.instanceElement.setAttribute("url", this.getURLAsString());
+        this.instanceElement.getOrCreateChild("moduleName").textContent = this.meta_name;
+        this.instanceElement.getOrCreateChild("moduleImage").setAttribute('path', this.meta_image);
 
         for (const install of this.installs) {
             this.instanceElement.appendChild(install.asModuleXML(document));
@@ -718,5 +720,23 @@ export class FOMOD extends XMLElement {
         }
 
         return this.instanceElement;
+    }
+
+    override asInfoXML(document: XMLDocument): Element {
+        this.infoInstanceElement = this.infoInstanceElement ?? document.getOrCreateChild("fomod");
+        document.appendChild(this.infoInstanceElement);
+
+        // Set schema info
+        this.infoInstanceElement.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        this.infoInstanceElement.setAttribute("xsi:noNamespaceSchemaLocation", "https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd");
+
+        // Set actual data
+        this.infoInstanceElement.getOrCreateChild("Name").textContent = this.meta_name;
+        this.infoInstanceElement.getOrCreateChild("Author").textContent = this.meta_author;
+        this.infoInstanceElement.getOrCreateChild("Id").textContent = this.meta_id.toString();
+        this.infoInstanceElement.getOrCreateChild("Website").textContent = this.getURLAsString();
+        this.infoInstanceElement.getOrCreateChild("Version").textContent = this.meta_version;
+
+        return this.infoInstanceElement;
     }
 }

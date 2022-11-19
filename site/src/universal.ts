@@ -150,31 +150,53 @@ $$ |  $$ |$$  __$$ | \____$$\ $$ |$$ |              $$ |  $$ |  $$ |$$ |  $$ |$$
 $$$$$$$  |\$$$$$$$ |$$$$$$$  |$$ |\$$$$$$$\       $$$$$$\ $$ |  $$ |$$ |  \$$$$  |
  \______/  \_______|\_______/ \__| \_______|      \______|\__|  \__|\__|   \___*/
 
+interface getOrCreateChild {
+    /** Returns the first element with the specified tag name or creates one if it does not exist */
+    getOrCreateChild<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
+    getOrCreateChild(tagName: string):Element;
+}
 
+declare global {
+    interface Element extends getOrCreateChild {}
+    interface Document extends getOrCreateChild {}
 
-declare global {interface Window {
-    /** Variables set by the page */
-    //bcdPageVars: Partial<{}>
+    interface Window {
+        /** Variables set by the page */
+        //bcdPageVars: Partial<{}>
 
-    /** Browser-Supported Click Event */
-    clickEvt: 'click'|'mousedown'
+        /** Browser-Supported Click Event */
+        clickEvt: 'click'|'mousedown'
 
-    /** The MDL layout element */
-    layout: mdl.MaterialLayout
+        /** The MDL layout element */
+        layout: mdl.MaterialLayout
 
-    /** A list of Query Parameters from the URI */
-    queryParams: objOf<string>;
+        /** A list of Query Parameters from the URI */
+        queryParams: objOf<string>;
 
-    /** A list of functions used when loading scripts */
-    bcd_init_functions: objOf<Function>;
+        /** A list of functions used when loading scripts */
+        bcd_init_functions: objOf<Function>;
 
-    /** A special class used to track components across multiple module scripts */
-    bcd_ComponentTracker: bcd_ComponentTracker;
+        /** A special class used to track components across multiple module scripts */
+        bcd_ComponentTracker: bcd_ComponentTracker;
 
-    copyCode(elem: HTMLElement): void;
+        copyCode(elem: HTMLElement): void;
 
-    lazyStylesLoaded: true|undefined;
-}}
+        lazyStylesLoaded: true|undefined;
+    }
+}
+
+function ___getOrCreateChild(this:Document|Element, tagName: string) {
+    let child = this.getElementsByTagName(tagName)[0];
+
+    if (!child) {
+        child = document.createElement(tagName);
+        this.appendChild(child);
+    }
+
+    return child;
+}
+Element.prototype.getOrCreateChild = ___getOrCreateChild;
+Document.prototype.getOrCreateChild = ___getOrCreateChild;
 
 /** Quick-and-dirty enum of strings used often throughout the code */
 enum strs {
@@ -719,9 +741,9 @@ export enum menuCorners {
 
 type optionObj = objOf<Function|null>
 
-export class bcdDropdown extends mdl.MaterialMenu {
+export abstract class bcdDropdown extends mdl.MaterialMenu {
 
-    options(): void | optionObj {return;}
+    abstract options(): optionObj;
 
     doReorder:boolean;
 
@@ -735,13 +757,32 @@ export class bcdDropdown extends mdl.MaterialMenu {
 
     selectionElements: undefined | HTMLCollectionOf<HTMLElement>;
 
-    constructor(element: Element, doReorder: boolean = true) {
+    constructor(element: Element, buttonElement?: Element, doReorder: boolean = true) {
         super(element);
         this.element_ = element as HTMLElement;
         this.doReorder = doReorder;
 
+
+        if (this.forElement_) {
+            this.forElement_?.removeEventListener(window.clickEvt, this.boundForClick_);
+            this.forElement_?.removeEventListener('keydown', this.boundForKeydown_);
+        }
+
+        if (buttonElement && buttonElement !== this.forElement_) {
+            this.forElement_ = buttonElement as HTMLElement;
+        }
+
+
+        if (this.forElement_) {
+            this.forElement_.setAttribute('aria-haspopup', 'true');
+
+            this.forElement_.addEventListener(window.clickEvt, this.boundForClick_);
+            this.forElement_.addEventListener('keydown', this.boundForKeydown_);
+        }
+
+        console.log("[BCD-DROPDOWN] Initializing dropdown:", this);
+
         const tempOptions = this.options();
-        if (!tempOptions) throw new TypeError('A BellCubic Dropdown cannot be created directly. It must be created through a subclass extending the `options` method past `void`.');
         this.options_ = tempOptions;
         this.options_keys = Object.keys(this.options_);
 
@@ -793,7 +834,7 @@ export class bcdDropdown extends mdl.MaterialMenu {
 
         li.addEventListener(window.clickEvt, temp_clickCallback?.bind(this));
 
-        this.onCreateOption(option);
+        this.onCreateOption?.(option);
         return li;
     }
 
@@ -802,7 +843,7 @@ export class bcdDropdown extends mdl.MaterialMenu {
         this.updateOptions();
     }
 
-    onCreateOption(option: string): void {return;}
+    onCreateOption?(option: string): void
 
     makeSelected(option: HTMLLIElement) {
         if (this.doReorder) option.classList.add('mdl-menu__item--full-bleed-divider');
@@ -847,7 +888,7 @@ export class bcdDropdown_AwesomeButton extends bcdDropdown {
     static readonly cssClass = 'js-bcd-debuggers-all-powerful-button';
 
     constructor(element: Element) {
-        super(element, false);
+        super(element, undefined, false);
     }
 
     override options(): objOf<Function|null> {
@@ -1369,13 +1410,16 @@ export function registerBCDComponent(component:BCDComponent):boolean|Error {
 /** Tell MDL about our shiny new components
     @param components The components to register. Defaults to the global bcdComponents array if not specified.
 */
-function registerComponents(components?:BCDComponent[]):void{
+export function registerBCDComponents(...components:BCDComponent[]):void{
+
+    const componentArr = components.length ? components : bcdComponents;
 
     // Tell mdl about our shiny new components
-    for (const component of components ?? bcdComponents) {
-        registerBCDComponent(component);
+    for (let i = 0; i < componentArr.length; i++) {
+        registerBCDComponent(componentArr[i]!);
     }
 
+    //console.debug("[BCD-Components] Registered the following components:", componentArr.map(c => `\n    ${c.asString}`).join(''));
 }
 /*
 
@@ -1413,7 +1457,7 @@ export function bcd_universalJS_init():void {
     // =============================================================
     // Register all the things!
     // =============================================================
-    registerComponents();
+    registerBCDComponents();
 
     // =============================================================
     // Modify links not in the main nav to not send a referrer
