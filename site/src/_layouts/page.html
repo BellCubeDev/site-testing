@@ -55,12 +55,7 @@ layout: compress_html
     <script       type="module" src="{{ site.baseurl }}{% link assets/site/mdl/material.js %}"></script> <!--onload="window.bcd_init_functions.material()"-->
     <script async type="module" src="{{ site.baseurl }}{% link universal.js %}" onload="window.bcd_init_functions.universal()"></script> <!-- the setTimeout was taken from https://stackoverflow.com/a/38296629/13076790 -->
 
-    <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/mdl/css/material-blue.scss %}">
-    <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/css/site.scss %}">
-
-    {% if layout.use_docs_CSS or page.use_docs_CSS %}
-        <link rel="stylesheet" href="{{ site.baseurl }}{% link assets/site/css/docs.scss %}">
-    {% endif %}
+    <link rel="stylesheet" href="{{ site.baseurl }}{% link main.css %}">
 
 
     <!-- Require fonts at page load -->

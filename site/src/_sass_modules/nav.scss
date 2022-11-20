@@ -1,0 +1,87 @@
+.mdl-layout__drawer {
+    background-color: #222222;
+    border-right-color: #ffffff;
+    color: #ffffffbf;
+
+    overflow-x: hidden;
+
+    h1 { font-size: 30px; }
+    h2 { font-size: 25px; }
+    h3 { font-size: 20px; }
+
+    h1, h2, h3 {
+        color: white;
+
+        padding-top: 0;
+        padding-right: 40px;
+        padding-bottom: 0;
+        margin-bottom: 0;
+        padding-left: 24px;
+
+        &:first-child {
+            margin-top: -24px;
+        }
+    }
+
+    .js-bcd-summary { h1, h2, h3 {
+        margin-top: 0;
+        padding-left: 0;
+    }}
+
+    .mdl-layout-title {
+        padding-top: 0;
+        padding-left: 0;
+
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .center-vert {
+        gap: 24px;
+    }
+}
+
+.icon--nexus {
+    .nexus-SVG-primary, .nexus-SVG-secondary {
+        // VISH DID IT TO ME
+        transition-timing-function: cubic-bezier(0, 0, 1, 0.2);
+        transition-duration: 250ms;
+        transition-delay: 10ms;
+    }
+
+    .nexus-SVG-primary {
+        fill: #222;
+    }
+
+    .nexus-SVG-secondary {
+        fill: #000;
+    }
+
+    &:is(:hover, :-ms-keyboard-active, :focus, :active) {
+        .nexus-SVG-primary {
+            fill: #da8e35;
+        }
+
+        .nexus-SVG-secondary {
+            fill: #b4762c;
+        }
+    }
+}
+
+.mdl-navigation {
+    overflow: hidden;
+}
+
+.mdl-layout__drawer .mdl-navigation .mdl-navigation__link, .mdl-navigation__link {
+    color: #fffffff2;
+    display: block;
+    padding: 16px 40px;
+    margin: 0;
+    white-space: nowrap;
+    width: 100%;
+    outline: none;
+
+    &:is(:hover, :-ms-keyboard-active, :focus, :active) {
+        background-color: #ffffff40;
+    }
+}

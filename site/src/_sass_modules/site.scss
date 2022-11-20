@@ -1,0 +1,563 @@
+.mdl-layout-title {
+    color: #fff;
+
+    :is(img, svg) {
+        height: 48px;
+        margin-right: 8px;
+    }
+
+}
+
+.needs-shadow, .mdl-layout__header-row > .mdl-layout-title, .mdl-button--colored {
+    text-shadow: 2px 2px 10px #000000a0;
+}
+
+.mdl-button--colored {
+    text-shadow: 2px 2px 10px #000000bb;
+}
+
+.mdl-navigation__link--icon {
+    display: flex;
+    justify-content: flex-start;
+    align-content: center;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    .material-icons {
+        width: 24px;
+    }
+
+    > :not(.material-icons, .center-vert) {
+        width: 24px;
+        padding-left: 24px;
+    }
+}
+
+.bcd-projects {
+    align-content: flex-start;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+
+    a {
+        max-width: 350px;
+    }
+}
+
+.GitHub-Stats-Card {
+    border-radius: 2pt;
+    line-height: 0;
+    width: 100%;
+}
+
+.GitHub-Stats-Card:is(:hover, :-ms-keyboard-active, :focus, :active) {
+    background-color: #345a;
+}
+
+.mdl-layout__content {
+    background: #1b1b1b;
+
+    &:not(footer) {
+        min-height: calc(100vh - 152px);
+    }
+
+    &:is(footer) {
+        align-items: center;
+        background-color: #222;
+        bottom: 0;
+        display: flex;
+        height: min-content;
+        justify-content: center;
+        overflow: visible;
+        padding: 12px;
+        padding-left: 312px;
+        padding-bottom: 12px;
+        position: sticky;
+        vertical-align: middle;
+
+        p {
+            bottom: auto;
+            font-size: medium;
+            margin: 0;
+            position: relative;
+            text-align: center;
+            top: auto;
+        }
+    }
+}
+
+.center-vert {
+    display: flex !important;
+    justify-content: flex-start;
+    align-content: center;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    text-align: center;
+}
+
+.subheader {
+    color: rgba(255, 255, 255, 0.6);
+    height: 48px;
+    line-height: 48px;
+    padding-left: 16px;
+}
+
+nav>.subheader {
+    border-top: 1px solid #ffffff40;
+    margin-top: 8px;
+}
+
+.mdl-button {
+    text-transform: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.text-alt01 {
+    color: #49ba56;
+}
+
+.text-alt02 {
+    color: #8d49ba;
+}
+
+.text-alt03 {
+    color: #ba5449;
+}
+
+.text-alt04 {
+    color: #ba4982;
+}
+
+.text-alt05 {
+    color: #b649ba;
+}
+
+.text-alt06 {
+    color: #baaf49;
+}
+
+.noBullet > li {
+    display: block;
+}
+
+.mdl-textfield {
+    vertical-align: middle;
+}
+
+.mdl-textfield__label {
+    color: #ffffff80;
+}
+
+.mdl-textfield__input {
+    border-bottom-color: #ffffe03d;
+}
+
+.mod-manager-list img {
+    height: 18px;
+}
+
+.mod-manager-list li {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: nowrap;
+    flex-direction: row;
+    padding: 4px;
+}
+
+@keyframes pulseBackward {
+    100% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    50% {
+        -webkit-transform: scale(.01);
+        transform: scale(.01);
+        visibility: visible;
+    }
+
+    0% {
+        -webkit-transform: scale(1);
+        transform: scale(1);
+        opacity: 1;
+        visibility: visible;
+    }
+}
+
+.mdl-switch {
+    width: fit-content;
+    margin-right: 64px;
+}
+
+.mdl-button--raised.mdl-button--colored {
+    color: #ffffff;
+    border-radius: 3px;
+}
+
+
+.dual-column {
+    margin-left: 24px;
+    display: grid;
+    grid-template-columns: min-content auto;
+
+    > * {
+        height: min-content;
+    }
+
+    .left {
+        grid-column: 1;
+        margin-right: 16px;
+    }
+}
+
+.smaller {
+    transform: scale(.8);
+}
+
+.tabs-content-container {
+    padding: 0;
+    overflow: visible;
+    height: max-content;
+
+    > * {
+        padding: 0;
+        padding-top: 16px;
+
+        transition-property: margin-left;
+        margin-left: 0; // overridden later in JavaScript
+
+        height: max-content;
+        width: max-content;
+
+        overflow: hidden;
+        overflow-y: visible;
+
+        display: grid;
+        justify-content: start;
+        align-items: start;
+        grid-template-columns: repeat(16, calc(100vw - 52px));
+        grid-template-rows: 100%;
+        gap: 52px;
+    }
+}
+
+.tab-content {
+    min-height: 70vh;
+    min-width: 100%;
+
+    opacity: 0; &.active { opacity: 1; }
+    &--hidden { visibility: none; }
+
+    transition-duration: inherit;
+    transition-timing-function: inherit;
+}
+
+.mdl-layout__header-row {
+    z-index: 3;
+}
+
+.tabs-list-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    align-content: center;
+
+    gap: 16px;
+
+    padding-left: 316px;
+
+    height: max-content;
+    width: calc(100vw + 300px);
+
+    overflow: hidden;
+    overflow-x: auto;
+
+    background-color: #666d;
+    vertical-align: top;
+
+    position: sticky;
+    margin-top: -20px;
+    margin-left: -300px;
+    z-index: 2;
+}
+
+@mixin customColoredButton($hue, $sat, $lum, $alpha: 1, $satShiftIntensity: 1, $lumShiftIntensity: 1, $doAltRipple: false) {
+
+    @if $doAltRipple {
+        .mdl-ripple {
+            background-color: #0008;
+        }
+    }
+
+    // Normal State
+    &, &:focus:not(:active, .active) {
+        background-color: hsla($hue, $sat, $lum, $alpha - 0.15);
+        color: #ffffff;
+
+        padding: 0 40px;
+        margin: 6px 0 5px;
+        height: 40px;
+
+        -webkit-tap-highlight-color: #fff4;
+        box-shadow: 2px 2px 3px #0001;
+
+        text-shadow: 2px 2px 10px #000b;
+
+        border-radius: 4px;
+    }
+
+    // Hover State
+    &:hover, :focus:hover {   &:not(:active, .active) {
+        background-color: hsla($hue, $sat  - ((10 * $satShiftIntensity) * 1%), $lum + ((13 * $lumShiftIntensity * 1%)), $alpha);
+        box-shadow: 3px 3px 4.5px #00000028;
+
+        text-shadow: 1.5px 1.5px 7px #000d;
+    }}
+
+    // Active State
+    &:is(:active, .active) {
+        background-color: hsla($hue, $sat  - ((10 * $satShiftIntensity) * 1%), $lum + ((27 * $lumShiftIntensity) * 1%), $alpha + .25);
+        box-shadow: 4px 4px 7px #0004;
+
+        text-shadow: 1px 1px 10px #000f;
+    }
+}
+
+#bcd-stepBTN-builder {
+    @include customColoredButton(209deg, 100%, 50%, 1, 0.2, 0.1, true);
+}
+
+#bcd-stepBTN-vortex {
+    @include customColoredButton(31deg, 67%, 50%, 1, 0.1, 0.6, true);
+}
+
+#bcd-stepBTN-mo2 {
+    @include customColoredButton(199deg, 82%, 61%, 1, 0.1, 0.1, true);
+}
+
+.js-tab-list-button, .js-tab-list-button.mdl-button:focus:not(:active) {
+    @include customColoredButton(160deg, 33%, 30%);
+}
+
+.js-bcd-modal {
+    margin: auto;
+    position: fixed;
+    top: 64px;
+    left: 32px;
+    right: 32px;
+    bottom: 128px;
+    overflow-wrap: break-word;
+    overflow: scroll;
+
+    min-width: 40%;
+    min-height: 40%;
+
+    max-width: 80%;
+    max-height: 80%;
+
+    border-radius: 10px;
+    border-width: 5px;
+    border-color: #0af;
+    background-color: #333;
+    box-shadow: 0 0 10px #000;
+    z-index: 256;
+}
+
+.mdl-layout__header .mdl-layout__drawer-button {
+    background-color: #0000;
+    user-select: none;
+}
+
+.js-bcd-modal, .js-bcd-modal-obfuscator {
+    opacity: 0;
+    transition-duration: 250ms;
+    transition-timing-function: ease-in-out;
+}
+
+.js-bcd-modal-obfuscator {
+    transition-duration: 400ms;
+}
+
+.js-bcd-modal[open], .js-bcd-modal-obfuscator.is-visible {
+    opacity: 1;
+}
+
+.js-bcd-modal-buttons {
+    margin: 0;
+    margin-left: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    align-content: center;
+}
+
+.w128 {
+    width: 128px;
+}
+
+.w144 {
+    width: 144px;
+}
+
+.w192 {
+    width: 192px;
+}
+
+.mr8 {
+    margin-right: 8px;
+}
+
+
+.js-dynamic-textarea-height, .js-dynamic-textarea-width {
+    resize: none;
+    overflow: visible;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+
+.drawer-init-open .mdl-layout__obfuscator {
+    background-color: #0008 !important;
+    visibility: visible !important;
+}
+
+
+.builderStep {
+    &:not(.active_) { display: none; }
+
+    opacity: 0; &.active { opacity: 1; }
+    transition-duration: 100ms;
+    transition-timing-function: ease-in-out;
+    transition-property: opacity;
+}
+
+.bcd-builder-input {
+    background-color: #222;
+    border-radius: 4px;
+    border: #444 solid 2px;
+    border-style: ridge;
+    border-left: #fff solid 4px;
+    padding: 8px;
+    padding-left: 8px;
+
+    margin-right: 16px;
+}
+
+.builder-steps-opt-body .bcd-builder-input {
+    margin-right: 0;
+}
+
+@mixin fomodStepsBuilderCard($hue, $sat, $val, $hueShiftMult: 1) {
+    //          184°, 87%, 41%
+    background: hsl($hue, $sat, $val);
+    //          208°, 100%, 58%
+    border-left: hsl($hue + ($hueShiftMult * 48deg), $sat + 13%, $val + 17%) 8px solid;
+}
+
+#steps-builder-container,
+.builder-steps-step,
+.builder-steps-step-body > .js-bcd-details-inner,
+.builder-steps-group-body > .js-bcd-details-inner,
+.builder-steps-opt-body > .js-bcd-details-inner {
+    border-radius: 8px;
+    padding: 12px;
+    @include fomodStepsBuilderCard(184deg, 87%, 41%)
+}
+
+.builder-steps-step {
+    @include fomodStepsBuilderCard(215deg, 76%, 23%);
+}
+
+.builder-steps-step-body > .js-bcd-details-inner {
+    @include fomodStepsBuilderCard(101deg, 78%, 18%);
+}
+
+.builder-steps-group-body > .js-bcd-details-inner {
+    @include fomodStepsBuilderCard(319deg, 76%, 22%, -1);
+}
+
+.builder-steps-opt-body > .js-bcd-details-inner {
+    @include fomodStepsBuilderCard(160deg, 0%, 11%);
+
+    >* {
+        display: grid;
+        justify-content: space-between;
+        gap: 32px;
+        align-items: start;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 40vw);
+    }
+
+}
+
+.builder-steps-opt-image {
+    max-width: 40vw;
+}
+
+.builder-steps-opt-body-left {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: auto;
+    grid-row: 1;
+    gap: 24px;
+}
+
+.item-with-fake-label {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 8px;
+
+    &--one-liner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    width: 100%;
+
+    > h4 {
+        margin: 0;
+    }
+}
+
+// Don't mind the fact that I subtly stole this from VS Code's context menu
+.mdl-menu__outline {
+    background: #303031;
+    color: #ccc;
+}
+
+.mdl-menu__item {
+    @extend .mdl-menu__outline;
+
+    &:hover, &:focus {
+        background: #0d365e;
+        color: #fff;
+    }
+
+    &--full-bleed-divider {
+        border-bottom-color: #ffffff20;
+    }
+}
+
+.builder-steps-step-sum {
+    padding-left: 8px;
+}

@@ -1,7 +1,52 @@
 /* eslint-disable sonarjs/no-duplicate-string */
-import * as uglify from 'uglify-js';
+
 import * as path from 'path';
 import * as afs from 'fs/promises';
+
+import * as uglify from 'uglify-js';
+
+import sass from 'sass';
+
+import postcss_ from 'postcss';
+import cssnano from 'cssnano';
+
+import sourcemap from 'source-map-js';
+
+const postcss = postcss_([
+    cssnano({
+        plugins: [
+            ['autoprefixer', {add: true}],
+            ['css-declaration-sorter', {}],
+            ['postcss-calc', {}],
+            ['postcss-colormin', {}],
+            ['postcss-convert-values', {precision: 2}],
+            ['postcss-discard-duplicates', {}],
+            ['postcss-discard-empty', {}],
+            ['postcss-discard-overridden', {}],
+            ['postcss-merge-longhand', {}],
+            ['postcss-merge-rules', {}],
+            ['postcss-minify-font-values', {}],
+            ['postcss-minify-gradients', {}],
+            ['postcss-minify-params', {}],
+            ['postcss-minify-selectors', {}],
+            ['postcss-normalize-charset', {}],
+            ['postcss-normalize-display-values', {}],
+            ['postcss-normalize-positions', {}],
+            ['postcss-normalize-repeat-style', {}],
+            ['postcss-normalize-string', {}],
+            ['postcss-normalize-timing-functions', {}],
+            ['postcss-normalize-unicode', {}],
+            ['postcss-normalize-url', {defaultProtocol: 'https', forceHttps: true}],
+            //['postcss-normalize-whitespace', {}],
+            ['postcss-ordered-values', {}],
+            ['postcss-reduce-initial', {}],
+            ['postcss-reduce-transforms', {}],
+            ['postcss-svgo', {}],
+            ['postcss-unique-selectors', {}],
+            ['postcss-zindex', {startIndex: 1}]
+        ]
+    })
+]);
 
 //console.log('environment:', JSON.stringify(process.env, undefined, 4));
 
@@ -12,19 +57,24 @@ process.on('exit', ()=>    console.log(`${minifiedAnyFile ? '\n' : ''}Minificati
 
 let minifiedVarCache = {};
 
-if (!process.env.minifyDir?.trim().replace(/^"(.*)"$/, '$1')) throw new Error('No minifyDir environment variable was provided');
+const minifyDir = process.env.minifyDir?.trim().replace(/^"(.*)"$/, '$1');
+if (!minifyDir) throw new Error('No minifyDir environment variable was provided');
 
 const doInlineSources = process.env.doInlineSources?.trim().replace(/^"(.*)"$/, '$1') === 'true';
 //console.log('doInlineSources:', process.env.doInlineSources);
 //console.log('doInlineSources:', process.env.doInlineSources?.trim().replace(/^"(.*)"$/, '$1'));
 //console.log('doInlineSources:', process.env.doInlineSources?.trim().replace(/^"(.*)"$/, '$1') === 'true');
 
+const absoluteMinifyDir = path.resolve(minifyDir);
+const minifyDirURI = new URL(`file://${absoluteMinifyDir}/`);
+const canonicalMinifyURI = doInlineSources ? minifyDirURI.href : 'https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/';
+
 // Code mostly taken from `minifyJSInDir()`
 setTimeout(async () => {
-        const files = await afs.readdir(process.env.minifyDir);
+        const files = await afs.readdir(minifyDir);
 
         for (let i = 0; i < files.length; i++) {
-            evalFileOrDir(path.join(process.env.minifyDir, files[i]));
+            evalFileOrDir(path.join(minifyDir, files[i]));
         }
     },
     100
@@ -32,7 +82,7 @@ setTimeout(async () => {
 // End self-piracy
 
 /** @param {string} dirPath Directory to traverse */
-async function minifyJSInDir(dirPath) {
+async function evalFilesInDir(dirPath) {
     const files = await afs.readdir(dirPath);
 
     for (let i = 0; i < files.length; i++) {
@@ -41,14 +91,23 @@ async function minifyJSInDir(dirPath) {
 }
 
 /** Evaluates a single file or directory asynchronously
-    @param {string} filePath the path of the file or directory to evaluate
+    @param {string} thisPath the path of the file or directory to evaluate
 */
-async function evalFileOrDir(path) {
-    const stat = await afs.lstat(path);
+async function evalFileOrDir(thisPath) {
+    //console.log('Evaluating file or directory:', thisPath);
+    if (path.basename(thisPath).startsWith('_')) return;
 
-    if (stat.isDirectory()) minifyJSInDir(path);
-    else if (path.endsWith('.js')) minifyJSFile(path);
-    //else if (path.endsWith('.html')) minifyHTMLFile(path);
+    const stat = await afs.lstat(thisPath);
+    if (stat.isDirectory()) return evalFilesInDir(thisPath);
+
+    const [,original, minified, ext] = thisPath.match(/(?:\.(original))?(?:\.(min))?\.([^.]+)$/) || [];
+    //console.log('original:', original, 'minified:', minified, 'ext:', ext);
+    if (original || minified || !ext) return;
+
+    switch (ext) {
+        case 'js' : return minifyJSFile(thisPath);
+        case 'scss': return minifySassFile(thisPath);
+    }
 }
 
 /** Minify a single JavaScript file asynchronously
@@ -65,9 +124,9 @@ async function minifyJSFile(filePath) {
     minifiedAnyFile = true;
 
     const fileContents = await afs.readFile(filePath, 'utf8');
-    afs.writeFile(filePath.replace(/\.js$/, '.original.js'), fileContents);
+    afs.writeFile(filePath.replace(/\.js$/, '.original.js'), fileContents, {encoding: 'utf8'});
 
-    const urlFilePath = filePath.replace(process.env.minifyDir, '').replace(/\\/g, '/');
+    const urlFilePath = filePath.replace(minifyDir, '').replace(/\\/g, '/');
 
     const hasTS = fileContents.includes('//# sourceMappingURL=');
 
@@ -153,15 +212,79 @@ async function minifyJSFile(filePath) {
 
     minifiedVarCache = {...minifiedVarCache, ...tempCache};
 
-    afs.writeFile(filePath, minified.code)
+    afs.writeFile(filePath, minified.code, {encoding: 'utf8'})
 
         // Change the dates of the file to allow us to check if it has been modified since last minification
         .then(() => {
             afs.utimes(path.join(filePath), new Date(Date.now()), new Date(stat.birthtime.getTime() - 5000));
         });
 
-    if (hasTS) afs.writeFile(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${hasTS ? urlFilePath.replace(/\.js$/, '.ts') : urlFilePath}"]`));
+    if (hasTS) afs.writeFile(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${hasTS ? urlFilePath.replace(/\.js$/, '.ts') : urlFilePath}"]`), {encoding: 'utf8'});
     else {
-        afs.writeFile(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${urlFilePath.replace(/\.js$/, '.original.js')}"]`));
+        afs.writeFile(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${urlFilePath.replace(/\.js$/, '.original.js')}"]`), {encoding: 'utf8'});
     }
+}
+
+async function minifySassFile(filePath) {
+    console.log('Minifying', filePath);
+    //const rawFileStr = await afs.readFile(filePath, 'utf8');
+
+    const sassCompiled = sass.compile(filePath, {
+        alertAscii: true,
+        alertColor: true,
+        charset: 'utf8',
+        loadPaths: [path.join(minifyDir, '_sass_modules')],
+        sourceMap: true,
+        sourceMapIncludeSources: doInlineSources,
+        style: 'compressed',
+        verbose: !doInlineSources
+    });
+
+    /** @type {typeof sassCompiled.sourceMap} */
+    const sassMap = JSON.parse(JSON.stringify(sassCompiled.sourceMap));
+    sassMap.sourceRoot = canonicalMinifyURI;
+    sassMap.sources = sassMap.sources.map((src) => src.replace(minifyDirURI, ''));
+
+    const filePath_Original = filePath.replace(/\.scss$/, '.original.css');
+    const filePath_CSS = filePath.replace(/\.scss$/, '.css');
+
+    afs.writeFile(filePath_Original, sassCompiled.css, {encoding: 'utf8'});
+    afs.writeFile(`${filePath_Original}.map`, JSON.stringify(sassMap), {encoding: 'utf8'});
+    await afs.writeFile(`${filePath_Original}.css.map`, JSON.stringify(sassCompiled.sourceMap), {encoding: 'utf8'});
+
+    const css = await postcss.process(sassCompiled.css, {
+        from: filePath_Original,
+        to: filePath_CSS,
+        map: {
+            annotation: false,
+            inline: false,
+            absolute: false,
+            from: canonicalMinifyURI + filePath.replace(minifyDir, ''),
+        },
+    });
+
+    css.map.applySourceMap(new sourcemap.SourceMapConsumer(sassMap), filePath_Original);
+    const mapObj = css.map.toJSON?.() ?? {};
+
+    mapObj.sourceRoot = canonicalMinifyURI;
+    mapObj.sources = sassMap.sources.map((src) => src.replace(minifyDirURI, ''));
+
+    if (sassMap.sourcesContent) {
+        mapObj.sourcesContent = [];
+        for (let i = 0; i < mapObj.sources.length; i++) {
+            const posInSassSrc = sassMap.sources.indexOf(mapObj.sources[i]);
+            mapObj.sourcesContent.push(posInSassSrc < 0 ? null : sassMap.sourcesContent[posInSassSrc]);
+        }
+    } else
+        mapObj.sourcesContent = null;
+
+    const map = JSON.stringify(mapObj);
+
+    // Write files
+
+    afs.writeFile(`${filePath_CSS}.map`, map, {encoding: 'utf8'});
+
+    const cssOut = doInlineSources ?   `${css.css ?? ''}\n/*# sourceMappingURL=data:application/json;base64,${Buffer.from((map), 'utf8').toString('base64')}*/` :
+                                        css.css ?? '';
+    afs.writeFile(filePath_CSS, cssOut, {encoding: 'utf8'});
 }

@@ -1,0 +1,70 @@
+
+
+.mdl-button--raised.mdl-button--colored:is(:active, :not(:active), :focus) {
+    &.bcd-button-open {
+        background-color: #0084ff;
+    }
+
+    &.bcd-button-openDir {
+        background-color: #00a2b8;
+    }
+
+    &.bcd-button-openFile {
+        background-color: #3c60ff;
+    }
+
+    &.bcd-button-save {
+        background-color: #009950;
+    }
+}
+
+%message-block {
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    color: #ddd;
+
+    :first-child {
+        color: #fff;
+        margin-top: 0;
+    }
+
+    :last-child {
+        margin-bottom: 0;
+    }
+}
+
+.danger-block {
+    @extend %message-block;
+    background-color: #f003;
+}
+
+.warning-block {
+    @extend %message-block;
+    background-color: #ff04;
+}
+
+.notice-block {
+    @extend %message-block;
+    background-color: #0cf3;
+}
+
+.wide01 {
+    max-width: 600px !important;
+}
+
+.wide02 {
+    max-width: 700px !important;
+}
+
+.wide03 {
+    max-width: 800px !important;
+}
+
+.wide04 {
+    max-width: 900px !important;
+}
+
+.wide05 {
+    max-width: 1000px !important;
+}
