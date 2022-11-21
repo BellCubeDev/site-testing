@@ -233,7 +233,7 @@ async function minifySassFile(filePath) {
         alertAscii: true,
         alertColor: true,
         charset: 'utf8',
-        loadPaths: [path.join(minifyDir, '_sass_modules')],
+        loadPaths: [path.join(minifyDir, 'sass_modules')],
         sourceMap: true,
         sourceMapIncludeSources: doInlineSources,
         style: 'compressed',
@@ -285,6 +285,6 @@ async function minifySassFile(filePath) {
     afs.writeFile(`${filePath_CSS}.map`, map, {encoding: 'utf8'});
 
     const cssOut = doInlineSources ?   `${css.css ?? ''}\n/*# sourceMappingURL=data:application/json;base64,${Buffer.from((map), 'utf8').toString('base64')}*/` :
-                                        css.css ?? '';
+                                       `${css.css ?? ''}\n/*# sourceMappingURL=${canonicalMinifyURI}${filePath_CSS.replace(minifyDir, '')}.map*/`;
     afs.writeFile(filePath_CSS, cssOut, {encoding: 'utf8'});
 }
