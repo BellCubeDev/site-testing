@@ -57,6 +57,17 @@ export function preventPropagation(event: Event): void {
     event.stopPropagation();
 }
 
+export function setProxies<TObj extends Record<string, any>>(obj: TObj, handler: ProxyHandler<TObj>): TObj {
+    for (const [key, value] of Object.entries(obj)) {
+        if (typeof value !== 'object') continue;
+
+        setProxies(value, handler);
+        obj[key as keyof TObj] = new Proxy(value ?? {}, handler);
+
+    }
+    return obj;
+}
+
 // =================================
 // ======== ARRAY UTILITIES ========
 // =================================
@@ -1526,14 +1537,10 @@ export function bcd_universalJS_init():void {
     // =============================================================
 
     const randomTextField = document.getElementById("randomized-text-field");
-    if (!randomTextField) return;
+    if (!randomTextField) throw new Error("No random text field found!");
 
-    const toSetText = quotes.possibilities_conditionalized[randomNumber(0, quotes.possibilities_conditionalized.length - 1)];
-
-
-    // Check condition
-    if (quotes.checkCondition(toSetText![0])) randomTextField.innerHTML = toSetText![1];
-    else randomTextField.innerHTML = quotes.possibilities_Generic[randomNumber(0, quotes.possibilities_Generic.length - 1)]!;
+    const quote = quotes.getRandomQuote();
+    randomTextField.innerHTML = typeof quote === "string" ? quote : quote[1]!;
 
     // =============================================================
     // Import Lazy-Loaded Styles

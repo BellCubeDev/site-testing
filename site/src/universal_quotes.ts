@@ -374,6 +374,34 @@ export function checkDateCondition(dateBounds: conditionDateBounds):boolean {
 }
 
 
+function saveStorage() {
+    try {
+        localStorage.setItem('BCD - Last 50 Quotes', JSON.stringify(last50));
+    } catch {
+        return false;
+    }
+    return true;
+}
+
+const last50 = JSON.parse(localStorage.getItem('BCD - Last 50 Quotes') ?? '[]')
+
+export function getRandomQuote_base(){
+    const pos = Math.floor(Math.random() * (possibilities_Generic.length + possibilities_conditionalized.length));
+    return pos < possibilities_Generic.length ? possibilities_Generic[pos]! : possibilities_conditionalized[pos - possibilities_Generic.length]!;
+}
+
+export function getRandomQuote() {
+    let quote = getRandomQuote_base();
+
+    while (last50.includes(quote) || (typeof quote !== 'string' && !checkCondition(quote[0]!)))
+        quote = getRandomQuote_base();
+
+    last50.push(quote);
+    if (last50.length > 50) last50.shift();
+
+    saveStorage();
+    return quote;
+}
 
 export type conditionDate_Individual = [number, number, number]
 export type conditionDateBounds = [conditionDate_Individual, conditionDate_Individual]

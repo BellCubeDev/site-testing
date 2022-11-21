@@ -96,18 +96,7 @@ function storageProxyHandler_set<TObj>(target: TObj, prop: keyof TObj, value: TO
     return saveStorage();
 }
 
-function setProxies<TObj extends Record<string, any>>(obj: TObj, handler: ProxyHandler<TObj>): TObj {
-    for (const [key, value] of Object.entries(obj)) {
-        if (typeof value !== 'object') continue;
-
-        setProxies(value, handler);
-        obj[key as keyof TObj] = new Proxy(value ?? {}, handler);
-
-    }
-    return obj;
-}
-
-setProxies(window.FOMODBuilder.storage, {get: storageProxyHandler_get, set: storageProxyHandler_set});
+bcdUniversal.setProxies(window.FOMODBuilder.storage, {get: storageProxyHandler_get, set: storageProxyHandler_set});
 
 window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
 
