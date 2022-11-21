@@ -252,6 +252,7 @@ async function minifySassFile(filePath) {
     afs.writeFile(`${filePath_Original}.map`, JSON.stringify(sassMap), {encoding: 'utf8'});
     await afs.writeFile(`${filePath_Original}.css.map`, JSON.stringify(sassCompiled.sourceMap), {encoding: 'utf8'});
 
+    const originalSassFileURI = canonicalMinifyURI + filePath.replace(minifyDir, '')
     const css = await postcss.process(sassCompiled.css, {
         from: filePath_Original,
         to: filePath_CSS,
@@ -259,15 +260,16 @@ async function minifySassFile(filePath) {
             annotation: false,
             inline: false,
             absolute: false,
-            from: canonicalMinifyURI + filePath.replace(minifyDir, ''),
+            prev: new sourcemap.SourceMapConsumer(sassMap),
+            from: originalSassFileURI,
         },
     });
 
-    css.map.applySourceMap(new sourcemap.SourceMapConsumer(sassMap), filePath_Original);
-    const mapObj = css.map.toJSON?.() ?? {};
+    css.map.applySourceMap(new sourcemap.SourceMapConsumer(sassMap), originalSassFileURI);
+    const mapObj = css.map.toJSON?.() || sassMap || {};
 
     mapObj.sourceRoot = canonicalMinifyURI;
-    mapObj.sources = sassMap.sources.map((src) => src.replace(minifyDirURI, ''));
+    mapObj.sources = mapObj.sources.map((src) => src.replace(minifyDirURI, ''));
 
     if (sassMap.sourcesContent) {
         mapObj.sourcesContent = [];
