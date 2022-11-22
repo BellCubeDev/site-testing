@@ -16,7 +16,7 @@ export function getFomodFilesFromFolder(folder: files.folder) : IFomodFolder {
     };
 }
 
-export function translateWhole(module: string, info: string) : classes.FOMOD {
+export function translateWhole(module: string, info: string, setWindowValues = false) : classes.FOMOD {
     const parser = new DOMParser();
 
 
@@ -32,7 +32,15 @@ export function translateWhole(module: string, info: string) : classes.FOMOD {
 
     if (!infoMainElem) throw new TypeError('No <fomod> element found in supplied Info file.');
 
+    const obj = new classes.FOMOD(moduleMainElem, infoMainElem);
+    
+    if (setWindowValues) {
+        window.FOMODBuilder.trackedFomod = {
+            obj,
+            infoDoc,
+            moduleDoc
+        };
+    }
 
-
-    return new classes.FOMOD(moduleMainElem, infoMainElem);
+    return obj;
 }
