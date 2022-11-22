@@ -54,7 +54,7 @@ export abstract class dependency extends XMLElement {
 
 export abstract class dependency_versionCheck extends dependency {
     private _version = "";
-    set version(value: string) { this.updateObjects(); this._version = value; } get version(): string { return this._version; }
+    set version(value: string) { this._version = value; this.updateObjects(); } get version(): string { return this._version; }
 }
 
 
@@ -98,10 +98,10 @@ export type dependency_file_state = "Active" | "Inactive" | "Missing";
 export type dependency_group_operator = "And" | "Or";
 export class dependency_group extends dependency {
     private _operator: dependency_group_operator = 'And';
-    set operator(value: dependency_group_operator) { this.updateObjects(); this._operator = value; } get operator(): dependency_group_operator { return this._operator; }
+    set operator(value: dependency_group_operator) { this._operator = value; this.updateObjects(); } get operator(): dependency_group_operator { return this._operator; }
 
     private _children: dependency[] = [];
-    set children(value: dependency[]) { this.updateObjects(); this._children = value; } get children(): dependency[] { return this._children; }
+    set children(value: dependency[]) { this._children = value; this.updateObjects(); } get children(): dependency[] { return this._children; }
 
     constructor(
         instanceElement: Element | undefined = undefined,
@@ -147,10 +147,10 @@ export class dependency_group extends dependency {
 }
 export class dependency_flag extends dependency {
     private _flag = "";
-    set flag(value: string) { this.updateObjects(); this._flag = value; } get flag(): string { return this._flag; }
+    set flag(value: string) { this._flag = value; this.updateObjects(); } get flag(): string { return this._flag; }
 
     private _value = "";
-    set value(value: string) { this.updateObjects(); this._value = value; } get value(): string { return this._value; }
+    set value(value: string) { this._value = value; this.updateObjects(); } get value(): string { return this._value; }
 
     // <flagDependency flag="" value="" />
     override asModuleXML(document: XMLDocument): Element {
@@ -162,10 +162,10 @@ export class dependency_flag extends dependency {
 }
 export class dependency_file extends dependency {
     private _file = "";
-    set file(value: string) { this.updateObjects(); this._file = value; } get file(): string { return this._file; }
+    set file(value: string) { this._file = value; this.updateObjects(); } get file(): string { return this._file; }
 
     private _state: dependency_file_state = "Active";
-    set state(value: dependency_file_state) { this.updateObjects(); this._state = value; } get state(): dependency_file_state { return this._state; }
+    set state(value: dependency_file_state) { this._state = value; this.updateObjects(); } get state(): dependency_file_state { return this._state; }
 
     // <fileDependency file="2" state="Active" />
     override asModuleXML(document: XMLDocument): Element {
@@ -230,23 +230,23 @@ export type OptionType =
     | "NotUseable";     // Permanently unchecked
 export class OptionTypeDescriptor extends XMLElement {
     private _default: OptionType = "Optional";
-    set default(value: OptionType) { this.updateObjects(); this._default = value; } get default(): OptionType { return this._default; }
+    set default(value: OptionType) { this._default = value; this.updateObjects(); } get default(): OptionType { return this._default; }
 
     private _dependencies: OptionTypeDescriptor_dependency[] = [];
-    set dependencies(value: OptionTypeDescriptor_dependency[]) { this.updateObjects(); this._dependencies = value; } get dependencies(): OptionTypeDescriptor_dependency[] { return this._dependencies; }
+    set dependencies(value: OptionTypeDescriptor_dependency[]) { this._dependencies = value; this.updateObjects(); } get dependencies(): OptionTypeDescriptor_dependency[] { return this._dependencies; }
 
 
     private _instanceElement_basic: Element | undefined = undefined;
-    set instanceElement_basic(value: Element | undefined) { this.updateObjects(); this._instanceElement_basic = value; } get instanceElement_basic(): Element | undefined { return this._instanceElement_basic; }
+    set instanceElement_basic(value: Element | undefined) { this._instanceElement_basic = value; this.updateObjects(); } get instanceElement_basic(): Element | undefined { return this._instanceElement_basic; }
 
     private _instanceElement_complex: Element | undefined = undefined;
-    set instanceElement_complex(value: Element | undefined) { this.updateObjects(); this._instanceElement_complex = value; } get instanceElement_complex(): Element | undefined { return this._instanceElement_complex; }
+    set instanceElement_complex(value: Element | undefined) { this._instanceElement_complex = value; this.updateObjects(); } get instanceElement_complex(): Element | undefined { return this._instanceElement_complex; }
 
     private _instanceElement_complex_type: Element | undefined = undefined;
-    set instanceElement_complex_type(value: Element | undefined) { this.updateObjects(); this._instanceElement_complex_type = value; } get instanceElement_complex_type(): Element | undefined { return this._instanceElement_complex_type; }
+    set instanceElement_complex_type(value: Element | undefined) { this._instanceElement_complex_type = value; this.updateObjects(); } get instanceElement_complex_type(): Element | undefined { return this._instanceElement_complex_type; }
 
     private _instanceElement_complex_patterns: Element | undefined = undefined;
-    set instanceElement_complex_patterns(value: Element | undefined) { this.updateObjects(); this._instanceElement_complex_patterns = value; } get instanceElement_complex_patterns(): Element | undefined { return this._instanceElement_complex_patterns; }
+    set instanceElement_complex_patterns(value: Element | undefined) { this._instanceElement_complex_patterns = value; this.updateObjects(); } get instanceElement_complex_patterns(): Element | undefined { return this._instanceElement_complex_patterns; }
 
 
     constructor(
@@ -305,13 +305,13 @@ export class OptionTypeDescriptor extends XMLElement {
 
 export class OptionTypeDescriptor_dependency extends XMLElement {
     private _type: OptionType = "Optional";
-    set type(value: OptionType) { this.updateObjects(); this._type = value; } get type(): OptionType { return this._type; }
+    set type(value: OptionType) { this._type = value; this.updateObjects(); } get type(): OptionType { return this._type; }
 
     private _instanceElement_type: Element | undefined = undefined;
-    set instanceElement_type(value: Element | undefined) { this.updateObjects(); this._instanceElement_type = value; } get instanceElement_type(): Element | undefined { return this._instanceElement_type; }
+    set instanceElement_type(value: Element | undefined) { this._instanceElement_type = value; this.updateObjects(); } get instanceElement_type(): Element | undefined { return this._instanceElement_type; }
 
     private _dependency!: dependency_group;
-    set dependency(value: dependency_group) { this.updateObjects(); this._dependency = value; } get dependency(): dependency_group { return this._dependency; }
+    set dependency(value: dependency_group) { this._dependency = value; this.updateObjects(); } get dependency(): dependency_group { return this._dependency; }
 
     constructor(dependency: dependency_group, type: OptionType = "Optional") {
         super();
@@ -348,7 +348,7 @@ export class FOMOD_install extends XMLElement {
     static paths: string[][] = [];
 
     private _path!: string[];
-    set path(value: string[]) { this.updateObjects(); this._path = value; } get path(): string[] { return this._path; }
+    set path(value: string[]) { this._path = value; this.updateObjects(); } get path(): string[] { return this._path; }
 
     async updateFile(pathOrFile: string|string[] | FileSystemHandle): Promise<void> {
 
@@ -446,16 +446,16 @@ export type groupSelectType =
     | "SelectExactlyOne";   // Requires users to select exactly one option
 export class group extends XMLElement {
     private _name = "";
-    set name(value: string) { this.updateObjects(); this._name = value; } get name(): string { return this._name; }
+    set name(value: string) { this._name = value; this.updateObjects(); } get name(): string { return this._name; }
 
     private _type: groupSelectType = "SelectAny";
-    set type(value: groupSelectType) { this.updateObjects(); this._type = value; } get type(): groupSelectType { return this._type; }
+    set type(value: groupSelectType) { this._type = value; this.updateObjects(); } get type(): groupSelectType { return this._type; }
 
     private _sortOrder: sortOrder = "Explicit";
-    set sortOrder(value: sortOrder) { this.updateObjects(); this._sortOrder = value; } get sortOrder(): sortOrder { return this._sortOrder; }
+    set sortOrder(value: sortOrder) { this._sortOrder = value; this.updateObjects(); } get sortOrder(): sortOrder { return this._sortOrder; }
 
     private _options: option[] = [];
-    set options(value: option[]) { this.updateObjects(); this._options = value; } get options(): option[] { return this._options; }
+    set options(value: option[]) { this._options = value; this.updateObjects(); } get options(): option[] { return this._options; }
 
 
     // <group name="Banana Types" type="SelectAny">
@@ -479,44 +479,44 @@ export class group extends XMLElement {
 export class option extends XMLElement {
     // Actual Option Name
     private _name = "";
-    set name(value: string) { this.updateObjects(); this._name = value; } get name(): string { return this._name; }
+    set name(value: string) { this._name = value; this.updateObjects(); } get name(): string { return this._name; }
 
     // Backend Name
     private _name_backend = "";
-    set name_backend(value: string) { this.updateObjects(); this._name_backend = value; } get name_backend(): string { return this._name_backend; }
+    set name_backend(value: string) { this._name_backend = value; this.updateObjects(); } get name_backend(): string { return this._name_backend; }
 
     private _name_backend_node: Comment | undefined;
-    set name_backend_node(value: Comment | undefined) { this.updateObjects(); this._name_backend_node = value; } get name_backend_node(): Comment | undefined { return this._name_backend_node; }
+    set name_backend_node(value: Comment | undefined) { this._name_backend_node = value; this.updateObjects(); } get name_backend_node(): Comment | undefined { return this._name_backend_node; }
 
 
     // Description
     private _description!: option_description;
-    set description(value: option_description) { this.updateObjects(); this._description = value; } get description(): option_description { return this._description; }
+    set description(value: option_description) { this._description = value; this.updateObjects(); } get description(): option_description { return this._description; }
 
 
     // Image
     private _image!: option_image;
-    set image(value: option_image) { this.updateObjects(); this._image = value; } get image(): option_image { return this._image; }
+    set image(value: option_image) { this._image = value; this.updateObjects(); } get image(): option_image { return this._image; }
 
     // Flags
     private _conditionFlags: dependency_flag[] = [];
-    set conditionFlags(value: dependency_flag[]) { this.updateObjects(); this._conditionFlags = value; } get conditionFlags(): dependency_flag[] { return this._conditionFlags; }
+    set conditionFlags(value: dependency_flag[]) { this._conditionFlags = value; this.updateObjects(); } get conditionFlags(): dependency_flag[] { return this._conditionFlags; }
 
     private _conditionFlags_container: Element | undefined;
-    set conditionFlags_container(value: Element | undefined) { this.updateObjects(); this._conditionFlags_container = value; } get conditionFlags_container(): Element | undefined { return this._conditionFlags_container; }
+    set conditionFlags_container(value: Element | undefined) { this._conditionFlags_container = value; this.updateObjects(); } get conditionFlags_container(): Element | undefined { return this._conditionFlags_container; }
 
 
     // Files
     private _files: dependency_file[] = [];
-    set files(value: dependency_file[]) { this.updateObjects(); this._files = value; } get files(): dependency_file[] { return this._files; }
+    set files(value: dependency_file[]) { this._files = value; this.updateObjects(); } get files(): dependency_file[] { return this._files; }
 
     private _files_container: Element | undefined;
-    set files_container(value: Element | undefined) { this.updateObjects(); this._files_container = value; } get files_container(): Element | undefined { return this._files_container; }
+    set files_container(value: Element | undefined) { this._files_container = value; this.updateObjects(); } get files_container(): Element | undefined { return this._files_container; }
 
 
     // Type Descriptor
     private _typeDescriptor!: OptionTypeDescriptor;
-    set typeDescriptor(value: OptionTypeDescriptor) { this.updateObjects(); this._typeDescriptor = value; } get typeDescriptor(): OptionTypeDescriptor { return this._typeDescriptor; }
+    set typeDescriptor(value: OptionTypeDescriptor) { this._typeDescriptor = value; this.updateObjects(); } get typeDescriptor(): OptionTypeDescriptor { return this._typeDescriptor; }
 
     constructor(
         element?: Element,
@@ -580,7 +580,7 @@ export class option extends XMLElement {
 
 export class option_description extends XMLElement {
     private _description = "";
-    set description(value: string) { this.updateObjects(); this._description = value; } get description(): string { return this._description; }
+    set description(value: string) { this._description = value; this.updateObjects(); } get description(): string { return this._description; }
 
     constructor(element?: Element, description = "") {
         super(element);
@@ -597,7 +597,7 @@ export class option_description extends XMLElement {
 
 export class option_image extends XMLElement {
     private _image: string[] = [];
-    set image(value: string[]) { this.updateObjects(); this._image = value; } get image(): string[] { return this._image; }
+    set image(value: string[]) { this._image = value; this.updateObjects(); } get image(): string[] { return this._image; }
 
     constructor(element?: Element, image: string[] | FileSystemFileHandle = []) {
         super(element);
@@ -629,26 +629,26 @@ export class option_image extends XMLElement {
 
 export class FOMOD extends XMLElement {
     private _meta_name: string = "";
-    set meta_name(value: string) { this.updateObjects(); this._meta_name = value; } get meta_name(): string { return this._meta_name; }
+    set meta_name(value: string) { this._meta_name = value; this.updateObjects(); } get meta_name(): string { return this._meta_name; }
 
     private _meta_image: string = "";
-    set meta_image(value: string) { this.updateObjects(); this._meta_image = value; } get meta_image(): string { return this._meta_image; }
+    set meta_image(value: string) { this._meta_image = value; this.updateObjects(); } get meta_image(): string { return this._meta_image; }
 
     private _meta_author: string = "";
-    set meta_author(value: string) { this.updateObjects(); this._meta_author = value; } get meta_author(): string { return this._meta_author; }
+    set meta_author(value: string) { this._meta_author = value; this.updateObjects(); } get meta_author(): string { return this._meta_author; }
 
     private _meta_version: string = "";
     /** The metadata version of this mod */
-    set meta_version(value: string) { this.updateObjects(); this._meta_version = value; } get meta_version(): string { return this._meta_version; }
+    set meta_version(value: string) { this._meta_version = value; this.updateObjects(); } get meta_version(): string { return this._meta_version; }
 
     private _meta_id: number = 0;
-    set meta_id(value: number) { this.updateObjects(); this._meta_id = value; } get meta_id(): number { return this._meta_id; }
+    set meta_id(value: number) { this._meta_id = value; this.updateObjects(); } get meta_id(): number { return this._meta_id; }
 
     private _infoInstanceElement: Element | undefined;
-    set infoInstanceElement(value: Element | undefined) { this.updateObjects(); this._infoInstanceElement = value; } get infoInstanceElement(): Element | undefined { return this._infoInstanceElement; }
+    set infoInstanceElement(value: Element | undefined) { this._infoInstanceElement = value; this.updateObjects(); } get infoInstanceElement(): Element | undefined { return this._infoInstanceElement; }
 
     _meta_url:URL|string = ''; // Is actually set during the constructor, however TS is too static to understand that.
-    set meta_url(value:URL|string) { this.updateObjects(); this._meta_url = value; } get meta_url():URL|string { return this._meta_url; }
+    set meta_url(value:URL|string) { this._meta_url = value; this.updateObjects(); } get meta_url():URL|string { return this._meta_url; }
 
     setURL(url:URL|string, doWarn:boolean=true):void{
         if (url instanceof URL) this.meta_url = url;
