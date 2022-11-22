@@ -41,7 +41,8 @@ export interface builderStorage {
         defaultGroupSelectType: fomodClasses.groupSelectType; // 'SelectAtLeastOne'
     }
     preferences: {
-        stepsBuilder: fomodUI.bcdBuilderType
+        stepsBuilder: fomodUI.bcdBuilderType,
+        autoSave: boolean,
     }
 }
 
@@ -61,6 +62,7 @@ const defaultStorage: builderStorage =  {
     },
     preferences: {
         stepsBuilder: 'builder',
+        autoSave: false,
     }
 };
 
@@ -88,6 +90,7 @@ window.FOMODBuilder = {
 
     trackedFomod: null
 };
+export const save = fomodUI.save;
 
 function saveStorage() {
     try {

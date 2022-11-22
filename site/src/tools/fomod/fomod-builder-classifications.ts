@@ -24,6 +24,7 @@ export abstract class XMLElement implements updatableObject {
 
     updateObjects() {
         this.objectsToUpdate.forEach(  (obj) => obj.update()  );
+        if (window.FOMODBuilder.storage.preferences.autoSave)  main.save();
     }
 
     update() { this.updateObjects(); }
