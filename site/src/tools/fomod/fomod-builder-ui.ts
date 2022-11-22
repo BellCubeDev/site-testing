@@ -2,9 +2,9 @@ import * as mdl from '../../assets/site/mdl/material.js';
 import * as fomodClasses from './fomod-builder-classifications.js';
 import * as fomod from './fomod-builder.js';
 import * as bcdUniversal from '../../universal.js';
+import * as bcdFS from '../../filesystem-interface.js';
 
-
-
+import * as xml from './fomod-builder-xml-translator.js';
 
 export class bcdDropdownSortingOrder extends bcdUniversal.bcdDropdown {
     static asString = 'FOMOD Builder - Sorting Order Dropdown';
@@ -83,10 +83,29 @@ export function setStepEditorType(type: bcdBuilderType) {
     window.FOMODBuilder.storage.preferences!.stepsBuilder = type;
 }
 
+export async function openFolder_entry() {
+    console.debug('Opening a folder!');
+    const picked = await bcdFS.getUserPickedFolder(true);
+    console.debug('Picked folder:', picked);
+    console.debug('Picked folder name:', picked?.handle.name);
+    console.debug('Picked folder perms?', await picked?.handle.queryPermission({mode: 'readwrite'}));
+
+    window.FOMODBuilder.directory = picked;
+    //const moduleStr = await picked.children['ModuleConfig.xml']?.handle.then(file => file.text());
+    //xml.translateWhole()
+}
+
 export async function save() {
     if (!window.FOMODBuilder.trackedFomod) throw new Error('No FOMOD is currently loaded.');
 
-    const fomodFolder = await window.FOMODBuilder.directory!.getDirectoryHandle('FOMOD', {create: true});
+    if (!window.FOMODBuilder.directory) {
+        const picked = await bcdFS.getUserPickedFolder(true);
+        if (!picked) return;
+        window.FOMODBuilder.directory = picked;
+    }
+
+    const fomodFolder = window.FOMODBuilder.directory.childrenInsensitive['fomod']?.handle ?? await window.FOMODBuilder.directory.handle.getDirectoryHandle('fomod', {create: true});
+    if (!(fomodFolder instanceof FileSystemDirectoryHandle)) throw new Error('Could not get or create the fomod folder.');
 
     const fomodInfo_ = fomodFolder.getFileHandle('Info.xml', {create: true});
     const fomodModule_ = fomodFolder.getFileHandle('ModuleConfig.xml', {create: true});
@@ -106,11 +125,13 @@ export async function save() {
     ));
 }
 
-export async function cleanSave(){
+export function cleanSave(){
     if (!window.FOMODBuilder.trackedFomod) throw new Error('No FOMOD is currently loaded.');
 
-    window.FOMODBuilder.trackedFomod!.infoDoc = new DOMParser().parseFromString('<fomod/>', 'text/xml');
-    window.FOMODBuilder.trackedFomod!.moduleDoc = new DOMParser().parseFromString('<config/>', 'text/xml');
+    window.FOMODBuilder.trackedFomod!.infoDoc = window.domParser.parseFromString('<fomod/>', 'text/xml');
+    window.FOMODBuilder.trackedFomod!.moduleDoc = window.domParser.parseFromString('<config/>', 'text/xml');
+
+    save();
 }
 
 

@@ -4,12 +4,12 @@ import * as fomodClasses from  './fomod-builder-classifications.js';
 import * as bcdUniversal from '../../universal.js';
 import * as xml from './fomod-builder-xml-translator.js';
 
-const domParser = new DOMParser();
 
 declare global {interface Window {
+    domParser: DOMParser;
     FOMODBuilder: {
         ui: fomodUI.windowUI
-        directory?: FileSystemDirectoryHandle;
+        directory?: bcdFS.writeableFolder;
         storage: builderStorage;
         fomodClass: typeof fomodClasses.FOMOD;
         testingFomod: fomodClasses.FOMOD;
@@ -22,6 +22,9 @@ declare global {interface Window {
         };
     };
 }}
+
+window.domParser = new DOMParser();
+const domParser = window.domParser;
 
 export interface builderStorage {
     settings: {
@@ -66,7 +69,7 @@ const fetchedStorage = JSON.parse(   localStorage.getItem('BellCubeDev_FOMOD_BUI
 window.FOMODBuilder = {
 
     ui: {
-        openFolder: openFolder_entry,
+        openFolder: fomodUI.openFolder_entry,
         save: fomodUI.save,
         cleanSave: fomodUI.cleanSave,
         attemptRepair: () => {},
@@ -145,15 +148,3 @@ window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
 
     }
 };
-
-async function openFolder_entry() {
-    console.debug('Opening a folder!');
-    const picked = await bcdFS.getUserPickedFolder(true);
-    console.debug('Picked folder:', picked);
-    console.debug('Picked folder name:', picked?.handle.name);
-    console.debug('Picked folder perms?', await picked?.handle.queryPermission({mode: 'readwrite'}));
-
-    window.FOMODBuilder.directory = picked.handle;
-    //const moduleStr = await picked.children['ModuleConfig.xml']?.handle.then(file => file.text());
-    //xml.translateWhole()
-}

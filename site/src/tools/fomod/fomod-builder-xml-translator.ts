@@ -17,7 +17,7 @@ export function getFomodFilesFromFolder(folder: files.folder) : IFomodFolder {
 }
 
 export function translateWhole(module: string, info: string, setWindowValues = false) : classes.FOMOD {
-    const parser = new DOMParser();
+    const parser = window.domParser;
 
 
     const moduleDoc = parser.parseFromString(module, 'text/xml');
