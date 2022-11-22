@@ -359,7 +359,7 @@ export class FOMOD_install extends XMLElement {
         }
 
         else if (pathOrFile instanceof FileSystemHandle) {
-            pathOrFile = await window.FOMODBuilder.directory?.resolve(pathOrFile) ?? '';
+            pathOrFile = await window.FOMODBuilder.directory?.handle.resolve(pathOrFile) ?? '';
         }
 
         if (pathOrFile instanceof Array) {
@@ -606,7 +606,7 @@ export class option_image extends XMLElement {
 
         if (!(temp_img instanceof Array))
             window.FOMODBuilder.directory
-                ?.resolve(temp_img)
+                ?.handle.resolve(temp_img)
                 .then((path) => (this.image = path ?? []));
         else this.image = temp_img;
     }
