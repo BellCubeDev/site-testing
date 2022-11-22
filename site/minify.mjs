@@ -252,7 +252,7 @@ async function minifySassFile(filePath) {
     afs.writeFile(`${filePath_Original}.map`, JSON.stringify(sassMap), {encoding: 'utf8'});
     await afs.writeFile(`${filePath_Original}.css.map`, JSON.stringify(sassCompiled.sourceMap), {encoding: 'utf8'});
 
-    const originalSassFileURI = canonicalMinifyURI + filePath.replace(minifyDir, '')
+    const originalSassFileURI = canonicalMinifyURI + filePath.replace(minifyDir, '');
     const css = await postcss.process(sassCompiled.css, {
         from: filePath_Original,
         to: filePath_CSS,

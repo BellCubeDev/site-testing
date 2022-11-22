@@ -1566,21 +1566,21 @@ export function bcd_universalJS_init():void {
     main = document.getElementById('cont') as HTMLDivElement;
     footer = document.getElementById('footer') as HTMLDivElement;
 
-    //function resizeMain() {
-    //    const footerHeight = footer!.offsetHeight ?? 0;
-    //    const headerHeight = window.layout.header_?.offsetHeight ?? 0;
+    if (!main || !footer) throw new Error('No main or footer div found!');
 
-    //    const mainComputedStyle = window.getComputedStyle(main!);
-    //    const mainContentPaddingHeight = parseFloat(mainComputedStyle.paddingTop) + parseFloat(mainComputedStyle.paddingBottom);
+    function resizeMain() {
+        const footerHeight = Math.max(footer?.offsetHeight ?? 0, 48);
+        const headerHeight = window.layout.header_?.offsetHeight ?? 0;
 
-    //    main!.style.minHeight = `calc(100vh - ${Math.max(footerHeight, 24) + headerHeight + mainContentPaddingHeight + 1}px)`;
-    //}
+        const mainComputedStyle = window.getComputedStyle(main!);
+        const mainContentPaddingHeight = parseFloat(mainComputedStyle.paddingTop) + parseFloat(mainComputedStyle.paddingBottom);
 
-    //resizeMain();
+        main!.style.minHeight = `calc(100vh - ${footerHeight + headerHeight + mainContentPaddingHeight + 1}px)`;
+        main!.style.paddingBottom = `${footerHeight}px)`;
+    }
+    const contResizeObserver = new ResizeObserver(resizeMain);
 
-    //const contResizeObserver = new ResizeObserver(resizeMain);
-
-    //contResizeObserver.observe(footer);
-    //if (window.layout.header_) contResizeObserver.observe(window.layout.header_);
+    resizeMain();
+    contResizeObserver.observe(footer);
 }
 window.bcd_init_functions.universal = bcd_universalJS_init;

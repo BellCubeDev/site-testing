@@ -1,3 +1,7 @@
+html {
+    background: #1b1b1b;
+}
+
 .mdl-layout-title {
     color: #fff;
 
@@ -58,35 +62,33 @@
     background-color: #345a;
 }
 
-.mdl-layout__content {
-    background: #1b1b1b;
+#cont {
+    min-height: calc(100vh - 152px);
+    margin-top: -64px;
+    padding-top: 80px; // 16 for the header + the 64 we took out from margin-top
+}
 
-    &:not(footer) {
-        min-height: calc(100vh - 152px);
-    }
+#footer {
+    align-items: center;
+    background-color: #222;
+    bottom: 0;
+    display: flex;
+    height: min-content;
+    justify-content: center;
+    overflow: visible;
+    padding: 12px;
+    padding-left: 312px;
+    padding-bottom: 12px;
+    position: sticky;
+    vertical-align: middle;
 
-    &:is(footer) {
-        align-items: center;
-        background-color: #222;
-        bottom: 0;
-        display: flex;
-        height: min-content;
-        justify-content: center;
-        overflow: visible;
-        padding: 12px;
-        padding-left: 312px;
-        padding-bottom: 12px;
-        position: sticky;
-        vertical-align: middle;
-
-        p {
-            bottom: auto;
-            font-size: medium;
-            margin: 0;
-            position: relative;
-            text-align: center;
-            top: auto;
-        }
+    p {
+        bottom: auto;
+        font-size: medium;
+        margin: 0;
+        position: relative;
+        text-align: center;
+        top: auto;
     }
 }
 
@@ -290,7 +292,8 @@ nav>.subheader {
     vertical-align: top;
 
     position: sticky;
-    margin-top: -20px;
+    margin-top: -60px;
+    padding-top: 44px;
     margin-left: -300px;
     z-index: 2;
 }
@@ -361,7 +364,7 @@ nav>.subheader {
     right: 32px;
     bottom: 128px;
     overflow-wrap: break-word;
-    overflow: scroll;
+    overflow: auto;
 
     min-width: 40%;
     min-height: 40%;
@@ -369,7 +372,7 @@ nav>.subheader {
     max-width: 80%;
     max-height: 80%;
 
-    border-radius: 10px;
+    border-radius: 8px;
     border-width: 5px;
     border-color: #0af;
     background-color: #333;
@@ -377,9 +380,14 @@ nav>.subheader {
     z-index: 256;
 }
 
-.mdl-layout__header .mdl-layout__drawer-button {
-    background-color: #0000;
-    user-select: none;
+.mdl-layout__header {
+    background: none;
+
+    .mdl-layout__drawer-button {
+        background: none;
+        user-select: none;
+    }
+
 }
 
 .js-bcd-modal, .js-bcd-modal-obfuscator {
