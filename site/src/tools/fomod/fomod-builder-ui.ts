@@ -83,6 +83,36 @@ export function setStepEditorType(type: bcdBuilderType) {
     window.FOMODBuilder.storage.preferences!.stepsBuilder = type;
 }
 
+export async function save() {
+    if (!window.FOMODBuilder.trackedFomod) throw new Error('No FOMOD is currently loaded.');
+
+    const fomodFolder = await window.FOMODBuilder.directory!.getDirectoryHandle('FOMOD', {create: true});
+
+    const fomodInfo_ = fomodFolder.getFileHandle('Info.xml', {create: true});
+    const fomodModule_ = fomodFolder.getFileHandle('ModuleConfig.xml', {create: true});
+    const [fomodInfo, fomodModule] = await Promise.all([fomodInfo_, fomodModule_]);
+
+    const infoDoc = window.FOMODBuilder.trackedFomod!.infoDoc;
+    const moduleDoc = window.FOMODBuilder.trackedFomod!.moduleDoc;
+
+    // Tell the browser to save Info.xml
+    fomodInfo.createWritable().then(writable => writable.write(
+        window.FOMODBuilder.trackedFomod?.obj.asInfoXML(infoDoc).toString() ?? '<!-- ERROR -->'
+    ));
+
+    // Tell the browser to save ModuleConfig.xml
+    fomodModule.createWritable().then(writable => writable.write(
+        window.FOMODBuilder.trackedFomod?.obj.asModuleXML(moduleDoc).toString() ?? '<!-- ERROR -->'
+    ));
+}
+
+export async function cleanSave(){
+    if (!window.FOMODBuilder.trackedFomod) throw new Error('No FOMOD is currently loaded.');
+
+    window.FOMODBuilder.trackedFomod!.infoDoc = new DOMParser().parseFromString('<fomod/>', 'text/xml');
+    window.FOMODBuilder.trackedFomod!.moduleDoc = new DOMParser().parseFromString('<config/>', 'text/xml');
+}
+
 
 /*\    /$\                       /$\
 $$ |   $$ |                      $$ |

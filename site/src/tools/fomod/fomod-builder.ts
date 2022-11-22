@@ -14,6 +14,11 @@ declare global {interface Window {
         testingFomod: fomodClasses.FOMOD;
         testingInfoDoc: XMLDocument;
         testingModuleDoc: XMLDocument;
+        trackedFomod: null | {
+            obj: fomodClasses.FOMOD,
+            infoDoc: XMLDocument,
+            moduleDoc: XMLDocument,
+        };
     };
 }}
 
@@ -61,8 +66,8 @@ window.FOMODBuilder = {
 
     ui: {
         openFolder: openFolder_entry,
-        save: () => {},
-        cleanSave: () => {},
+        save: fomodUI.save,
+        cleanSave: fomodUI.cleanSave,
         attemptRepair: () => {},
         setStepEditorType: fomodUI.setStepEditorType,
         openTypeConditions: () => {},
@@ -76,6 +81,8 @@ window.FOMODBuilder = {
     testingFomod: new fomodClasses.FOMOD(),
     testingInfoDoc: domParser.parseFromString('<fomod></fomod>', 'text/xml'),
     testingModuleDoc: domParser.parseFromString('<config></config>', 'text/xml'),
+
+    trackedFomod: null
 };
 
 function saveStorage() {
