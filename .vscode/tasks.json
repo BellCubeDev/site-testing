@@ -36,8 +36,8 @@
                 "base": "$tsc-watch",
                 "background": {
                     "activeOnStart": true,
-                    "beginsPattern": "^\\d+:\\d+:\\d+ \\w+ - File change detected\. Starting incremental compilation\.\.\.$",
-                    "endsPattern": "^Minification complete\.$"
+                    "beginsPattern": "^\\d+:\\d+:\\d+ \\w+ - File change detected\\. Starting incremental compilation\\.\\.\\.$",
+                    "endsPattern": "^Minification complete\\.$"
                 },
                 "fileLocation": [ "relative", "${workspaceFolder}\\site"],
             },
