@@ -132,7 +132,7 @@ export function focusAnyElement(element:HTMLElement|undefined, preventScrolling:
 export function copyCode(elem: HTMLElement): void {
     if (!elem) throw new Error("No element provided to copyCode with!");
 
-    console.debug("copyCode", elem);
+    //console.debug("copyCode", elem);
 
     // Get code
     const codeElem = elem.parentElement?.querySelector('code');
@@ -546,7 +546,7 @@ export class BellCubicSummary extends bcd_collapsibleParent {
     }
 
     handleClick(event?:MouseEvent){
-        console.log(event);
+        //console.log(event);
 
         // @ts-expect-error: Property 'path' and 'pointerType' DO exist on type 'MouseEvent', but not in Firefox or presumably Safari
         if (!event || (('pointerType' in event) && !event.pointerType) || (event.path && event.path?.slice(0, 5).map((el:HTMLElement) => el.tagName === 'A').includes(true))) return;
@@ -642,7 +642,7 @@ export class bcdModalDialog extends EventTarget {
 
     static evalQueue(delay: number = 100):void {
 
-        console.debug("========================\nEvaluating modal queue...\n========================");
+        //console.debug("========================\nEvaluating modal queue...\n========================");
 
         const willExit = {
             shownModal: this.shownModal,
@@ -651,23 +651,23 @@ export class bcdModalDialog extends EventTarget {
             shownModal_bool: !!this.modalsToShow.length,
             modalsToShow_lengthBool: !this.modalsToShow.length
         };
-        console.debug('Will exit?', !!(this.shownModal || !this.modalsToShow.length), willExit);
+        //console.debug('Will exit?', !!(this.shownModal || !this.modalsToShow.length), willExit);
 
         if (this.shownModal || !this.modalsToShow.length) return;
 
         const modal = bcdModalDialog.modalsToShow.shift(); if (!modal) return this.evalQueue();
         bcdModalDialog.shownModal = modal;
 
-        console.debug("Showing modal:", modal);
+        //console.debug("Showing modal:", modal);
 
         afterDelay(delay, modal.show_forReal.bind(modal));
     }
 
     show(){
         bcdModalDialog.modalsToShow.push(this);
-        console.debug("[BCD-MODAL] Modals to show (after assignment):", bcdModalDialog.modalsToShow);
+        //console.debug("[BCD-MODAL] Modals to show (after assignment):", bcdModalDialog.modalsToShow);
         bcdModalDialog.evalQueue();
-        console.debug("[BCD-MODAL] Modals to show (after eval):", bcdModalDialog.modalsToShow);
+        //console.debug("[BCD-MODAL] Modals to show (after eval):", bcdModalDialog.modalsToShow);
     }
 
     /** Event sent just before the modal is shown
@@ -684,18 +684,18 @@ export class bcdModalDialog extends EventTarget {
     static afterShowEvent = new CustomEvent('afterShow', {cancelable: false, bubbles: false, composed: false});
 
     private show_forReal() {
-        console.debug("[BCD-MODAL] Showing modal:", this);
+        //console.debug("[BCD-MODAL] Showing modal:", this);
         /* 'Before' Event */ if (!this.dispatchEvent(bcdModalDialog.beforeShowEvent) || !this.element_.dispatchEvent(bcdModalDialog.beforeShowEvent)) return;
 
         bcdModalDialog.obfuscator.classList.add(mdl.MaterialLayout.cssClasses.IS_DRAWER_OPEN);
         bcdModalDialog.obfuscator.addEventListener(window.clickEvt, this.boundHideFunction);
 
         this.element_.show();
-        console.debug("[BCD-MODAL] Modal shown:", this);
+        //console.debug("[BCD-MODAL] Modal shown:", this);
 
         /* 'After' Event */  if (this.dispatchEvent(bcdModalDialog.afterShowEvent)) this.element_.dispatchEvent(bcdModalDialog.afterShowEvent);
 
-        console.debug("[BCD-MODAL] Modals to show (after show):", bcdModalDialog.modalsToShow);
+        //console.debug("[BCD-MODAL] Modals to show (after show):", bcdModalDialog.modalsToShow);
     }
 
     /** Event sent just before the modal is hidden
@@ -715,7 +715,7 @@ export class bcdModalDialog extends EventTarget {
     boundHideFunction = this.hide.bind(this);
 
     hide(evt?: Event){
-        console.debug("[BCD-MODAL] Hiding modal:", this);
+        //console.debug("[BCD-MODAL] Hiding modal:", this);
         if (evt) evt.stopImmediatePropagation();
         /* 'Before' Event */ if (!this.dispatchEvent(bcdModalDialog.beforeHideEvent) ||!this.element_.dispatchEvent(bcdModalDialog.beforeHideEvent)) return;
 
@@ -800,7 +800,7 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
             this.forElement_.addEventListener('keydown', this.boundForKeydown_);
         }
 
-        console.log("[BCD-DROPDOWN] Initializing dropdown:", this);
+        //console.log("[BCD-DROPDOWN] Initializing dropdown:", this);
 
         const tempOptions = this.options();
         this.options_ = tempOptions;
@@ -896,7 +896,7 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
 
         if (this.element_.ariaHidden === 'false') return;
 
-        console.log("[BCD-DROPDOWN] Showing dropdown:", this, evt);
+        //console.log("[BCD-DROPDOWN] Showing dropdown:", this, evt);
 
         if (evt instanceof KeyboardEvent || evt instanceof PointerEvent && evt.pointerId === -1 || 'mozInputSource' in evt && evt.mozInputSource !== 1)
             this.optionElements[0]?.focus();
@@ -916,7 +916,7 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
 
         if (this.element_.ariaHidden === 'true') return;
 
-        console.log("[BCD-DROPDOWN] Hiding dropdown:", this);
+        //console.log("[BCD-DROPDOWN] Hiding dropdown:", this);
 
         this.optionElements[0]?.blur();
 
@@ -1182,7 +1182,7 @@ export class bcdTooltip {
 
         this.relation = tempRelation;
 
-        if (!tempElement || !(tempElement instanceof HTMLElement) ) throw new Error('Could not find a valid HTML Element to bind to!');
+        if (!tempElement || !(tempElement instanceof HTMLElement) ) throw new Error('TOOLTIP - Could not find a valid HTML Element to bind to!');
         this.boundElement = tempElement;
 
         const tempPos = element.getAttribute('tooltip-position');
@@ -1235,7 +1235,7 @@ export class bcdTooltip {
     }
 
     setPosition() {
-        console.log(`Setting position of tooltip to the ${this.position} of `, this.boundElement);
+        //console.log(`Setting position of tooltip to the ${this.position} of `, this.boundElement);
 
         this.element.style.transform = 'none !important';
         this.element.style.transition = 'none !important';
@@ -1248,15 +1248,15 @@ export class bcdTooltip {
         const tipPaddingTop =    parseInt(tipStyle.paddingTop);
         const tipPaddingBottom = parseInt(tipStyle.paddingBottom);
 
-        console.debug('Recalculated styles:', {transform: tipStyle.transform, transition: tipStyle.transition, width: tipStyle.width, height: tipStyle.height, offsetLeft: this.element.offsetLeft, offsetTop: this.element.offsetTop, offsetWidth: this.element.offsetWidth, offsetHeight: this.element.offsetHeight});
+        //console.debug('Recalculated styles:', {transform: tipStyle.transform, transition: tipStyle.transition, width: tipStyle.width, height: tipStyle.height, offsetLeft: this.element.offsetLeft, offsetTop: this.element.offsetTop, offsetWidth: this.element.offsetWidth, offsetHeight: this.element.offsetHeight});
 
         const elemRect = this.boundElement.getBoundingClientRect();
         const tipRect = {width: this.element.offsetWidth, height: this.element.offsetHeight};
 
-        console.debug('Element rect:', elemRect);
-        console.debug('Element rects:', this.boundElement.getClientRects());
-        console.debug('Tooltip rect:', tipRect);
-        console.debug('Tooltip rects:', this.element.getClientRects());
+        //console.debug('Element rect:', elemRect);
+        //console.debug('Element rects:', this.boundElement.getClientRects());
+        //console.debug('Tooltip rect:', tipRect);
+        //console.debug('Tooltip rects:', this.element.getClientRects());
 
         /** The top position - set to the middle of the Bound Element */
         let top = elemRect.top  + (elemRect.height / 2);
@@ -1268,7 +1268,7 @@ export class bcdTooltip {
         /** The left margin - the negative width of the tooltip */
         const marginLeft =   tipRect.width / -2;
 
-        console.log(`Left Position: ${left + marginLeft}, pushing? ${left + marginLeft < 8}; Right Position: ${left + marginLeft + tipRect.width}, pushing? ${left + marginLeft + tipRect.width > window.innerWidth - 8}`);
+        //console.log(`Left Position: ${left + marginLeft}, pushing? ${left + marginLeft < 8}; Right Position: ${left + marginLeft + tipRect.width}, pushing? ${left + marginLeft + tipRect.width > window.innerWidth - 8}`);
 
         // Padding of 16px on the left and right of the document
 
@@ -1306,7 +1306,7 @@ export class bcdTooltip {
             break;
         }
 
-        console.log(`Final Left Position: ${left + marginLeft - (tipRect.width / 2)}`);
+        //console.log(`Final Left Position: ${left + marginLeft - (tipRect.width / 2)}`);
 
         switch (this.position) {
 
@@ -1426,7 +1426,7 @@ bcdComponents.push(bcdDynamicTextAreaWidth);
 interface settingsGridObj {
     type: 'bool'|'string'
     name: string,
-    tooltip: string | {
+    tooltip?: string | {
         text: string,
         position: 'top'|'bottom'|'left'|'right'
     };
@@ -1434,6 +1434,12 @@ interface settingsGridObj {
         name: string,
         value: string
     }>,
+}
+
+const settingsToUpdate: (() => unknown)[] = [];
+export function updateSettings() {
+    for (let i = 0; i < settingsToUpdate.length; i++)
+        settingsToUpdate[i]!();
 }
 
 type settingsGrid = Record<string, settingsGridObj>
@@ -1470,20 +1476,20 @@ export class SettingsGrid {
     createSetting(key: string, settings: settingsGridObj) {
         const children = this.settingTemplate.children;
         if (!children[0]) throw new Error("Settings Grid template is missing a root element!");
-        console.log(children);
+        //console.log(children);
 
         for (const child of children) {
             const clone = child.cloneNode(true) as HTMLElement;
 
-            afterDelay(500, (()=>{
-                this.element.appendChild(clone);
-                this.upgradeElement(clone, key, settings);
-                this.createTooltip(clone, settings.tooltip);
-            }).bind(this));
+            this.element.appendChild(clone);
+            this.upgradeElement(clone, key, settings);
+
+            // If the node wasn't removed, give 'er a tooltip
+            if (clone.parentElement && settings.tooltip) this.createTooltip(clone, settings.tooltip);
         }
     }
 
-    createTooltip(element: HTMLElement, tooltip: settingsGridObj['tooltip']) {
+    createTooltip(element: HTMLElement, tooltip: NonNullable<settingsGridObj['tooltip']>) {
         //<div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
         //    TOOLTIP INNER HTML
         //</p></div>
@@ -1503,12 +1509,12 @@ export class SettingsGrid {
         for (const child of element.children) this.upgradeElement(child, key, settings);
 
         const displayType = element.getAttribute('data-setting-display');
-        if (!displayType) return console.warn('A Settings Grid element is missing the `data-setting-display` attribute!', element);
+        if (!displayType) return console.error('A Settings Grid element is missing the `data-setting-display` attribute!', element);
 
-        const filterType = element.getAttribute('data-setting-filter');             // eslint-disable-next-line sonarjs/no-nested-template-literals
-        console.log(`Upgrading child with type ${filterType ? `${filterType}:`:''}${displayType}`, element, settings);
+        const filterType = element.getAttribute('data-setting-filter');             // es lint-disable-next-line sonarjs/no-nested-template-literals
+        //console.log(`Upgrading child with type ${filterType ? `${filterType}:`:''}${displayType}`, element, settings);
 
-        if (filterType && filterType !== settings.type) return console.warn("Removing element from tree:", (element.remove(), element));
+        if (filterType && filterType !== settings.type) return ;//console.warn("Removing element from tree:", (element.remove(), element));
 
         switch(displayType) {
             case('id'):
@@ -1520,10 +1526,14 @@ export class SettingsGrid {
                 break;
 
             case('checkbox'):
-                if (element instanceof HTMLInputElement) element.checked = !!this.getSetting(key);
+                if (element instanceof HTMLInputElement) element.checked = !!this.getSetting(key, true);
                 else throw new Error("Settings Grid template has a checkbox that is not an INPUT element!");
 
                 element.addEventListener('change', (() => this.setSetting(key, element.checked)).bind(this));
+                settingsToUpdate.push(() => {
+                    if (element.checked !== !!this.getSetting(key))
+                        element.click();
+                });
                 break;
 
             case('dropdown'):
@@ -1532,31 +1542,41 @@ export class SettingsGrid {
                 break;
         }
 
-        console.log(`Upgraded element with type ${displayType}. Passing off to MDL component handler...`);
+        //console.log(`Upgraded element with type ${displayType}. Passing off to MDL component handler...`);
         mdl.componentHandler.upgradeElement(element);
-        console.log(`Fully upgraded element with type ${displayType}!`);
+        //console.log(`Fully upgraded element with type ${displayType}!`);
     }
 
-    getSetting<TReturnValue = string|boolean|number|null>(key: string|number): TReturnValue|undefined {
-        let currentDir = window;
-        for (const dir of this.settingsPath) //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
-            currentDir = currentDir[dir];
+    getSetting<TReturnValue = string|boolean|number|null>(key: string|number, suppressError = false): TReturnValue|undefined {
+        try {
+            let currentDir = window;
+            for (const dir of this.settingsPath) //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
+                currentDir = currentDir?.[dir];
 
-        if (currentDir === undefined) throw new Error(`Settings Grid cannot find the settings path "${this.settingsPath.join('.')}"!`);
+            if (currentDir === undefined) throw new Error(`Settings Grid cannot find the settings path "${this.settingsPath.join('.')}"!`);
 
-        //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
-        return currentDir[key];
+            //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
+            return currentDir[key];
+        } catch (e) {
+            if (!suppressError) console.error(e);
+            return undefined;
+        }
     }
 
-    setSetting(key: string|number, value:string|boolean|number|null|undefined): void {
-        let currentDir = window;
-        for (const dir of this.settingsPath) //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
-            currentDir = currentDir[dir];
+    setSetting(key: string|number, value:string|boolean|number|null|undefined, suppressError = false): void {
+        try {
+            let currentDir = window;
+            for (const dir of this.settingsPath) //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
+                currentDir = currentDir?.[dir];
 
-        if (currentDir === undefined) throw new Error(`Settings Grid cannot find the settings path "${this.settingsPath.join('.')}"!`);
+            if (currentDir === undefined) throw new Error(`Settings Grid cannot find the settings path "${this.settingsPath.join('.')}"!`);
 
-        //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
-        return currentDir[key] = value;
+            //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
+            return currentDir[key] = value;
+        } catch (e) {
+            if (!suppressError) console.error(e);
+            return undefined;
+        }
     }
 }
 bcdComponents.push(SettingsGrid);

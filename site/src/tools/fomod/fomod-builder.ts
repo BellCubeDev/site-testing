@@ -135,6 +135,7 @@ window.FOMODBuilder = {
 export const save = fomodUI.save;
 
 function saveStorage() {
+    bcdUniversal.updateSettings();
     try {
         localStorage.setItem('BellCubeDev_FOMOD_BUILDER_DATA', JSON.stringify(window.FOMODBuilder.storage));
     } catch {
