@@ -1676,9 +1676,6 @@ $$$$$$\ $$ |  $$ |$$ |  \$$$$  |$$ |\$$$$$$$ |$$ |$$ |$$$$$$$$\ \$$$$$$$ |  \$$$
 
 
 */
-let main: HTMLDivElement|undefined;
-let footer: HTMLDivElement|undefined;
-
 
 export function bcd_universalJS_init():void {
 
@@ -1727,24 +1724,17 @@ export function bcd_universalJS_init():void {
     // Set main content div to respect the footer for mobile
     // =============================================================
 
-    main = document.getElementById('cont') as HTMLDivElement;
-    footer = document.getElementById('footer') as HTMLDivElement;
+    // NOTE: This code has been compiled, minified, and relocated to the page HTML itself
 
-    if (!main || !footer) throw new Error('No main or footer div found!');
-
-    function resizeMain() {
-        const footerHeight = Math.max(footer?.offsetHeight ?? 0, 48);
-        const headerHeight = window.layout.header_?.offsetHeight ?? 0;
-
-        const mainComputedStyle = window.getComputedStyle(main!);
-        const mainContentPaddingHeight = parseFloat(mainComputedStyle.paddingTop) + parseFloat(mainComputedStyle.paddingBottom);
-
-        main!.style.minHeight = `calc(100vh - ${footerHeight + headerHeight + mainContentPaddingHeight + 1}px)`;
-        main!.style.paddingBottom = `${footerHeight}px)`;
-    }
-    const contResizeObserver = new ResizeObserver(resizeMain);
-
-    resizeMain();
-    contResizeObserver.observe(footer);
+    //const footer = document.getElementById('footer') as HTMLDivElement;
+    //
+    //if (!footer) throw new Error('No main or footer div found!');
+    //function resizeMain() {
+    //    const footerHeight = (footer!.firstElementChild as HTMLElement)?.offsetHeight ?? 0;
+    //    footer!.style.height = `${footerHeight}px`;
+    //}
+    //const contResizeObserver = new ResizeObserver(resizeMain);
+    //resizeMain();
+    //contResizeObserver.observe(footer.firstElementChild ?? footer);
 }
 window.bcd_init_functions.universal = bcd_universalJS_init;

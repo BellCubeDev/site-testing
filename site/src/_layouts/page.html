@@ -50,6 +50,8 @@ layout: compress_html
         requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>
             document.documentElement.classList.remove('preload')
         ))));
+
+        function e(){const e=t.firstElementChild?.offsetHeight??0;t.style.height=e+"px"}const t=document.getElementById("footer");if(!t)throw new Error("No main or footer div found!");const o=new ResizeObserver(e);e(),o.observe(t.firstElementChild??t);
     </script>
 
     <script       type="module" src="{{ site.baseurl }}{% link assets/site/mdl/material.js %}"></script> <!--onload="window.bcd_init_functions.material()"-->
