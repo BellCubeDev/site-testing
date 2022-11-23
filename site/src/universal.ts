@@ -245,7 +245,6 @@ interface BCDComponent extends Function {
 /** Variable to store components that we'll be registering on DOM initialization */
 const bcdComponents:BCDComponent[] = [];
 
-console.log("%cHello and welcome to the JavaScript console! This is where wizards do their magic!\nAs for me? I'm the wizard you don't want to anger.", "color: #2d6");
 
 
 

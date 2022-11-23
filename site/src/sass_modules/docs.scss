@@ -1,4 +1,9 @@
 .docs {
+    article {
+        max-width: min(100vw - 296px, 11in);
+        padding-right: 16px;
+    }
+
     &.sideBar_cont {
         display: grid;
         grid-template-columns: minmax(0, auto) min-content;
@@ -8,6 +13,10 @@
             display: flex;
             flex-direction: column;
             flex-wrap: nowrap;
+
+            article {
+                max-width: calc(100vw - 52px);
+            }
         }
 
         > .docs.sideBar {
@@ -31,7 +40,6 @@
         > :not(.docs.sideBar) {
             grid-column: 1;
             width: 100%;
-            display: block;
         }
     }
 

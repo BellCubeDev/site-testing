@@ -2,6 +2,16 @@ html {
     background: #1b1b1b;
 }
 
+.has-article {
+    display: grid;
+    grid-template-columns: 4fr max-content 7fr;
+}
+
+article {
+    max-width: min(100cqw - 52px, 11in);
+    grid-column: 2;
+}
+
 .mdl-layout-title {
     color: #fff;
 
@@ -64,8 +74,8 @@ html {
 
 #cont {
     min-height: calc(100vh - 152px);
-    margin-top: -64px;
-    padding-top: 80px; // 16 for the header + the 64 we took out from margin-top
+    margin-top: -8px;
+    padding-top: 24px; // 16 for the header + the 8 we took out from margin-top
 }
 
 #footer {

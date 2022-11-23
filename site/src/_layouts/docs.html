@@ -2,11 +2,12 @@
 layout: page
 use_docs_CSS: true
 ---
-
 {% if page.disableNav %}
 
-<div class="docs content">
-    {{ content }}
+<div class="has-article">
+    <article class="docs content">
+        {{ content }}
+    </article>
 </div>
 
 {% else %}
@@ -22,8 +23,10 @@ use_docs_CSS: true
             {% endif %}
         </div>
     </div>
-    <div class="docs content">
-        {{ content }}
+    <div class="has-article">
+        <article class="docs content">
+            {{ content }}
+        </article>
     </div>
 </div>
 

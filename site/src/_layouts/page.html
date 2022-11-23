@@ -5,8 +5,8 @@ layout: compress_html
 <html lang="en" class="preload lazy-styles-not-loaded">
 <head><meta charset='utf-8' /><meta name="charset" content="utf-8" /><meta name="google-site-verification" content="SfqBHB4cgh561S6fUtT2ENp0mLbrVrIb9kEb9bK922o" />
 
-    <title>BellCube: {{ page.title }} | BellCubeDev.GitHub.IO - The Home of A Decent Hobbyist Programmer</title>
-    <meta property="og:title" content="{{ page.title }}">
+    <title>{{ page.title }} | BellCubeDev.GitHub.IO - The Home of A Decent Hobbyist Programmer</title>
+    <meta property="og:title" content="BellCube: {{ page.title }}">
 
 
 
@@ -38,13 +38,15 @@ layout: compress_html
 
     <!-- Script Init Stuff -->
     <script>
+        console.log("%cHello and welcome to the JavaScript console! This is where wizards do their magic!\nAs for me? I'm the wizard you don't want to anger.", "color: #2d6");
         window.bcd_init_functions={};
 
         window.clickEvt = ('onclick' in window) ? 'click' : 'mousedown';
 
         try   {window.startWithDrawer=performance.getEntriesByType("navigation").find(e => e.type=='navigate') && new URL(document.referrer).host === window.location.host;}
         catch {window.startWithDrawer=false}
-
+    </script>
+    <script defer>
         if (window.startWithDrawer) document.documentElement.classList.add('drawer-init-open');
 
         requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>
@@ -695,7 +697,7 @@ layout: compress_html
 
                     <h2>Other Places</h2>
                     <a class="mdl-navigation__link icon--nexus mdl-navigation__link--icon" target="_blank"
-                        href="https://www.nexusmods.com/skyrimspecialedition/users/98340728?tab=user+files">
+                        href="https://www.nexusmods.com/users/98340728?tab=user+files">
                         <svg alt="" xmlns="http://www.w3.org/2000/svg" class="material-icons" version="1.1" viewBox="0 0 162.5 162.5">
                             <!--
                                 THIS VECTOR GRAPHIC IS THE INTELLECTUAL PROPERTY OF BLACK TREE GAMING LIMITED.
@@ -733,9 +735,18 @@ layout: compress_html
                 <path fill="#0084ff" d="M0 0h975v50.9H0z"/>
               </svg>
         </header>
+
+        {% if page.isArticle || layout.isArticle %}
+        <main id="cont" class="mdl-layout__content has-article">
+                <article>{{ content }}</article>
+
+        {% else %}
         <main id="cont" class="mdl-layout__content">
             {{ content }}
+
+        {% endif %}
         </main>
+
         <footer id="footer" class="mdl-layout__content">
             <div style="margin-right:auto;margin-left:auto;">
                 {% assign _current_year = 'now' | date: "%Y" | plus: 0 %}

@@ -32,15 +32,22 @@
             "type": "shell",
             "command": ".vscode\\watch.bat",
 
-            "problemMatcher": {
-                "base": "$tsc-watch",
-                "background": {
-                    "activeOnStart": true,
-                    "beginsPattern": "^\\d+:\\d+:\\d+ \\w+ - File change detected\\. Starting incremental compilation\\.\\.\\.$",
-                    "endsPattern": "^Minification complete\\.$"
+            "problemMatcher": [
+                "$node-sass",
+                {
+                    "base": "$tsc-watch",
+                    "fileLocation": [ "relative", "${workspaceFolder}\\site", ],
                 },
-                "fileLocation": [ "relative", "${workspaceFolder}\\site"],
-            },
+                {
+                    "owner": "BACKGROUND FINISHED DETECTOR",
+                    /* Dummy pattern matcher --> */"pattern": [{"regexp": "(1)23456789012345678901234567890","file": 1,"message": 1,"kind": "file"}],
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": "^\\d+:\\d+:\\d+ \\w+ - File change detected\\. Starting incremental compilation\\.\\.\\.$",
+                        "endsPattern": "^Minification complete\\.$"
+                    }
+                }
+            ],
             "isBackground": true,
 
             "group": "build",
@@ -83,7 +90,10 @@
                 }
             }],
 
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
 
             "detail": "Runs the Jekyll site host and serves it locally.",
 

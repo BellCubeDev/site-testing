@@ -41,30 +41,36 @@
     }
 }
 
+%nexus-icon-transition {
+    // VISH DID IT TO ME
+    transition-timing-function: cubic-bezier(0, 0, 0.85, 0.65);
+    transition-duration: 250ms;
+    transition-delay: 10ms;
+}
+
 .icon--nexus {
-    .nexus-SVG-primary, .nexus-SVG-secondary {
-        // VISH DID IT TO ME
-        transition-timing-function: cubic-bezier(0, 0, 1, 0.2);
-        transition-duration: 250ms;
-        transition-delay: 10ms;
-    }
 
     .nexus-SVG-primary {
+        @extend %nexus-icon-transition;
         fill: #222;
     }
 
     .nexus-SVG-secondary {
+        @extend %nexus-icon-transition;
         fill: #000;
     }
 
-    &:is(:hover, :-ms-keyboard-active, :focus, :active) {
-        .nexus-SVG-primary {
-            fill: #da8e35;
-        }
+    >:first-child {
+        @extend %nexus-icon-transition;
+        transition-duration: 100ms !important;
+        fill: #333;
+    }
 
-        .nexus-SVG-secondary {
-            fill: #b4762c;
-        }
+    &:is(:hover, :-ms-keyboard-active, :focus, :active) {
+        .nexus-SVG-primary { fill: #da8e35; }
+        .nexus-SVG-secondary { fill: #b4762c; }
+
+        >:first-child { fill: #000; }
     }
 }
 

@@ -3284,7 +3284,7 @@ export class MaterialLayout {
             }
 
             const titleElement = this.element_.querySelector('.mdl-layout-title');
-            console.debug('titleElement', titleElement);
+            //console.debug('titleElement', titleElement);
             if (titleElement) {
                 titleElement.setAttribute('role', 'button');
                 titleElement.setAttribute('tabindex', '-1');

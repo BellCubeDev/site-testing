@@ -305,7 +305,7 @@ export const possibilities_Generic = [
     "Somebody better call the Nuclear Regulatory Commission.",
     "This will all make sense when I am older.",
     "I&rsquo;m busy and you can&rsquo;t come in.",
-    
+    "Don&rsquo;t sweat the petty stuff and don&rsquo;t pet the sweaty stuff.",
 ];
 
 
@@ -416,10 +416,11 @@ export function getRandomQuote_base(){
 export function getRandomQuote() {
     let quote = getRandomQuote_base();
 
-    while (last50.includes(quote) || (typeof quote !== 'string' && !checkCondition(quote[0]!)))
+    while (last50.includes(typeof quote === 'string' ? quote : quote[1]) || (typeof quote !== 'string' && !checkCondition(quote[0]!))) {
         quote = getRandomQuote_base();
+    }
 
-    last50.push(quote);
+    last50.push(typeof quote === 'string' ? quote : quote[1]);
     if (last50.length > 50) last50.shift();
 
     saveStorage();

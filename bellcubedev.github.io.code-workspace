@@ -177,6 +177,7 @@
 			"uncompiled",
 			"unfill"
 		],
-		"liquid.format.enable": true
+		"liquid.format.enable": true,
+		"commentAnchors.workspace.excludeFiles": "**/{node_modules,.git,_generated,highlight_js,mdl}/**/*"
 	}
 }
