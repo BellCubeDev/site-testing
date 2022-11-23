@@ -12,9 +12,6 @@ declare global {interface Window {
         directory?: bcdFS.writeableFolder;
         storage: builderStorage;
         fomodClass: typeof fomodClasses.FOMOD;
-        testingFomod?: fomodClasses.FOMOD;
-        testingInfoDoc: XMLDocument;
-        testingModuleDoc: XMLDocument;
         trackedFomod: null | {
             obj: fomodClasses.FOMOD,
             infoDoc: XMLDocument,
@@ -132,12 +129,8 @@ window.FOMODBuilder = {
 
     fomodClass: fomodClasses.FOMOD,
 
-    testingInfoDoc: domParser.parseFromString('<fomod></fomod>', 'text/xml'),
-    testingModuleDoc: domParser.parseFromString('<config></config>', 'text/xml'),
-
     trackedFomod: null
 };
-window.FOMODBuilder.testingFomod = new fomodClasses.FOMOD();
 
 export const save = fomodUI.save;
 
@@ -155,7 +148,7 @@ function storageProxyHandler_get<TObj, TKey extends keyof TObj>(target: TObj, pr
 }
 
 function storageProxyHandler_set<TObj>(target: TObj, prop: keyof TObj, value: TObj[keyof TObj], _receiver: unknown): boolean {
-    target[prop] = value;
+    target[prop] = bcdUniversal.setProxies(value, {get: storageProxyHandler_get, set: storageProxyHandler_set}) as TObj[keyof TObj]; // I wish TypeScript would keep that type, but no...
     return saveStorage();
 }
 

@@ -1,0 +1,11 @@
+.js-settings-grid {
+    display: grid;
+    
+    gap: 16px;
+    margin-top: 32px;
+
+    justify-items: start;
+    align-content: center;
+
+    grid-template-columns: 320px;
+}

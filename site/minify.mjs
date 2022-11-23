@@ -134,9 +134,11 @@ async function minifyJSFile(filePath) {
 
     const tempCache = {...minifiedVarCache};
 
-    const asES6 = moduleDetector.detect(fileContents) === 'cjs' ? convertToES6(fileContents) : fileContents;
+    let strToMinify = fileContents;
+    if (moduleDetector.detect(fileContents) === 'cjs') strToMinify = convertToES6(strToMinify);
+    //if (path.basename(filePath, '.js') === 'highlight') strToMinify += 'window.hljs = module.exports;';
 
-    const minified = uglify.minify(asES6, {
+    const minified = uglify.minify(strToMinify, {
         compress: {
             passes: 5,
 

@@ -57,7 +57,9 @@ export function preventPropagation(event: Event): void {
     event.stopPropagation();
 }
 
-export function setProxies<TObj extends Record<string, any>>(obj: TObj, handler: ProxyHandler<TObj>): TObj {
+export function setProxies<TObj>(obj: TObj, handler: TObj extends Record<string, any> ? ProxyHandler<TObj> : ProxyHandler<any>): TObj {
+    if (!obj || typeof obj !== 'object') return obj;
+
     for (const [key, value] of Object.entries(obj)) {
         if (typeof value !== 'object') continue;
 
@@ -1421,6 +1423,143 @@ export class bcdDynamicTextAreaWidth extends bcdDynamicTextArea_base {
 }
 bcdComponents.push(bcdDynamicTextAreaWidth);
 
+interface settingsGridObj {
+    type: 'bool'|'string'
+    name: string,
+    tooltip: string | {
+        text: string,
+        position: 'top'|'bottom'|'left'|'right'
+    };
+    options?: Array<{
+        name: string,
+        value: string
+    }>,
+}
+
+type settingsGrid = Record<string, settingsGridObj>
+export class SettingsGrid {
+    static readonly asString = 'BCD - Settings Grid';
+    static readonly cssClass = 'js-settings-grid';
+
+    element: HTMLElement;
+    settingTemplate: DocumentFragment;
+    settingsPath: string[];
+    settings: settingsGrid;
+    constructor(element: HTMLElement) {
+        this.element = element;
+
+        this.settings = JSON.parse(element.innerText) as settingsGrid;
+        element.innerText = '';
+
+        const settingsElemID = element.getAttribute("data-templateID");
+        if (!settingsElemID) throw new Error("Settings Grid is missing the data-templateID attribute!");
+
+        const settingTemplate = document.getElementById(settingsElemID);
+        if (!settingTemplate || !(settingTemplate instanceof HTMLTemplateElement)) throw new Error(`Settings Grid cannot find a TEMPLATE element with the ID "${settingsElemID}"!`);
+
+        this.settingTemplate = settingTemplate.content;
+
+        this.settingsPath = element.getAttribute("data-settingsPath")?.split('.') ?? [];
+
+        for (const [key, settings] of Object.entries(this.settings))
+            this.createSetting(key, settings);
+
+        this.element.hidden = false;
+    }
+
+    createSetting(key: string, settings: settingsGridObj) {
+        const children = this.settingTemplate.children;
+        if (!children[0]) throw new Error("Settings Grid template is missing a root element!");
+        console.log(children);
+
+        for (const child of children) {
+            const clone = child.cloneNode(true) as HTMLElement;
+
+            afterDelay(500, (()=>{
+                this.element.appendChild(clone);
+                this.upgradeElement(clone, key, settings);
+                this.createTooltip(clone, settings.tooltip);
+            }).bind(this));
+        }
+    }
+
+    createTooltip(element: HTMLElement, tooltip: settingsGridObj['tooltip']) {
+        //<div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
+        //    TOOLTIP INNER HTML
+        //</p></div>
+        const elem = document.createElement('div');
+        elem.classList.add('js-bcd-tooltip');
+        elem.setAttribute('tooltip-relation', 'proceeding');
+        elem.setAttribute('tooltip-position', typeof tooltip === 'object' ? tooltip.position : 'bottom');
+        elem.appendChild(document.createElement('p')).innerHTML = typeof tooltip === 'object' ? tooltip.text : tooltip;
+
+        element.insertAdjacentElement('afterend', elem);
+        mdl.componentHandler.upgradeElement(elem);
+    }
+
+    upgradeElement(element: Element, key: string, settings: settingsGridObj) {
+        if (!(element && 'getAttribute' in element)) return console.error("A Settings Grid element was not actually an element!", element);
+
+        for (const child of element.children) this.upgradeElement(child, key, settings);
+
+        const displayType = element.getAttribute('data-setting-display');
+        if (!displayType) return console.warn('A Settings Grid element is missing the `data-setting-display` attribute!', element);
+
+        const filterType = element.getAttribute('data-setting-filter');             // eslint-disable-next-line sonarjs/no-nested-template-literals
+        console.log(`Upgrading child with type ${filterType ? `${filterType}:`:''}${displayType}`, element, settings);
+
+        if (filterType && filterType !== settings.type) return console.warn("Removing element from tree:", (element.remove(), element));
+
+        switch(displayType) {
+            case('id'):
+                element.id = `setting--${key}`;
+                break;
+
+            case('label'):
+                element.innerHTML = settings.name;
+                break;
+
+            case('checkbox'):
+                if (element instanceof HTMLInputElement) element.checked = !!this.getSetting(key);
+                else throw new Error("Settings Grid template has a checkbox that is not an INPUT element!");
+
+                element.addEventListener('change', (() => this.setSetting(key, element.checked)).bind(this));
+                break;
+
+            case('dropdown'):
+                element.classList.add('js-bcd-dynamic-dropdown');
+                element.setAttribute('data-options', JSON.stringify(settings.options));
+                break;
+        }
+
+        console.log(`Upgraded element with type ${displayType}. Passing off to MDL component handler...`);
+        mdl.componentHandler.upgradeElement(element);
+        console.log(`Fully upgraded element with type ${displayType}!`);
+    }
+
+    getSetting<TReturnValue = string|boolean|number|null>(key: string|number): TReturnValue|undefined {
+        let currentDir = window;
+        for (const dir of this.settingsPath) //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
+            currentDir = currentDir[dir];
+
+        if (currentDir === undefined) throw new Error(`Settings Grid cannot find the settings path "${this.settingsPath.join('.')}"!`);
+
+        //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
+        return currentDir[key];
+    }
+
+    setSetting(key: string|number, value:string|boolean|number|null|undefined): void {
+        let currentDir = window;
+        for (const dir of this.settingsPath) //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
+            currentDir = currentDir[dir];
+
+        if (currentDir === undefined) throw new Error(`Settings Grid cannot find the settings path "${this.settingsPath.join('.')}"!`);
+
+        //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
+        return currentDir[key] = value;
+    }
+}
+bcdComponents.push(SettingsGrid);
 
 
 

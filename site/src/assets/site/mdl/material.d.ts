@@ -1,6 +1,118 @@
 // Reference browser types
 export function materialInit(): void;
-export const componentHandler: any;
+export const componentHandler: {
+
+   /**
+    * Searches registered components for a class we are interested in using.
+    * Optionally replaces a match with passed object if specified.
+    *
+    * @param name - The name of a class we want to use.
+    * @param replace - Optional object to replace match with.
+    */
+   private findRegisteredClass_(name: string, replace?: IComponentConfig): Record<string, unknown>|boolean;
+
+   /**
+    * Returns an array of the classNames of the upgraded classes on the element.
+    *
+    * @param element - The element to fetch data from.
+    */
+   private getUpgradedListOfElement_(element: Element): string[],
+
+   /**
+    * Returns true if the given element has already been upgraded for the given
+    * class.
+    *
+    * @param element - The element we want to check.
+    * @param jsClass - The class to check for.
+    */
+   private isElementUpgraded_(element: Element, jsClass: string): boolean,
+
+   /**
+    * Create an event object.
+    *
+    * @param eventType - The type name of the event.
+    * @param bubbles - Whether the event should bubble up the DOM.
+    * @param cancelable - Whether the event can be canceled.
+    */
+   private createEvent_(eventType: string, bubbles: boolean, cancelable: boolean): Event,
+
+   /**
+    * Searches existing DOM for elements of our component type and upgrades them
+    * if they have not already been upgraded.
+    *
+    * @param jsClass - the programmatic name of the element class we need to create a new instance of.
+    * @param cssClass - the name of the CSS class elements of this type will have.
+    */
+   upgradeDom(jsClass?: string, cssClass?: string),
+
+   /**
+    * Upgrades a specific element rather than all in the DOM.
+    *
+    * @param element - The element we wish to upgrade.
+    * @param jsClass - Optional name of the class we want to upgrade the element to.
+    */
+   upgradeElement(element: Element, jsClass?: string),
+
+   /**
+    * Upgrades a specific list of elements rather than all in the DOM.
+    *
+    * @param elements - The elements we wish to upgrade.
+    */
+   upgradeElements(elements: Element|Element[]|NodeList|HTMLCollection),
+
+   /** Registers a class for future use and attempts to upgrade existing DOM. */
+   register(config: IComponentConfigPublic),
+
+   /**
+    * Allows user to be alerted to any upgrades that are performed for a given component type
+    *
+    * @param jsClass - The class name of the MDL component we wish to hook into for any upgrades performed.
+    * @param callback - The function to call upon an upgrade. This function should expect 1 parameter - the HTMLElement which got upgraded.
+    */
+   registerUpgradedCallback(jsClass: string, callback: (element: HTMLElement) => unknown),
+
+   /**
+    * Upgrades all registered components found in the current DOM. This is automatically called on window load.
+    */
+   upgradeAllRegistered(),
+
+   /**
+    * Check the component for the downgrade method.
+    * Execute if found.
+    * Remove component from createdComponents list.
+    */
+   deconstructComponent(component?: IComponent),
+
+   /** Downgrade either a given node, an array of nodes, or a NodeList. */
+   downgradeNodes(nodes: Node|Node[]|NodeList),
+};
+
+
+/** Describes the type of a registered component type managed by componentHandler. */
+interface IComponentConfigPublic {
+   constructor: Function,
+   classAsString: string,
+   cssClass: string,
+   widget: string|boolean|undefined
+}
+
+/** Describes the type of a registered component type managed by componentHandler. */
+interface IComponentConfig {
+   constructor: Function,
+   className: string,
+   cssClass: string,
+   widget: string|boolean,
+   callbacks: ((element: HTMLElement)=>unknown)[]
+}
+
+/** Created component (i.e., upgraded element) type as managed by componentHandler. */
+interface IComponent {
+   element_: HTMLElement,
+   className: string,
+   classAsString: string,
+   cssClass: string,
+   widget: string
+}
 /**
  * @license
  * Copyright 2015 Google Inc. All Rights Reserved.

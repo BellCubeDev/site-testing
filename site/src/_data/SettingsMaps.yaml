@@ -1,0 +1,54 @@
+FOMODBuilder:
+  autoSaveAfterChange:
+    type: bool
+    name: Auto-Save
+    tooltip: Automatically save the FOMOD after each change?
+
+  alwaysCleanSave:
+    type: bool
+    name: "Auto-Save: Clean Save"
+    tooltip: If auto-save is enabled, should the FOMOD be rebuilt from scratch each time?
+
+  includeInfoSchema:
+    type: bool
+    name: Include Info Schema
+    tooltip: While no official schema exists, BellCube made a schema for the Info.xml file while researching to build this tool. Should it be included in Info.xml?
+
+  optimizationUsingFlags:
+    type: bool
+    name: Optimize FOMOD
+    tooltip: Should various optimizations be applied to the FOMOD? These will have no effect on the actual content of the FOMOD but will improve how mod managers handle it.
+
+  saveConfigInXML:
+    type: bool
+    name: Save Settings in XML
+    tooltip: Should the settings be saved in the ModuleConfig.xml file? If settings are found, opening the FOMOD will restore the settings used when it was last saved.<br><hr>This setting has no impact on the functionality of the FOMOD.
+
+  brandingComment:
+    type: bool
+    name: Include Branding Comment
+    tooltip: Should a comment be added to the top of the FOMOD to identify it as a FOMOD built with FOMOD Builder?<br><hr>This setting has no impact on the functionality of the FOMOD.
+
+  defaultGroupSortingOrder:
+    type: string
+    name: Default Sorting Order
+    tooltip: How should groups and options be sorted by default?<br><hr>This is merely a convenience, can be changed at any time, and has no functional impact on the FOMOD.
+    options:
+      - name: Manual
+        value: explicit
+      - name: Alphabetical
+        value: ascending
+      - name: Reverse Alphabetical
+        value: descending
+
+  defaultGroupSelectType:
+    type: string
+    name: Default Group Selection Type
+    tooltip: How should groups of options behave by default?<br><hr>This is merely a convenience, can be changed at any time, and has no functional impact on the FOMOD.
+    options:
+      -
+
+  formatXML:
+    type: bool
+    name: Format XML
+    tooltip: Should the XML be formatted? This will make the raw file easier to read but will increase the size of the FOMOD.<br><hr>This setting has no impact on the functionality of the FOMOD.

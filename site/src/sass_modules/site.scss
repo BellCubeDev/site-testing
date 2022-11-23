@@ -82,6 +82,8 @@ html {
     position: sticky;
     vertical-align: middle;
 
+    max-height: 10ex;
+
     p {
         bottom: auto;
         font-size: medium;
@@ -201,6 +203,10 @@ nav>.subheader {
 .mdl-switch {
     width: fit-content;
     margin-right: 64px;
+}
+
+.mdl-switch__track {
+    background: #ffffff26;
 }
 
 .mdl-button--raised.mdl-button--colored {

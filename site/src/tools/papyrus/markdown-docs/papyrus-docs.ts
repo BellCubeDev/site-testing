@@ -1,5 +1,5 @@
 import { trimWhitespace, capitalizeFirstLetter } from '../../../universal.js';
-import {hljs} from  '../../../assets/site/highlight_js/highlight.js';
+import hljs from  '../../../assets/site/highlight_js/highlight.js';
 
 // HLJS Language Definition
 import '../../../assets/site/highlight_js/languages/markdown.min.js';

@@ -21,6 +21,13 @@ redirect_from:
     "{{site.baseurl}}{% link assets/site/css/vortex_fomod.css %}"
 </div>
 
+<template id="builder-settings-toggle">
+    <label data-setting-display="id" data-setting-filter="bool" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
+        <input type="checkbox" class="mdl-switch__input" data-setting-display="checkbox">
+        <span class="mdl-switch__label" data-setting-display="label"></span>
+    </label>
+</template>
+
 <!--
     MO2 - Info.xml
     https://github.com/Holt59/mo2-merge/blob/master/plugins/installer_fomod/src/fomodinstallerdialog.cpp#L626-L639
@@ -109,20 +116,8 @@ redirect_from:
                         THIS IS DANGEROUS! MAKE A BACKUP AND USE AT YOUR OWN RISK!
                     </p></div>
         </div>
-        <div id="settings-container" class="settings-grid">
-            <label id="settings-toggle--autoSaveAfterChange" class="mdl-switch mdl-js-switch mdl-js-ripple-effect">
-                <input type="checkbox"class="mdl-switch__input">
-                <span class="mdl-switch__label"></span>
-            </label>
-            autoSaveAfterChange
-            alwaysCleanSave
-            includeInfoSchema
-            optimizationUsingFlags
-            saveConfigInXML
-            brandingComment
-            defaultGroupSortingOrder
-            defaultGroupSelectType
-            formatXML
+        <div id="settings-container" class="js-settings-grid" hidden data-templateID="builder-settings-toggle" data-settingsPath="FOMODBuilder.storage.settings">
+            {{ site.data.SettingsMaps.FOMODBuilder | jsonify | escape }}
         </div>
     </div>
     <div role="tabpanel" class="tab-content" name="Metadata">

@@ -690,8 +690,10 @@ export class MaterialCheckbox {
     checkToggleState() {
         if (this.inputElement_.checked) {
             this.element_.classList.add(this.cssClasses_.IS_CHECKED);
+            this.inputElement_.checked = true;
         } else {
             this.element_.classList.remove(this.cssClasses_.IS_CHECKED);
+            this.inputElement_.checked = false;
         }
     }
     /**
@@ -747,7 +749,7 @@ export class MaterialCheckbox {
     */
     init() {
         if (this.element_) {
-            this.inputElement_ = this.element_.querySelector(`.${  this.cssClasses_.INPUT}`);
+            this.inputElement_ = this.element_.querySelector(`.${this.cssClasses_.INPUT}`);
             var boxOutline = document.createElement('span');
             boxOutline.classList.add(this.cssClasses_.BOX_OUTLINE);
             var tickContainer = document.createElement('span');
@@ -1014,7 +1016,7 @@ export class MaterialMenu {
     constructor(element) {
         this.boundItemKeydown_ = this.handleItemKeyboardEvent_.bind(this);
         this.boundItemClick_ = this.handleItemClick_.bind(this);
-        
+
         this.boundForKeydown_ = this.handleForKeyboardEvent_.bind(this);
         this.boundForClick_ = this.handleForClick_.bind(this);
 
@@ -2374,16 +2376,24 @@ export class MaterialSwitch {
     init() {
         if (this.element_) {
             this.inputElement_ = this.element_.querySelector(`.${this.cssClasses_.INPUT}`);
+            console.log(`this.element_.querySelector(\`.${this.cssClasses_.INPUT}\`); =`, this.inputElement_);
+            console.log(`this.element_ =`, this.element_);
+
             var track = document.createElement('div');
             track.classList.add(this.cssClasses_.TRACK);
+
             var thumb = document.createElement('div');
             thumb.classList.add(this.cssClasses_.THUMB);
+
             var focusHelper = document.createElement('span');
             focusHelper.classList.add(this.cssClasses_.FOCUS_HELPER);
             thumb.appendChild(focusHelper);
+
             this.element_.appendChild(track);
             this.element_.appendChild(thumb);
+
             this.boundMouseUpHandler = this.onMouseUp_.bind(this);
+
             if (this.element_.classList.contains(this.cssClasses_.RIPPLE_EFFECT)) {
                 this.element_.classList.add(this.cssClasses_.RIPPLE_IGNORE_EVENTS);
                 this.rippleContainerElement_ = document.createElement('span');
@@ -2396,14 +2406,19 @@ export class MaterialSwitch {
                 this.rippleContainerElement_.appendChild(ripple);
                 this.element_.appendChild(this.rippleContainerElement_);
             }
+
             this.boundChangeHandler = this.onChange_.bind(this);
             this.boundFocusHandler = this.onFocus_.bind(this);
             this.boundBlurHandler = this.onBlur_.bind(this);
+
             this.inputElement_.addEventListener('change', this.boundChangeHandler);
             this.inputElement_.addEventListener('focus', this.boundFocusHandler);
             this.inputElement_.addEventListener('blur', this.boundBlurHandler);
+
             this.element_.addEventListener(window.clickEvt, this.boundMouseUpHandler);
+
             this.updateClasses_();
+
             this.element_.classList.add('is-upgraded');
         }
     }
