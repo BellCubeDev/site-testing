@@ -4,6 +4,7 @@ import * as path from 'path';
 import * as afs from 'fs/promises';
 
 import * as uglify from 'uglify-js';
+import convertToES6 from 'cjs-to-module';
 
 import sass from 'sass';
 
@@ -11,6 +12,7 @@ import postcss_ from 'postcss';
 import cssnano from 'cssnano';
 
 import sourcemap from 'source-map-js';
+import moduleDetector from 'js-module-formats';
 
 const postcss = postcss_([
     cssnano({
@@ -132,7 +134,9 @@ async function minifyJSFile(filePath) {
 
     const tempCache = {...minifiedVarCache};
 
-    const minified = uglify.minify(fileContents, {
+    const asES6 = moduleDetector.detect(fileContents) === 'cjs' ? convertToES6(fileContents) : fileContents;
+
+    const minified = uglify.minify(asES6, {
         compress: {
             passes: 5,
 

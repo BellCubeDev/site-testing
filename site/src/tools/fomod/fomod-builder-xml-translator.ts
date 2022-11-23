@@ -1,39 +1,18 @@
 import * as classes from './fomod-builder-classifications.js';
-import * as files from '../../filesystem-interface.js';
-
-interface IFomodFolder {
-    fomodDir: files.folderDirectoryEntry;
-    infoFile: files.folderEntry | undefined;
-    moduleFile: files.folderEntry | undefined;
-}
-export function getFomodFilesFromFolder(folder: files.folder) : IFomodFolder {
-    const fomodFolder = folder.childrenInsensitive['fomod'];
-    if (!fomodFolder || !('children' in fomodFolder)) throw new TypeError('The folder contains a folder named "fomod" - not a file!');
-    return {
-        fomodDir: fomodFolder,
-        infoFile: fomodFolder.children['info.xml'],
-        moduleFile: fomodFolder.children['moduleconfig.xml']
-    };
-}
 
 export function translateWhole(module: string, info: string, setWindowValues = false) : classes.FOMOD {
     const parser = window.domParser;
 
+    const moduleDoc = parser.parseFromString(module || '<config/>', 'text/xml');
+    if (moduleDoc.documentElement.tagName !== 'config') throw new Error('ModuleConfig.xml is not valid!'); // TODO: Inform user of error and provide a way to fix it
 
-    const moduleDoc = parser.parseFromString(module, 'text/xml');
-    const moduleMainElem = moduleDoc.querySelector('config');
+    const infoDoc = parser.parseFromString(info || '<fomod/>', 'text/xml');
+    if (infoDoc.documentElement.tagName !== 'fomod') throw new Error('Info.xml is not valid!'); // TODO: Inform user of error and provide a way to fix it
 
-    if (!moduleMainElem) throw new TypeError('No <config> element found in supplied ModuleConfig file.');
+    console.log("Documents fetched!", {moduleDoc, infoDoc});
 
+    const obj = new classes.FOMOD(moduleDoc.getOrCreateChild("config"), infoDoc.getOrCreateChild("fomod"));
 
-
-    const infoDoc = parser.parseFromString(info, 'text/xml');
-    const infoMainElem = infoDoc.querySelector('fomod');
-
-    if (!infoMainElem) throw new TypeError('No <fomod> element found in supplied Info file.');
-
-    const obj = new classes.FOMOD(moduleMainElem, infoMainElem);
-    
     if (setWindowValues) {
         window.FOMODBuilder.trackedFomod = {
             obj,

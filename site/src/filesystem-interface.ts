@@ -3,55 +3,73 @@ import * as universal from './universal.js';
 export interface folderEntry {
     handle: FileSystemHandle;
 }
-export interface folderDirectoryEntry extends folderEntry {
-    handle: FileSystemDirectoryHandle;
-    children: universal.objOf<folderEntry>;
-}
 
-export type folderAnyEntry = folderEntry | folderDirectoryEntry;
-export type objOfEntries = universal.objOf<folderAnyEntry>;
+function getFolderFromFolder<TCreate extends true|false>(this: folder, create: TCreate, target: Record<string, Promise<folder>>, prop: string): TCreate extends true ? Promise<folder> : Promise<folder>|null {
+    // Make the name case-insensitive
+    const name = prop.toLowerCase();
 
-export async function getTreeOfHandle(handle: FileSystemDirectoryHandle): Promise<folderDirectoryEntry> {
-    const entries = handle.entries();
+    // Fetch/create folder if it doesn't already exist
+    try {
+        if (!(name in target)){
+            const dir = (async() => new folder(
+                await this.handle.getDirectoryHandle(prop, {create})
+            ))();
 
-    const tree:folderDirectoryEntry = {
-        handle,
-        children: {}
-    };
+            this.childDirs[name] = dir;
+            this.childDirsC[name] = dir;
+        }
+    } catch (e) {
+        if (e instanceof DOMException && e.name === 'NotFoundError') this.childDirs[name] = null;
+        throw e;
 
-    for await (const entry of entries) {
-        const [name, handle] = entry;
-        tree.children[name] = {handle};
-        if (handle.kind === 'directory') tree.children[name] = await getTreeOfHandle(handle);
     }
 
-    return tree;
+    // Return the newly-assured folder (or null, but we don't tell TypeScript that or it would freak out)
+    return target[name]!;
 }
+
+function getFileFromFolder<TCreate extends true|false>(this: folder, create: TCreate, target: Record<string, Promise<FileSystemFileHandle>|null>, prop: string): TCreate extends true ? Promise<FileSystemFileHandle> : Promise<FileSystemFileHandle>|null {
+    // Make the name case-insensitive
+    const name = prop.toLowerCase();
+
+    // Fetch/create file if it doesn't already exist
+    try {
+        if (!(name in target)) {
+            const handle = this.handle.getFileHandle(prop, {create});
+            this.childFiles[name] = handle;
+            this.childFilesC[name] = handle;
+        }
+
+    } catch (e) {
+        if (e instanceof DOMException && e.name === 'NotFoundError') this.childFiles[name] = null;
+        else throw e;
+    }
+
+    // Return the newly-assured file (or null, but we don't tell TypeScript that or it would freak out)
+    return target[name]!;
+}
+
 
 export class folder {
     readonly handle: FileSystemDirectoryHandle;
 
-    private children_: objOfEntries = {};
-    get children() {
-        if (!this.children_) this.updateChildren();
-        return this.children_;
-    }
+    readonly childDirs: Record<string, Promise<folder>|null> = new Proxy({}, {
+        get: getFolderFromFolder.bind(this, false),
+    });
+    readonly childDirsC: Record<string, Promise<folder>> = new Proxy({}, {
+        get: getFolderFromFolder.bind(this, true),
+    });
 
-    private childrenInsensitive_: objOfEntries = {};
-    get childrenInsensitive() {
-        if (!this.childrenInsensitive_) this.childrenInsensitive_ = Object.fromEntries(Object.entries(this.children).map(([key, value]) => [key.toLowerCase(), value]));
-        return this.childrenInsensitive_;
-    }
+    readonly childFiles: Record<string, Promise<FileSystemFileHandle>|null> = new Proxy({}, {
+        get: getFileFromFolder.bind(this, false),
+    });
+
+    readonly childFilesC: Record<string, Promise<FileSystemFileHandle>> = new Proxy<Record<string, Promise<FileSystemFileHandle>>>({}, {
+        get: getFileFromFolder.bind(this, true),
+    });
 
     constructor(handle: FileSystemDirectoryHandle) {
         this.handle = handle;
-    }
-
-    private tree_: folderDirectoryEntry|undefined;
-    get tree() {return this.tree_;}
-
-    async updateChildren() {
-        this.tree_ = await getTreeOfHandle(this.handle);
     }
 }
 

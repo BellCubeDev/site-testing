@@ -63,8 +63,9 @@ export function setProxies<TObj extends Record<string, any>>(obj: TObj, handler:
 
         setProxies(value, handler);
         obj[key as keyof TObj] = new Proxy(value ?? {}, handler);
-
     }
+
+    obj = new Proxy(obj, handler);
     return obj;
 }
 
@@ -125,6 +126,7 @@ export function focusAnyElement(element:HTMLElement|undefined, preventScrolling:
     });});
 }
 
+
 export function copyCode(elem: HTMLElement): void {
     if (!elem) throw new Error("No element provided to copyCode with!");
 
@@ -145,10 +147,26 @@ export function copyCode(elem: HTMLElement): void {
 }
 window.copyCode = copyCode;
 
+
 export function getInputValue(input: HTMLInputElement): string {
     return input.value || input.getAttribute('bcdPlaceholder') || input.placeholder || '';
 }
 
+
+function ___getOrCreateChild(this:Document|Element, tagName: string) {
+    let child = this.getElementsByTagName(tagName)[0];
+
+    if (!child) {
+        const doc = this instanceof Document ? this : this.ownerDocument;
+        //console.debug(`Creating ${tagName} element for`, this);
+        child = doc.createElement(tagName, {is: tagName});
+        this.appendChild(child);
+    }
+
+    return child;
+}
+Element.prototype.getOrCreateChild = ___getOrCreateChild;
+Document.prototype.getOrCreateChild = ___getOrCreateChild;
 
 
 
@@ -195,19 +213,6 @@ declare global {
         lazyStylesLoaded: true|undefined;
     }
 }
-
-function ___getOrCreateChild(this:Document|Element, tagName: string) {
-    let child = this.getElementsByTagName(tagName)[0];
-
-    if (!child) {
-        child = document.createElement(tagName);
-        this.appendChild(child);
-    }
-
-    return child;
-}
-Element.prototype.getOrCreateChild = ___getOrCreateChild;
-Document.prototype.getOrCreateChild = ___getOrCreateChild;
 
 /** Quick-and-dirty enum of strings used often throughout the code */
 enum strs {

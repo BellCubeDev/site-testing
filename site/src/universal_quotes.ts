@@ -279,10 +279,33 @@ export const possibilities_Generic = [
     "I&rsquo;m calibrating this drone footage.",
     "I push buttons. I turn dials. I read numbers. Sometimes I make up little stories in my head about what the numbers mean.",
     "I am myself for tax purposes.", // HazakTheMad
-    "I mean the macaroni's soggy, the peas are mushed,<br />And the chicken tastes like wood", 
+    "I mean the macaroni's soggy, the peas are mushed,<br />And the chicken tastes like wood",
     "Man, I just wanna make a boid simulation <i>smh</i>", // - Vuunyy
     "I am at piece with my not-so-inner idiot.",
     "You have to flaunt the weird, my friends.",
+    "I a&nbsp;m a&nbsp;n&nbsp;d&nbsp;e&nbsp;r&nbsp;s&nbsp;o&nbsp;n", // Copilot was here
+    "I want a freezer that heats things up like a microwave.", // - an IRL friend
+    "I'd love to show you, but, frankly, I'm not sure how.",
+    "When I hear music, I feel like I'm in a movie.",
+    "I'm not a fan of the word &lsquo;fan.&rsquo;",
+    "I ain&rsquo;t gonna say &ldquo;ain&rsquo;t&rdquo; &lsquo;cuz &ldquo;ain&rsquo;t&rdquo; ain&rsquo;t in the dictionary.",
+    "Now isn&rsquo;t that special?",
+    "Whatever it is, I&rsquo;ll take ten.",
+    "Though I dread the memory, I can&rsquo;t help but smile.",
+    "Without proper guidance, one cannot hope to come within a ten-mile radius of the truth.",
+    "Man, I feel really good coming up with all of these quotes!",
+    "I know you think you understand what you thought I said but I&rsquo;m not sure you realize that what you heard is not what I meant",
+    "Whatever you&rsquo;re doing, I implore you to continue.",
+    "Stop looking at me, I&rsquo;m not a quote generator.",
+    "I&rsquo;m not a quote generator, I&rsquo;m a quote <i>selector</i>.",
+    "Having good quotes is overrated.",
+    "Whatever she told you, she lied.",
+    "You see, everything is a quote if you surround it with quotation marks.",
+    "Latin has a word for it, but I don&rsquo;t speak Latin.",
+    "Somebody better call the Nuclear Regulatory Commission.",
+    "This will all make sense when I am older.",
+    "I&rsquo;m busy and you can&rsquo;t come in.",
+    
 ];
 
 

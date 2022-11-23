@@ -12,7 +12,7 @@ declare global {interface Window {
         directory?: bcdFS.writeableFolder;
         storage: builderStorage;
         fomodClass: typeof fomodClasses.FOMOD;
-        testingFomod: fomodClasses.FOMOD;
+        testingFomod?: fomodClasses.FOMOD;
         testingInfoDoc: XMLDocument;
         testingModuleDoc: XMLDocument;
         trackedFomod: null | {
@@ -27,26 +27,50 @@ window.domParser = new DOMParser();
 const domParser = window.domParser;
 
 export interface builderStorage {
+    storageRevision: number,
+    /** Values that the user has explicitly set */
     settings: {
+        /** Save after each change?
+            @default false */
         autoSaveAfterChange: boolean; // false
+        /** ALWAYS nuke the document and start anew?
+            @default false */
         alwaysCleanSave: boolean; // false
 
+        /** Include a schema link inside Info.xml?
+            @default true */
         includeInfoSchema: boolean; // true
+        /** Automatically optimize the FOMOD by moving file installs to the end rather than after each step
+            @default true */
         optimizationUsingFlags: boolean; // true
 
+        /** Whether or not we should save the FOMOD Builder settings inside of the XML document rather than the browser
+            @default false */
         saveConfigInXML: boolean; // false
+        /** Whether or not we should include a comment directing users to the FOMOD Builder
+            @default false */
         brandingComment: boolean; // false
 
+        /** What should the default Group Sorting Order be?
+            @default 'Explicit' */
         defaultGroupSortingOrder: fomodClasses.sortOrder; // 'Explicit'
+        /** What should the default Group Selection type be?
+            @default 'SelectAtLeastOne' */
         defaultGroupSelectType: fomodClasses.groupSelectType; // 'SelectAtLeastOne'
+
+        /** Whether we should format XML documents on save
+            @default true */
+        formatXML: boolean; // true
     }
+    /** Things that the code has determined that the user prefers */
     preferences: {
-        stepsBuilder: fomodUI.bcdBuilderType,
-        autoSave: boolean,
+        stepsBuilder: fomodUI.bcdBuilderType, // 'builder'
     }
 }
 
+const storageRevision = 1;
 const defaultStorage: builderStorage =  {
+    storageRevision,
     settings: {
         autoSaveAfterChange: false,
         alwaysCleanSave: false,
@@ -59,13 +83,37 @@ const defaultStorage: builderStorage =  {
 
         defaultGroupSortingOrder: 'Explicit',
         defaultGroupSelectType: 'SelectAtLeastOne',
+
+        formatXML: true,
     },
     preferences: {
         stepsBuilder: 'builder',
-        autoSave: false,
     }
 };
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+function mergeObjects(obj1: Object, obj2: Object): Object {
+    const obj1Keys = Object.keys(obj1) as (keyof typeof obj1)[];
+    const obj2Keys = Object.keys(obj2) as (keyof typeof obj2)[];
+
+    const returnObj: Record<string, any> = {};
+
+    for (let i = 0; i < obj1Keys.length; i++) {
+        const key = obj1Keys[i]!;
+
+        if (key in obj2) {
+            if (typeof obj1[key] === 'object' && typeof obj2[key] === 'object')
+                    returnObj[key] = mergeObjects(obj1[key], obj2[key]);
+            else returnObj[key] = obj2[key] ?? obj1[key];
+        } else
+            returnObj[key] = obj1[key];
+
+    }
+
+    return returnObj;
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
 const fetchedStorage = JSON.parse(   localStorage.getItem('BellCubeDev_FOMOD_BUILDER_DATA') ?? '{}'   ) as builderStorage | {};
 
 window.FOMODBuilder = {
@@ -80,16 +128,17 @@ window.FOMODBuilder = {
     },
 
     // Retrieves the browser storage entry if available, otherwise uses the defaults.
-    storage: 'settings' in fetchedStorage ? fetchedStorage : defaultStorage,
+    storage: mergeObjects(defaultStorage, fetchedStorage) as builderStorage,
 
     fomodClass: fomodClasses.FOMOD,
 
-    testingFomod: new fomodClasses.FOMOD(),
     testingInfoDoc: domParser.parseFromString('<fomod></fomod>', 'text/xml'),
     testingModuleDoc: domParser.parseFromString('<config></config>', 'text/xml'),
 
     trackedFomod: null
 };
+window.FOMODBuilder.testingFomod = new fomodClasses.FOMOD();
+
 export const save = fomodUI.save;
 
 function saveStorage() {
@@ -110,7 +159,8 @@ function storageProxyHandler_set<TObj>(target: TObj, prop: keyof TObj, value: TO
     return saveStorage();
 }
 
-bcdUniversal.setProxies(window.FOMODBuilder.storage, {get: storageProxyHandler_get, set: storageProxyHandler_set});
+window.FOMODBuilder.storage = bcdUniversal.setProxies(window.FOMODBuilder.storage, {get: storageProxyHandler_get, set: storageProxyHandler_set});
+saveStorage();
 
 window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
 

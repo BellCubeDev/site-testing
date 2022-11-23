@@ -24,7 +24,7 @@ export abstract class XMLElement implements updatableObject {
 
     updateObjects() {
         this.objectsToUpdate.forEach(  (obj) => obj.update()  );
-        if (window.FOMODBuilder.storage.preferences.autoSave)  main.save();
+        if (window.FOMODBuilder.storage.settings.autoSaveAfterChange)  main.save();
     }
 
     update() { this.updateObjects(); }
@@ -703,8 +703,12 @@ export class FOMOD extends XMLElement {
     }
 
     override asModuleXML(document: XMLDocument): Element {
-        this.instanceElement = this.instanceElement ?? document.getOrCreateChild("config");
-        document.appendChild(this.instanceElement);
+        if (document.documentElement !== this.instanceElement) {
+            document.removeChild(document.documentElement);
+            this.instanceElement = document.getOrCreateChild("config");
+        }
+        this.instanceElement.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        this.instanceElement.setAttribute("xsi:noNamespaceSchemaLocation", "http://qconsulting.ca/fo3/ModConfig5.0.xsd");
 
         this.instanceElement.getOrCreateChild("moduleName").textContent = this.meta_name;
         this.instanceElement.getOrCreateChild("moduleImage").setAttribute('path', this.meta_image);
@@ -724,12 +728,17 @@ export class FOMOD extends XMLElement {
     }
 
     override asInfoXML(document: XMLDocument): Element {
-        this.infoInstanceElement = this.infoInstanceElement ?? document.getOrCreateChild("fomod");
-        document.appendChild(this.infoInstanceElement);
+        if (document.documentElement !== this.infoInstanceElement) {
+            document.removeChild(document.documentElement);
+            this.infoInstanceElement = document.getOrCreateChild("fomod");
+        }
 
         // Set schema info
         this.infoInstanceElement.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-        this.infoInstanceElement.setAttribute("xsi:noNamespaceSchemaLocation", "https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd");
+        if (window.FOMODBuilder.storage.settings.includeInfoSchema)
+            this.infoInstanceElement.setAttribute("xsi:noNamespaceSchemaLocation", "https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd");
+        else if (this.infoInstanceElement.getAttribute("xsi:noNamespaceSchemaLocation") === "https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd")
+            this.infoInstanceElement.removeAttribute("xsi:noNamespaceSchemaLocation");
 
         // Set actual data
         this.infoInstanceElement.getOrCreateChild("Name").textContent = this.meta_name;

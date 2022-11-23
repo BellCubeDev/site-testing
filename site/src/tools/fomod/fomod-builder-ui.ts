@@ -3,6 +3,7 @@ import * as fomodClasses from './fomod-builder-classifications.js';
 import * as fomod from './fomod-builder.js';
 import * as bcdUniversal from '../../universal.js';
 import * as bcdFS from '../../filesystem-interface.js';
+import formatHTML from '../../included_node_modules/html-format/index.js';
 
 import * as xml from './fomod-builder-xml-translator.js';
 
@@ -91,8 +92,20 @@ export async function openFolder_entry() {
     console.debug('Picked folder perms?', await picked?.handle.queryPermission({mode: 'readwrite'}));
 
     window.FOMODBuilder.directory = picked;
-    //const moduleStr = await picked.children['ModuleConfig.xml']?.handle.then(file => file.text());
-    //xml.translateWhole()
+
+    const fomodDir = await picked.childDirsC['fomod']!;
+
+    const moduleStr_ = fomodDir.childFilesC['ModuleConfig.xml']!
+                                .then(handle => handle.getFile())
+                                .then(file => file.text());
+
+    const infoStr_ = fomodDir.childFilesC['Info.xml']!
+                                .then(handle => handle.getFile())
+                                .then(file => file.text());
+
+    const [moduleStr, infoStr] = await Promise.all([moduleStr_, infoStr_]);
+
+    xml.translateWhole(moduleStr, infoStr, true);
 }
 
 export async function save() {
@@ -104,25 +117,26 @@ export async function save() {
         window.FOMODBuilder.directory = picked;
     }
 
-    const fomodFolder = window.FOMODBuilder.directory.childrenInsensitive['fomod']?.handle ?? await window.FOMODBuilder.directory.handle.getDirectoryHandle('fomod', {create: true});
-    if (!(fomodFolder instanceof FileSystemDirectoryHandle)) throw new Error('Could not get or create the fomod folder.');
+    const fomodFolder = (await window.FOMODBuilder.directory.childDirsC['fomod']!);
 
-    const fomodInfo_ = fomodFolder.getFileHandle('Info.xml', {create: true});
-    const fomodModule_ = fomodFolder.getFileHandle('ModuleConfig.xml', {create: true});
+    const fomodInfo_ = fomodFolder.childFilesC['Info.xml']!;
+    const fomodModule_ = fomodFolder.childFilesC['ModuleConfig.xml']!;
     const [fomodInfo, fomodModule] = await Promise.all([fomodInfo_, fomodModule_]);
 
     const infoDoc = window.FOMODBuilder.trackedFomod!.infoDoc;
     const moduleDoc = window.FOMODBuilder.trackedFomod!.moduleDoc;
 
     // Tell the browser to save Info.xml
-    fomodInfo.createWritable().then(writable => writable.write(
-        window.FOMODBuilder.trackedFomod?.obj.asInfoXML(infoDoc).toString() ?? '<!-- ERROR -->'
-    ));
+    let infoString = window.FOMODBuilder.trackedFomod!.obj.asInfoXML(infoDoc).outerHTML || '<!-- ERROR - Serialized document was empty! -->';
+    if (window.FOMODBuilder.storage.settings.formatXML) infoString = formatHTML(infoString, '    ', Number.MAX_SAFE_INTEGER);
+    console.log({infoString});
+    fomodInfo.createWritable().then(writable => writable.write(infoString).then(()=>writable.close()));
 
     // Tell the browser to save ModuleConfig.xml
-    fomodModule.createWritable().then(writable => writable.write(
-        window.FOMODBuilder.trackedFomod?.obj.asModuleXML(moduleDoc).toString() ?? '<!-- ERROR -->'
-    ));
+    let moduleString = window.FOMODBuilder.trackedFomod!.obj.asModuleXML(moduleDoc).outerHTML || '<!-- ERROR - Serialized document was empty! -->';
+    if (window.FOMODBuilder.storage.settings.formatXML) moduleString = formatHTML(moduleString, '    ', Number.MAX_SAFE_INTEGER);
+    console.log({moduleString});
+    fomodModule.createWritable().then(writable => writable.write(moduleString).then(()=>writable.close()));
 }
 
 export function cleanSave(){

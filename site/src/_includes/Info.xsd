@@ -26,7 +26,7 @@
                     </xs:complexType>
                 </xs:element>
 
-                <xs:element name="Id" minOccurs="0" maxOccurs="1" type="xs:positiveInteger">
+                <xs:element name="Id" minOccurs="0" maxOccurs="1" type="xs:nonNegativeInteger">
                     <xs:annotation><xs:documentation><h2>Nexus Mods ID of the mod.</h2><br /><s>Used by MO2 to pull Nexus Mods metadata.</s> The ID appears to be unused after reading, however it <i>does</i> share a variable name with the Nexus ID.<br /><hr /><br />Not <i>actually</i> used either mainstream mod manager yet.</xs:documentation></xs:annotation>
                 </xs:element>
 
