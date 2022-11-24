@@ -43,7 +43,7 @@
                     /* Dummy pattern matcher --> */"pattern": [{"regexp": "(1)23456789012345678901234567890","file": 1,"message": 1,"kind": "file"}],
                     "background": {
                         "activeOnStart": true,
-                        "beginsPattern": "^\\d+:\\d+:\\d+ \\w+ - File change detected\\. Starting incremental compilation\\.\\.\\.$",
+                        "beginsPattern": "^(?:\\d+:\\d+:\\d+ \\w+ - File change detected\\. Starting incremental compilation\\.\\.\\.|   ROBOCOPY     ::     Robust File Copy for Windows)$",
                         "endsPattern": "^Minification complete\\.$"
                     }
                 }
