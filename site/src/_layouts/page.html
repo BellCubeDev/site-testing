@@ -736,7 +736,7 @@ layout: compress_html
               </svg>
         </header>
 
-        {% if page.isArticle || layout.isArticle %}
+        {% if page.isArticle or layout.isArticle %}
         <main id="cont" class="mdl-layout__content has-article">
                 <article>{{ content }}</article>
 

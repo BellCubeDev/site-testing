@@ -7,18 +7,18 @@ import formatHTML from '../../included_node_modules/html-format/index.js';
 
 import * as xml from './fomod-builder-xml-translator.js';
 
-export class bcdDropdownSortingOrder extends bcdUniversal.bcdDropdown {
-    static asString = 'FOMOD Builder - Sorting Order Dropdown';
-    static cssClass = 'bcd-dropdown-sorting-order';
+export class bcdDropdownSortingOrder extends bcdUniversal.BCDDropdown {
+    static readonly asString = 'FOMOD Builder - Sorting Order Dropdown';
+    static readonly cssClass = 'bcd-dropdown-sorting-order';
 
     override options() {
         return {'Explicit':null, 'Ascending':null, 'Descending':null};
     }
 }
 
-export class bcdDropdownOptionState extends bcdUniversal.bcdDropdown {
-    static asString = 'FOMOD Builder - Option State Dropdown';
-    static cssClass = 'bcd-dropdown-option-state';
+export class bcdDropdownOptionState extends bcdUniversal.BCDDropdown {
+    static readonly asString = 'FOMOD Builder - Option State Dropdown';
+    static readonly cssClass = 'bcd-dropdown-option-state';
 
     constructor(element: Element) {
         super(element, element.previousElementSibling!, true);

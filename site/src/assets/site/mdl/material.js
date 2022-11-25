@@ -2376,8 +2376,8 @@ export class MaterialSwitch {
     init() {
         if (this.element_) {
             this.inputElement_ = this.element_.querySelector(`.${this.cssClasses_.INPUT}`);
-            console.log(`this.element_.querySelector(\`.${this.cssClasses_.INPUT}\`); =`, this.inputElement_);
-            console.log(`this.element_ =`, this.element_);
+            //console.log(`this.element_.querySelector(\`.${this.cssClasses_.INPUT}\`); =`, this.inputElement_);
+            //console.log(`this.element_ =`, this.element_);
 
             var track = document.createElement('div');
             track.classList.add(this.cssClasses_.TRACK);

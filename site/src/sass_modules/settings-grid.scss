@@ -8,5 +8,5 @@
     justify-items: start;
     align-content: center;
 
-    grid-template-columns: 320px;
+    grid-template-columns: minmax(425px, max-content);
 }

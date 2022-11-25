@@ -126,7 +126,7 @@ async function minifyJSFile(filePath) {
     minifiedAnyFile = true;
 
     const fileContents = await afs.readFile(filePath, 'utf8');
-    afs.writeFile(filePath.replace(/\.js$/, '.original.js'), fileContents, {encoding: 'utf8'});
+    afs.writeFile(filePath.replace(/\.js$/, '.very.original.js'), fileContents, {encoding: 'utf8'});
 
     const urlFilePath = filePath.replace(minifyDir, '').replace(/\\/g, '/');
 
@@ -137,6 +137,8 @@ async function minifyJSFile(filePath) {
     let strToMinify = fileContents;
     if (moduleDetector.detect(fileContents) === 'cjs') strToMinify = convertToES6(strToMinify);
     //if (path.basename(filePath, '.js') === 'highlight') strToMinify += 'window.hljs = module.exports;';
+
+    afs.writeFile(filePath.replace(/\.js$/, '.original.js'), strToMinify, {encoding: 'utf8'});
 
     const minified = uglify.minify(strToMinify, {
         compress: {

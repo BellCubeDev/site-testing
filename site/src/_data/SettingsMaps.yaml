@@ -34,19 +34,20 @@ FOMODBuilder:
     name: Default Sorting Order
     tooltip: How should groups and options be sorted by default?<br><hr>This is merely a convenience, can be changed at any time, and has no functional impact on the FOMOD.
     options:
-      - name: Manual
-        value: explicit
-      - name: Alphabetical
-        value: ascending
-      - name: Reverse Alphabetical
-        value: descending
+      explicit: Manual
+      ascending: Alphabetical
+      descending: Reverse Alphabetical
 
   defaultGroupSelectType:
     type: string
     name: Default Group Selection Type
     tooltip: How should groups of options behave by default?<br><hr>This is merely a convenience, can be changed at any time, and has no functional impact on the FOMOD.
     options:
-      -
+      SelectAny: Allow Any Selections
+      SelectAll: Force-Select Everything
+      SelectExactlyOne: Require One Selection
+      SelectAtMostOne: Require One or No Selections
+      SelectAtLeastOne: Require One or More Selections
 
   formatXML:
     type: bool

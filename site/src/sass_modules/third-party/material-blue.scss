@@ -4297,7 +4297,7 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
     height: 0;
     width: 0;
     /*visibility: hidden;*/
-    z-index: 999
+    z-index: 99
 }
 
 .mdl-menu__container.is-visible,
@@ -4331,7 +4331,7 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
     opacity: 1;
     -webkit-transform: scale(1);
     transform: scale(1);
-    z-index: 999
+    z-index: 99
 }
 
 .mdl-menu__outline.mdl-menu--bottom-right {
@@ -4361,7 +4361,7 @@ fieldset[disabled] .mdl-checkbox .mdl-checkbox__ripple-container .mdl-ripple,
     margin: 0;
     opacity: 0;
     clip: rect(0 0 0 0);
-    z-index: 999
+    z-index: 99
 }
 
 .mdl-menu__container.is-visible .mdl-menu {
@@ -6736,7 +6736,7 @@ fieldset[disabled] .mdl-textfield .mdl-textfield__label,
     transform: scale(0);
     -webkit-transform-origin: top center;
     transform-origin: top center;
-    z-index: 999;
+    z-index: 100;
     background: #616161e6;
     border-radius: 2px;
     color: #fff;

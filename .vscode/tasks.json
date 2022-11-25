@@ -36,7 +36,7 @@
                 "$node-sass",
                 {
                     "base": "$tsc-watch",
-                    "fileLocation": [ "relative", "${workspaceFolder}\\site", ],
+                    "fileLocation": [ "relative", "${workspaceFolder}\\site" ],
                 },
                 {
                     "owner": "BACKGROUND FINISHED DETECTOR",

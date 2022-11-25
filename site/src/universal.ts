@@ -8,6 +8,7 @@ import * as quotes from './universal_quotes.js';
 
 
 
+
 $$\   $$\   $$\     $$\ $$\ $$\   $$\     $$\
 $$ |  $$ |  $$ |    \__|$$ |\__|  $$ |    \__|
 $$ |  $$ |$$$$$$\   $$\ $$ |$$\ $$$$$$\   $$\  $$$$$$\   $$$$$$$\
@@ -16,6 +17,7 @@ $$ |  $$ |  $$ |    $$ |$$ |$$ |  $$ |    $$ |$$$$$$$$ |\$$$$$$\
 $$ |  $$ |  $$ |$$\ $$ |$$ |$$ |  $$ |$$\ $$ |$$   ____| \____$$\
 \$$$$$$  |  \$$$$  |$$ |$$ |$$ |  \$$$$  |$$ |\$$$$$$$\ $$$$$$$  |
  \______/    \____/ \__|\__|\__|   \____/ \__| \_______|\______*/
+
 
 
 /** Rearranged and better-typed parameters for `setTimeout` */
@@ -188,7 +190,18 @@ interface getOrCreateChild {
 }
 
 declare global {
-    interface Element extends getOrCreateChild {}
+    interface Element extends getOrCreateChild {
+        upgrades?: Record<string, InstanceType<BCDComponentI>>;
+        upgrades_proto?: Partial<{
+            tooltip: BCDTooltip;
+            dropdown: BCDDropdown
+        }>
+        targetingComponents?: Record<string, BCDComponentI>;
+        targetingComponents_proto?: Partial<{
+            tooltip: BCDTooltip;
+            dropdown: BCDDropdown
+        }>
+    }
     interface Document extends getOrCreateChild {}
 
     interface Window {
@@ -213,6 +226,58 @@ declare global {
         copyCode(elem: HTMLElement): void;
 
         lazyStylesLoaded: true|undefined;
+
+        BCDSettingsDropdown: typeof BCDSettingsDropdown;
+    }
+}
+
+function registerUpgrade(subject: Element, upgrade: InstanceType<BCDComponentI>, target?: Element|null, propagateToTargetChildren = false, propagateToSubjectToChildren = false): void {
+    console.log("registerUpgrade", {subject, upgrade, target, propagateToTargetChildren, propagateSubjectToChildren: propagateToSubjectToChildren});
+    // Set the upgrade on the subject
+    forEachChildAndOrParent(subject, propagateToSubjectToChildren, child => {
+        console.log("registerUpgrade: subject", child);
+        child.upgrades ??= {};
+        child.upgrades[upgrade.constructor.name] = upgrade;
+    });
+
+    // Repeat for target
+    if (target) forEachChildAndOrParent(target, propagateToTargetChildren, child => {
+        child.targetingComponents ??= {};
+        child.targetingComponents[upgrade.constructor.name] = upgrade;
+    });
+
+    if (upgrade instanceof BCDTooltip) {
+        forEachChildAndOrParent(subject, propagateToSubjectToChildren, child => {
+            if (!child.upgrades_proto) child.upgrades_proto = {};
+            child.upgrades_proto!.tooltip = upgrade;
+        });
+        if (target) forEachChildAndOrParent(target, propagateToTargetChildren, child => {
+            if (!child.targetingComponents_proto) child.targetingComponents_proto = {};
+            child.targetingComponents_proto!.tooltip = upgrade;
+        });
+    }
+
+    if (upgrade instanceof BCDDropdown) {
+        forEachChildAndOrParent(subject, propagateToSubjectToChildren, child => {
+            if (!child.upgrades_proto) child.upgrades_proto = {};
+            child.upgrades_proto!.dropdown = upgrade;
+        });
+        if (target) forEachChildAndOrParent(target, propagateToTargetChildren, child => {
+            if (!child.targetingComponents_proto) child.targetingComponents_proto = {};
+            child.targetingComponents_proto!.dropdown = upgrade;
+        });
+    }
+}
+
+function forEachChildAndOrParent(start: Element, doChildren: boolean, callback: (child: Element) => unknown): void {
+    if (doChildren) forEachChild(start, callback);
+    callback(start);
+}
+
+function forEachChild(start: Element, callback: (child: Element) => void): void {
+    for (let i = 0; i < start.children.length; i++) {
+        forEachChild(start.children[i]!, callback);
+        callback(start.children[i]!);
     }
 }
 
@@ -237,14 +302,14 @@ if (window.location.search[0] === '?')
 
 
 /** Interface defining the readonly properties cssClass and asString to make identifying MDL Classes set up for my custom, painless registration functions a breeze */
-interface BCDComponent extends Function {
-    readonly asString:string;
-    readonly cssClass:string;
+interface BCDComponentI extends Function {
+    new(element: any, ...args: any[]): any;
+    readonly asString: string;
+    readonly cssClass: string;
 }
 
 /** Variable to store components that we'll be registering on DOM initialization */
-const bcdComponents:BCDComponent[] = [];
-
+const bcdComponents:BCDComponentI[] = [];
 
 
 
@@ -494,6 +559,8 @@ export class BellCubicDetails extends bcd_collapsibleParent {
         bcd_ComponentTracker.registerComponent(this, BellCubicDetails, this.details);
         this.reEval(true, true);
         this.self.classList.add('initialized');
+
+        registerUpgrade(this.self, this, this.summary, true);
     }
 
     reEvalOnSizeChange(event: unknown) {
@@ -524,6 +591,8 @@ export class BellCubicSummary extends bcd_collapsibleParent {
         }
 
         this.divertedCompletion();
+
+        registerUpgrade(this.self, this, this.details, false, true);
     }
 
     divertedCompletion(){requestAnimationFrame(()=>{
@@ -571,6 +640,7 @@ export class bcd_prettyJSON {
     static readonly asString = 'bcd_prettyJSON';
     element_:HTMLElement;
     constructor(element:HTMLElement) {
+        registerUpgrade(element, this, null, false, true);
         this.element_ = element;
 
         const raw_json = element.innerText;
@@ -612,6 +682,7 @@ export class bcdModalDialog extends EventTarget {
 
     constructor(element:HTMLDialogElement) {
         super();
+        registerUpgrade(element, this, null, false, true);
 
         this.element_ = element;
 
@@ -758,7 +829,7 @@ export enum menuCorners {
 
 type optionObj = objOf<Function|null>
 
-export abstract class bcdDropdown extends mdl.MaterialMenu {
+export abstract class BCDDropdown extends mdl.MaterialMenu {
 
     abstract options(): optionObj;
 
@@ -767,14 +838,13 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
     options_: optionObj;
     options_keys: string[];
 
-    unselectedOptions: string[] = [];
     selectedOption: string = '';
 
     override element_: HTMLElement;
 
     selectionTextElements: undefined | HTMLCollectionOf<HTMLElement>;
 
-    constructor(element: Element, buttonElement?: Element, doReorder: boolean = true) {
+    constructor(element: Element, buttonElement?: Element|null, doReorder: boolean = true) {
         super(element);
 
         this.element_ = element as HTMLElement;
@@ -791,7 +861,6 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
             this.forElement_ = buttonElement as HTMLElement;
         }
 
-
         if (this.forElement_) {
             this.forElement_.setAttribute('aria-haspopup', 'true');
 
@@ -805,7 +874,6 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
         this.options_ = tempOptions;
         this.options_keys = Object.keys(this.options_);
 
-        this.unselectedOptions = this.doReorder ? this.options_keys.slice(1) : this.options_keys;
         this.selectedOption = this.options_keys[0] ?? '';
 
         for (const option of this.options_keys) {
@@ -817,10 +885,19 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
         this.updateOptions();
 
         this.element_.addEventListener('focusout', this.focusOutHandler.bind(this));
+
+        registerUpgrade(element, this, this.forElement_, true, true);
     }
 
     focusOutHandler(evt: FocusEvent){
-        if ((evt.relatedTarget as Element).parentElement !== this.element_) this.hide();
+        if ((evt.relatedTarget as Element|null)?.parentElement !== this.element_) this.hide();
+    }
+
+    selectByString(option: string){
+        //console.log("[BCD-DROPDOWN] Selecting option:", option);
+        if (this.options_keys.includes(option)) this.selectedOption = option;
+        //console.log("[BCD-DROPDOWN] Selected option:", this.selectedOption);
+        this.updateOptions();
     }
 
     updateOptions() {
@@ -828,7 +905,10 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
 
         if (this.doReorder) {
             const goldenChild = children.find((elm) => (elm as HTMLLIElement).innerText === this.selectedOption);
-            if (!goldenChild) throw new Error('Could not find the selected option in the dropdown.');
+            if (!goldenChild) {
+                console.log("[BCD-DROPDOWN] Erroring instance:", this);
+                throw new Error('Could not find the selected option in the dropdown.');
+            }
 
             this.makeSelected(goldenChild);
         }
@@ -905,6 +985,8 @@ export abstract class bcdDropdown extends mdl.MaterialMenu {
 
         for (const item of this.optionElements) item.tabIndex = 0;
 
+        this.forElement_?.targetingComponents_proto?.tooltip?.forceClose();
+
         super.show(evt);
     }
 
@@ -953,7 +1035,7 @@ $$ |   $$ | $$$$$$\   $$$$$$\  $$\  $$$$$$\  $$$$$$$\  $$$$$$\    $$$$$$$\
 
 
 
-export class bcdDropdown_AwesomeButton extends bcdDropdown {
+export class bcdDropdown_AwesomeButton extends BCDDropdown {
     static readonly asString = 'BCD - Debugger\'s All-Powerful Button';
     static readonly cssClass = 'js-bcd-debuggers-all-powerful-button';
 
@@ -1010,6 +1092,7 @@ export class bcdTabButton extends mdl.MaterialButton {
         element.setAttribute('type', 'button');
 
         super(element); // Now we can use `this`!
+        registerUpgrade(element, this, boundTab, false, true);
         this.element_ = element;
 
         this.boundTab = boundTab;
@@ -1138,7 +1221,7 @@ bcdComponents.push(bcdTabButton);
                                                 \_*/
 
 
-export class bcdTooltip {
+export class BCDTooltip {
     static readonly asString = 'BCD - Tooltip';
     static readonly cssClass = 'js-bcd-tooltip';
 
@@ -1183,6 +1266,7 @@ export class bcdTooltip {
 
         if (!tempElement || !(tempElement instanceof HTMLElement) ) throw new Error('TOOLTIP - Could not find a valid HTML Element to bind to!');
         this.boundElement = tempElement;
+        registerUpgrade(element, this, this.boundElement, true, true);
 
         const tempPos = element.getAttribute('tooltip-position');
 
@@ -1211,13 +1295,21 @@ export class bcdTooltip {
 
     handleTouch(event: TouchEvent) {
         if (event.targetTouches.length > 0) this.handleHoverEnter(undefined, true);
-        else this.handleHoverLeave(undefined, true);
+        else this.handleHoverLeave();
     }
 
-    handleHoverEnter(event?: MouseEvent|FocusEvent, bypassWait? : true) {
+    handleHoverEnter(event?: MouseEvent|FocusEvent, bypassWait?: true) {
+        console.log(event)
+        const targetElement = event instanceof MouseEvent ? document.elementFromPoint(event?.x ?? 0, event?.y ?? 0) : event?.target;
+
+        if (targetElement instanceof Element && (
+            targetElement.upgrades_proto?.dropdown
+            || targetElement.targetingComponents_proto?.dropdown?.container_.classList.contains('is-visible')
+        )) return;
+
         this.element.classList.add('active_');
 
-        afterDelay(600, ()=> {
+        afterDelay(bypassWait ? 0 : 600, ()=> {
             if (!this.element.classList.contains('active_')) return;
             this.element.classList.add('active');
             this.element.addEventListener('transitionend', this.setPosition.bind(this), {once: true});
@@ -1226,10 +1318,16 @@ export class bcdTooltip {
 
     }
 
-    handleHoverLeave(event?: MouseEvent|FocusEvent, bypassWait? : true) {
+    forceClose() {
+        this.handleHoverLeave();
+    }
+
+    handleHoverLeave(event?: MouseEvent|FocusEvent) {
         this.element.classList.remove('active_');
         afterDelay(10, () => {
-            if (!this.element.classList.contains('active_')) this.element.classList.remove('active');
+            if (!this.element.classList.contains('active_')) {
+                this.element.classList.remove('active');
+            }
         });
     }
 
@@ -1333,7 +1431,7 @@ export class bcdTooltip {
     }
 
 }
-bcdComponents.push(bcdTooltip);
+bcdComponents.push(BCDTooltip);
 
 
 
@@ -1356,6 +1454,7 @@ export abstract class bcdDynamicTextArea_base {
     element: HTMLElement;
 
     constructor(element: HTMLElement) {
+        registerUpgrade(element, this, null, false, true);
         this.element = element;
 
         this.adjust();
@@ -1422,6 +1521,20 @@ export class bcdDynamicTextAreaWidth extends bcdDynamicTextArea_base {
 }
 bcdComponents.push(bcdDynamicTextAreaWidth);
 
+
+/*$$$$$\              $$\       $$\     $$\                                      $$$$$$\            $$\       $$\
+$$  __$$\             $$ |      $$ |    \__|                                    $$  __$$\           \__|      $$ |
+$$ /  \__| $$$$$$\  $$$$$$\   $$$$$$\   $$\ $$$$$$$\   $$$$$$\   $$$$$$$\       $$ /  \__| $$$$$$\  $$\  $$$$$$$ |
+\$$$$$$\  $$  __$$\ \_$$  _|  \_$$  _|  $$ |$$  __$$\ $$  __$$\ $$  _____|      $$ |$$$$\ $$  __$$\ $$ |$$  __$$ |
+ \____$$\ $$$$$$$$ |  $$ |      $$ |    $$ |$$ |  $$ |$$ /  $$ |\$$$$$$\        $$ |\_$$ |$$ |  \__|$$ |$$ /  $$ |
+$$\   $$ |$$   ____|  $$ |$$\   $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \____$$\       $$ |  $$ |$$ |      $$ |$$ |  $$ |
+\$$$$$$  |\$$$$$$$\   \$$$$  |  \$$$$  |$$ |$$ |  $$ |\$$$$$$$ |$$$$$$$  |      \$$$$$$  |$$ |      $$ |\$$$$$$$ |
+ \______/  \_______|   \____/    \____/ \__|\__|  \__| \____$$ |\_______/        \______/ \__|      \__| \_______|
+                                                      $$\   $$ |
+                                                      \$$$$$$  |
+                                                       \_____*/
+
+
 interface settingsGridObj {
     type: 'bool'|'string'
     name: string,
@@ -1429,10 +1542,7 @@ interface settingsGridObj {
         text: string,
         position: 'top'|'bottom'|'left'|'right'
     };
-    options?: Array<{
-        name: string,
-        value: string
-    }>,
+    options?: Record<string, string>,
 }
 
 const settingsToUpdate: (() => unknown)[] = [];
@@ -1452,6 +1562,7 @@ export class SettingsGrid {
     settings: settingsGrid;
     constructor(element: HTMLElement) {
         this.element = element;
+        registerUpgrade(element, this, null, false, true);
 
         this.settings = JSON.parse(element.innerText) as settingsGrid;
         element.innerText = '';
@@ -1503,17 +1614,17 @@ export class SettingsGrid {
     }
 
     upgradeElement(element: Element, key: string, settings: settingsGridObj) {
-        if (!(element && 'getAttribute' in element)) return console.error("A Settings Grid element was not actually an element!", element);
-
-        for (const child of element.children) this.upgradeElement(child, key, settings);
-
-        const displayType = element.getAttribute('data-setting-display');
-        if (!displayType) return console.error('A Settings Grid element is missing the `data-setting-display` attribute!', element);
+        if (!(element && 'getAttribute' in element)) return ;//console.error("A Settings Grid element was not actually an element!", element);
 
         const filterType = element.getAttribute('data-setting-filter');             // es lint-disable-next-line sonarjs/no-nested-template-literals
         //console.log(`Upgrading child with type ${filterType ? `${filterType}:`:''}${displayType}`, element, settings);
 
-        if (filterType && filterType !== settings.type) return ;//console.warn("Removing element from tree:", (element.remove(), element));
+        if (filterType && filterType !== settings.type) return element.remove();//console.warn("Removing element from tree:", (element.remove(), element));
+
+        for (const child of element.children) this.upgradeElement(child, key, settings);
+
+        const displayType = element.getAttribute('data-setting-display');
+        if (!displayType) return ;//console.warn('A Settings Grid element is missing the `data-setting-display` attribute!', element);
 
         switch(displayType) {
             case('id'):
@@ -1536,9 +1647,14 @@ export class SettingsGrid {
                 break;
 
             case('dropdown'):
-                element.classList.add('js-bcd-dynamic-dropdown');
+                element.classList.add(BCDSettingsDropdown.cssClass);
                 element.setAttribute('data-options', JSON.stringify(settings.options));
+                element.setAttribute('data-settings-path',  JSON.stringify(this.settingsPath));
+                element.setAttribute('data-setting',  key);
                 break;
+
+            default:
+                console.warn(`A Settings Grid element has an unknown display type: ${displayType}`, element);
         }
 
         //console.log(`Upgraded element with type ${displayType}. Passing off to MDL component handler...`);
@@ -1546,13 +1662,15 @@ export class SettingsGrid {
         //console.log(`Fully upgraded element with type ${displayType}!`);
     }
 
-    getSetting<TReturnValue = string|boolean|number|null>(key: string|number, suppressError = false): TReturnValue|undefined {
+    getSetting<TReturnValue = string|boolean|number|null>(key: string|number, suppressError = false): TReturnValue|undefined { return SettingsGrid.getSetting<TReturnValue>(this.settingsPath, key, suppressError); }
+
+    static getSetting<TReturnValue = string|boolean|number|null>(settingsPath: string[], key: string|number, suppressError = false): TReturnValue|undefined {
         try {
             let currentDir = window;
-            for (const dir of this.settingsPath) //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
+            for (const dir of settingsPath) //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
                 currentDir = currentDir?.[dir];
 
-            if (currentDir === undefined) throw new Error(`Settings Grid cannot find the settings path "${this.settingsPath.join('.')}"!`);
+            if (currentDir === undefined) throw new Error(`Settings Grid cannot find the settings path "${settingsPath.join('.')}"!`);
 
             //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
             return currentDir[key];
@@ -1562,13 +1680,15 @@ export class SettingsGrid {
         }
     }
 
-    setSetting(key: string|number, value:string|boolean|number|null|undefined, suppressError = false): void {
+    setSetting(key: string|number, value:string|boolean|number|null|undefined, suppressError = false): void { SettingsGrid.setSetting(this.settingsPath, key, value, suppressError); }
+
+    static setSetting(settingsPath: string[], key: string|number, value:string|boolean|number|null|undefined, suppressError = false): void {
         try {
             let currentDir = window;
-            for (const dir of this.settingsPath) //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
+            for (const dir of settingsPath) //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
                 currentDir = currentDir?.[dir];
 
-            if (currentDir === undefined) throw new Error(`Settings Grid cannot find the settings path "${this.settingsPath.join('.')}"!`);
+            if (currentDir === undefined) throw new Error(`Settings Grid cannot find the settings path "${settingsPath.join('.')}"!`);
 
             //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
             return currentDir[key] = value;
@@ -1579,6 +1699,52 @@ export class SettingsGrid {
     }
 }
 bcdComponents.push(SettingsGrid);
+
+/** Variable to work around the complexities of Constructors and whatnot */
+let tempKeyMap = {};
+export class BCDSettingsDropdown extends BCDDropdown {
+    static readonly asString = 'BCD Settings Dropdown';
+    static readonly cssClass = 'js-bcd-settings-dropdown';
+
+    settingsPath:string[] = JSON.parse(this.element_.getAttribute('data-settings-path') ?? '[]');
+    settingKey = this.element_.getAttribute('data-setting') ?? '';
+    keyMap: Record<string, string>;
+
+    constructor(element: HTMLElement) {
+        //console.log('Constructing BCDSettingsDropdown', element);
+        super(element, element.previousElementSibling);
+        this.keyMap = tempKeyMap;
+        //console.log('[BCD-DROPDOWN] Key map is now', this.keyMap);
+        //this.selectByString(SettingsGrid.getSetting(this.settingsPath, this.settingKey) ?? '');
+        settingsToUpdate.push(() => {
+            this.selectByString(SettingsGrid.getSetting(this.settingsPath, this.settingKey) ?? '');
+        });
+    }
+
+    override selectByString(option: string): void {
+        //console.log('[BCD-DROPDOWN] Selecting by string', option, 'aka', this.keyMap?.[option], {keyMap: this.keyMap});
+        super.selectByString(this.keyMap[option] ?? option);
+    }
+
+    override options(): optionObj {
+        const options: optionObj = {};
+        Object.entries<string>(JSON.parse(this.element_.getAttribute('data-options') ?? '[]')).forEach(([literalName, prettyName]) => {
+            options[prettyName.toString()] = () => {
+                SettingsGrid.setSetting(this.settingsPath, this.settingKey, literalName);
+            };
+
+            //console.log('[BCD-DROPDOWN] Adding option', literalName, 'aka', prettyName);
+           this.keyMap ??= {};
+            this.keyMap[literalName] = prettyName;
+            //console.log('[BCD-DROPDOWN] Key map is now', this.keyMap);
+        });
+        tempKeyMap = this.keyMap;
+
+        return options;
+    }
+}
+bcdComponents.push(BCDSettingsDropdown);
+window.BCDSettingsDropdown = BCDSettingsDropdown;
 
 
 
@@ -1613,7 +1779,7 @@ $$ |  $$ |\$$$$$$$\ \$$$$$$$ |$$ |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |  \$$$
     @throws nothing - this function gracefully handles errors in the form of `console.error` calls instead of throwing actual errors
     @returns whether or not an error occurred with the error as the return value
 */
-export function registerBCDComponent(component:BCDComponent):boolean|Error {
+export function registerBCDComponent(component:BCDComponentI):boolean|Error {
     try{
 
         mdl.componentHandler.register({
@@ -1637,7 +1803,7 @@ export function registerBCDComponent(component:BCDComponent):boolean|Error {
 /** Tell MDL about our shiny new components
     @param components The components to register. Defaults to the global bcdComponents array if not specified.
 */
-export function registerBCDComponents(...components:BCDComponent[]):void{
+export function registerBCDComponents(...components:BCDComponentI[]):void{
 
     const componentArr = components.length ? components : bcdComponents;
 

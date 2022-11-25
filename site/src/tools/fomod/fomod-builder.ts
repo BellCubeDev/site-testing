@@ -161,6 +161,7 @@ window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
     console.debug('Initializing the FOMOD Builder!');
 
     bcdUniversal.registerBCDComponents(fomodUI.bcdDropdownSortingOrder, fomodUI.bcdDropdownOptionState);
+    bcdUniversal.updateSettings();
 
     window.FOMODBuilder.ui.setStepEditorType(window.FOMODBuilder.storage.preferences.stepsBuilder);
 

@@ -582,6 +582,8 @@ nav>.subheader {
     }
 }
 
+.mdl-menu__container:not(.is-visible) { pointer-events: none; }
+
 .builder-steps-step-sum {
     padding-left: 8px;
 }
