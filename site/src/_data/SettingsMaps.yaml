@@ -7,7 +7,7 @@ FOMODBuilder:
   alwaysCleanSave:
     type: bool
     name: "Auto-Save: Clean Save"
-    tooltip: If auto-save is enabled, should the FOMOD be rebuilt from scratch each time?
+    tooltip: If auto-save is enabled, should the FOMOD be reconstructed it from the ground up?
 
   includeInfoSchema:
     type: bool
