@@ -108,7 +108,7 @@ redirect_from:
 
 
 
-            <button
+            <button disabled="visual"
                 type="button" onclick="window.FOMODBuilder.ui.attemptRepair()"
                 class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">
 
@@ -126,7 +126,15 @@ redirect_from:
     </div>
     <div role="tabpanel" class="tab-content" name="Metadata">
         <p>Tab: Metadata</p>
-        <div id="metadata-container"></div>
+        <div id="metadata-container">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
+                <input class="mdl-textfield__input" type="text">
+                <label class="mdl-textfield__label">Mod Name</label>
+            </div>
+            <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
+                The name of the library. For instance, <code>Vanilla</code>.
+            </p></div>
+        </div>
     </div>
 
 

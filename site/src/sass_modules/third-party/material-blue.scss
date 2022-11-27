@@ -3186,27 +3186,23 @@ input.mdl-button[type="submit"] {
     background-color: #448aff
 }
 
-.mdl-button[disabled],
 .mdl-button--disabled {
     color: #00000042;
     cursor: default;
     background-color: transparent
 }
 
-.mdl-button--fab[disabled],
 .mdl-button--fab.mdl-button--disabled {
     background-color: #0000001f;
     color: #00000042
 }
 
-.mdl-button--raised[disabled],
 .mdl-button--raised.mdl-button--disabled {
     background-color: #0000001f;
     color: #00000042;
     box-shadow: none
 }
 
-.mdl-button--colored[disabled],
 .mdl-button--colored.mdl-button--disabled {
     color: #00000042
 }
