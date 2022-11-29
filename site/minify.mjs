@@ -102,9 +102,9 @@ async function evalFileOrDir(thisPath) {
     const stat = await afs.lstat(thisPath);
     if (stat.isDirectory()) return evalFilesInDir(thisPath);
 
-    const [,original, minified, ext] = thisPath.match(/(?:\.(original))?(?:\.(min))?\.([^.]+)$/) || [];
+    const [,isSassDir,isOriginal, isMinified, ext] = thisPath.match(/(sass_modules)|(?:\.(original))?(?:\.(min))?\.([^.]+)$/) || [];
     //console.log('original:', original, 'minified:', minified, 'ext:', ext);
-    if (original || minified || !ext) return;
+    if (isSassDir || isOriginal || isMinified || !ext) return;
 
     switch (ext) {
         case 'js' : return minifyJSFile(thisPath);

@@ -1,0 +1,57 @@
+@mixin customColoredButton($hue, $sat, $lum, $alpha: 1, $satShiftIntensity: 1, $lumShiftIntensity: 1, $doAltRipple: false) {
+
+    @if $doAltRipple {
+        .mdl-ripple {
+            background-color: #0008;
+        }
+    }
+
+    // Normal State
+    &, &:focus:not(:active, .active) {
+        background-color: hsla($hue, $sat, $lum, $alpha - 0.15);
+        color: #ffffff;
+
+        padding: 0 40px;
+        margin: 6px 0 5px;
+        height: 40px;
+
+        -webkit-tap-highlight-color: #fff4;
+        box-shadow: 2px 2px 3px #0001;
+
+        text-shadow: 2px 2px 10px #000b;
+
+        border-radius: 4px;
+    }
+
+    // Hover State
+    &:hover, :focus:hover {   &:not(:active, .active) {
+        background-color: hsla($hue, $sat  - ((10 * $satShiftIntensity) * 1%), $lum + ((13 * $lumShiftIntensity * 1%)), $alpha);
+        box-shadow: 3px 3px 4.5px #00000028;
+
+        text-shadow: 1.5px 1.5px 7px #000d;
+    }}
+
+    // Active State
+    &:is(:active, .active) {
+        background-color: hsla($hue, $sat  - ((10 * $satShiftIntensity) * 1%), $lum + ((27 * $lumShiftIntensity) * 1%), $alpha + .25);
+        box-shadow: 4px 4px 7px #0004;
+
+        text-shadow: 1px 1px 10px #000f;
+    }
+}
+
+#bcd-stepBTN-builder {
+    @include customColoredButton(209deg, 100%, 50%, 1, 0.2, 0.1, true);
+}
+
+#bcd-stepBTN-vortex {
+    @include customColoredButton(31deg, 67%, 50%, 1, 0.1, 0.6, true);
+}
+
+#bcd-stepBTN-mo2 {
+    @include customColoredButton(199deg, 82%, 61%, 1, 0.1, 0.1, true);
+}
+
+.js-tab-list-button, .js-tab-list-button.mdl-button:focus:not(:active) {
+    @include customColoredButton(160deg, 33%, 30%);
+}

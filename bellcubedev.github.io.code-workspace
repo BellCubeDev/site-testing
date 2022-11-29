@@ -5,6 +5,7 @@
 		}
 	],
 	"settings": {
+
 		"cSpell.words": [
 			"'Mornin",
 			"Argonian",
@@ -95,9 +96,7 @@
 			"Vegimite",
 			"Vivec",
 			"Wabbajack",
-			"zindex"
-		],
-		"cSpell.ignoreWords": [
+			"zindex",
 			"4uthor",
 			"Aflack",
 			"Anatol",
@@ -177,8 +176,19 @@
 			"uncompiled",
 			"unfill"
 		],
+
 		"liquid.format.enable": true,
 		"commentAnchors.workspace.excludeFiles": "**/{node_modules,.git,_generated,highlight_js,mdl}/**/*",
 		"terminal.integrated.cwd": "${workspaceFolder}/site",
+
+		"cSpell.ignorePaths": [
+			"package-lock.json",
+			"node_modules",
+			".git/objects",
+			"highlight_js"
+		],
+
+		"files.trimFinalNewlines": true,
+		"files.trimTrailingWhitespace": true
 	}
 }

@@ -1,0 +1,51 @@
+%modal-transition {
+    opacity: 0;
+    transition-duration: 250ms;
+    transition-timing-function: ease-in-out;
+}
+
+.js-bcd-modal {
+    @extend %modal-transition;
+
+    margin: auto;
+    position: fixed;
+    top: 64px;
+    left: 32px;
+    right: 32px;
+    bottom: 128px;
+    overflow-wrap: break-word;
+    overflow: auto;
+
+    min-width: 40%;
+    min-height: 40%;
+
+    max-width: 80%;
+    max-height: 80%;
+
+    border-radius: 8px;
+    border-width: 5px;
+    border-color: #0af;
+    background-color: #333;
+    box-shadow: 0 0 10px #000;
+    z-index: 256;
+}
+
+.js-bcd-modal-obfuscator {
+    @extend %modal-transition;
+    transition-duration: 400ms;
+}
+
+.js-bcd-modal[open], .js-bcd-modal-obfuscator.is-visible {
+    opacity: 1;
+}
+
+.js-bcd-modal-buttons {
+    margin: 0;
+    margin-left: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    align-content: center;
+}

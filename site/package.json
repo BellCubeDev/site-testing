@@ -6,17 +6,19 @@
   ],
   "devDependencies": {
     "@mysticatea/eslint-plugin": "^13.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.30.5",
-    "@typescript-eslint/parser": "^5.30.5",
-    "eslint": "^8.19.0",
-    "eslint-plugin-github": "^4.3.6",
-    "eslint-plugin-sonarjs": "^0.13.0",
-    "eslint-plugin-unicorn": "^42.0.0"
+    "@typescript-eslint/eslint-plugin": "^5.44.0",
+    "@typescript-eslint/parser": "^5.44.0",
+    "eslint": "^8.28.0",
+    "eslint-plugin-github": "^4.4.1",
+    "eslint-plugin-sonarjs": "^0.16.0",
+    "eslint-plugin-unicorn": "^45.0.0"
   },
   "dependencies": {
+    "@types/archiver": "^5.3.1",
     "@types/highlightjs": "^9.12.2",
     "@types/wicg-entries-api": "^2020.8.2",
     "@types/wicg-file-system-access": "^2020.9.5",
+    "@zip.js/zip.js": "^2.6.58",
     "cjs-to-module": "^1.0.0",
     "cssnano": "^5.1.14",
     "cssnano-preset-advanced": "^5.3.9",
@@ -24,9 +26,9 @@
     "html-format": "^1.0.2",
     "js-module-formats": "^0.1.2",
     "postcss": "^8.4.19",
-    "sass": "^1.56.0",
+    "sass": "^1.56.1",
     "tsc-watch": "^5.0.3",
-    "typescript": "^4.7.4",
-    "uglify-js": "^3.17.2"
+    "typescript": "^4.9.3",
+    "uglify-js": "^3.17.4"
   }
 }

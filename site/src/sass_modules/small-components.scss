@@ -1,3 +1,13 @@
+// Dynamic Width/Height Text Areas
+.js-dynamic-textarea-width,
+.js-dynamic-textarea-height {
+    resize: none;
+    overflow: visible;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+// Settings Grid
 .js-settings-grid {
     display: grid;
 

@@ -21,9 +21,9 @@ $$ |  $$ |  $$ |$$\ $$ |$$ |$$ |  $$ |$$\ $$ |$$   ____| \____$$\
 
 
 /** Rearranged and better-typed parameters for `setTimeout` */
-export function afterDelay<TCallback extends (...args: any) => any = any>(timeout: number, callback: TCallback|string, ...args: Parameters<TCallback>):void {
+export function afterDelay<TCallback extends (...args: any) => any = any>(timeout: number, callback: TCallback|string, ...args: Parameters<TCallback>): number {
     // @ts-ignore: the `Parameters` utility type returns a tuple, which inherently has an iterator function--regardless of what TypeScript thinks
-    window.setTimeout(callback, timeout, ...(args || []));
+    return window.setTimeout(callback, timeout, ...(args || []));
 }
 
 // ================================
@@ -232,10 +232,10 @@ declare global {
 }
 
 function registerUpgrade(subject: Element, upgrade: InstanceType<BCDComponentI>, target?: Element|null, propagateToTargetChildren = false, propagateToSubjectToChildren = false): void {
-    console.log("registerUpgrade", {subject, upgrade, target, propagateToTargetChildren, propagateSubjectToChildren: propagateToSubjectToChildren});
+    //console.log("registerUpgrade", {subject, upgrade, target, propagateToTargetChildren, propagateSubjectToChildren: propagateToSubjectToChildren});
     // Set the upgrade on the subject
     forEachChildAndOrParent(subject, propagateToSubjectToChildren, child => {
-        console.log("registerUpgrade: subject", child);
+        //console.log("registerUpgrade: subject", child);
         child.upgrades ??= {};
         child.upgrades[upgrade.constructor.name] = upgrade;
     });
@@ -1299,7 +1299,6 @@ export class BCDTooltip {
     }
 
     handleHoverEnter(event?: MouseEvent|FocusEvent, bypassWait?: true) {
-        console.log(event)
         const targetElement = event instanceof MouseEvent ? document.elementFromPoint(event?.x ?? 0, event?.y ?? 0) : event?.target;
 
         if (targetElement instanceof Element && (

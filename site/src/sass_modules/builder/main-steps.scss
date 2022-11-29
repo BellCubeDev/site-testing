@@ -1,0 +1,104 @@
+.builderStep {
+    &:not(.active_) { display: none; }
+
+    opacity: 0; &.active { opacity: 1; }
+    transition-duration: 100ms;
+    transition-timing-function: ease-in-out;
+    transition-property: opacity;
+}
+
+.bcd-builder-input {
+    background-color: #222;
+    border-radius: 4px;
+    border: #444 solid 2px;
+    border-style: ridge;
+    border-left: #fff solid 4px;
+    padding: 8px;
+    padding-left: 8px;
+
+    margin-right: 16px;
+}
+
+.builder-steps-opt-body .bcd-builder-input {
+    margin-right: 0;
+}
+
+@mixin fomodStepsBuilderCard($hue, $sat, $val, $hueShiftMult: 1) {
+    //          184°, 87%, 41%
+    background: hsl($hue, $sat, $val);
+    //          208°, 100%, 58%
+    border-left: hsl($hue + ($hueShiftMult * 48deg), $sat + 13%, $val + 17%) 8px solid;
+}
+
+#steps-builder-container,
+.builder-steps-step,
+.builder-steps-step-body > .js-bcd-details-inner,
+.builder-steps-group-body > .js-bcd-details-inner,
+.builder-steps-opt-body > .js-bcd-details-inner {
+    border-radius: 8px;
+    padding: 12px;
+    @include fomodStepsBuilderCard(184deg, 87%, 41%)
+}
+
+.builder-steps-step {
+    @include fomodStepsBuilderCard(215deg, 76%, 23%);
+}
+
+.builder-steps-step-body > .js-bcd-details-inner {
+    @include fomodStepsBuilderCard(101deg, 78%, 18%);
+}
+
+.builder-steps-group-body > .js-bcd-details-inner {
+    @include fomodStepsBuilderCard(319deg, 76%, 22%, -1);
+}
+
+.builder-steps-opt-body > .js-bcd-details-inner {
+    @include fomodStepsBuilderCard(160deg, 0%, 11%);
+
+    >* {
+        display: grid;
+        justify-content: space-between;
+        gap: 32px;
+        align-items: start;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 40vw);
+    }
+
+}
+
+.builder-steps-opt-image {
+    max-width: 40vw;
+}
+
+.builder-steps-opt-body-left {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: auto;
+    grid-row: 1;
+    gap: 24px;
+}
+
+.item-with-fake-label {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 8px;
+
+    &--one-liner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    width: 100%;
+
+    > h4 {
+        margin: 0;
+    }
+}
+
+.builder-steps-step-sum {
+    padding-left: 8px;
+}

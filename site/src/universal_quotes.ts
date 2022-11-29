@@ -406,7 +406,7 @@ function saveStorage() {
     return true;
 }
 
-const last50 = JSON.parse(localStorage.getItem('BCD - Last 50 Quotes') ?? '[]')
+const last50 = JSON.parse(localStorage.getItem('BCD - Last 50 Quotes') ?? '[]');
 
 export function getRandomQuote_base(){
     const pos = Math.floor(Math.random() * (possibilities_Generic.length + possibilities_conditionalized.length));

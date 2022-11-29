@@ -77,7 +77,7 @@ jobs:
         run: |
           echo "minifyDir=$GITHUB_WORKSPACE/_generated/ts_out/" >> $GITHUB_ENV
 
-      - name: Minify JavaScript and JSON
+      - name: Minify JavaScript and CSS
         # Output dir: [in-place] $GITHUB_WORKSPACE/_generated/ts_out/
         run: |
           echo Minification Directory: $minifyDir

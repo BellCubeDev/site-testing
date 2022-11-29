@@ -69,7 +69,7 @@
         "no-console": "off",
         "no-var": "off",
         "eqeqeq": "off",
-        "sonarjs/no-duplicate-string": "warn",
+        "sonarjs/no-duplicate-string": "off",
         "func-style": "warn",
         "github/no-then": "off",
         "semi": "warn",
@@ -82,5 +82,10 @@
         "@typescript-eslint/no-non-null-assertion": "off",
         "no-inner-declarations": "off",
         "@typescript-eslint/no-empty-interface": "off"
-    }
+    },
+    "ignorePatterns": [
+        "node_modules/*",
+        "included_node_modules/*",
+        "assets/site/highlight_js/*"
+    ]
 }

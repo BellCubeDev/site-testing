@@ -1,3 +1,5 @@
+@use 'utils';
+
 .mdl-layout__drawer {
     background-color: #222222;
     border-right-color: #ffffff;
@@ -78,7 +80,18 @@
     overflow: hidden;
 }
 
-.mdl-layout__drawer .mdl-navigation .mdl-navigation__link, .mdl-navigation__link {
+.mdl-layout-title {
+    color: #fff;
+
+    :is(img, svg) {
+        height: 48px;
+        margin-right: 8px;
+    }
+
+}
+
+.mdl-navigation__link, // Next line is for specificity only
+.mdl-layout__drawer .mdl-navigation .mdl-navigation__link {
     color: #fffffff2;
     display: block;
     padding: 16px 40px;
@@ -90,4 +103,45 @@
     &:is(:hover, :-ms-keyboard-active, :focus, :active) {
         background-color: #ffffff40;
     }
+}
+
+.mdl-navigation__link--icon {
+    display: flex;
+    justify-content: flex-start;
+    align-content: center;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    .material-icons {
+        width: 24px;
+    }
+
+    > :not(.material-icons, .center-vert) {
+        width: 24px;
+        padding-left: 24px;
+    }
+}
+
+.drawer-init-open .mdl-layout__obfuscator {
+    background-color: #0008 !important;
+    visibility: visible !important;
+}
+
+.mdl-layout__header {
+    background: none;
+
+    .mdl-layout__drawer-button {
+        background: none;
+        user-select: none;
+    }
+
+}
+
+.mdl-layout__header-row > .mdl-layout-title, .mdl-button--colored {
+    @extend .needs-shadow;
+}
+
+.mdl-layout__header-row {
+    z-index: 3;
 }

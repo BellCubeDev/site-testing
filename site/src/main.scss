@@ -1,12 +1,43 @@
-@use 'third-party/material-blue';
+// Third-Party
 @use 'third-party/hljs-atelier-lakeside';
+@use 'third-party/material-blue';
+
+
+
+// Wide-reaching tweaks
+@use 'small-mdl-overwrites';
 @use 'global-tweaks';
-@use 'details-summary';
-@use 'docs';
-@use 'lazy-loading';
+
+
+
+// Layout
+@use 'content-and-footer';
 @use 'nav';
-@use 'scrollbar';
 @use 'site';
-@use 'tooltips';
+
+@use 'docs';
+
+
+
+// Generic Stuff
+@use 'button-colors';
 @use 'utils';
-@use 'settings-grid';
+
+
+
+// Components
+@use 'details-summary';
+@use 'modals';
+@use 'menu-dropdown';
+@use 'scrollbar';
+@use 'small-components';
+@use 'tabs';
+@use 'tooltips';
+
+// Builder
+@use 'builder/main-steps';
+
+
+
+// Lazy-Loading
+@use 'lazy-loading';
