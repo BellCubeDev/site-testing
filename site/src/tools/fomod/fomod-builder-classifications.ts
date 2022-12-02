@@ -1,5 +1,6 @@
 import * as main from "./fomod-builder.js"; // Brings in global things
 import { objOf } from '../../universal.js';
+import * as genericBindings from './fomod-builder-bindings.js';
 /*x eslint-disable i18n-text/no-en */// FOMODs are XML files with a schema written in English, so disallowing English makes little sense.
 
 /*
@@ -700,6 +701,11 @@ export class FOMOD extends XMLElement {
         this.installs = installs;
         this.conditions = conditions;
         this.steps = steps;
+
+
+        this.objectsToUpdate.push(
+            new genericBindings.modName(this)
+        );
     }
 
     override asModuleXML(document: XMLDocument): Element {
