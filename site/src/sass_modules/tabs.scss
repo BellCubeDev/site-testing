@@ -9,6 +9,33 @@
     transition-timing-function: inherit;
 }
 
+.tabs-content-container {
+    padding: 0;
+    overflow: visible;
+    height: max-content;
+
+    > * {
+        padding: 0;
+        padding-top: 16px;
+
+        transition-property: margin-left;
+        margin-left: 0; // overridden later in JavaScript
+
+        height: max-content;
+        width: max-content;
+
+        overflow: hidden;
+        overflow-y: visible;
+
+        display: grid;
+        justify-content: start;
+        align-items: start;
+        grid-template-columns: repeat(16, calc(100vw - 52px));
+        grid-template-rows: 100%;
+        gap: 52px;
+    }
+}
+
 .tabs-list-container {
     display: flex;
     flex-direction: row;
