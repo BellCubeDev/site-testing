@@ -33,7 +33,7 @@ export const possibilities_conditionalized:[conditionObj, string][] = [
     [ {date: [[0,0,0], [3,32,2023]], random: .25}, "Starfield community beta when?"],
     [ {random: .05}, "Well, well, well. You must be perty lucky!" ],
     [ {random: .001}, "WHAT IN OBLIVION?!!! <b>WHY ARE YOU SO LUCKY?!!</b>" ],
-    [ {random: .25}, "Known Troublemakers:<ul><li>Lively</li><li>Lively&rsquo;s Cat</li><li>Lively Again</li></ul>- BigBizkit" ],
+    [ {random: .25}, "Known Troublemakers:<ul><li>Lively</li><li>Lively&rsquo;s Cat</li><li>Lively Again</li></ul>&mdash; BigBizkit" ],
     [ {random: .75}, "Nexus Mods is the best!"],
     [ {random: .5}, "And then I&hellip; I would be named&hellip; <i><b>TIM!</b></i><br />The horrors would never cease!" ],
     [ {random: .75}, "Greetings, Dragonborn."],
@@ -306,6 +306,7 @@ export const possibilities_Generic = [
     "This will all make sense when I am older.",
     "I&rsquo;m busy and you can&rsquo;t come in.",
     "Don&rsquo;t sweat the petty stuff and don&rsquo;t pet the sweaty stuff.",
+    "The man who does not read has no advantage over the man who cannot read.<br />&mdash; Mark Twain",
 ];
 
 

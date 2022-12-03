@@ -747,11 +747,12 @@ export class FOMOD extends XMLElement {
             this.infoInstanceElement.removeAttribute("xsi:noNamespaceSchemaLocation");
 
         // Set actual data
-        this.infoInstanceElement.getOrCreateChild("Name").textContent = this.meta_name;
-        this.infoInstanceElement.getOrCreateChild("Author").textContent = this.meta_author;
-        this.infoInstanceElement.getOrCreateChild("Id").textContent = this.meta_id.toString();
-        this.infoInstanceElement.getOrCreateChild("Website").textContent = this.getURLAsString();
-        this.infoInstanceElement.getOrCreateChild("Version").textContent = this.meta_version;
+        const url = this.getURLAsString();
+        if (this.meta_name)    this.infoInstanceElement.getOrCreateChild("Name").textContent    = this.meta_name;
+        if (this.meta_author)  this.infoInstanceElement.getOrCreateChild("Author").textContent  = this.meta_author;
+        if (this.meta_id)      this.infoInstanceElement.getOrCreateChild("Id").textContent      = this.meta_id.toString();
+        if (url)               this.infoInstanceElement.getOrCreateChild("Website").textContent = url;
+        if (this.meta_version) this.infoInstanceElement.getOrCreateChild("Version").textContent = this.meta_version;
 
         return this.infoInstanceElement;
     }

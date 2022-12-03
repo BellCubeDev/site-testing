@@ -131,8 +131,46 @@ redirect_from:
                 <input class="mdl-textfield__input" type="text">
                 <label class="mdl-textfield__label">Mod Name</label>
             </div>
+
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
+                <input class="mdl-textfield__input" type="number" pattern="\d+">
+                <label class="mdl-textfield__label">Mod ID</label>
+            </div>
             <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
-                The name of the library. For instance, <code>Vanilla</code>.
+                This field is not technically used by Mod Organizer 2 or Vortex. That said, MO2's parser does assign the value to an unused variable that shares a name with the Nexus Mods Page ID elsewhere in its code.
+                <br><hr>
+                This value must be a pure number. It is recommended that you create a mod page and use the page's Nexus Mods ID for this field.
+            </p></div>
+
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
+                <input class="mdl-textfield__input" type="text">
+                <label class="mdl-textfield__label">Mod Author</label>
+            </div>
+            <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
+                The author of the mod.
+                <br><hr>
+                This value is only read and displayed during FOMOD installation by Mod Organizer 2. It is not used by Vortex.
+            </p></div>
+
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
+                <input class="mdl-textfield__input" type="version">
+                <label class="mdl-textfield__label">Mod Version</label>
+            </div>
+            <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
+                The version of the mod. I suggest using <a href="https://semver.org/">Semantic Versioning</a> (aka SemVer) for this field.
+                <br><hr>
+                This value is only read and displayed during FOMOD installation by Mod Organizer 2. It is not used by Vortex.
+            </p></div>
+
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
+                <input class="mdl-textfield__input" type="url" pattern="^([a-z0-9+.-]+):(?:\/\/(?:((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*)@)?((?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*)(?::(\d*))?(\/(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?|(\/?(?:[a-z0-9-._~!$&'()*+,;=:@]|%[0-9A-F]{2})+(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?)(?:\?((?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*))?(?:#(?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*)?$">
+                <label class="mdl-textfield__label">Website</label>
+                <span class="mdl-textfield__error">If specified, this must be a valid URI</span>
+            </div>
+            <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
+                A link to the mod's website.
+                <br><hr>
+                This value is only read and accessible as a hyperlink during FOMOD installation by Mod Organizer 2. It is not used by Vortex.
             </p></div>
         </div>
     </div>
