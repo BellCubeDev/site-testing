@@ -669,13 +669,13 @@ $$ | \_/ $$ |\$$$$$$  |\$$$$$$$ |\$$$$$$$ |$$ |$$  /     $$$$$$$  |$$ |\$$$$$$$ 
 
 
 
-export class bcdModalDialog extends EventTarget {
+export class BCDModalDialog extends EventTarget {
     static readonly cssClass = 'js-bcd-modal';
     static readonly asString = 'BellCubic Modal';
 
     static obfuscator: HTMLDivElement;
-    static modalsToShow: bcdModalDialog[] = [];
-    static shownModal: bcdModalDialog|null = null;
+    static modalsToShow: BCDModalDialog[] = [];
+    static shownModal: BCDModalDialog|null = null;
 
     element_:HTMLDialogElement;
     closeByClickOutside:boolean;
@@ -686,20 +686,24 @@ export class bcdModalDialog extends EventTarget {
 
         this.element_ = element;
 
-        const body = document.documentElement.getElementsByTagName('body')[0] ?? document.body;
+        this.element_.ariaModal = 'true';
+        this.element_.setAttribute('role', 'dialog');
+        this.element_.ariaHidden = 'true';
 
-        // Move element to the root (so it shows above everything else)
+        const body = document.body ?? document.documentElement.getElementsByTagName('body')[0];
+
+        // Move element to the top of the body (just one more thing to make sure it shows above everything else)
         body.prepend(element);
 
-        if (!bcdModalDialog.obfuscator) {
-            bcdModalDialog.obfuscator = document.createElement('div');
-            bcdModalDialog.obfuscator.classList.add(mdl.MaterialLayout.cssClasses.OBFUSCATOR, 'js-bcd-modal-obfuscator');
-            body.appendChild(bcdModalDialog.obfuscator);
+        if (!BCDModalDialog.obfuscator) {
+            BCDModalDialog.obfuscator = document.createElement('div');
+            BCDModalDialog.obfuscator.classList.add(mdl.MaterialLayout.cssClasses.OBFUSCATOR, 'js-bcd-modal-obfuscator');
+            body.appendChild(BCDModalDialog.obfuscator);
         }
 
         this.closeByClickOutside = !this.element_.hasAttribute('no-click-outside');
 
-        afterDelay(1000, function (this: bcdModalDialog) { // Lets the DOM settle and gives JavaScript a chance to modify the element
+        afterDelay(1000, function (this: BCDModalDialog) { // Lets the DOM settle and gives JavaScript a chance to modify the element
 
             const closeButtons = this.element_.getElementsByClassName('js-bcd-modal-close');
             for (const button of closeButtons) {
@@ -714,19 +718,19 @@ export class bcdModalDialog extends EventTarget {
 
         //console.debug("========================\nEvaluating modal queue...\n========================");
 
-        const willExit = {
-            shownModal: this.shownModal,
-            modalsToShow: this.modalsToShow,
-
-            shownModal_bool: !!this.modalsToShow.length,
-            modalsToShow_lengthBool: !this.modalsToShow.length
-        };
+        //const willExit = {
+        //    shownModal: this.shownModal,
+        //    modalsToShow: this.modalsToShow,
+        //
+        //    shownModal_bool: !!this.modalsToShow.length,
+        //    modalsToShow_lengthBool: !this.modalsToShow.length
+        //};
         //console.debug('Will exit?', !!(this.shownModal || !this.modalsToShow.length), willExit);
 
         if (this.shownModal || !this.modalsToShow.length) return;
 
-        const modal = bcdModalDialog.modalsToShow.shift(); if (!modal) return this.evalQueue();
-        bcdModalDialog.shownModal = modal;
+        const modal = BCDModalDialog.modalsToShow.shift(); if (!modal) return this.evalQueue();
+        BCDModalDialog.shownModal = modal;
 
         //console.debug("Showing modal:", modal);
 
@@ -734,9 +738,9 @@ export class bcdModalDialog extends EventTarget {
     }
 
     show(){
-        bcdModalDialog.modalsToShow.push(this);
+        BCDModalDialog.modalsToShow.push(this);
         //console.debug("[BCD-MODAL] Modals to show (after assignment):", bcdModalDialog.modalsToShow);
-        bcdModalDialog.evalQueue();
+        BCDModalDialog.evalQueue();
         //console.debug("[BCD-MODAL] Modals to show (after eval):", bcdModalDialog.modalsToShow);
     }
 
@@ -755,15 +759,16 @@ export class bcdModalDialog extends EventTarget {
 
     private show_forReal() {
         //console.debug("[BCD-MODAL] Showing modal:", this);
-        /* 'Before' Event */ if (!this.dispatchEvent(bcdModalDialog.beforeShowEvent) || !this.element_.dispatchEvent(bcdModalDialog.beforeShowEvent)) return;
+        /* 'Before' Event */ if (!this.dispatchEvent(BCDModalDialog.beforeShowEvent) || !this.element_.dispatchEvent(BCDModalDialog.beforeShowEvent)) return;
 
-        bcdModalDialog.obfuscator.classList.add(mdl.MaterialLayout.cssClasses.IS_DRAWER_OPEN);
-        bcdModalDialog.obfuscator.addEventListener(window.clickEvt, this.boundHideFunction);
+        BCDModalDialog.obfuscator.classList.add(mdl.MaterialLayout.cssClasses.IS_DRAWER_OPEN);
+        BCDModalDialog.obfuscator.addEventListener(window.clickEvt, this.boundHideFunction);
 
+        this.element_.ariaHidden = 'false';
         this.element_.show();
         //console.debug("[BCD-MODAL] Modal shown:", this);
 
-        /* 'After' Event */  if (this.dispatchEvent(bcdModalDialog.afterShowEvent)) this.element_.dispatchEvent(bcdModalDialog.afterShowEvent);
+        /* 'After' Event */  if (this.dispatchEvent(BCDModalDialog.afterShowEvent)) this.element_.dispatchEvent(BCDModalDialog.afterShowEvent);
 
         //console.debug("[BCD-MODAL] Modals to show (after show):", bcdModalDialog.modalsToShow);
     }
@@ -787,22 +792,23 @@ export class bcdModalDialog extends EventTarget {
     hide(evt?: Event){
         //console.debug("[BCD-MODAL] Hiding modal:", this);
         if (evt) evt.stopImmediatePropagation();
-        /* 'Before' Event */ if (!this.dispatchEvent(bcdModalDialog.beforeHideEvent) ||!this.element_.dispatchEvent(bcdModalDialog.beforeHideEvent)) return;
+        /* 'Before' Event */ if (!this.dispatchEvent(BCDModalDialog.beforeHideEvent) ||!this.element_.dispatchEvent(BCDModalDialog.beforeHideEvent)) return;
 
+        this.element_.ariaHidden = 'true';
         this.element_.close();
 
-        bcdModalDialog.obfuscator.classList.remove(mdl.MaterialLayout.cssClasses.IS_DRAWER_OPEN);
-        bcdModalDialog.obfuscator.removeEventListener(window.clickEvt, this.boundHideFunction);
+        BCDModalDialog.obfuscator.classList.remove(mdl.MaterialLayout.cssClasses.IS_DRAWER_OPEN);
+        BCDModalDialog.obfuscator.removeEventListener(window.clickEvt, this.boundHideFunction);
 
-        bcdModalDialog.shownModal = null;
+        BCDModalDialog.shownModal = null;
 
-        /* 'After' Event */  if (this.dispatchEvent(bcdModalDialog.afterHideEvent)) this.element_.dispatchEvent(bcdModalDialog.afterHideEvent);
+        /* 'After' Event */  if (this.dispatchEvent(BCDModalDialog.afterHideEvent)) this.element_.dispatchEvent(BCDModalDialog.afterHideEvent);
 
-        bcdModalDialog.evalQueue();
+        BCDModalDialog.evalQueue();
     }
 
 }
-bcdComponents.push(bcdModalDialog);
+bcdComponents.push(BCDModalDialog);
 
 
 /*$$$$$\                                      $$\
@@ -862,7 +868,7 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
         }
 
         if (this.forElement_) {
-            this.forElement_.setAttribute('aria-haspopup', 'true');
+            this.forElement_.ariaHasPopup = 'true';
 
             this.forElement_.addEventListener(window.clickEvt, this.boundForClick_);
             this.forElement_.addEventListener('keydown', this.boundForKeydown_);
@@ -882,6 +888,7 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
 
         this.selectionTextElements = this.forElement_?.getElementsByClassName('bcd-dropdown_value') as HTMLCollectionOf<HTMLElement>;
 
+        this.hide();
         this.updateOptions();
 
         this.element_.addEventListener('focusout', this.focusOutHandler.bind(this));
@@ -982,10 +989,11 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
 
         this.element_.ariaHidden = 'false';
         this.element_.removeAttribute('disabled');
+        if (this.forElement_) this.forElement_.ariaExpanded = 'true';
 
         for (const item of this.optionElements) item.tabIndex = 0;
 
-        this.forElement_?.targetingComponents_proto?.tooltip?.forceClose();
+        this.forElement_?.targetingComponents_proto?.tooltip?.hide();
 
         super.show(evt);
     }
@@ -1003,6 +1011,7 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
 
         this.element_.ariaHidden = 'true';
         this.element_.setAttribute('disabled', '');
+        if (this.forElement_) this.forElement_.ariaExpanded = 'false';
 
         for (const item of this.optionElements) item.tabIndex = -1;
 
@@ -1067,7 +1076,7 @@ $$$$$$$$\           $$\                        $$$$$$\    $$\                $$$
 
 */
 
-export class bcdTabButton extends mdl.MaterialButton {
+export class BCDTabButton extends mdl.MaterialButton {
     static readonly asString = 'BCD - Tab List Button';
     static readonly cssClass = 'js-tab-list-button';
 
@@ -1129,11 +1138,11 @@ export class bcdTabButton extends mdl.MaterialButton {
         for (const sibling of siblingsAndSelf) {
             if (sibling === this.element_) {
                 sibling.classList.add('active');
-                sibling.setAttribute('aria-selected', 'true');
+                sibling.setAttribute('aria-pressed', 'true');
             }
             else {
                 sibling.classList.remove('active');
-                sibling.setAttribute('aria-selected', 'false');
+                sibling.setAttribute('aria-pressed', 'false');
             }
         }
 
@@ -1179,16 +1188,16 @@ export class bcdTabButton extends mdl.MaterialButton {
 
         if (this.setAnchor) {
             // Update the URL hash - if the tab is not the first tab, then add the tab name to the hash. Otherwise, remove the hash.
-            bcdTabButton.anchorToSet = tabNumber == 0 ? '' : `#tab-${this.name}`.toLowerCase();
-            bcdTabButton.setAnchorIn3AnimFrames();
+            BCDTabButton.anchorToSet = tabNumber == 0 ? '' : `#tab-${this.name}`.toLowerCase();
+            BCDTabButton.setAnchorIn3AnimFrames();
         }
     }
 
     /** Sets `window.location.hash` to the value of `bcdTabButton.anchorToSet` in three animation frames. */
     static setAnchorIn3AnimFrames() {
         requestAnimationFrame( () => { requestAnimationFrame( () => { requestAnimationFrame( () => {
-                    if (bcdTabButton.anchorToSet === '') window.history.replaceState(null, '', window.location.pathname);
-                    else window.location.hash = bcdTabButton.anchorToSet;
+                    if (BCDTabButton.anchorToSet === '') window.history.replaceState(null, '', window.location.pathname);
+                    else window.location.hash = BCDTabButton.anchorToSet;
         });                          });                            });
     }
 
@@ -1203,7 +1212,7 @@ export class bcdTabButton extends mdl.MaterialButton {
         }
     }
 }
-bcdComponents.push(bcdTabButton);
+bcdComponents.push(BCDTabButton);
 
 
 
@@ -1236,6 +1245,7 @@ export class BCDTooltip {
 
     constructor(element: HTMLElement) {
         this.element = element;
+        element.setAttribute('role', 'tooltip'); element.setAttribute('aria-role', 'tooltip');
 
         this.gapBridgeElement = document.createElement('div');
         this.gapBridgeElement.classList.add('js-bcd-tooltip_gap-bridge');
@@ -1293,6 +1303,11 @@ export class BCDTooltip {
         this.boundElement.addEventListener('touchcancel', boundTouch, {passive: true}); this.element.addEventListener('touchcancel', boundTouch, {passive: true});
     }
 
+    handleKeyDown(event: KeyboardEvent): void {
+        if (event.key === 'Escape') this.hide();
+    }
+    readonly boundKeyDown = this.handleKeyDown.bind(this);
+
     handleTouch(event: TouchEvent) {
         if (event.targetTouches.length > 0) this.handleHoverEnter(undefined, true);
         else this.handleHoverLeave();
@@ -1306,27 +1321,41 @@ export class BCDTooltip {
             || targetElement.targetingComponents_proto?.dropdown?.container_.classList.contains('is-visible')
         )) return;
 
-        this.element.classList.add('active_');
+        this.showPart1();
 
-        afterDelay(bypassWait ? 0 : 600, ()=> {
+        afterDelay(bypassWait ? 0 : 600, function(this: BCDTooltip) {
             if (!this.element.classList.contains('active_')) return;
-            this.element.classList.add('active');
-            this.element.addEventListener('transitionend', this.setPosition.bind(this), {once: true});
-            this.setPosition();
-        });
+            this.showPart2();
+        }.bind(this));
 
     }
 
-    forceClose() {
-        this.handleHoverLeave();
+    showPart1() {
+        this.element.classList.add('active_');
+        window.addEventListener('keydown', this.boundKeyDown, {once: true});
     }
 
-    handleHoverLeave(event?: MouseEvent|FocusEvent) {
+    showPart2() {
+        this.element.classList.add('active');
+        this.element.addEventListener('transitionend', this.setPosition.bind(this), {once: true});
+        this.setPosition();
+    }
+
+    show() {
+        this.showPart1();
+        this.showPart2();
+    }
+
+    handleHoverLeave(event?: MouseEvent|FocusEvent) { this.hide(); }
+
+    hide() {
+        window.removeEventListener('keydown', this.boundKeyDown);
+
         this.element.classList.remove('active_');
+
         afterDelay(10, () => {
-            if (!this.element.classList.contains('active_')) {
+            if (!this.element.classList.contains('active_'))
                 this.element.classList.remove('active');
-            }
         });
     }
 
