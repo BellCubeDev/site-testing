@@ -18,10 +18,10 @@ $$ |  $$ |$$ |  $$ | \____$$\   $$ |$$\ $$ |      $$  __$$ |$$ |        $$ |$$\ 
 $$ |  $$ |$$$$$$$  |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |\$$$$$$$\   \$$$$  |$$$$$$$  |
 \__|  \__|\_______/ \_______/    \____/ \__|       \_______| \_______|   \____/ \______*/
 
-export abstract class XMLElement implements updatableObject {
+export abstract class XMLElement implements main.updatableObject {
     instanceElement: Element | undefined;
 
-    objectsToUpdate: updatableObject[] = [];
+    objectsToUpdate: main.updatableObject[] = [];
 
     updateObjects() {
         this.objectsToUpdate.forEach(  (obj) => obj.update()  );
@@ -36,10 +36,6 @@ export abstract class XMLElement implements updatableObject {
 
     asModuleXML?(document: XMLDocument): Element;
     asInfoXML?(document: XMLDocument): Element;
-}
-
-export abstract class updatableObject {
-    abstract update(): any;
 }
 
 

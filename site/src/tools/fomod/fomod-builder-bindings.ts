@@ -1,9 +1,10 @@
 /** This file contains code to update the information displayed within the FOMOD Builder UI
  */
 
-import { updatableObject, FOMOD } from './fomod-builder-classifications.js';
+import { updatableObject } from './fomod-builder.js';
+import { FOMOD } from './fomod-builder-classifications.js';
 
-export class modName extends updatableObject {
+export class modName implements updatableObject {
     parent: FOMOD;
 
     /** The name of the mod */
@@ -12,7 +13,6 @@ export class modName extends updatableObject {
     input: HTMLInputElement;
 
     constructor(parent: FOMOD) {
-        super();
         this.parent = parent;
 
         this.input = document.getElementById("metadata-mod-name")!.getOrCreateChild('input');
