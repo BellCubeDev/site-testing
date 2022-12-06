@@ -6,7 +6,22 @@
         {
             "label": "Set Up Environment",
             "type": "shell",
-            "command": ".vscode\\setupEnv.bat",
+
+            "command": "${workspaceFolder}\\.vscode\\setupEnv.ps1",
+
+            "options": {
+                "shell": {
+                    "executable": "powershell.exe",
+                    "args": ["-ExecutionPolicy", "Bypass", "-File"]
+                }
+            },
+
+            "windows": {
+                "options": {
+                    "cwd": "C:\\" // Workaround for (what I presume to be) a bug in code-server
+                }
+            },
+
             "presentation": {
                 "reveal": "never",
                 "echo": false,
@@ -30,7 +45,21 @@
             // TypeScript Watch from custom .bat
             "label": "TypeScript Watch",
             "type": "shell",
-            "command": ".vscode\\watch.bat",
+
+            "command": "${workspaceFolder}\\.vscode\\watch.ps1",
+
+            "options": {
+                "shell": {
+                    "executable": "powershell.exe",
+                    "args": ["-ExecutionPolicy", "Bypass", "-File"]
+                }
+            },
+
+            "windows": {
+                "options": {
+                    "cwd": "C:\\" // Workaround for (what I presume to be) a bug in code-server
+                }
+            },
 
             "problemMatcher": [
                 "$node-sass",
@@ -76,7 +105,22 @@
         {
             "label": "Serve Site",
             "type": "shell",
-            "command": ".vscode\\serve.bat",
+
+            "command": "${workspaceFolder}\\.vscode\\serve.ps1",
+
+            "options": {
+                "shell": {
+                    "executable": "powershell.exe",
+                    "args": ["-ExecutionPolicy", "Bypass", "-File"]
+                }
+            },
+
+            "windows": {
+                "options": {
+                    "cwd": "C:\\" // Workaround for (what I presume to be) a bug in code-server
+                }
+            },
+
             "isBackground": true,
 
             "problemMatcher": [{
@@ -119,7 +163,15 @@
         {
             "label": "Open Site Locally (SERVE)",
             "type": "shell",
-            "command": "start http://127.0.0.1:4000/site-testing/",
+
+            "command": "xdg-open http://http://127.0.0.1:4000/site-testing/",
+            "windows": {
+                "command": "start http://127.0.0.1:4000/site-testing/",
+
+                "options": {
+                    "cwd": "C:\\" // Workaround for (what I presume to be) a bug in code-server
+                }
+            },
 
             "group": {
                 "kind": "test",
@@ -148,7 +200,22 @@
         {
             "label": "Build Site",
             "type": "shell",
-            "command": ".vscode\\build.bat",
+
+            "command": "${workspaceFolder}\\.vscode\\build.ps1",
+
+            "options": {
+                "shell": {
+                    "executable": "powershell.exe",
+                    "args": ["-ExecutionPolicy", "Bypass", "-File"]
+                }
+            },
+
+            "windows": {
+                "options": {
+                    "cwd": "C:\\" // Workaround for (what I presume to be) a bug in code-server
+                }
+            },
+
             "problemMatcher": [
                 "$tsc"
             ],
@@ -171,6 +238,34 @@
             "dependsOn": [
                 "Set Up Environment",
             ]
+        },
+
+        {
+            "label": "Get IP Address",
+            "type": "shell",
+
+            "command": "${workspaceFolder}\\.vscode\\getIP.ps1",
+            "windows": {
+                "options": {
+                    "cwd": "C:\\" // Workaround for (what I presume to be) a bug in code-server
+                }
+            },
+
+            "group": { "kind": "test" },
+            "detail": "Determine your machine's local IP address",
+            "presentation": {
+                "echo": false,
+                "reveal": "always",
+                "focus": true,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true,
+                "close": false
+            },
+            "icon": {
+                "color": "terminal.ansiWhite",
+                "id": "globe"
+            },
         }
     ]
 }

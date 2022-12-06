@@ -1,7 +1,7 @@
 /** This file contains code to update the information displayed within the FOMOD Builder UI
  */
 
-import { updatableObject, FOMOD } from './fomod-builder-classifications';
+import { updatableObject, FOMOD } from './fomod-builder-classifications.js';
 
 export class modName extends updatableObject {
     parent: FOMOD;

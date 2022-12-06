@@ -190,5 +190,21 @@
 
 		"files.trimFinalNewlines": true,
 		"files.trimTrailingWhitespace": true
+	},
+	"extensions": {
+		"recommendations": [
+			"streetsidesoftware.code-spell-checker",
+			"ginfuru.ginfuru-vscode-jekyll-syntax",
+			"christian-kohler.npm-intellisense",
+			"christian-kohler.path-intellisense",
+			"natqe.reload",
+			"gencer.html-slim-scss-css-class-completion",
+			"adamwalzer.scss-lint",
+			"somewhatstationery.some-sass",
+			"pmneo.tsimporter",
+			"dbaeumer.vscode-eslint",
+			"visualstudioexptteam.vscodeintellicode",
+			"sissel.shopify-liquid"
+		]
 	}
 }
