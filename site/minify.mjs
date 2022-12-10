@@ -1,5 +1,3 @@
-/* eslint-disable sonarjs/no-duplicate-string */
-
 import * as path from 'path';
 import * as afs from 'fs/promises';
 
@@ -96,6 +94,7 @@ async function evalFilesInDir(dirPath) {
     @param {string} thisPath the path of the file or directory to evaluate
 */
 async function evalFileOrDir(thisPath) {
+    console.log('Evaluating file or directory:', thisPath);
     //console.log('Evaluating file or directory:', thisPath);
     if (path.basename(thisPath).startsWith('_')) return;
 
