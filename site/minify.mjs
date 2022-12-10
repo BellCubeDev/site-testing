@@ -99,10 +99,14 @@ async function evalFileOrDir(thisPath) {
     if (path.basename(thisPath).startsWith('_')) return;
 
     const stat = await afs.lstat(thisPath);
-    if (stat.isDirectory()) return evalFilesInDir(thisPath);
+    if (stat.isDirectory()) {
+        console.log('Evaluating directory:', thisPath);
+        return evalFilesInDir(thisPath);
+    }
 
     const [,isSassDir,isOriginal, isMinified, ext] = thisPath.match(/(sass_modules)|(?:\.(original))?(?:\.(min))?\.([^.]+)$/) || [];
     //console.log('original:', original, 'minified:', minified, 'ext:', ext);
+    console.log('Evaluating file with...', JSON.stringify({path: thisPath, isSassDir, isOriginal, isMinified, ext}, undefined, 2));
     if (isSassDir || isOriginal || isMinified || !ext) return;
 
     switch (ext) {
@@ -115,7 +119,7 @@ async function evalFileOrDir(thisPath) {
     @param {string} filePath
 */
 async function minifyJSFile(filePath) {
-    if (filePath.endsWith('.min.js') || filePath.endsWith('.original.js')) return;
+    if ((filePath.endsWith('.min.js') && !filePath.includes('highlight_js')) || filePath.endsWith('.original.js')) return;
 
     // Check if we've already processed this file
     const stat = await afs.stat(filePath);
