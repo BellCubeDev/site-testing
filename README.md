@@ -37,9 +37,10 @@ Set up a repository on GitHub and run the workflow '*Build & Deploy Site*' to bu
 
 ~~Figure out how the NPM packages and Ruby gems work and how to use them to build the site. Have fun!~~
 
-Actually, here. Install NPM and RubyGems, then run these commands in the `site` directory:
+Install NPM and RubyGems, then run these commands in the `site` directory:
 
 ```bash
+cd site
 
 npm install
 
@@ -48,4 +49,43 @@ bundle install
 
 ```
 
-More instructions soon™
+From there, copy the `site` directory (optionally excluding JavaScript and TypeScript) to the folder `_generated\ts_out`. The following commands will accomplish that for you:
+
+### Bash
+```bash
+rsync -t -r -v site/src/* _generated/ts_out/
+```
+
+### Windows (Batch/PowerShell)
+```powershell
+robocopy site\src\ _generated\ts_out\ /s /purge /xf *.js *.ts
+```
+
+After that, set the environment variable `minifyDir` to the path of the `_generated\ts_out` directory and run the `minify` script. This will minify JavaScript and compile Sass to minified CSS. The following commands will accomplish that for you:
+
+### Bash
+```bash
+export minifyDir=_generated/ts_out
+cd site
+node minify.mjs
+```
+
+### PowerShell
+```powershell
+$env:minifyDir = "_generated\ts_out"
+cd site
+node minify.mjs
+```
+
+### Batch
+```bat
+set minifyDir=_generated\ts_out
+cd site
+node minify.mjs
+```
+
+Finally, run the `jekyll build` command in the `site` directory to build the site. The following commands will accomplish that for you:
+
+```bash
+bundle exec jekyll build --config site/_config.yml --source _generated/ts_out/ --destination _generated/_jekyll-out/ --verbose --safe --trace
+```
