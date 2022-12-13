@@ -27,7 +27,7 @@ To build this project, you've got three options:
 
 ## 1. The Simple Way (Windows Only)
 
-If you haven't already, install Node Package Manager (NPM) and RubyGems. Once you've done that, open a command prompt in the project's root directory and run the command `.vscode\build.bat`
+If you haven't already, install Node Package Manager (NPM) and RubyGems. Once you've done that, open a command prompt or PowerShell window in the project's root directory and run the command `.vscode\build.ps1`
 
 ## 2. The Slightly-More-Complicated Way (GitHub Actions)
 
@@ -35,7 +35,7 @@ Set up a repository on GitHub and run the workflow '*Build & Deploy Site*' to bu
 
 ## 3. The Stupidly Complex Way (DIY)
 
-Figure out how the NPM packages and Ruby gems work and how to use them to build the site. Have fun!
+~~Figure out how the NPM packages and Ruby gems work and how to use them to build the site. Have fun!~~
 
 Actually, here. Install NPM and RubyGems, then run these commands in the `site` directory:
 
