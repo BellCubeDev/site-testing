@@ -4,6 +4,18 @@ cd $PSScriptRoot\..\site
 
 Write-Host
 Write-Host
+Write-Host "Moving non-JS files to output..." -ForegroundColor cyan
+Write-Host
+
+try {
+    robocopy src\ ..\_generated\ts_out\ /s /purge /xf *.js *.ts
+} catch {
+    Write-Host  "Copying files to ts_out\ failed." -ForegroundColor red
+    exit /b 1
+}
+
+Write-Host
+Write-Host
 Write-Host "Compiling TypeScript files..." -ForegroundColor cyan
 Write-Host
 
@@ -18,7 +30,7 @@ try {
 
 Write-Host
 Write-Host
-Write-Host "Minifying JavaScript files..." -ForegroundColor cyan
+Write-Host "Minifying files..." -ForegroundColor cyan
 Write-Host
 
 try {

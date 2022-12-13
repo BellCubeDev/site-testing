@@ -677,7 +677,7 @@ export class BCDModalDialog extends EventTarget {
     static modalsToShow: BCDModalDialog[] = [];
     static shownModal: BCDModalDialog|null = null;
 
-    element_:HTMLDialogElement;
+    element_:HTMLDialogElement|HTMLElement;
     closeByClickOutside:boolean;
 
     constructor(element:HTMLDialogElement) {
@@ -765,7 +765,9 @@ export class BCDModalDialog extends EventTarget {
         BCDModalDialog.obfuscator.addEventListener(window.clickEvt, this.boundHideFunction);
 
         this.element_.ariaHidden = 'false';
-        this.element_.show();
+
+        if ('show' in this.element_) this.element_.show();
+        else this.element_.setAttribute('open', '');
         //console.debug("[BCD-MODAL] Modal shown:", this);
 
         /* 'After' Event */  if (this.dispatchEvent(BCDModalDialog.afterShowEvent)) this.element_.dispatchEvent(BCDModalDialog.afterShowEvent);
@@ -795,7 +797,9 @@ export class BCDModalDialog extends EventTarget {
         /* 'Before' Event */ if (!this.dispatchEvent(BCDModalDialog.beforeHideEvent) ||!this.element_.dispatchEvent(BCDModalDialog.beforeHideEvent)) return;
 
         this.element_.ariaHidden = 'true';
-        this.element_.close();
+
+        if ('close' in this.element_) this.element_.close();
+        else this.element_.removeAttribute('open');
 
         BCDModalDialog.obfuscator.classList.remove(mdl.MaterialLayout.cssClasses.IS_DRAWER_OPEN);
         BCDModalDialog.obfuscator.removeEventListener(window.clickEvt, this.boundHideFunction);

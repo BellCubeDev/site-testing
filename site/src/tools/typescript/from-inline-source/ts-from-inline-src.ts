@@ -1,4 +1,4 @@
-import hljs from '../../../assets/site/highlight_js/highlight.js';
+import hljs from '../../../assets/site/highlight_js/es/highlight.js';
 
 // HLJS Language Definition
 import '../../../assets/site/highlight_js/languages/typescript.min.js';

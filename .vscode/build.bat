@@ -2,7 +2,16 @@
 cd %~dp0..\site
 
 :: Batch script assumes NPM and RubyGems are installed
+ECHO.
+ECHO.
+ECHO [36mMoving non-JS files to output...[0m
+ECHO.
 
+robocopy src\ ..\_generated\ts_out\ /s /purge /xf *.js *.ts
+if not errorlevel 0 (
+    ECHO  [101mCopying files to ts_out\ failed.[0m
+    exit /b 1
+)
 ECHO.
 ECHO.
 ECHO [36mCompiling TypeScript files...[0m
@@ -18,7 +27,7 @@ if not errorlevel 0 (
 
 ECHO.
 ECHO.
-ECHO [36mMinifying JavaScript files...[0m
+ECHO [36mMinifying files...[0m
 ECHO.
 
 call node "%~dp0\..\site\minify.mjs"

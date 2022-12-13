@@ -9,10 +9,12 @@
 
     margin: auto;
     position: fixed;
+
     top: 64px;
     left: 32px;
     right: 32px;
     bottom: 128px;
+
     overflow-wrap: break-word;
     overflow: auto;
 
@@ -25,9 +27,15 @@
     border-radius: 8px;
     border-width: 5px;
     border-color: #0af;
+    border-style: solid;
+
     background-color: #333;
+
     box-shadow: 0 0 10px #000;
+
     z-index: 256;
+
+    padding: 16px;
 }
 
 .js-bcd-modal-obfuscator {
@@ -48,4 +56,8 @@
     justify-content: flex-end;
     align-items: center;
     align-content: center;
+
+    button {
+        width: 2in;
+    }
 }
