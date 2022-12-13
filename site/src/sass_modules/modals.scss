@@ -23,9 +23,8 @@
     max-width: 80%;
     max-height: 80%;
 
-    // Resolves issues in Safari
+    // Resolves height issues in Safari
     height: min-content;
-    width: min-content;
 
     border-radius: 8px;
     border-width: 5px;
