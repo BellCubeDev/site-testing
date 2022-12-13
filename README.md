@@ -1,3 +1,5 @@
+[![Build & Deploy Site](https://github.com/BellCubeDev/site-testing/actions/workflows/github-pages-build-and-deploy.yml/badge.svg?branch=main&event=push)](https://github.com/BellCubeDev/site-testing/actions/workflows/github-pages-build-and-deploy.yml)
+
 # BellCubeDev.GitHub.IO
 
 This repository is the website for BellCube Dev, a mod author and occasionally a utility developer.
