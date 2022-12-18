@@ -253,13 +253,18 @@ redirect_from:
                             -->
 
                             <!-- Option Image -->
-                            <img class="builder-steps-opt-image" src="/site-testing/assets/site/images/example-image.png" />
+                            <div class="builder-steps-opt-image">
+                                <img src="/site-testing/assets/site/images/example-image.png" />
+                                <div class="js-relative-file-picker--container">
+                                    <input class="bcd-builder-input js-relative-file-picker" placeholder="Option Image" value="assets/site/images/example-image.png" />
+                                </div>
+                            </div>
 
                             <div class="builder-steps-opt-body-left">
 
                                 <!-- The Backend Name will identify the plugin entirely on its own in the XML, so it better be good! -->
-                                <div class="item-with-fake-label"><h4>Backend Name</h4>
-                                    <input class="bcd-builder-input" placeholder="Backend Name" value="vers_singleTexture" />
+                                <div class="item-with-fake-label"><h4>Option Name</h4>
+                                    <input class="bcd-builder-input" placeholder="Backend Name" value="Single Texture" />
                                 </div>
 
                                 <!-- Option Description -->
@@ -268,24 +273,24 @@ redirect_from:
                                 </div>
 
                                 <!-- Plugin Type -->
-                                <div class="item-with-fake-label item-with-fake-label--one-liner"><h4>Default Type:</h4>
+                                <div class="item-with-fake-label item-with-fake-label--one-liner"><h4>Default Selection Type:</h4>
                                     <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
                                     <menu class="bcd-dropdown-option-state mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect mdl-js-ripple-effect--ignore-events"></menu>
                                 </div>
 
-                                <div class="item-with-fake-label"><h4>Type Conditions</h4>
+                                <div class="item-with-fake-label"><h4>Selection Type Conditions</h4>
                                     <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect" onclick="window.FOMODBuilder.ui.openTypeConditions(this)">
                                         Edit
                                     </button>
                                 </div>
 
                                 <!-- Condition Flags -->
-                                <div class="item-with-fake-label"><h4>Condition Flags</h4>
+                                <div class="item-with-fake-label"><h4>Condition Flags to Set</h4>
                                     <div class="builder-steps-opt-set-flags"></div>
                                 </div>
 
                                 <!-- Files -->
-                                <div class="item-with-fake-label"><h4>File Installs</h4>
+                                <div class="item-with-fake-label"><h4>Files & Folders to Install</h4>
                                     <div class="builder-steps-opt-files"></div>
                                 </div>
 

@@ -117,7 +117,7 @@ export async function save() {
         window.FOMODBuilder.directory = picked;
     }
 
-    const fomodFolder = (await window.FOMODBuilder.directory.childDirsC['fomod']!);
+    const fomodFolder = (await window.FOMODBuilder.directory.childDirsC['fomod'])!;
 
     const fomodInfo_ = fomodFolder.childFilesC['Info.xml']!;
     const fomodModule_ = fomodFolder.childFilesC['ModuleConfig.xml']!;

@@ -133,7 +133,7 @@ linters:
       'ms', 's',                               # Duration
       'Hz', 'kHz',                             # Frequency
       'dpi', 'dpcm', 'dppx',                   # Resolution
-      '%']                                     # Other
+      '%', 'cqmin']                                     # Other
     properties: {}
 
   PseudoElement:

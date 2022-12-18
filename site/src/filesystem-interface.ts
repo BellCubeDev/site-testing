@@ -28,7 +28,8 @@ function getFolderFromFolder<TCreate extends true|false>(this: folder, create: T
     return target[name]!;
 }
 
-function getFileFromFolder<TCreate extends true|false>(this: folder, create: TCreate, target: Record<string, Promise<FileSystemFileHandle>|null>, prop: string): TCreate extends true ? Promise<FileSystemFileHandle> : Promise<FileSystemFileHandle>|null {
+function getFileFromFolder<TCreate extends true|false>(this: folder, create: TCreate, target: Record<string, Promise<FileSystemFileHandle>|null>, prop: string):TCreate extends true ? Promise<FileSystemFileHandle> : Promise<FileSystemFileHandle>|null {
+
     // Make the name case-insensitive
     const name = prop.toLowerCase();
 

@@ -1,5 +1,6 @@
 import * as mdl from './assets/site/mdl/material.js';
 import * as quotes from './universal_quotes.js';
+import type * as fs from './filesystem-interface.js';
 
 /*
     Thanks to Patrick Gillespie for the great ASCII art generator!
@@ -1552,6 +1553,57 @@ export class bcdDynamicTextAreaWidth extends bcdDynamicTextArea_base {
 
 }
 bcdComponents.push(bcdDynamicTextAreaWidth);
+
+class RelativeFilePicker {
+    static readonly asString = 'BCD - Relative File Picker';
+    static readonly cssClass = 'js-relative-file-picker';
+
+    element: HTMLInputElement;
+    button: HTMLButtonElement;
+    relativeTo?: fs.folder|{directory: fs.folder};
+
+    constructor(element: HTMLInputElement, relativeTo?: fs.folder|{directory: fs.folder}) {
+        this.element = element;
+        this.relativeTo = relativeTo;
+
+        this.element.addEventListener('change', this.boundOnChange);
+        this.element.addEventListener('input', this.boundOnChange);
+
+
+        /* Create the following button:
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect js-relative-file-picker--button"
+                <i class="material-icons">edit_document</i>
+            </button>
+        */
+
+        this.button = document.createElement('button');
+        this.button.type = 'button';
+        this.button.classList.add(
+            /* MDL  */ 'mdl-button', 'mdl-js-button', 'mdl-button--fab', 'mdl-js-ripple-effect',
+            /* Mine */ 'js-relative-file-picker--button'
+        );
+
+        const icon = document.createElement('i');
+        icon.classList.add('material-icons');
+        icon.textContent = 'edit_document';
+
+        this.button.appendChild(icon);
+        this.element.after(this.button);
+
+        this.button.addEventListener(window.clickEvt, this.boundOnButtonClick);
+    }
+
+    onChange() {
+        console.log('onChange', this.element.value, this);
+    }
+    readonly boundOnChange = this.onChange.bind(this);
+
+    onButtonClick() {
+        console.log('onButtonClick', this.element.value, this);
+    }
+    readonly boundOnButtonClick = this.onButtonClick.bind(this);
+}
+bcdComponents.push(RelativeFilePicker);
 
 
 /*$$$$$\              $$\       $$\     $$\                                      $$$$$$\            $$\       $$\

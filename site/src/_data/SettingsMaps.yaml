@@ -52,4 +52,4 @@ FOMODBuilder:
   formatXML:
     type: bool
     name: Format XML
-    tooltip: Should the XML be formatted? This will make the raw file easier to read but will increase the size of the FOMOD.<br><hr>This setting has no impact on the functionality of the FOMOD.
+    tooltip: Should the XML be formatted? This will make the raw file easier to read but will increase the size of the generated files.<br><hr>This setting has no impact on the functionality of the FOMOD.
