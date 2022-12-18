@@ -82,8 +82,8 @@ jobs:
 
       - name: Minify JavaScript and CSS
         # Output dir: [in-place] $GITHUB_WORKSPACE/_generated/ts_out/
-        working-directory: $GITHUB_WORKSPACE/site
         run: |
+          cd $GITHUB_WORKSPACE/site
           echo Minification Directory: $minifyDir
           node minify.mjs
 
@@ -91,8 +91,8 @@ jobs:
 
       - name: Build with Jekyll
         # Output dir: $GITHUB_WORKSPACE/_generated/_jekyll-out/
-        working-directory: $GITHUB_WORKSPACE/site/
         run: |
+          cd $GITHUB_WORKSPACE/site/
           mkdir $GITHUB_WORKSPACE/_generated/_jekyll-out/
           bundle exec jekyll build --config $GITHUB_WORKSPACE/site/_config.yml --source $GITHUB_WORKSPACE/_generated/ts_out/ --destination $GITHUB_WORKSPACE/_generated/_jekyll-out/ --verbose --safe --trace
 
