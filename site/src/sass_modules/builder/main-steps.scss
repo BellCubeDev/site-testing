@@ -75,11 +75,14 @@
 
 .builder-steps-opt-image {
     height: 100%;
+
     display: grid;
-    justify-content: center;
-    align-items: start;
-    justify-items: stretch;
     grid-template-columns: 1fr auto 1fr;
+    grid-template-rows: auto 1fr;
+    align-items: start;
+
+    justify-content: center;
+    justify-items: stretch;
 
     > img {
         max-height: 50cqmin;
