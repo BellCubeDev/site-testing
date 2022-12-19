@@ -1560,11 +1560,25 @@ class RelativeFilePicker {
 
     element: HTMLInputElement;
     button: HTMLButtonElement;
-    relativeTo?: fs.folder|{directory: fs.folder};
+
+    relativeTo?: fs.folder|{directory: fs.folder}|string[];
+    get directory(): fs.folder|undefined {
+        if (!this.relativeTo) return undefined;
+        if ('handle' in this.relativeTo) return this.relativeTo;
+        if ('directory' in this.relativeTo) return this.relativeTo.directory;
+        return SettingsGrid.getSetting(this.relativeTo, 'directory');
+    }
 
     constructor(element: HTMLInputElement, relativeTo?: fs.folder|{directory: fs.folder}) {
         this.element = element;
         this.relativeTo = relativeTo;
+
+        if (!relativeTo) {
+            const relativeToAttr = element.getAttribute('relative-to');
+            if (!relativeToAttr) throw new Error('The relative file picker must have a relative-to attribute or have a folder specified at creation.');
+
+            this.relativeTo = relativeToAttr.split('.');
+        }
 
         this.element.addEventListener('change', this.boundOnChange);
         this.element.addEventListener('input', this.boundOnChange);
@@ -1598,8 +1612,22 @@ class RelativeFilePicker {
     }
     readonly boundOnChange = this.onChange.bind(this);
 
-    onButtonClick() {
+    async onButtonClick() {
         console.log('onButtonClick', this.element.value, this);
+
+        let fileHandle: FileSystemFileHandle;
+        try {
+            [fileHandle] = await window.showOpenFilePicker({multiple: false});
+        } catch (e) {
+            if (e && e instanceof DOMException && e.name === 'AbortError') return; // The user canceled the file picker (which is fine)
+            console.warn('The file picker threw some sort of error', e);
+            return;
+        }
+
+        const nameArr = await this.directory?.handle.resolve(fileHandle);
+        if (!nameArr) return console.debug('The file picker returned a file that is not in the specified directory', fileHandle, this.directory);
+
+        this.element.value = nameArr.join('/');
     }
     readonly boundOnButtonClick = this.onButtonClick.bind(this);
 }

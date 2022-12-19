@@ -5,8 +5,7 @@
         margin-top: 8px;
 
         // Grid stuff for the grid layout that is used in the builder
-        grid-column-start: 1;
-        grid-column-end: 4;
+        grid-column: 1 / -1;
         grid-row: 2;
     }
 
@@ -17,7 +16,7 @@
     &--button {
         position: relative;
         right: 33px;
-        top: -1px;
+        top: -2px;
 
         height: 28px;
         width: 28px;

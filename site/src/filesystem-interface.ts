@@ -1,5 +1,3 @@
-import * as universal from './universal.js';
-
 export interface folderEntry {
     handle: FileSystemHandle;
 }
@@ -69,9 +67,43 @@ export class folder {
         get: getFileFromFolder.bind(this, true),
     });
 
+    async getFile(name: string): Promise<FileSystemFileHandle|null>;
+    async getFile(name: string, create: true): Promise<FileSystemFileHandle>
+    async getFile(name: string, create?: boolean): Promise<FileSystemFileHandle|null> {
+        // Split by forward slashes
+        const parts = name.split('/');
+
+        // Split by backslashes
+        parts.forEach((part, index, arr) => {
+            const parts2 = part.split('\\');
+            arr.splice(index, 1, ...parts2);
+        });
+
+        const fileName = parts.pop()!;
+
+        // Get the file
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        let currentFolder: folder = this;
+        for (let i = 0; i < parts.length - 1; i++) {
+            currentFolder = await currentFolder[create ? 'childDirsC' : 'childDirs'][parts[i]!]!;
+            if (currentFolder === null) return null;
+        }
+
+        return await currentFolder[create ? 'childFilesC' : 'childFiles'][fileName]!;
+    }
+
     constructor(handle: FileSystemDirectoryHandle) {
         this.handle = handle;
     }
+}
+
+export async function readFileAsDataURI(file_: FileSystemFileHandle | File) {
+    const file = file_ instanceof File ? file_ : await file_.getFile();
+    const blob = await file.slice(0, 4).arrayBuffer();
+    const bytes = new Uint8Array(blob);
+
+    // Construct data URI
+    return `data:${file.type};base64,${btoa(String.fromCharCode(...bytes))}`;
 }
 
 export class writeableFolder extends folder {

@@ -1,14 +1,14 @@
 /** This file contains code to update the information displayed within the FOMOD Builder UI
  */
 
-import { updatableObject } from './fomod-builder.js';
-import { FOMOD } from './fomod-builder-classifications.js';
+import type { updatableObject } from './fomod-builder.js';
+import type { FOMOD } from './fomod-builder-classifications.js';
 
 export class modName implements updatableObject {
     parent: FOMOD;
 
     /** The name of the mod */
-    get name(): string { return this.parent.meta_name; } set name(value: string) { this.parent.meta_name = value; this.update(); }
+    get name(): string { return this.parent.metaName; } set name(value: string) { this.parent.metaName = value; this.update(); }
 
     input: HTMLInputElement;
 

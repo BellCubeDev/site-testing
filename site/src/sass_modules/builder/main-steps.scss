@@ -16,8 +16,6 @@
     padding: 8px;
     padding-left: 8px;
 
-    margin-right: 16px;
-
     &--warn {
         border-left-color: #ff0;
     }
@@ -36,16 +34,26 @@
     background: hsl($hue, $sat, $val);
     //          208°, 100%, 58%
     border-left: hsl($hue + ($hueShiftMult * 48deg), $sat + 13%, $val + 17%) 8px solid;
-}
 
-#steps-builder-container,
-.builder-steps-step,
-.builder-steps-step-body > .js-bcd-details-inner,
-.builder-steps-group-body > .js-bcd-details-inner,
-.builder-steps-opt-body > .js-bcd-details-inner {
     border-radius: 8px;
     padding: 12px;
-    @include fomodStepsBuilderCard(184deg, 87%, 41%)
+    margin-top: 32px;
+}
+
+@mixin imageColumn() {
+    display: grid;
+    justify-content: space-between;
+    gap: 32px;
+    align-items: start;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 40vw);
+}
+
+#steps-builder-container {
+    @include fomodStepsBuilderCard(184deg, 87%, 30%);
+
+    >:first-child {
+        @include imageColumn();
+    }
 }
 
 .builder-steps-step {
@@ -63,17 +71,11 @@
 .builder-steps-opt-body > .js-bcd-details-inner {
     @include fomodStepsBuilderCard(160deg, 0%, 11%);
 
-    >* {
-        display: grid;
-        justify-content: space-between;
-        gap: 32px;
-        align-items: start;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 40vw);
-    }
+    >* { @include imageColumn(); }
 
 }
 
-.builder-steps-opt-image {
+.builder-steps-opt-image, .builder-steps-mod-image {
     height: 100%;
 
     display: grid;
@@ -123,4 +125,11 @@
 
 .builder-steps-step-sum {
     padding-left: 8px;
+}
+
+// Disabled down here for clarity purposes
+// scss-lint:disable MergeableSelector
+
+#steps-builder-container sub {
+    margin-left: 16px;
 }
