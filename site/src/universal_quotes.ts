@@ -307,7 +307,8 @@ export const possibilities_Generic = [
     "I&rsquo;m busy and you can&rsquo;t come in.",
     "Don&rsquo;t sweat the petty stuff and don&rsquo;t pet the sweaty stuff.",
     "The man who does not read has no advantage over the man who cannot read.<br />&mdash; Mark Twain",
-    "I don't believe in Blackjack", // - an IRL friend
+    "I don't believe in Blackjack", // - an IRL friend 
+    "When stupidity is considered patriotism, it is unsafe to be intelligent", // - Isaac Asimov
 ];
 
 
