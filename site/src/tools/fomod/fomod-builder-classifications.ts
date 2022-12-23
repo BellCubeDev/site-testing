@@ -411,7 +411,7 @@ export type sortOrder =
     | "Descending" // Reverse Alphabetical
     | "Explicit";  // Explicit order
 
-export abstract class step extends XMLElement {
+export abstract class Step extends XMLElement {
     name = "";
     order: sortOrder = "Explicit";
     groups: Group[] = [];
@@ -612,7 +612,10 @@ export class OptionImage extends XMLElement {
 
 export class FOMOD extends XMLElement {
     private _metaName: string = "";
-    set metaName(value: string) { this._metaName = value; this.updateObjects(); } get metaName(): string { return this._metaName; }
+    set metaName(value: string) { this._metaName = value; this.updateObjects(); } get metaName(): string { return this._metaName || this._moduleName; }
+
+    private _moduleName: string = "";
+    set moduleName(value: string) { this._moduleName = value; this.updateObjects(); } get moduleName(): string { return this._moduleName || this._metaName; }
 
     private _metaImage: string = "";
     set metaImage(value: string) { this._metaImage = value; this.updateObjects(); } get metaImage(): string { return this._metaImage; }
@@ -656,7 +659,7 @@ export class FOMOD extends XMLElement {
     installs: Install[];
 
     conditions: DependencyGroup | undefined;
-    steps: step[];
+    steps: Step[];
 
     constructor(
         instanceElement?: Element,
@@ -668,7 +671,7 @@ export class FOMOD extends XMLElement {
         metaId: number = 0,
         metaUrl: string = "",
         installs: Install[] = [],
-        steps: step[] = [],
+        steps: Step[] = [],
         conditions?: DependencyGroup
     ) {
         super(instanceElement);

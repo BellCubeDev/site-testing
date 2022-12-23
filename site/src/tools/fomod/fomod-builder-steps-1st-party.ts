@@ -61,7 +61,7 @@ export class Fomod implements updatableObject {
         }
 
         const img = await window.FOMODBuilder.directory?.getFile(this.image);
-        if (!img)  return this.imageDisplay.src = '';
+        if (!img || img instanceof fs.InvalidNameError)  return this.imageDisplay.src = '';
 
         this.imageDisplay.src = await fs.readFileAsDataURI(img);
     }

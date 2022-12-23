@@ -11,6 +11,10 @@ export class bcdDropdownSortingOrder extends bcdUniversal.BCDDropdown {
     static readonly asString = 'FOMOD Builder - Sorting Order Dropdown';
     static readonly cssClass = 'bcd-dropdown-sorting-order';
 
+    constructor(element: Element) {
+        super(element, element.previousElementSibling!, true);
+    }
+
     override options() {
         return {'Explicit':null, 'Ascending':null, 'Descending':null};
     }
@@ -93,13 +97,13 @@ export async function openFolder_entry() {
 
     window.FOMODBuilder.directory = picked;
 
-    const fomodDir = await picked.childDirsC['fomod']!;
+    const fomodDir = await picked.childDirsCV['fomod']!;
 
-    const moduleStr_ = fomodDir.childFilesC['ModuleConfig.xml']!
+    const moduleStr_ = fomodDir.childFilesCV['ModuleConfig.xml']!
                                 .then(handle => handle.getFile())
                                 .then(file => file.text());
 
-    const infoStr_ = fomodDir.childFilesC['Info.xml']!
+    const infoStr_ = fomodDir.childFilesCV['Info.xml']!
                                 .then(handle => handle.getFile())
                                 .then(file => file.text());
 
@@ -117,10 +121,10 @@ export async function save() {
         window.FOMODBuilder.directory = picked;
     }
 
-    const fomodFolder = (await window.FOMODBuilder.directory.childDirsC['fomod'])!;
+    const fomodFolder = (await window.FOMODBuilder.directory.childDirsCV['fomod'])!;
 
-    const fomodInfo_ = fomodFolder.childFilesC['Info.xml']!;
-    const fomodModule_ = fomodFolder.childFilesC['ModuleConfig.xml']!;
+    const fomodInfo_ = fomodFolder.childFilesCV['Info.xml']!;
+    const fomodModule_ = fomodFolder.childFilesCV['ModuleConfig.xml']!;
     const [fomodInfo, fomodModule] = await Promise.all([fomodInfo_, fomodModule_]);
 
     const infoDoc = window.FOMODBuilder.trackedFomod!.infoDoc;

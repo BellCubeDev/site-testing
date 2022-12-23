@@ -204,18 +204,31 @@ redirect_from:
 
         <div id="steps-builder-container" class="builderStep">
             <div>
-                <!-- Mod Name -->
-                <div class="item-with-fake-label" identifier="nameInput"><h4>Mod Name</h4>
-                    <input class="builder-steps-mod-name bcd-builder-input" placeholder="Mod Name" value="Retexture for The Scroll" />
+
+                <!-- Left Column -->
+                <div class="builder-steps-body-left">
+
+                    <!-- Mod Name -->
+                    <div class="item-with-fake-label" identifier="nameInput"><h4>Mod Name</h4>
+                        <input class="builder-steps-mod-name bcd-builder-input" placeholder="Mod Name" value="Retexture for The Scroll" />
+                    </div>
+
+                    <!-- Steps Sorting Order -->
+                    <div class="item-with-fake-label item-with-fake-label--one-liner" identifier="sortOrderButton"><h4>Sorting Order</h4>
+                        <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
+                        <menu class="bcd-dropdown-sorting-order mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect mdl-js-ripple-effect--ignore-events"></menu>
+                    </div>
                 </div>
 
-                <!-- Mod Image -->
+
+                <!-- Right Column - Mod Image -->
                 <div class="builder-steps-mod-image">
                     <img src="/site-testing/assets/site/images/example-image.png" />
                     <div class="js-relative-file-picker--container">
-                        <input class="bcd-builder-input js-relative-file-picker" relative-to="FOMODBuilder" placeholder="Mod Image Path" value="assets/site/images/example-image.png" />
+                        <input class="bcd-builder-input js-relative-image-picker" relative-to="FOMODBuilder" placeholder="Mod Image Path" value="assets/site/images/example-image.png" />
                     </div>
                 </div>
+
             </div>
 
             <!-- Steps Container -->
@@ -268,11 +281,11 @@ redirect_from:
                             <div class="builder-steps-opt-image">
                                 <img src="/site-testing/assets/site/images/example-image.png" />
                                 <div class="js-relative-file-picker--container">
-                                    <input class="bcd-builder-input js-relative-file-picker" relative-to="FOMODBuilder" placeholder="Option Image Path" value="assets/site/images/example-image.png" />
+                                    <input class="bcd-builder-input js-relative-image-picker" relative-to="FOMODBuilder" placeholder="Option Image Path" value="assets/site/images/example-image.png" />
                                 </div>
                             </div>
 
-                            <div class="builder-steps-opt-body-left">
+                            <div class="builder-steps-body-left">
 
                                 <!-- Option Name -->
                                 <div class="item-with-fake-label" identifier="nameInput"><h4>Option Name</h4>

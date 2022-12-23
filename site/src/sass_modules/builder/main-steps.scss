@@ -49,10 +49,16 @@
 }
 
 #steps-builder-container {
-    @include fomodStepsBuilderCard(184deg, 87%, 30%);
+    @include fomodStepsBuilderCard(184deg, 87%, 25%);
 
     >:first-child {
         @include imageColumn();
+
+        >.builder-steps-mod-image {
+            padding: 8px;
+            border-radius: 4px;
+            background: #1c1c1c;
+        }
     }
 }
 
@@ -80,7 +86,7 @@
 
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto max-content;
     align-items: start;
 
     justify-content: center;
@@ -93,7 +99,7 @@
     }
 }
 
-.builder-steps-opt-body-left {
+.builder-steps-body-left {
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
