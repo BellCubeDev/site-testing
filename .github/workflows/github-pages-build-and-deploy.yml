@@ -18,7 +18,8 @@ jobs:
     steps:
 
       # Cancel Outdated Workflow Runs
-      - uses: styfle/cancel-workflow-action
+      - name: Cancel Outdated Workflow Runs
+        uses: styfle/cancel-workflow-action@0.11.0
         with:
           all_but_latest: true
 
