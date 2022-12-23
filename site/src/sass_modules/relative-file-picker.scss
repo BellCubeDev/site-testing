@@ -25,3 +25,12 @@
         i { font-size: 90%; }
     }
 }
+
+.js-relative-image-picker--no-image {
+    fill: #ddd;
+    grid-column: 2;
+    grid-row: 1;
+    height: 100%;
+
+    +img { grid-row: 1; }
+}

@@ -1645,7 +1645,10 @@ class RelativeImagePicker extends RelativeFilePicker {
     static override readonly cssClass = 'js-relative-image-picker';
 
     imageElem?: HTMLImageElement;
+    noImageElem?: SVGSVGElement;
     relation: 'previous'|'next'|'parent'|'selector';
+
+    static noImageDoc?: Document | Promise<string>;
 
     constructor(element: HTMLInputElement, relativeTo?: fs.folder|{directory: fs.folder}) {
         super(element, relativeTo);
@@ -1679,8 +1682,64 @@ class RelativeImagePicker extends RelativeFilePicker {
                 throw new Error('The relative image picker must have a relation attribute that is either previous, next, parent, or selector.');
         }
 
+        this.createNoImageElem();
+
         registerUpgrade(element, this, this.imageElem, true, true);
     }
+
+    async createNoImageElem() {
+        // Create the request if it does not already exist
+        RelativeImagePicker.noImageDoc ??= fetch('https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsrounded/image/default/48px.svg').then(r => r.text());
+
+        let svg: undefined|SVGSVGElement = undefined;
+        // Wait for the request to finish if it has not already
+        if (RelativeImagePicker.noImageDoc instanceof Promise) {
+            const str = await RelativeImagePicker.noImageDoc;
+            RelativeImagePicker.noImageDoc = new DOMParser().parseFromString(str, 'text/html');
+            svg = RelativeImagePicker.noImageDoc.querySelector('svg') as SVGSVGElement;
+
+            // change width and height to viewBox
+            svg.removeAttribute('width'); svg.removeAttribute('height');
+            svg.setAttribute('viewBox', '0 0 48 48');
+        }
+
+        svg ??= RelativeImagePicker.noImageDoc.querySelector('svg') as SVGSVGElement;
+        if (!svg) throw new Error('Could not find the SVG element in the SVG document.');
+
+        this.noImageElem = svg.cloneNode(true) as SVGSVGElement;
+        this.noImageElem.classList.add('js-relative-image-picker--no-image');
+
+        this.imageElem?.before(this.noImageElem);
+
+        this.imageElem?.src ? this.showImage() : this.hideImage();
+    }
+
+    hideImage() {
+        if (this.imageElem) {
+            this.imageElem.style.display = 'none';
+            this.imageElem.ariaDisabled = 'true';
+            this.imageElem.ariaHidden = 'true';
+        }
+        if (this.noImageElem) {
+            this.noImageElem.style.display = 'block';
+            this.noImageElem.ariaDisabled = 'false';
+            this.noImageElem.ariaHidden = 'false';
+        }
+    }
+
+    showImage() {
+        if (this.imageElem) {
+            this.imageElem.style.display = 'block';
+            this.imageElem.ariaDisabled = 'false';
+            this.imageElem.ariaHidden = 'false';
+        }
+        if (this.noImageElem) {
+            this.noImageElem.style.display = 'none';
+            this.noImageElem.ariaDisabled = 'true';
+            this.noImageElem.ariaHidden = 'true';
+        }
+    }
+
 
     override async onChange() {
         super.onChange();
@@ -1691,19 +1750,21 @@ class RelativeImagePicker extends RelativeFilePicker {
             return console.info('The relative image picker does not have an image element to update.', this);
 
         if (!dir) {
-            this.imageElem.src = '';
+            this.hideImage();
             return console.info('The relative image picker does not have a directory to update the image from.', this, dir);
         }
 
-        const fileHandle = await dir.getFile(this.element.value);
-
-        const fs = await loadFS();
+        const fileHandle_ = dir.getFile(this.element.value);
+        const fs_ = loadFS();
+        const [fileHandle, fs] = await Promise.all([fileHandle_, fs_]);
 
         if (!fileHandle || fileHandle instanceof fs.InvalidNameError) {
-            this.imageElem.src = '';
+            this.hideImage();
             return console.info('The relative image picker does not have a file handle to update the image with.', this);
         }
-        else this.imageElem.src = await fs.readFileAsDataURI(fileHandle);
+
+        this.imageElem.src = await fs.readFileAsDataURI(fileHandle);
+        this.showImage();
     }
 }
 bcdComponents.push(RelativeImagePicker);
