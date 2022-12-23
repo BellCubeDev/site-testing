@@ -2,6 +2,10 @@ import * as mdl from './assets/site/mdl/material.js';
 import * as quotes from './universal_quotes.js';
 import type * as fs from './filesystem-interface.js';
 
+function loadFS() {
+    return import('./filesystem-interface.js');
+}
+
 /*
     Thanks to Patrick Gillespie for the great ASCII art generator!
     https://patorjk.com/software/taag/#p=display&h=0&v=0&f=Big%20Money-nw
@@ -750,13 +754,13 @@ export class BCDModalDialog extends EventTarget {
 
         The event is first sent for the class and, if not canceled and if `PreventDefault()` was not called, the event is sent for the element.
     */
-    static beforeShowEvent = new CustomEvent('beforeShow', {cancelable: true, bubbles: false, composed: false});
+    static readonly beforeShowEvent = new CustomEvent('beforeShow', {cancelable: true, bubbles: false, composed: false});
 
     /** Event sent just after the modal is shown
 
         The event is first sent for the class and, if not canceled and if PreventDefault() was not called, the event is sent for the element.
     */
-    static afterShowEvent = new CustomEvent('afterShow', {cancelable: false, bubbles: false, composed: false});
+    static readonly afterShowEvent = new CustomEvent('afterShow', {cancelable: false, bubbles: false, composed: false});
 
     private show_forReal() {
         //console.debug("[BCD-MODAL] Showing modal:", this);
@@ -781,13 +785,13 @@ export class BCDModalDialog extends EventTarget {
 
         The event is first sent for the class and, if not canceled and if `PreventDefault()` was not called, the event is sent for the element.
     */
-    static beforeHideEvent = new CustomEvent('beforeHide', {cancelable: true, bubbles: false, composed: false});
+    static readonly beforeHideEvent = new CustomEvent('beforeHide', {cancelable: true, bubbles: false, composed: false});
 
     /** Event sent just after the modal is hidden
 
         The event is first sent for the class and, if not canceled and if PreventDefault() was not called, the event is sent for the element.
     */
-    static afterHideEvent = new CustomEvent('afterHide', {cancelable: false, bubbles: false, composed: false});
+    static readonly afterHideEvent = new CustomEvent('afterHide', {cancelable: false, bubbles: false, composed: false});
 
     // Storing the bound function lets us remove the event listener from the obfuscator after the modal is hidden
     boundHideFunction = this.hide.bind(this);
@@ -1555,8 +1559,8 @@ export class bcdDynamicTextAreaWidth extends bcdDynamicTextArea_base {
 bcdComponents.push(bcdDynamicTextAreaWidth);
 
 class RelativeFilePicker {
-    static readonly asString = 'BCD - Relative File Picker';
-    static readonly cssClass = 'js-relative-file-picker';
+    static asString = 'BCD - Relative File Picker';
+    static cssClass = 'js-relative-file-picker';
 
     element: HTMLInputElement;
     button: HTMLButtonElement;
@@ -1579,6 +1583,8 @@ class RelativeFilePicker {
 
             this.relativeTo = relativeToAttr.split('.');
         }
+
+        registerUpgrade(element, this, null, false, true);
 
         this.element.addEventListener('change', this.boundOnChange);
         this.element.addEventListener('input', this.boundOnChange);
@@ -1628,10 +1634,79 @@ class RelativeFilePicker {
         if (!nameArr) return console.debug('The file picker returned a file that is not in the specified directory', fileHandle, this.directory);
 
         this.element.value = nameArr.join('/');
+        this.element.dispatchEvent(new Event('change'));
     }
     readonly boundOnButtonClick = this.onButtonClick.bind(this);
 }
 bcdComponents.push(RelativeFilePicker);
+
+class RelativeImagePicker extends RelativeFilePicker {
+    static override readonly asString = 'BCD - Relative Image Picker';
+    static override readonly cssClass = 'js-relative-image-picker';
+
+    imageElem?: HTMLImageElement;
+    relation: 'previous'|'next'|'parent'|'selector';
+
+    constructor(element: HTMLInputElement, relativeTo?: fs.folder|{directory: fs.folder}) {
+        super(element, relativeTo);
+
+        this.relation = element.getAttribute('relation') as 'previous'|'next'|'parent'|'selector' ?? 'previous';
+
+        switch (this.relation) {
+
+            case 'previous':
+                this.imageElem = element.parentElement!.previousElementSibling as HTMLImageElement;
+                break;
+
+            case 'next':
+                this.imageElem = element.parentElement!.nextElementSibling as HTMLImageElement;
+                break;
+
+            case 'parent':
+                this.imageElem = element.parentElement as HTMLImageElement;
+                break;
+
+            case 'selector': {
+                const selector = element.getAttribute('selector');
+                if (!selector) throw new Error('The relative image picker must have a selector attribute if the relation is set to selector.');
+
+                this.imageElem = element.parentElement!.querySelector(selector) as HTMLImageElement
+                                            || document.querySelector(selector) as HTMLImageElement;
+                break;
+            }
+
+            default:
+                throw new Error('The relative image picker must have a relation attribute that is either previous, next, parent, or selector.');
+        }
+
+        registerUpgrade(element, this, this.imageElem, true, true);
+    }
+
+    override async onChange() {
+        super.onChange();
+
+        const dir = this.directory;
+
+        if (!this.imageElem)
+            return console.info('The relative image picker does not have an image element to update.', this);
+
+        if (!dir) {
+            this.imageElem.src = '';
+            return console.info('The relative image picker does not have a directory to update the image from.', this, dir);
+        }
+
+        const fileHandle = await dir.getFile(this.element.value);
+
+        const fs = await loadFS();
+
+        if (!fileHandle || fileHandle instanceof fs.InvalidNameError) {
+            this.imageElem.src = '';
+            return console.info('The relative image picker does not have a file handle to update the image with.', this);
+        }
+        else this.imageElem.src = await fs.readFileAsDataURI(fileHandle);
+    }
+}
+bcdComponents.push(RelativeImagePicker);
 
 
 /*$$$$$\              $$\       $$\     $$\                                      $$$$$$\            $$\       $$\
