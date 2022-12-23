@@ -17,6 +17,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      # Cancel Outdated Workflow Runs
+      - uses: styfle/cancel-workflow-action
+        with:
+          all_but_latest: true
+
 
 
       # Setup Work
@@ -79,12 +84,14 @@ jobs:
       - name: Set Minification Directory
         run: |
           echo "minifyDir=$GITHUB_WORKSPACE/_generated/ts_out/" >> $GITHUB_ENV
+          echo "doDebug=true" >> $GITHUB_ENV
 
       - name: Minify JavaScript and CSS
         # Output dir: [in-place] $GITHUB_WORKSPACE/_generated/ts_out/
         run: |
           cd $GITHUB_WORKSPACE/site
           echo Minification Directory: $minifyDir
+          echo Debug: $doDebug
           node minify.mjs
 
 
