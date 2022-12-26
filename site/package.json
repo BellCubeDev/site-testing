@@ -23,12 +23,12 @@
     "cssnano": "^5.1.14",
     "cssnano-preset-advanced": "^5.3.9",
     "discord.js": "^14.6.0",
-    "html-format": "^1.0.2",
     "js-module-formats": "^0.1.2",
     "postcss": "^8.4.19",
     "sass": "^1.56.1",
+    "terser": "^5.16.1",
     "tsc-watch": "^5.0.3",
     "typescript": "^4.9.3",
-    "uglify-js": "^3.17.4"
+    "xml-beautify": "^1.2.3"
   }
 }

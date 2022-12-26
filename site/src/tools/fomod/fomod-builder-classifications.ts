@@ -1,6 +1,12 @@
 import * as main from "./fomod-builder.js"; // Brings in global things
 import { objOf } from '../../universal.js';
-import * as genericBindings from './fomod-builder-bindings.js';
+
+import * as bindingsGeneric from './fomod-builder-bindings.js';
+import * as bindings1stParty from './fomod-builder-steps-1st-party.js';
+import * as bindingsVortex from './fomod-builder-steps-vortex.js';
+import * as bindingsMO2 from './fomod-builder-steps-mo2.js';
+
+
 /*x eslint-disable i18n-text/no-en */// FOMODs are XML files with a schema written in English, so disallowing English makes little sense.
 
 /*
@@ -51,7 +57,7 @@ export abstract class dependency extends XMLElement {
 
 
 export abstract class DependencyBaseVersionCheck extends dependency {
-    private _version = "";
+    private _version = '';
     set version(value: string) { this._version = value; this.updateObjects(); } get version(): string { return this._version; }
 }
 
@@ -69,12 +75,12 @@ $$ |  $$\ $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \
 export const flags:objOf<Flag> = {};
 
 export class Flag {
-    name = "";
+    name = '';
     values = new Set<string>();
     getters:unknown[] = [];
     setters:unknown[] = [];
 
-    constructor(name = "", value = "") {
+    constructor(name = '', value = '') {
         this.name = name;
         this.values.add(value);
 
@@ -144,13 +150,13 @@ export class DependencyGroup extends dependency {
     }
 }
 export class DependencyFlag extends dependency {
-    private _flag = "";
+    private _flag = '';
     set flag(value: string) { this._flag = value; this.updateObjects(); } get flag(): string { return this._flag; }
 
-    private _value = "";
+    private _value = '';
     set value(value: string) { this._value = value; this.updateObjects(); } get value(): string { return this._value; }
 
-    // <flagDependency flag="" value="" />
+    // <flagDependency flag='' value='' />
     override asModuleXML(document: XMLDocument): Element {
         const thisElement = document.createElement("flagDependency");
         thisElement.setAttribute("flag", this.flag);
@@ -159,7 +165,7 @@ export class DependencyFlag extends dependency {
     }
 }
 export class DependencyFile extends dependency {
-    private _file = "";
+    private _file = '';
     set file(value: string) { this._file = value; this.updateObjects(); } get file(): string { return this._file; }
 
     private _state: DependencyFileState = "Active";
@@ -176,7 +182,7 @@ export class DependencyFile extends dependency {
 
 
 export class DependencyScriptExtender extends DependencyBaseVersionCheck {
-    // <foseDependency version="" />
+    // <foseDependency version='' />
     override asModuleXML(document: XMLDocument): Element {
         const thisElement = document.createElement("foseDependency");
         thisElement.setAttribute("version", this.version);
@@ -184,7 +190,7 @@ export class DependencyScriptExtender extends DependencyBaseVersionCheck {
     }
 }
 export class DependencyGameVersion extends DependencyBaseVersionCheck {
-    // <gameDependency version="" />
+    // <gameDependency version='' />
     override asModuleXML(document: XMLDocument): Element {
         const thisElement = document.createElement("gameDependency");
         thisElement.setAttribute("version", this.version);
@@ -371,7 +377,7 @@ export class Install extends XMLElement {
 
     constructor(
         element: Element,
-        file: string | string[] | FileSystemFileHandle = [""]
+        file: string | string[] | FileSystemFileHandle = ['']
     ) {
         super(element);
         this.updateFile(file);
@@ -382,7 +388,7 @@ export class Install extends XMLElement {
             this.instanceElement ?? document.createElement("install");
 
         const path = this.path.join("/");
-        const isFolder = this.path[this.path.length - 1] === "";
+        const isFolder = this.path[this.path.length - 1] === '';
 
         this.instanceElement.appendChild(
             document.createElement(isFolder ? 'folder' : 'file')
@@ -406,14 +412,14 @@ $$ |  $$ |$$ |  $$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \____$$\
           $$ |
           \_*/
 
-export type sortOrder =
+export type SortOrder =
     | "Ascending"  // Alphabetical
     | "Descending" // Reverse Alphabetical
     | "Explicit";  // Explicit order
 
 export abstract class Step extends XMLElement {
-    name = "";
-    order: sortOrder = "Explicit";
+    name = '';
+    order: SortOrder = "Explicit";
     groups: Group[] = [];
 
     // <installStep name="THE FIRST OF MANY STEPS">
@@ -443,14 +449,14 @@ export type groupSelectType =
     | "SelectAtLeastOne"    // Requires users to select at least one option
     | "SelectExactlyOne";   // Requires users to select exactly one option
 export class Group extends XMLElement {
-    private _name = "";
+    private _name = '';
     set name(value: string) { this._name = value; this.updateObjects(); } get name(): string { return this._name; }
 
     private _type: groupSelectType = "SelectAny";
     set type(value: groupSelectType) { this._type = value; this.updateObjects(); } get type(): groupSelectType { return this._type; }
 
-    private _sortOrder: sortOrder = "Explicit";
-    set sortOrder(value: sortOrder) { this._sortOrder = value; this.updateObjects(); } get sortOrder(): sortOrder { return this._sortOrder; }
+    private _sortOrder: SortOrder = "Explicit";
+    set sortOrder(value: SortOrder) { this._sortOrder = value; this.updateObjects(); } get sortOrder(): SortOrder { return this._sortOrder; }
 
     private _options: Option[] = [];
     set options(value: Option[]) { this._options = value; this.updateObjects(); } get options(): Option[] { return this._options; }
@@ -476,7 +482,7 @@ export class Group extends XMLElement {
 
 export class Option extends XMLElement {
     // Actual Option Name
-    private _name = "";
+    private _name = '';
     set name(value: string) { this._name = value; this.updateObjects(); } get name(): string { return this._name; }
 
     // Description
@@ -510,8 +516,8 @@ export class Option extends XMLElement {
 
     constructor(
         element?: Element,
-        name = "",
-        description: OptionDescription | string = "",
+        name = '',
+        description: OptionDescription | string = '',
         image: OptionImage | string[] | FileSystemFileHandle = [],
         conditionFlags: DependencyFlag[] = [],
         files: DependencyFile[] = [],
@@ -562,10 +568,10 @@ export class Option extends XMLElement {
 }
 
 export class OptionDescription extends XMLElement {
-    private _description = "";
+    private _description = '';
     set description(value: string) { this._description = value; this.updateObjects(); } get description(): string { return this._description; }
 
-    constructor(element?: Element, description = "") {
+    constructor(element?: Element, description = '') {
         super(element);
         this.description = description;
     }
@@ -610,20 +616,20 @@ export class OptionImage extends XMLElement {
 
 
 
-export class FOMOD extends XMLElement {
-    private _metaName: string = "";
+export class Fomod extends XMLElement {
+    private _metaName: string = '';
     set metaName(value: string) { this._metaName = value; this.updateObjects(); } get metaName(): string { return this._metaName || this._moduleName; }
 
-    private _moduleName: string = "";
+    private _moduleName: string = '';
     set moduleName(value: string) { this._moduleName = value; this.updateObjects(); } get moduleName(): string { return this._moduleName || this._metaName; }
 
-    private _metaImage: string = "";
+    private _metaImage: string = '';
     set metaImage(value: string) { this._metaImage = value; this.updateObjects(); } get metaImage(): string { return this._metaImage; }
 
-    private _metaAuthor: string = "";
+    private _metaAuthor: string = '';
     set metaAuthor(value: string) { this._metaAuthor = value; this.updateObjects(); } get metaAuthor(): string { return this._metaAuthor; }
 
-    private _metaVersion: string = "";
+    private _metaVersion: string = '';
     /** The metadata version of this mod */
     set metaVersion(value: string) { this._metaVersion = value; this.updateObjects(); } get metaVersion(): string { return this._metaVersion; }
 
@@ -633,18 +639,17 @@ export class FOMOD extends XMLElement {
     private _infoInstanceElement: Element | undefined;
     set infoInstanceElement(value: Element | undefined) { this._infoInstanceElement = value; this.updateObjects(); } get infoInstanceElement(): Element | undefined { return this._infoInstanceElement; }
 
-    _metaUrl:URL|string = ''; // Is actually set during the constructor, however TS is too static to understand that.
-    set metaUrl(value:URL|string) { this._metaUrl = value; this.updateObjects(); } get metaUrl():URL|string { return this._metaUrl; }
-
-    setURL(url:URL|string, doWarn:boolean=true):void{
-        if (url instanceof URL) this.metaUrl = url;
+    _metaUrl:URL|string = '';
+    get metaUrl():URL|string { return this._metaUrl; } set metaUrl(url:URL|string) {
+        if (url instanceof URL) this._metaUrl = url;
         else {
             try {
-                this.metaUrl = new URL(url);
+                this._metaUrl = new URL(url);
             } catch (e) {
-                this.metaUrl = url;
+                this._metaUrl = url;
+                this.updateObjects();
 
-                if(doWarn) null; // TODO: Warn about invalid URL
+                console.warn(`Invalid URL: "${url}"`);
             }
         }
     }
@@ -660,35 +665,38 @@ export class FOMOD extends XMLElement {
 
     conditions: DependencyGroup | undefined;
     steps: Step[];
+    sortingOrder: SortOrder = 'Explicit';
 
     constructor(
         instanceElement?: Element,
         infoInstanceElement?: Element,
-        metaName: string = "",
-        metaImage: string = "",
-        metaAuthor: string = "",
-        metaVersion: string = "",
+        metaName: string = '',
+        metaImage: string = '',
+        metaAuthor: string = '',
+        metaVersion: string = '',
         metaId: number = 0,
-        metaUrl: string = "",
+        metaUrl: string = '',
         installs: Install[] = [],
         steps: Step[] = [],
         conditions?: DependencyGroup
     ) {
         super(instanceElement);
         this.infoInstanceElement = infoInstanceElement;
-        this.metaName = metaName ?? instanceElement?.getAttribute("moduleName") ?? infoInstanceElement?.getElementsByTagName("Name")[0]?.textContent;
-        this.metaImage = metaImage ?? instanceElement;
-        this.metaAuthor = metaAuthor ?? instanceElement ?? infoInstanceElement?.getElementsByTagName("Author")[0]?.textContent;
-        this.metaVersion = metaVersion ?? instanceElement ?? infoInstanceElement?.getElementsByTagName("Version")[0]?.textContent;
-        this.metaId = metaId ?? instanceElement ?? infoInstanceElement?.getElementsByTagName("Id")[0]?.textContent;
-        this.setURL(metaUrl);
+        this.metaName = metaName ?? infoInstanceElement?.getElementsByTagName("Name")[0]?.textContent ?? '';
+        this.moduleName = instanceElement?.getElementsByTagName("moduleName")[0]?.textContent ?? '';
+        this.metaImage = metaImage ?? instanceElement?.getElementsByTagName("moduleImage")[0]?.getAttribute("path");
+        this.metaAuthor = metaAuthor ?? infoInstanceElement?.getElementsByTagName("Author")[0]?.textContent ?? '';
+        this.metaVersion = metaVersion ?? infoInstanceElement?.getElementsByTagName("Version")[0]?.textContent ?? '';
+        this.metaId = metaId ?? infoInstanceElement?.getElementsByTagName("Id")[0]?.textContent ?? 0;
+        this.metaUrl = metaUrl ?? infoInstanceElement?.getElementsByTagName("Url")[0]?.textContent ?? '';
         this.installs = installs;
         this.conditions = conditions;
         this.steps = steps;
 
 
         this.objectsToUpdate.push(
-            new genericBindings.modName(this)
+            new bindingsGeneric.modMetadata(this),
+            new bindings1stParty.Fomod(this),
         );
     }
 

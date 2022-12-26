@@ -1,4 +1,3 @@
-// Reference browser types
 export function materialInit(): void;
 export const componentHandler: {
 

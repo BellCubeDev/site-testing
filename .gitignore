@@ -1,6 +1,7 @@
 # Temporary Files & folders
 _generated
 .sass-cache
+minify.log
 
 # Unnessecary Package Manager Files
 #Gemfile.lock # The workflow wants this

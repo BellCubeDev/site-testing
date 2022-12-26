@@ -6,3 +6,4 @@
     @author BellCube Dev
     @namespace - fomod-builder-steps
  */
+export const a = '';

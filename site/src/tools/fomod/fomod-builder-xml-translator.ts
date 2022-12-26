@@ -1,6 +1,6 @@
 import * as classes from './fomod-builder-classifications.js';
 
-export function translateWhole(module: string, info: string, setWindowValues = false) : classes.FOMOD {
+export function translateWhole(module: string, info: string, setWindowValues = false) : classes.Fomod {
     const parser = window.domParser;
 
     const moduleDoc = parser.parseFromString(module || '<config/>', 'text/xml');
@@ -11,7 +11,7 @@ export function translateWhole(module: string, info: string, setWindowValues = f
 
     console.log("Documents fetched!", {moduleDoc, infoDoc});
 
-    const obj = new classes.FOMOD(moduleDoc.getOrCreateChild("config"), infoDoc.getOrCreateChild("fomod"));
+    const obj = new classes.Fomod(moduleDoc.getOrCreateChild("config"), infoDoc.getOrCreateChild("fomod"));
 
     if (setWindowValues) {
         window.FOMODBuilder.trackedFomod = {

@@ -20,9 +20,9 @@ declare global {interface Window {
         ui: fomodUI.windowUI
         directory?: bcdFS.writeableFolder;
         storage: builderStorage;
-        fomodClass: typeof fomodClasses.FOMOD;
+        fomodClass: typeof fomodClasses.Fomod;
         trackedFomod: null | {
-            obj: fomodClasses.FOMOD,
+            obj: fomodClasses.Fomod,
             infoDoc: XMLDocument,
             moduleDoc: XMLDocument,
         };
@@ -59,7 +59,7 @@ export interface builderStorage {
 
         /** What should the default Group Sorting Order be?
             @default 'Explicit' */
-        defaultGroupSortingOrder: fomodClasses.sortOrder; // 'Explicit'
+        defaultGroupSortingOrder: fomodClasses.SortOrder; // 'Explicit'
         /** What should the default Group Selection type be?
             @default 'SelectAtLeastOne' */
         defaultGroupSelectType: fomodClasses.groupSelectType; // 'SelectAtLeastOne'
@@ -131,12 +131,13 @@ window.FOMODBuilder = {
         attemptRepair: () => {},
         setStepEditorType: fomodUI.setStepEditorType,
         openTypeConditions: () => {},
+        openConditions: () => {},
     },
 
     // Retrieves the browser storage entry if available, otherwise uses the defaults.
     storage: mergeObjects(defaultStorage, fetchedStorage) as builderStorage,
 
-    fomodClass: fomodClasses.FOMOD,
+    fomodClass: fomodClasses.Fomod,
 
     trackedFomod: null
 };

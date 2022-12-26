@@ -9,10 +9,9 @@
 
 import type { updatableObject } from './fomod-builder.js';
 import type * as fomod from './fomod-builder-classifications.js';
-import * as fs from '../../filesystem-interface.js';
 
 export class Fomod implements updatableObject {
-    parent: fomod.FOMOD;
+    parent: fomod.Fomod;
 
     main: HTMLDivElement;
 
@@ -22,13 +21,14 @@ export class Fomod implements updatableObject {
     get name(): string { return this.parent.metaName; } set name(value: string) { this.parent.metaName = value; this.update(); }
 
     imageInput: HTMLInputElement;
-    imageDisplay: HTMLImageElement;
-    oldImage: string = '';
 
     /** The image of the mod */
     get image(): string { return this.parent.metaImage; } set image(value: string) { this.parent.metaImage = value; this.update(); }
 
-    constructor(parent: fomod.FOMOD) {
+    sortOrderMenu: HTMLMenuElement;
+    get sortOrder(): fomod.SortOrder { return this.parent.sortingOrder; } set sortOrder(value: fomod.SortOrder) { this.parent.sortingOrder = value; this.update(); }
+
+    constructor(parent: fomod.Fomod) {
         this.parent = parent;
 
         this.main = document.getElementById("steps-builder-container") as HTMLDivElement;
@@ -36,7 +36,8 @@ export class Fomod implements updatableObject {
         this.nameInput = this.main.querySelector('.builder-steps-mod-name') as HTMLInputElement;
 
         this.imageInput = this.main.querySelector('.builder-steps-mod-image input') as HTMLInputElement;
-        this.imageDisplay = this.main.querySelector('.builder-steps-mod-image img') as HTMLImageElement;
+
+        this.sortOrderMenu = this.main.querySelector('.bcd-dropdown-sorting-order') as HTMLMenuElement;
 
         const boundUpdateFromInput = this.updateFromInput.bind(this);
         this.nameInput.addEventListener('input', boundUpdateFromInput);
@@ -46,24 +47,14 @@ export class Fomod implements updatableObject {
     updateFromInput() {
         this.name = this.nameInput.value;
         this.image = this.imageInput.value;
+
     }
 
-    async update() {
+    update() {
         this.nameInput.value = this.name;
 
-        if (this.image === this.oldImage) return;
-        this.oldImage = this.image;
-
-        if (this.image === '') {
-            this.imageDisplay.src = '';
-            this.imageDisplay.style.display = 'none';
-            return;
-        }
-
-        const img = await window.FOMODBuilder.directory?.getFile(this.image);
-        if (!img || img instanceof fs.InvalidNameError)  return this.imageDisplay.src = '';
-
-        this.imageDisplay.src = await fs.readFileAsDataURI(img);
+        this.imageInput.value = this.image;
+        this.imageInput.dispatchEvent(new Event('change'));
     }
 }
 

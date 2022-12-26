@@ -199,7 +199,7 @@ declare global {
         upgrades?: Record<string, InstanceType<BCDComponentI>>;
         upgrades_proto?: Partial<{
             tooltip: BCDTooltip;
-            dropdown: BCDDropdown
+            dropdown: BCDDropdown;
         }>
         targetingComponents?: Record<string, BCDComponentI>;
         targetingComponents_proto?: Partial<{
@@ -1565,15 +1565,15 @@ class RelativeFilePicker {
     element: HTMLInputElement;
     button: HTMLButtonElement;
 
-    relativeTo?: fs.folder|{directory: fs.folder}|string[];
-    get directory(): fs.folder|undefined {
+    relativeTo?: fs.Folder|{directory: fs.Folder}|string[];
+    get directory(): fs.Folder|undefined {
         if (!this.relativeTo) return undefined;
         if ('handle' in this.relativeTo) return this.relativeTo;
         if ('directory' in this.relativeTo) return this.relativeTo.directory;
         return SettingsGrid.getSetting(this.relativeTo, 'directory');
     }
 
-    constructor(element: HTMLInputElement, relativeTo?: fs.folder|{directory: fs.folder}) {
+    constructor(element: HTMLInputElement, relativeTo?: fs.Folder|{directory: fs.Folder}) {
         this.element = element;
         this.relativeTo = relativeTo;
 
@@ -1650,7 +1650,7 @@ class RelativeImagePicker extends RelativeFilePicker {
 
     static noImageDoc?: Document | Promise<string>;
 
-    constructor(element: HTMLInputElement, relativeTo?: fs.folder|{directory: fs.folder}) {
+    constructor(element: HTMLInputElement, relativeTo?: fs.Folder|{directory: fs.Folder}) {
         super(element, relativeTo);
 
         this.relation = element.getAttribute('relation') as 'previous'|'next'|'parent'|'selector' ?? 'previous';
@@ -1740,8 +1740,11 @@ class RelativeImagePicker extends RelativeFilePicker {
         }
     }
 
-
+    lastValue: string = '';
     override async onChange() {
+        if (this.lastValue === this.element.value) return;
+        this.lastValue = this.element.value;
+
         super.onChange();
 
         const dir = this.directory;
@@ -1920,7 +1923,7 @@ export class SettingsGrid {
 
             if (currentDir === undefined) throw new Error(`Settings Grid cannot find the settings path "${settingsPath.join('.')}"!`);
 
-            //@ts-ignore: The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
+            //@ts-ignore:  The path is dynamically pulled from the HTML document, so it's not possible to know what it will be at compile time
             return currentDir[key];
         } catch (e) {
             if (!suppressError) console.error(e);

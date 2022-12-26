@@ -11,7 +11,8 @@ try {
     robocopy src\ ..\_generated\ts_out\ /s /purge /xf *.js *.ts
 } catch {
     Write-Host  "Copying files to ts_out\ failed." -ForegroundColor red
-    exit /b 1
+    Write-Host $_
+    exit 1
 }
 
 Write-Host
@@ -25,6 +26,7 @@ try {
     npx tsc --build --verbose tsconfig.json
 } catch {
     Write-Host "TypeScript compilation failed (for reasons other than compile errors!)." -ForegroundColor red
+    Write-Host $_
     exit 1
 }
 
@@ -37,6 +39,7 @@ try {
     node "$PSScriptRoot\..\site\minify.mjs"
 } catch {
     Write-Host "Minification failed." -ForegroundColor red
+    Write-Host $_
     exit 1
 }
 

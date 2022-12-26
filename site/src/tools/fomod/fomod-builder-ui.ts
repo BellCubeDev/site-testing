@@ -1,11 +1,21 @@
 import * as mdl from '../../assets/site/mdl/material.js';
 import * as fomodClasses from './fomod-builder-classifications.js';
 import * as fomod from './fomod-builder.js';
-import * as bcdUniversal from '../../universal.js';
-import * as bcdFS from '../../filesystem-interface.js';
-import formatHTML from '../../included_node_modules/html-format/index.js';
 
+import * as bcdUniversal from '../../universal.js';
+
+import * as bcdFS from '../../filesystem-interface.js';
 import * as xml from './fomod-builder-xml-translator.js';
+
+import xmlBeautify_ from '../../included_node_modules/xml-beautify/dist/XmlBeautify.js';
+import type { XmlBeautify } from '../../../untyped-modules';
+
+const xmlBeautify = (xmlBeautify_ as typeof XmlBeautify.XmlBeautify).prototype.beautify.bind(new xmlBeautify_());
+
+const beautifyXMLOptions: XmlBeautify.XmlBeautifyOptions  = {
+    indent: '    ',
+    useSelfClosingElement: true,
+};
 
 export class bcdDropdownSortingOrder extends bcdUniversal.BCDDropdown {
     static readonly asString = 'FOMOD Builder - Sorting Order Dropdown';
@@ -48,6 +58,7 @@ export interface windowUI {
     attemptRepair: () => void;
     setStepEditorType: (type: bcdBuilderType) => void;
     openTypeConditions: (elem: HTMLElement) => void;
+    openConditions: (elem: HTMLElement) => void;
 }
 
 
@@ -68,11 +79,15 @@ export function setStepEditorType(type: bcdBuilderType) {
         otherSteps.forEach(e => {
             e.classList.remove('active_');
             e.removeEventListener('transitionend', transitionPhaseTwo);
+            e.ariaHidden = 'true';
+            e.setAttribute('hidden', '');
         });
 
         thisElem.classList.add('active_');
         requestAnimationFrame(requestAnimationFrame.bind(window,()=>{
             thisElem.classList.add('active');
+            thisElem.ariaHidden = 'false';
+            thisElem.removeAttribute('hidden');
         }));
     }
 
@@ -97,13 +112,13 @@ export async function openFolder_entry() {
 
     window.FOMODBuilder.directory = picked;
 
-    const fomodDir = await picked.childDirsCV['fomod']!;
+    const fomodDir = await picked.childDirsC['fomod']!;
 
-    const moduleStr_ = fomodDir.childFilesCV['ModuleConfig.xml']!
+    const moduleStr_ = fomodDir.childFilesC['ModuleConfig.xml']!
                                 .then(handle => handle.getFile())
                                 .then(file => file.text());
 
-    const infoStr_ = fomodDir.childFilesCV['Info.xml']!
+    const infoStr_ = fomodDir.childFilesC['Info.xml']!
                                 .then(handle => handle.getFile())
                                 .then(file => file.text());
 
@@ -121,10 +136,10 @@ export async function save() {
         window.FOMODBuilder.directory = picked;
     }
 
-    const fomodFolder = (await window.FOMODBuilder.directory.childDirsCV['fomod'])!;
+    const fomodFolder = (await window.FOMODBuilder.directory.childDirsC['fomod'])!;
 
-    const fomodInfo_ = fomodFolder.childFilesCV['Info.xml']!;
-    const fomodModule_ = fomodFolder.childFilesCV['ModuleConfig.xml']!;
+    const fomodInfo_ = fomodFolder.childFilesC['Info.xml']!;
+    const fomodModule_ = fomodFolder.childFilesC['ModuleConfig.xml']!;
     const [fomodInfo, fomodModule] = await Promise.all([fomodInfo_, fomodModule_]);
 
     const infoDoc = window.FOMODBuilder.trackedFomod!.infoDoc;
@@ -132,13 +147,13 @@ export async function save() {
 
     // Tell the browser to save Info.xml
     let infoString = window.FOMODBuilder.trackedFomod!.obj.asInfoXML(infoDoc).outerHTML || '<!-- ERROR - Serialized document was empty! -->';
-    if (window.FOMODBuilder.storage.settings.formatXML) infoString = formatHTML(infoString, '    ', Number.MAX_SAFE_INTEGER);
+    if (window.FOMODBuilder.storage.settings.formatXML) infoString = xmlBeautify(infoString, beautifyXMLOptions);
     console.log({infoString});
     fomodInfo.createWritable().then(writable => writable.write(infoString).then(()=>writable.close()));
 
     // Tell the browser to save ModuleConfig.xml
     let moduleString = window.FOMODBuilder.trackedFomod!.obj.asModuleXML(moduleDoc).outerHTML || '<!-- ERROR - Serialized document was empty! -->';
-    if (window.FOMODBuilder.storage.settings.formatXML) moduleString = formatHTML(moduleString, '    ', Number.MAX_SAFE_INTEGER);
+    if (window.FOMODBuilder.storage.settings.formatXML) moduleString = xmlBeautify(moduleString, beautifyXMLOptions);
     console.log({moduleString});
     fomodModule.createWritable().then(writable => writable.write(moduleString).then(()=>writable.close()));
 }

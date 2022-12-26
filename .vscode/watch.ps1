@@ -5,10 +5,11 @@ Write-Host
 Write-Host "Removing previously-generated files..." -ForegroundColor cyan
 Write-Host
 try {
-    del ..\_generated\* /F /S /Q
+    Remove-Item ..\_generated\* -Force -Recurse
 } catch {
     Write-Host  "Deleting previously-generated files failed." -ForegroundColor red
-    exit /b 1
+    Write-Host $_
+    exit 1
 }
 
 Write-Host
@@ -19,7 +20,8 @@ try {
     robocopy src\ ..\_generated\ts_out\ /s /purge /xf *.js *.ts
 } catch {
     Write-Host  "Copying files to ts_out\ failed." -ForegroundColor red
-    exit /b 1
+    Write-Host $_
+    exit 1
 }
 
 function startWatcher {
@@ -37,4 +39,4 @@ while ($true) {
     timeout /t 5 /nobreak
 }
 
-exit /b 1
+exit 1

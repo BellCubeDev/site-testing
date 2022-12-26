@@ -132,17 +132,17 @@ redirect_from:
                 <label class="mdl-textfield__label">Mod Name</label>
             </div>
 
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
+            <div id="metadata-mod-id" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
                 <input class="mdl-textfield__input" type="number" pattern="\d+">
                 <label class="mdl-textfield__label">Mod ID</label>
             </div>
             <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
                 This field is not technically used by Mod Organizer 2 or Vortex. That said, MO2's parser does assign the value to an unused variable that shares a name with the Nexus Mods Page ID elsewhere in its code.
                 </p> <br><hr><br> <p>
-                This value must be a pure number. It is recommended that you create a mod page and use the page's Nexus Mods ID for this field.
+                This value must be a whole number. It is recommended that you create a mod page and use the page's Nexus Mods ID for this field.
             </p></div>
 
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
+            <div id="metadata-mod-author" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
                 <input class="mdl-textfield__input" type="text">
                 <label class="mdl-textfield__label">Mod Author</label>
             </div>
@@ -152,7 +152,7 @@ redirect_from:
                 This value is only read and displayed during FOMOD installation by Mod Organizer 2. It is not used by Vortex.
             </p></div>
 
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
+            <div id="metadata-mod-version" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
                 <input class="mdl-textfield__input" type="version">
                 <label class="mdl-textfield__label">Mod Version</label>
             </div>
@@ -162,10 +162,10 @@ redirect_from:
                 This value is only read and displayed during FOMOD installation by Mod Organizer 2. It is not used by Vortex.
             </p></div>
 
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
+            <div id="metadata-mod-url" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
                 <input class="mdl-textfield__input" type="url" pattern="^([a-z0-9+.-]+):(?:\/\/(?:((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*)@)?((?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*)(?::(\d*))?(\/(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?|(\/?(?:[a-z0-9-._~!$&'()*+,;=:@]|%[0-9A-F]{2})+(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?)(?:\?((?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*))?(?:#(?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*)?$">
                 <label class="mdl-textfield__label">Website</label>
-                <span class="mdl-textfield__error">If specified, this must be a valid URI</span>
+                <span class="mdl-textfield__error">If specified, this should be a valid URI</span>
             </div>
             <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
                 A link to the mod's website.
@@ -217,6 +217,12 @@ redirect_from:
                     <div class="item-with-fake-label item-with-fake-label--one-liner" identifier="sortOrderButton"><h4>Sorting Order</h4>
                         <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
                         <menu class="bcd-dropdown-sorting-order mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect mdl-js-ripple-effect--ignore-events"></menu>
+                    </div>
+
+                    <div class="item-with-fake-label" identifier="editModConditions"><h4>Mod Conditions</h4>
+                        <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+                            Edit
+                        </button>
                     </div>
                 </div>
 
@@ -304,7 +310,7 @@ redirect_from:
                                 </div>
 
                                 <div class="item-with-fake-label" identifier="editTypeConditions"><h4>Selection Type Conditions</h4>
-                                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect" onclick="window.FOMODBuilder.ui.openTypeConditions(this)">
+                                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
                                         Edit
                                     </button>
                                 </div>

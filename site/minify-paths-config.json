@@ -1,0 +1,9 @@
+{
+    "notModule": [
+        "xml-beautify/dist"
+    ],
+    "excluded": [
+        ".config.js",
+        "xml-beautify/index.js"
+    ]
+}

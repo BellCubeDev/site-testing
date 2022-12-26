@@ -1,0 +1,20 @@
+$warn-color: #d5b900ee;
+$warn-color-dim: #d5b90088;
+
+#metadata-mod-url {
+    &.is-invalid .mdl-textfield__label {
+        color: $warn-color;
+
+        &::after {
+            background-color: $warn-color;
+        }
+    }
+
+    &.is-invalid .mdl-textfield__input {
+        border-color: $warn-color-dim;
+    }
+
+    .mdl-textfield__error {
+        color: $warn-color;
+    }
+}
