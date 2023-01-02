@@ -311,6 +311,7 @@ export const possibilities_Generic = [
     "When stupidity is considered patriotism, it is unsafe to be intelligent", // - Isaac Asimov
     "I don't care how many fancy Latin names he gives himself, a thug ain&rsquo;t nothin&rsquo; but a thug",
     "Although, being a scientist, I have to admit I might&rsquo;ve just blinked for longer than usual",
+    "Speaking without thinking is not the same as telling the truth",
 ];
 
 
