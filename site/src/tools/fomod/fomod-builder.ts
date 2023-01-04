@@ -41,7 +41,12 @@ export interface builderStorage {
         autoSaveAfterChange: boolean; // false
         /** ALWAYS nuke the document and start anew?
             @default false */
-        alwaysCleanSave: boolean; // false
+        autoCleanSave: boolean; // false
+
+        /** Keep the Name in Info.xml and the Module Name in Module.xml synced?
+           Will prefer the name in Info.xml if they are different
+           @default true */
+        keepNamesSynced: boolean; // true - disable when loading a FOMOD with desynced names
 
         /** Include a schema link inside Info.xml?
             @default true */
@@ -79,7 +84,9 @@ const defaultStorage: builderStorage =  {
     storageRevision,
     settings: {
         autoSaveAfterChange: false,
-        alwaysCleanSave: false,
+        autoCleanSave: false,
+
+        keepNamesSynced: true, // be sure to disable when loading a FOMOD with desynced names
 
         includeInfoSchema: true,
         optimizationUsingFlags: true,

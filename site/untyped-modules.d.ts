@@ -31,12 +31,12 @@ export namespace XmlBeautify {
         useSelfClosingElement?: boolean;
     }
 
-    export interface XmlBeautifyOptionsWithParser extends XmlBeautifyOptions {
+    export interface XmlBeautifyInitOptions {
         parser?: () => DOMParser;
     }
 
     export class XmlBeautify {
-        constructor(option: XmlBeautifyOptionsWithParser)
+        constructor(option?: XmlBeautifyInitOptions)
 
         hasXmlDef(xmlText: string): boolean
 

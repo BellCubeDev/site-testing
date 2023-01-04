@@ -4,10 +4,15 @@ FOMODBuilder:
     name: Auto-Save
     tooltip: Automatically save the FOMOD after each change?
 
-  alwaysCleanSave:
+  autoCleanSave:
     type: bool
     name: "Auto-Save: Clean Save"
     tooltip: If auto-save is enabled, should the FOMOD be reconstructed it from the ground up?
+
+  keepNamesSynced:
+    type: bool
+    name: Keep FOMOD Names Synced
+    tooltip: Whether or not to keep the mod name stored in Info.xml and the "Module Name" stored in ModuleConfig.xml in sync.<br>When set, this will prioritize the name in Info.xml over the name in ModuleConfig.xml
 
   includeInfoSchema:
     type: bool

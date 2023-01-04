@@ -942,6 +942,7 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
     createOption(option: string, clickCallback?: Function|null, addToList: boolean = false): HTMLLIElement {
         const li = document.createElement('li');
         li.innerText = option;
+        li.setAttribute('option-value', option);
         li.classList.add('mdl-menu__item');
         this.registerItem(li);
 
@@ -1757,17 +1758,21 @@ class RelativeImagePicker extends RelativeFilePicker {
             return console.info('The relative image picker does not have a directory to update the image from.', this, dir);
         }
 
-        const fileHandle_ = dir.getFile(this.element.value);
-        const fs_ = loadFS();
-        const [fileHandle, fs] = await Promise.all([fileHandle_, fs_]);
+        try {
+            const fileHandle_ = dir.getFile(this.element.value);
+            const fs_ = loadFS();
+            const [fileHandle, fs] = await Promise.all([fileHandle_, fs_]);
 
-        if (!fileHandle || fileHandle instanceof fs.InvalidNameError) {
+            if (!fileHandle || fileHandle instanceof fs.InvalidNameError) {
+                this.hideImage();
+                return console.info('The relative image picker does not have a file handle to update the image with.', this);
+            }
+
+            this.imageElem.src = await fs.readFileAsDataURI(fileHandle);
+            this.showImage();
+        } catch {
             this.hideImage();
-            return console.info('The relative image picker does not have a file handle to update the image with.', this);
         }
-
-        this.imageElem.src = await fs.readFileAsDataURI(fileHandle);
-        this.showImage();
     }
 }
 bcdComponents.push(RelativeImagePicker);

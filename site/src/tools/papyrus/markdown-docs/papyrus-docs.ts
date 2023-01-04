@@ -9,12 +9,12 @@ import '../../../assets/site/highlight_js/languages/markdown.min.js';
     https://patorjk.com/software/taag/#p=display&h=0&v=0&f=Big%20Money-nw
     ...makes this code *so* much easier to maintain... you know, 'cuz I can find my functions in VSCode's Minimap
 */
-var elem_papy_docs_libName:HTMLInputElement;
-var elem_papy_docs_libLink:HTMLInputElement;
-var elem_papy_docs_registerPattern:HTMLInputElement;
-var elem_papy_docs_mdOutput:HTMLElement;
-var elem_papy_docs_filePicker:HTMLElement;
-var elem_papy_docs_folderPicker:HTMLElement;
+let elem_papy_docs_libName:HTMLInputElement;
+let elem_papy_docs_libLink:HTMLInputElement;
+let elem_papy_docs_registerPattern:HTMLInputElement;
+let elem_papy_docs_mdOutput:HTMLElement;
+let elem_papy_docs_filePicker:HTMLElement;
+let elem_papy_docs_folderPicker:HTMLElement;
 
 export function ___bcdLoad_autoPapyDocsInit() { //@ts-ignore Cannot find name 'autoPapyDocs'.
     const temp_elements = [
@@ -65,12 +65,133 @@ const regex_Scriptname =
 
 const regex_Events =
 /\n*((?:^\s*;.*\n)+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*Event(?:\s|;\/(?:\s|\S)*?\/;|\\)+([\w\d]+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*\((?:\s|;\/(?:\s|\S)*?\/;|\\)*((?:[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)*=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+|".*?(?<!\\)"))?(?:(?:\s|;\/(?:\s|\S)*?\/;|\\))*,(?:\s|;\/(?:\s|\S)*?\/;|\\)+)*[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+|".*?(?<!\\)"))?))?(?:\s|;\/(?:\s|\S)*?\/;|\\)*\)([\s\S]+?)^(?:\s|;\/(?:\s|\S)*?\/;|\\)*EndEvent/gim;
+/*
+Allow any number of new lines before the event:
+\n*
 
-const regex_EventParams =
+Capture all comments directly before the event:
+((?:^\s*;.*\n)+)
+
+Allow any number of spaces before the `Event` keyword:
+(?:\s|;\/(?:\s|\S)*?\/;|\\)*
+
+Match the `Event` keyword:
+Event
+
+Allow any number of spaces between the `Event` keyword and the event name:
+(?:\s|;\/(?:\s|\S)*?\/;|\\)+
+
+Capture the event name:
+([\w\d]+)
+
+Allow any number of spaces between the event name and the opening parenthesis:
+(?:\s|;\/(?:\s|\S)*?\/;|\\)*
+
+Match the opening parenthesis:
+\(
+
+Allow any number of spaces between the opening parenthesis and the first argument:
+(?:\s|;\/(?:\s|\S)*?\/;|\\)*
+
+Capture any arguments present:
+(
+    Capture arguments excepting the final argument:
+    (?:
+        Capture the argument type:
+        [\w\d]+
+
+        Require at least one space between the argument type and the argument name:
+        (?:\s|;\/(?:\s|\S)*?\/;|\\)+
+
+        Capture the argument name:
+        [\w\d]+
+
+        Capture the default, if any:
+        (?:
+            Allow any number of spaces between the argument name and the equal sign:
+            (?:\s|;\/(?:\s|\S)*?\/;|\\)*
+
+            Match the equal sign:
+            =
+
+            Allow any number of spaces between the equal sign and the default value:
+            (?:\s|;\/(?:\s|\S)*?\/;|\\)*
+
+            Capture the default value:
+            (?:[\w\d]+|".*?(?<!\\)")
+        )?
+
+        Allow any number of spaces between the argument and the comma:
+        (?:(?:\s|;\/(?:\s|\S)*?\/;|\\))*
+
+        Match the comma:
+        ,
+
+        Allow any number of spaces between the comma and the next argument:
+        (?:\s|;\/(?:\s|\S)*?\/;|\\)+
+    )*
+
+    Capture the type of the final argument:
+    [\w\d]+
+
+    -- not sure why this non-capturing group is here, actually --
+    (?:
+        Allow any number of spaces between the type and the name of the final argument:
+        (?:\s|;\/(?:\s|\S)*?\/;|\\)+
+
+        Capture the name of the final argument:
+        [\w\d]+
+
+        -- this should probably be in the optional group, but hey --
+        Allow any number of spaces between the name and either the equal sign or the closing parenthesis:
+        (?:\s|;\/(?:\s|\S)*?\/;|\\)*
+
+
+        Capture the default, if any:
+        (?:
+            Match the equal sign:
+            =
+
+            Allow any number of spaces between the equal sign and the default value:
+            (?:\s|;\/(?:\s|\S)*?\/;|\\)*
+
+            Capture the default value:
+            (?:[\w\d]+|".*?(?<!\\)")
+        )?
+    )
+)?
+
+Allow any number of spaces between arguments and the closing parenthesis:
+(?:\s|;\/(?:\s|\S)*?\/;|\\)*
+
+Match the closing parenthesis:
+\)
+
+Capture the event code:
+([\s\S]+?)
+
+Require the start of a new line:
+^
+
+Allow any number of spaces before the `EndEvent` keyword:
+(?:\s|;\/(?:\s|\S)*?\/;|\\)*
+
+Match the `EndEvent` keyword:
+EndEvent
+*/
+
+
+const regex_Parameters =
 /(?:\s|;\/.*?\/;|\\)*([\w\d]+)(\[])?(?:\s|;\/.*?\/;|\\)+([\w\d]+)(?:\s|;\/.*?\/;|\\)*(?:=(?:\s|;\/.*?\/;|\\)*(".+(?<!\\)"|[\w\d]+))?/gsi;
 
 const regex_Functions =
 /\n*((?:^\s*;.*\n)+)?(?:([\w\d]+)(\[.*?\])?(?:\s|;\/(?:\s|\S)*?\/;|\\)+)?Function(?:\s|;\/(?:\s|\S)*?\/;|\\)+([\w\d]+)(?:\s|;\/(?:\s|\S)*?\/;|\\)*\((?:\s|;\/(?:\s|\S)*?\/;|\\)*((?:[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)*=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+(?:\.\d+)?|".*?(?<!\\)"))?(?:(?:\s|;\/(?:\s|\S)*?\/;|\\))*,(?:\s|;\/(?:\s|\S)*?\/;|\\)+)*[\w\d]+(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+[\w\d]+(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:=(?:\s|;\/(?:\s|\S)*?\/;|\\)*(?:[\w\d]+(?:\.\d+)?|".*?(?<!\\)"))?))?(?:\s|;\/(?:\s|\S)*?\/;|\\)*\)(?:\s|;\/(?:\s|\S)*?\/;|\\)+(?:(global)(?:\s|;\/(?:\s|\S)*?\/;|\\)+)?(?:(native)(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+(global))?(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+\{(.*?)\})?|(?:(?:(?:\s|;\/(?:\s|\S)*?\/;|\\)+\{(.*?)\})?([\s\S]+?)^(?:\s|;\/(?:\s|\S)*?\/;|\\)*EndFunction))/gmi;
+
+const specialCharacters = ['*', '_', '-', '<', '>', '`', '~', '#', '^', '[', ']', '(', ')', '|', ':'];
+const regex_SpecialCharacters = new RegExp(`[\\${specialCharacters.join('\\')}]`, 'g');
+function escapeSpecialCharacters(str:string){
+    return str.replace(regex_SpecialCharacters, '\\$&');
+}
 
 /*
     papy_docs_libName
@@ -101,7 +222,7 @@ Regex Components:
 
 
 async function generateDocs_file(){
-    var file;
+    let file;
     try{
         file = (await window.showOpenFilePicker())[0];
     }catch(e){
@@ -123,7 +244,7 @@ async function generateDocs_file(){
 }
 
 async function generateDocs_folder(){
-    var folder;
+    let folder;
     try{
         folder = await window.showDirectoryPicker();
         await attainDirPerms(folder);
@@ -137,16 +258,14 @@ async function generateDocs_folder(){
             throw e;
         }
     }
-    //console.log(folder, folder.entries());
-    //var entries = folder.entries();
-    //console.log(await entries.next());
+
     await forEachFile(folder, iterationFunction, -1);
 
     /** @param {string} name @param {FileSystemHandle} file */
     async function iterationFunction(name:string, file:FileSystemHandle, directory:FileSystemDirectoryHandle){
         //console.log(name, file);
         if (file.kind === 'file' && name.endsWith('.psc')) {
-            var tempOut = parseScript(await readFile(await (file as FileSystemFileHandle).getFile()));
+            const tempOut = parseScript(await readFile(await (file as FileSystemFileHandle).getFile()));
             writeFile(await directory.getFileHandle(`${name}.md`, {create: true}), tempOut);
             setMarkdownOutput(tempOut);
         }
@@ -154,13 +273,12 @@ async function generateDocs_folder(){
 }
 
 /** Executes a callback for each file in the specified directory, recursing as requested.
-    @param {FileSystemDirectoryHandle} dir The directory to iterate over
-    @param {async function(string, FileSystemFileHandle, FileSystemDirectoryHandle)} callback The function to execute for each file
-    @param {number} [recursion = 0] The number of levels to recurse into subdirectories. Negative numbers will recurse indefinitely.
-    @param {function} finalCallback The function to execute when the iteration is complete
+    @param dir The directory to iterate over
+    @param callback The function to execute for each file
+    @param recursion The number of levels to recurse into subdirectories. Negative numbers will recurse indefinitely.
 */
-async function forEachFile(dir:FileSystemDirectoryHandle, callback:Function, recursion = 0): Promise<unknown> {
-    var promises = [];
+async function forEachFile<TCallback extends (name: string, file: FileSystemFileHandle, dir: FileSystemDirectoryHandle) => Promise<any>>(dir:FileSystemDirectoryHandle, callback:TCallback, recursion = 0): Promise<Awaited<ReturnType<TCallback>>[]> {
+    const promises = [];
     for await (const [name, file] of dir.entries()) {
         if (file.kind === 'file') {
             promises.push(callback(name, file, dir));
@@ -221,17 +339,11 @@ function readFile(file:File):Promise<string>{
 
 
 
-/*
- This function was taken from https://developer.mozilla.org/en-US/docs/Web/API/FileSystemFileHandle
- That code is available under CC-0: http://creativecommons.org/publicdomain/zero/1.0/
-*/
 /** Writes file contents to the file system.*/
 async function writeFile(fileHandle:FileSystemFileHandle, contents:string|BufferSource|Blob):Promise<void> {
-    //console.log(fileHandle);
-    fileHandle.createWritable().then(async (writable:FileSystemWritableFileStream) =>{
-        await writable.write(contents);
-        writable.close();
-    });
+    const writable = await fileHandle.createWritable();
+    await writable.write(contents);
+    writable.close();
 }
 
 
@@ -239,9 +351,7 @@ async function writeFile(fileHandle:FileSystemFileHandle, contents:string|Buffer
 
 
 /** Attain permissions for the specified directory
-    @param {FileSystemDirectoryHandle} dir
     @throws {DOMException} 'AbortError' If the user fails to give permissions for the directory
-    @returns {nil} nothing
 */
 async function attainDirPerms(dir:FileSystemDirectoryHandle) {
     while (!(await tryForPermission(dir as FileSystemHandle as FileSystemFileHandle, 'readwrite'))){
@@ -270,35 +380,35 @@ $$\   $$ |$$ |      $$ |      $$ |$$ |  $$ |  $$ |$$\ $$ |      $$  __$$ |$$ |  
 
 
 // Various interfaces for intuitively defining various components of Papyrus for parsing.
-interface papyrus_Type {
-    type: string,
-    is_array: boolean
+interface PapyrusType {
+    script: string,
+    isArray: boolean
 }
 
-interface papyrus_Parameter extends papyrus_Type {
+interface PapyrusParameter extends PapyrusType {
     name: string;
     default: string;
 }
 
-interface papyrus_Function {
+interface PapyrusFunction {
     name: string,
-    returns: papyrus_Type,
+    returns: PapyrusType,
     description: string,
-    parameters: papyrus_Parameter[],
+    parameters: PapyrusParameter[],
     global: boolean,
     native: boolean,
     body: string
 }
 
-interface papyrus_Event extends papyrus_Function {
+interface PapyrusEvent extends PapyrusFunction {
     global: false,
     native: false,
-    returns: {type: 'None', is_array: false}
+    returns: {script: 'None', isArray: false}
 }
 
-interface papyrus_Script {
+interface PapyrusScript {
     name: string,
-    included_documentation?: string,
+    documentation?: string,
     parent: string,
     conditional: boolean,
     hidden: boolean,
@@ -309,28 +419,27 @@ interface papyrus_Script {
 
 /** Parses the passed-in script into Markdown documentation */
 function parseScript(scriptStr:string):string {
-    var scriptname = parseScriptName(scriptStr);
-    var functions = sortArrayOfObjectAlphaByKey(
-        parseFunctions(scriptStr), 'name'
-        ) as papyrus_Function[];
-    var functionTable = '';
+    const scriptname = parseScriptName(scriptStr);
 
-    var events = sortArrayOfObjectAlphaByKey(parseEvents(scriptStr), 'name');
-    var eventTable = '';
+    const functions = sortArrayOfObjectAlphaByKey(parseFunctions(scriptStr), 'name');
+    let functionTable = '';
+
+    const events = sortArrayOfObjectAlphaByKey(parseEvents(scriptStr), 'name');
+    let eventTable = '';
     /* Example:
     |   Event   |                    Description                    | [Registration](https://modding.wiki/en/skyrim/developers/papyrus/concepts/functions#registration) |                Parameters                |
     |    :--    |                        :-:                        |                                                :-:                                                |                   :--                    |
     | OnLostLOS | Sent when an actor cannot see the target anymore. |                                                Yes                                                | Actor akViewer, ObjectReference akTarget |
     */
-    for (var event of events) {
+    for (const event of events) {
         // eslint-disable-next-line prefer-template
-        var eventTableRow = `| [${event.name}](${inputValue(elem_papy_docs_libLink).replace(/\/?$/, '/')}${scriptname.name}/${event.name}) | ${event.description.replace(/\n/g, '<br />')}${
+        const eventTableRow = `| [${escapeSpecialCharacters(event.name)}](${inputValue(elem_papy_docs_libLink).replace(/\/?$/, '/')}${scriptname.name}/${event.name}) | ${escapeSpecialCharacters(event.description.replace(/\n/g, '<br />'))}${
             scriptStr.toLowerCase().includes(
                 inputValue(elem_papy_docs_registerPattern).replace(/%e%/ig,
                     event.name.replace(/^on/i, '').replace(/(?:event)?(?:unregister(?:ed)?)?$/i, '').replace(/start|stop/i, '')
                 ).toLowerCase()
             ) ? ' | Registered | ' : ' | Unregistered | '}` +
-            event.parameters.map((param:papyrus_Parameter) => `\`${param.type}\` *${param.name}*`).join(', <br />').replace(/, <br \/>$/, '') +
+            event.parameters.map((param:PapyrusParameter) => `\`${escapeSpecialCharacters(param.script)}\` *${escapeSpecialCharacters(param.name)}*`).join(', <br />').replace(/, <br \/>$/, '') +
         ' |\n';
         eventTable += eventTableRow;
     }
@@ -340,11 +449,11 @@ function parseScript(scriptStr:string):string {
         | --: | :-: | :-: | :-: | :-: | :-: |
         | Int | GetFormID | Returns the form of of the form you run this on |     | No | Yes |
     */
-    for (var func of functions) {
+    for (const func of functions) {
         // eslint-disable-next-line prefer-template
-        var funcTableRow = `| ${func.returns.type}${func.returns.is_array ? '[]' : ''} | ${func.name} | ${func.description.replace(/\n/g, '<br />')} | ` +
+        const funcTableRow = `| ${func.returns.script}${func.returns.isArray ? '[]' : ''} | ${func.name} | ${func.description.replace(/\n/g, '<br />')} | ` +
 
-        func.parameters.map(param => `\`${param.type}\` *${param.name}*`).join(', <br />').replace(/, <br \/>$/, '') +
+        func.parameters.map(param => `\`${escapeSpecialCharacters(param.script)}\` *${escapeSpecialCharacters(param.name)}*`).join(', <br />').replace(/, <br \/>$/, '') +
 
         `| ${func.global ? 'Global' : 'Member'} | ${func.native ? 'Native' : 'Scripted'} |\n`;
         functionTable += funcTableRow;
@@ -354,10 +463,10 @@ function parseScript(scriptStr:string):string {
 
 | :-: | :-- |
 | Engine-Bound Type | <!-- **USER-INPUTTED** --> | <!-- e.g. \`_NPC\` (Actor) -->
-| [Parent](/skyrim/developers/papyrus/concepts/scripts#parents) | ${scriptname.parent} |
-| [Library](/skyrim/developers/papyrus/concepts/libraries) | [${inputValue(elem_papy_docs_libName)}](${inputValue(elem_papy_docs_libLink)}) |
+| [Parent](/skyrim/developers/papyrus/concepts/scripts#parents) | ${escapeSpecialCharacters(scriptname.parent)} |
+| [Library](/skyrim/developers/papyrus/concepts/libraries) | [${escapeSpecialCharacters(inputValue(elem_papy_docs_libName))}](${escapeSpecialCharacters(inputValue(elem_papy_docs_libLink))}) |
 
-${scriptname?.included_documentation?.replace(/^/gsm, '> ').replace(/^> $/g, '')}
+${escapeSpecialCharacters(scriptname?.documentation?.replace(/^/gsm, '> ').replace(/^> $/g, '') ?? '')}
 
 <!-- **Add extra description HERE** -->${functionTable.length > 0 ? `
 
@@ -399,12 +508,12 @@ Scripts extending this script
 
 
 /** Parses the "Scriptname" portion of a script */
-function parseScriptName(scriptStr:string): papyrus_Script {
-    var parsed = regex_Scriptname.exec(scriptStr);
+function parseScriptName(scriptStr:string): PapyrusScript {
+    const parsed = scriptStr.match(regex_Scriptname);
     if (!parsed) return {
         name: '',
         parent: '',
-        included_documentation: '',
+        documentation: '',
         conditional: false,
         hidden: false,
         native: false
@@ -412,7 +521,7 @@ function parseScriptName(scriptStr:string): papyrus_Script {
     return {
         name: parsed[1] ?? '',
 
-        included_documentation: typeof parsed[6] === 'undefined' ? '' : parsed[6],
+        documentation: typeof parsed[6] === 'undefined' ? '' : parsed[6],
 
         parent: typeof parsed[2] === 'undefined' ? '[Top-Level](/skyrim/developers/papyrus/top-level-index)' : parsed[2],
 
@@ -425,43 +534,43 @@ function parseScriptName(scriptStr:string): papyrus_Script {
 
 
 /** Parses the Events in the script */
-function parseEvents(scriptStr:string):papyrus_Event[] {
+function parseEvents(scriptStr:string):PapyrusEvent[] {
     //console.log('Parsing events...');
     //console.log(regex_Events);
     //console.log(scriptStr);
-    var events:papyrus_Event[] = [];
-    var parsed = scriptStr.matchAll(regex_Events);
+    const events:PapyrusEvent[] = [];
+    const parsed = scriptStr.matchAll(regex_Events);
     //console.log('Events Parsed:', parsed);
-    for (var _event of parsed){
+    for (const eventMatch of parsed){
         //console.log(`Current Event:`, _event);
         // Parse Event Parameters
 
         events.push({
-            name: _event[2] ?? '',
-            description: trimWhitespace(_event[1] ?? '').replace(/^\s*;\s*/gm, ''),
-            parameters: parseParameters(_event[3] ?? ''),
-            body: typeof _event[4] === 'undefined' ? '' : trimWhitespace(_event[4]),
+            name: eventMatch[2] ?? '',
+            description: trimWhitespace(eventMatch[1] ?? '').replace(/^\s*;\s*/gm, ''),
+            parameters: parseParameters(eventMatch[3] ?? ''),
+            body: typeof eventMatch[4] === 'undefined' ? '' : trimWhitespace(eventMatch[4]),
             global: false,
             native: false,
-            returns: {type: 'None', is_array: false}
+            returns: {script: 'None', isArray: false}
         });
     }
     //console.log('parseEvents(): ', events);
     return events;
 }
 
-function parseParameters(paramStr:string):papyrus_Parameter[] {
+function parseParameters(paramStr:string):PapyrusParameter[] {
     if (typeof paramStr !== 'string') return [];
 
-    const result_arr : papyrus_Parameter[] = [];
-    const params = paramStr.matchAll(regex_EventParams);
+    const result_arr : PapyrusParameter[] = [];
+    const params = paramStr.matchAll(regex_Parameters);
 
-    for (var _param of params){
+    for (const param of params){
         result_arr.push({
-            type: capitalizeFirstLetter(_param[1] ?? ''),
-            is_array: _param[2] !== undefined,
-            name: _param[3] ?? '',
-            default: typeof _param[4] === 'undefined' ? '' : _param[3] ?? ''
+            script: capitalizeFirstLetter(param[1] ?? ''),
+            isArray: param[2] !== undefined,
+            name: param[3] ?? '',
+            default: typeof param[4] === 'undefined' ? '' : param[3] ?? ''
         });
     }
 
@@ -473,12 +582,12 @@ function parseParameters(paramStr:string):papyrus_Parameter[] {
     @returns {Array<>} - An array of event objects
 */
 
-function parseFunctions(scriptStr:string):papyrus_Function[] {
-    const functions:papyrus_Function[] = [];
+function parseFunctions(scriptStr:string):PapyrusFunction[] {
+    const functions:PapyrusFunction[] = [];
     const parsed = scriptStr.matchAll(regex_Functions);
     for (const _function of parsed){
         functions.push({
-            returns: {type: typeof _function[2] === 'undefined' ? '' : capitalizeFirstLetter(_function[2]), is_array: typeof _function[3] !== 'undefined'},
+            returns: {script: typeof _function[2] === 'undefined' ? '' : capitalizeFirstLetter(_function[2]), isArray: typeof _function[3] !== 'undefined'},
             name: _function[4] ?? '',
             description: // Concatenate the various possible description matches
                 (typeof _function[1] === 'undefined' ? '' : trimWhitespace(_function[1]).replace(/^\s*;\s*/gm, '')) +
@@ -529,8 +638,8 @@ function inputValue(element:HTMLInputElement, usePlaceholder:boolean = true):str
 
 function sortArrayOfObjectAlphaByKey<TArr extends unknown[]>(obj:TArr, key:keyof TArr[number]): TArr {
     return obj.sort((a:TArr[number], b:TArr[number]) => {
-        var textA = JSON.stringify(a[key]).toUpperCase();
-        var textB = JSON.stringify(b[key]).toUpperCase();
+        const textA = JSON.stringify(a[key]).toUpperCase();
+        const textB = JSON.stringify(b[key]).toUpperCase();
         return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
     });
 }

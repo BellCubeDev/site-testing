@@ -4,6 +4,9 @@
     ],
     "excluded": [
         ".config.js",
-        "xml-beautify/index.js"
+        "xml-beautify/index.js",
+        "xml-beautify/node-example/",
+        "zip.js/dist/",
+        "pretty-data/test/"
     ]
 }
