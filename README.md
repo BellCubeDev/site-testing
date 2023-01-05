@@ -25,9 +25,9 @@ As well as some of the assets:
 
 To build this project, you've got three options:
 
-## 1. The Simple Way (Windows Only)
+## 1. The Simple Way
 
-If you haven't already, install Node Package Manager (NPM) and RubyGems. Once you've done that, open a command prompt or PowerShell window in the project's root directory and run the command `.vscode\build.ps1`
+If you haven't already, install the latest LTS version of [Node.js & Node Package Manager](https://nodejs.org/en/) as well as the latest stable releases of both [Ruby](https://www.ruby-lang.org/) and [RubyGems](https://rubygems.org/). Additionally, if you're not on Windows, be sure to [install PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell). Once you've done that, open a command prompt or PowerShell window in the project's root directory and run the command `.vscode\build.ps1`
 
 ## 2. The Slightly-More-Complicated Way (GitHub Actions)
 
