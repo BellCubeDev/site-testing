@@ -25,13 +25,14 @@ $$ |  $$ |$$$$$$$  |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |\$$$$$$$\   \$$$$  |
 \__|  \__|\_______/ \_______/    \____/ \__|       \_______| \_______|   \____/ \______*/
 
 export abstract class XMLElement implements main.updatableObject {
+    suppressUpdates = false;
     instanceElement: Element | undefined;
 
     objectsToUpdate: main.updatableObject[] = [];
 
     updateObjects() {
         this.objectsToUpdate.forEach(  (obj) => obj.update()  );
-        if (window.FOMODBuilder.storage.settings.autoSaveAfterChange)  main.save();
+        if (!this.suppressUpdates && window.FOMODBuilder.storage.settings.autoSaveAfterChange)  main.save();
     }
 
     update() { this.updateObjects(); }
@@ -633,8 +634,8 @@ export class Fomod extends XMLElement {
     /** The metadata version of this mod */
     set metaVersion(value: string) { this._metaVersion = value; this.updateObjects(); } get metaVersion(): string { return this._metaVersion; }
 
-    private _metaId: number = 0;
-    set metaId(value: number) { this._metaId = value; this.updateObjects(); } get metaId(): number { return this._metaId; }
+    private _metaId: number|null = null;
+    set metaId(value: number|null) { this._metaId = value; this.updateObjects(); } get metaId(): number|null { return this._metaId; }
 
     private _infoInstanceElement: Element | undefined;
     set infoInstanceElement(value: Element | undefined) { this._infoInstanceElement = value; this.updateObjects(); } get infoInstanceElement(): Element | undefined { return this._infoInstanceElement; }
@@ -649,7 +650,7 @@ export class Fomod extends XMLElement {
                 this._metaUrl = url;
                 this.updateObjects();
 
-                console.warn(`Invalid URL: "${url}"`);
+                //console.warn(`Invalid URL: "${url}"`);
             }
         }
     }
@@ -671,24 +672,34 @@ export class Fomod extends XMLElement {
         instanceElement?: Element,
         infoInstanceElement?: Element,
         metaName: string = '',
+        moduleName: string = '',
         metaImage: string = '',
         metaAuthor: string = '',
         metaVersion: string = '',
-        metaId: number = 0,
+        metaId: number|null|'' = '',
         metaUrl: string = '',
         installs: Install[] = [],
         steps: Step[] = [],
         conditions?: DependencyGroup
     ) {
         super(instanceElement);
+        this.suppressUpdates = true;
         this.infoInstanceElement = infoInstanceElement;
-        this.metaName = metaName ?? infoInstanceElement?.getElementsByTagName("Name")[0]?.textContent ?? '';
-        this.moduleName = instanceElement?.getElementsByTagName("moduleName")[0]?.textContent ?? '';
-        this.metaImage = metaImage ?? instanceElement?.getElementsByTagName("moduleImage")[0]?.getAttribute("path");
-        this.metaAuthor = metaAuthor ?? infoInstanceElement?.getElementsByTagName("Author")[0]?.textContent ?? '';
-        this.metaVersion = metaVersion ?? infoInstanceElement?.getElementsByTagName("Version")[0]?.textContent ?? '';
-        this.metaId = metaId ?? infoInstanceElement?.getElementsByTagName("Id")[0]?.textContent ?? 0;
-        this.metaUrl = metaUrl ?? infoInstanceElement?.getElementsByTagName("Url")[0]?.textContent ?? '';
+
+        this.metaName =         metaName || infoInstanceElement?.getElementsByTagName("Name")           [0]?.textContent            || '';
+        this.moduleName =     moduleName ||     instanceElement?.getElementsByTagName("moduleName")     [0]?.textContent            || '';
+        this.metaImage =       metaImage || infoInstanceElement?.getElementsByTagName("Name")           [0]?.getAttribute("path")   || '';
+        this.metaAuthor =     metaAuthor || infoInstanceElement?.getElementsByTagName("Author")         [0]?.textContent            || '';
+        this.metaVersion =   metaVersion || infoInstanceElement?.getElementsByTagName("Version")        [0]?.textContent            || '';
+        this.metaUrl =           metaUrl || infoInstanceElement?.getElementsByTagName("Website")        [0]?.textContent            || '';
+
+        if (metaId !== '') this.metaId = metaId;
+        else {
+            const [,id] = infoInstanceElement?.getElementsByTagName("Id")[0]?.textContent?.match(/^\s*(\d+)\s*$/) ?? [];
+            if (id) this.metaId = parseInt(id);
+            else this.metaId = null;
+        }
+
         this.installs = installs;
         this.conditions = conditions;
         this.steps = steps;
@@ -698,6 +709,12 @@ export class Fomod extends XMLElement {
             new bindingsGeneric.modMetadata(this),
             new bindings1stParty.Fomod(this),
         );
+
+        requestAnimationFrame(() => {
+            this.updateObjects();
+            this.suppressUpdates = false;
+        });
+
     }
 
     override asModuleXML(document: XMLDocument): Element {
@@ -740,11 +757,11 @@ export class Fomod extends XMLElement {
 
         // Set actual data
         const url = this.getURLAsString();
-        if (this.metaName)    this.infoInstanceElement.getOrCreateChild("Name").textContent    = this.metaName;
-        if (this.metaAuthor)  this.infoInstanceElement.getOrCreateChild("Author").textContent  = this.metaAuthor;
-        if (this.metaId)      this.infoInstanceElement.getOrCreateChild("Id").textContent      = this.metaId.toString();
-        if (url)               this.infoInstanceElement.getOrCreateChild("Website").textContent = url;
-        if (this.metaVersion) this.infoInstanceElement.getOrCreateChild("Version").textContent = this.metaVersion;
+        if (this.metaName)          this.infoInstanceElement.getOrCreateChild("Name").textContent    = this.metaName;
+        if (this.metaAuthor)        this.infoInstanceElement.getOrCreateChild("Author").textContent  = this.metaAuthor;
+        if (this.metaId !== null)   this.infoInstanceElement.getOrCreateChild("Id").textContent      = this.metaId.toString();
+        if (url)                    this.infoInstanceElement.getOrCreateChild("Website").textContent = url;
+        if (this.metaVersion)       this.infoInstanceElement.getOrCreateChild("Version").textContent = this.metaVersion;
 
         return this.infoInstanceElement;
     }

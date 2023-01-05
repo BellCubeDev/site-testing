@@ -40,21 +40,31 @@ export class Fomod implements updatableObject {
         this.sortOrderMenu = this.main.querySelector('.bcd-dropdown-sorting-order') as HTMLMenuElement;
 
         const boundUpdateFromInput = this.updateFromInput.bind(this);
+
         this.nameInput.addEventListener('input', boundUpdateFromInput);
         this.nameInput.addEventListener('change', boundUpdateFromInput);
+
+        this.imageInput.addEventListener('input', boundUpdateFromInput);
+        this.imageInput.addEventListener('change', boundUpdateFromInput);
     }
 
+    suppressUpdate = false;
     updateFromInput() {
+        if (this.suppressUpdate) return;
+
         this.name = this.nameInput.value;
         this.image = this.imageInput.value;
-
     }
 
     update() {
+        this.suppressUpdate = true;
+
         this.nameInput.value = this.name;
 
         this.imageInput.value = this.image;
-        this.imageInput.dispatchEvent(new Event('change'));
+        this.imageInput.dispatchEvent(new Event('imput'));
+
+        this.sortOrderMenu.upgrades_proto?.dropdown?.makeSelected(this.sortOrderMenu.querySelector(`:scope li[option-value="${this.sortOrder}"]`)!);
     }
 }
 

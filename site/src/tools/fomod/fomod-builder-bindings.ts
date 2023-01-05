@@ -20,7 +20,7 @@ export class modMetadata implements updatableObject {
     versionInput: HTMLInputElement;
 
     /** The ID of the mod */
-    get id(): number { return this.parent.metaId; } set id(value: number) { this.parent.metaId = value; this.update(); }
+    get id(): number|null { return this.parent.metaId; } set id(value: number|null) { this.parent.metaId = value; this.update(); }
     idInput: HTMLInputElement;
 
     /** The URL of the mod */
@@ -41,7 +41,10 @@ export class modMetadata implements updatableObject {
         this.nameInput.addEventListener('change', boundUpdateFromInput);
     }
 
+    skipUpdating = false;
     updateFromInput() {
+        if (this.skipUpdating) return;
+
         this.name = this.nameInput.value;
         this.author = this.authorInput.value;
         this.version = this.versionInput.value;
@@ -49,13 +52,18 @@ export class modMetadata implements updatableObject {
 
         const [,id] = this.idInput.value.match(/^\s*(\d+)\s*$/) ?? [];
         if (id) this.id = parseInt(id);
+        else this.id = null;
     }
 
     update() {
-        this.nameInput.value = this.name;
-        this.authorInput.value = this.author;
-        this.versionInput.value = this.version;
-        this.idInput.value = this.id.toString();
-        this.urlInput.value = this.url;
+        this.skipUpdating = true;
+
+        this.nameInput.value = this.name;               this.nameInput.dispatchEvent(new Event('input'));
+        this.authorInput.value = this.author;           this.authorInput.dispatchEvent(new Event('input'));
+        this.versionInput.value = this.version;         this.versionInput.dispatchEvent(new Event('input'));
+        this.idInput.value = this.id?.toString() ?? ''; this.idInput.dispatchEvent(new Event('input'));
+        this.urlInput.value = this.url;                 this.urlInput.dispatchEvent(new Event('input'));
+
+        this.skipUpdating = false;
     }
 }

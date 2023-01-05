@@ -1,47 +1,27 @@
-/*
- * xml-beautify - pretty-print text in XML formats.
- *
- * Copyright (c) 2018 Tom Misawa, riversun.org@gmail.com
- *
- * MIT license:
- * http://www.opensource.org/licenses/mit-license.php
- *
- * Usage:
- *
- *       const resultXmlText = new XmlBeautify().beautify(textInput.value,
- *       {
- *            indent: '  ',  //indent pattern like white spaces
- *            useSelfClosingElement: true //true:use self-closing element when empty element.
- *       });
- *
- * How "useSelfClosingElement" property works.
- *
- *   useSelfClosingElement:true
- *   <foo></foo> ==> <foo/>
- *
- *   useSelfClosingElement:false
- *   <foo></foo> ==> <foo></foo>
- *
-*/
+export interface prettyData {
+    /** I've no idea why they did this instead of just exporting `pd` as the default, but hey */
+    pd: {
+        xml: (xml: string) => string;
+        xmlmin: (xml: string, preserveComments: boolean) => string;
 
-export namespace XmlBeautify {
+        json: (json: string) => string;
+        jsonmin: (json: string, preserveComments: boolean) => string;
 
-    export interface XmlBeautifyOptions {
-        indent?: string;
-        useSelfClosingElement?: boolean;
+        css: (css: string) => string;
+        cssmin: (css: string, preserveComments: boolean) => string;
+
+        sql: (sql: string) => string;
+        sqlmin: (sql: string, preserveComments: boolean) => string;
+
+        step: string;
+        maxdeep: number;
+
+        shift: string[] & ['\n'];
+
+        /** @private */ ix: number;
     }
+}
 
-    export interface XmlBeautifyInitOptions {
-        parser?: () => DOMParser;
-    }
-
-    export class XmlBeautify {
-        constructor(option?: XmlBeautifyInitOptions)
-
-        hasXmlDef(xmlText: string): boolean
-
-        getEncoding(xmlText: string): string
-
-        beautify(xmlText: string, data?: XmlBeautifyOptions): string
-    }
+export declare module 'included_node_modules/pretty-data/pretty-data' {
+    export default prettyData;
 }

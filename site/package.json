@@ -16,6 +16,7 @@
   "dependencies": {
     "@types/archiver": "^5.3.1",
     "@types/highlightjs": "^9.12.2",
+    "@types/pretty-data": "^0.40.0",
     "@types/wicg-entries-api": "^2020.8.2",
     "@types/wicg-file-system-access": "^2020.9.5",
     "@zip.js/zip.js": "^2.6.58",
@@ -25,10 +26,10 @@
     "discord.js": "^14.6.0",
     "js-module-formats": "^0.1.2",
     "postcss": "^8.4.19",
+    "pretty-data": "^0.40.0",
     "sass": "^1.56.1",
     "terser": "^5.16.1",
     "tsc-watch": "^5.0.3",
-    "typescript": "^4.9.3",
-    "xml-beautify": "^1.2.3"
+    "typescript": "^4.9.3"
   }
 }

@@ -16,8 +16,8 @@ import moduleDetector from 'js-module-formats';
 
 import pathConfig from './minify-paths-config.json' assert {type: 'json'};
 
-//process.env.logToFile = 'true';
-//process.env.doDebug = 'true';
+process.env.logToFile = 'true';
+process.env.doDebug = 'true';
 
 // If requested, redirect all console output to minify.log
 if (process.env.logToFile?.trim().replace(/^"(.*)"$/, '$1') === 'true') {
@@ -58,7 +58,7 @@ const postcss = postcss_([
             ['postcss-normalize-timing-functions', {}],
             ['postcss-normalize-unicode', {}],
             ['postcss-normalize-url', {defaultProtocol: 'https', forceHttps: true}],
-            //['postcss-normalize-whitespace', {}],
+            ['postcss-normalize-whitespace', {}],
             ['postcss-ordered-values', {}],
             ['postcss-reduce-initial', {}],
             ['postcss-reduce-transforms', {}],
@@ -122,7 +122,7 @@ async function evalFileOrDir(thisPath) {
 
     // eslint-disable-next-line prefer-const
     let [,isSassDir, isOriginal, isMinified, ext] = thisPath.match(/(sass_modules)|(?:\.(original))?(?:\.(min))?\.([^.]+)$/) || [];
-    if (isMinified && ext === 'js' && thisPath.includes('highlight_js')) isMinified = false;
+    if (ext && !isOriginal && thisPath.includes('highlight_js')) isMinified = false;
 
     if (doDebug) console.log('DEBUG: Evaluating file with...', JSON.stringify({path: thisPath, isSassDir, isOriginal, isMinified, ext}, undefined, 2));
 
@@ -131,6 +131,7 @@ async function evalFileOrDir(thisPath) {
     switch (ext) {
         case 'js' : return minifyJSFile(thisPath);
         case 'scss': return minifySassFile(thisPath);
+        case 'css': return minifyCSSFile(thisPath);
     }
 }
 
@@ -138,31 +139,37 @@ async function evalFileOrDir(thisPath) {
     @param {string} filePath
 */
 async function minifyJSFile(filePath) {
-    if (doDebug) console.log('DEBUG: Minifying JS file:', filePath);
-
-    // Check if we've already processed this file
-    const stat = await afs.stat(filePath);
-    if (stat.birthtime.getTime() > stat.mtime.getTime() + 4000) return console.log('Skipping file due to birthtime:', filePath);
-
-    console.log('Minifying', filePath);
-    minifiedAnyFile = true;
-
-    const fileContents = await afs.readFile(filePath, 'utf8');
-    afs.writeFile(filePath.replace(/\.js$/, '.very.original.js'), fileContents, {encoding: 'utf8'});
-
-    const urlFilePath = filePath.replace(minifyDir, '').replace(/\\/g, '/');
-
-    const hasTS = fileContents.includes('//# sourceMappingURL=');
-
-    const tempCache = {...minifiedVarCache};
-
-    let strToMinify = fileContents;
-    if (moduleDetector.detect(fileContents) === 'cjs') strToMinify = convertToES6(strToMinify);
-    //if (path.basename(filePath, '.js') === 'highlight') strToMinify += 'window.hljs = module.exports;';
-
-    afs.writeFile(filePath.replace(/\.js$/, '.original.js'), strToMinify, {encoding: 'utf8'});
-
     try {
+        if (doDebug) console.log('DEBUG: Minifying JS file:', filePath);
+
+        // Check if we've already processed this file
+        const stat = await afs.stat(filePath);
+        if (stat.birthtime.getTime() > stat.mtime.getTime() + 4000) return console.log('Skipping file due to birthtime:', filePath);
+
+        console.log('Minifying', filePath);
+        minifiedAnyFile = true;
+
+        let fileContents = await afs.readFile(filePath, 'utf8');
+        afs.writeFile(filePath.replace(/\.js$/, '.very.original.js'), fileContents, {encoding: 'utf8'});
+
+        // check if file name is pretty-data.js
+        if (path.basename(filePath) === 'pretty-data.js')
+            fileContents = fileContents.replace(/\bmaxdeep\b/g, 'this.maxdeep').replace(/\bix\b/g, 'this.ix').replace(/str = '', this\.ix = 0;/g, "str = ''; this.ix = 0;");
+
+        const urlFilePath = filePath.replace(minifyDir, '').replace(/\\/g, '/');
+
+        const hasTS = fileContents.includes('//# sourceMappingURL=');
+
+        const tempCache = {...minifiedVarCache};
+
+        let strToMinify = fileContents;
+        const moduleTye = moduleDetector.detect(fileContents);
+        if (doDebug) console.log(`DEBUG: Detected module type for ${filePath}:\n    "${moduleTye}"`);
+        if (moduleTye !== 'es') strToMinify = convertToES6(strToMinify);
+        //if (path.basename(filePath, '.js') === 'highlight') strToMinify += 'window.hljs = module.exports;';
+
+        afs.writeFile(filePath.replace(/\.js$/, '.original.js'), strToMinify, {encoding: 'utf8'});
+
         const minified = await uglify.minify(strToMinify, { // https://terser.org/docs/api-reference
             mangle: {
                 eval: true,
@@ -273,7 +280,7 @@ async function minifyJSFile(filePath) {
             if (filteredWarnings.length > 0)
                 console.warn(`\nMinifying file "${filePath}" threw the warnings...\n- ${filteredWarnings.join('\n- ')}`);
         }
-        if (minified.error?.name?.length > 2) throw new Error(`Minifying file "${filePath}" threw an error:\n${minified.error.name}\n${minified.error.message}\n${minified.error.stack}`);
+        if (minified.error?.name?.length > 2) throw new Error(`Minifying JS file "${filePath}" threw an error:\n${JSON.stringify(minified.error, null, 4)}`);
 
         minifiedVarCache = {...minifiedVarCache, ...tempCache};
 
@@ -288,65 +295,96 @@ async function minifyJSFile(filePath) {
             afs.writeFile(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${urlFilePath.replace(/\.js$/, '.original.js')}"]`), {encoding: 'utf8'});
         }
     } catch (err) {
-        console.error(`Minifying file "${filePath}" threw an error:\n${err.name}\n${err.message}\n${err.stack}`);
+        console.error(`Minifying JS file "${filePath}" threw an error:\n${JSON.stringify(err, null, 4)}`);
         return;
     }
 }
 
 async function minifySassFile(filePath) {
-    console.log('Minifying', filePath);
-    //const rawFileStr = await afs.readFile(filePath, 'utf8');
+    try {
+        console.log('Minifying', filePath);
+        //const rawFileStr = await afs.readFile(filePath, 'utf8');
 
-    const sassCompiled = sass.compile(filePath, {
-        alertAscii: true,
-        alertColor: true,
-        charset: 'utf8',
-        loadPaths: [path.join(minifyDir, 'sass_modules')],
-        sourceMap: true,
-        sourceMapIncludeSources: doInlineSources,
-        style: 'compressed',
-        verbose: !doInlineSources
-    });
+        const sassCompiled = sass.compile(filePath, {
+            alertAscii: true,
+            alertColor: true,
+            charset: 'utf8',
+            loadPaths: [path.join(minifyDir, 'sass_modules')],
+            sourceMap: true,
+            sourceMapIncludeSources: doInlineSources,
+            style: 'compressed',
+            verbose: !doInlineSources
+        });
 
-    /** @type {typeof sassCompiled.sourceMap} */
-    const sassMap = JSON.parse(JSON.stringify(sassCompiled.sourceMap));
-    sassMap.sourceRoot = canonicalMinifyURI;
-    sassMap.sources = sassMap.sources.map((src) => src.replace(minifyDirURI, ''));
+        /** @type {typeof sassCompiled.sourceMap} */
+        const sassMap = JSON.parse(JSON.stringify(sassCompiled.sourceMap));
+        sassMap.sourceRoot = canonicalMinifyURI;
+        sassMap.sources = sassMap.sources.map((src) => src.replace(minifyDirURI, ''));
 
-    const filePath_Original = filePath.replace(/\.scss$/, '.original.css');
-    const filePath_CSS = filePath.replace(/\.scss$/, '.css');
+        const filePath_Original = filePath.replace(/\.scss$/, '.original.css');
 
-    afs.writeFile(filePath_Original, sassCompiled.css, {encoding: 'utf8'});
-    afs.writeFile(`${filePath_Original}.map`, JSON.stringify(sassMap), {encoding: 'utf8'});
-    await afs.writeFile(`${filePath_Original}.css.map`, JSON.stringify(sassCompiled.sourceMap), {encoding: 'utf8'});
+        afs.writeFile(filePath_Original, sassCompiled.css, {encoding: 'utf8'});
+        afs.writeFile(`${filePath_Original}.map`, JSON.stringify(sassMap), {encoding: 'utf8'});
+        await afs.writeFile(`${filePath_Original}.css.map`, JSON.stringify(sassCompiled.sourceMap), {encoding: 'utf8'});
 
-    const originalSassFileURI = canonicalMinifyURI + filePath.replace(minifyDir, '');
-    const css = await postcss.process(sassCompiled.css, {
+        await finishMinifyingCSS(filePath, sassCompiled.css, sassMap);
+    } catch (err) {
+        console.error(`Minifying SASS file "${filePath}" threw an error:\n${JSON.stringify(err, null, 4)}`);
+        return;
+    }
+}
+
+async function minifyCSSFile(filePath) {
+    try {
+        console.log('Minifying', filePath);
+        //const rawFileStr = await afs.readFile(filePath, 'utf8');
+
+        const css = await afs.readFile(filePath, 'utf8');
+
+        afs.writeFile(filePath.replace(/\.css$/, '.original.css'), css, {encoding: 'utf8'});
+
+        await finishMinifyingCSS(filePath, css);
+    } catch (err) {
+        console.error(`Minifying CSS file "${filePath}" threw an error:\n${JSON.stringify(err, null, 4)}`);
+        return;
+    }
+}
+
+async function finishMinifyingCSS(filePath, css, startMap) {
+    css ??= '';
+    const filePath_CSS = filePath.replace(/\.s?css$/, '.css');
+    startMap ??= {version: 3, sources: [filePath], names: [], mappings: '', file: filePath_CSS};
+
+    const filePath_Original = filePath.replace(/\.s?css$/, '.original.css');
+
+    const originalURI = canonicalMinifyURI + filePath.replace(minifyDir, '');
+    if (doDebug) console.log('Minifying CSS file', filePath, 'with original URI', originalURI);
+    const processed = await postcss.process(css, {
         from: filePath_Original,
         to: filePath_CSS,
         map: {
             annotation: false,
             inline: false,
             absolute: false,
-            prev: new sourcemap.SourceMapConsumer(sassMap),
-            from: originalSassFileURI,
+            prev: new sourcemap.SourceMapConsumer(startMap),
+            from: originalURI,
         },
     });
 
-    css.map.applySourceMap(new sourcemap.SourceMapConsumer(sassMap), originalSassFileURI);
-    const mapObj = css.map.toJSON?.() || sassMap || {};
+    processed.map.applySourceMap(new sourcemap.SourceMapConsumer(startMap), originalURI);
+    const mapObj = processed.map.toJSON?.() || startMap || {};
 
     mapObj.sourceRoot = canonicalMinifyURI;
     mapObj.sources = mapObj.sources.map((src) => src.replace(minifyDirURI, ''));
 
-    if (sassMap.sourcesContent) {
+    if (startMap.sourcesContent) {
         mapObj.sourcesContent = [];
         for (let i = 0; i < mapObj.sources.length; i++) {
-            const posInSassSrc = sassMap.sources.indexOf(mapObj.sources[i]);
-            mapObj.sourcesContent.push(posInSassSrc < 0 ? null : sassMap.sourcesContent[posInSassSrc]);
+            const posInSassSrc = startMap.sources.indexOf(mapObj.sources[i]);
+            mapObj.sourcesContent.push(posInSassSrc < 0 ? null : startMap.sourcesContent[posInSassSrc]);
         }
-    } else
-        mapObj.sourcesContent = null;
+    } else if (!mapObj.sourcesContent && css && doInlineSources)
+        mapObj.sourcesContent = [css];
 
     const map = JSON.stringify(mapObj);
 
@@ -354,7 +392,7 @@ async function minifySassFile(filePath) {
 
     afs.writeFile(`${filePath_CSS}.map`, map, {encoding: 'utf8'});
 
-    const cssOut = doInlineSources ?   `${css.css ?? ''}\n/*# sourceMappingURL=data:application/json;base64,${Buffer.from((map), 'utf8').toString('base64')}*/` :
-                                       `${css.css ?? ''}\n/*# sourceMappingURL=${canonicalMinifyURI}${filePath_CSS.replace(minifyDir, '')}.map*/`;
+    const cssOut = doInlineSources ?   `${processed.css ?? ''}\n/*# sourceMappingURL=data:application/json;base64,${Buffer.from((map), 'utf8').toString('base64')}*/` :
+                                       `${processed.css ?? ''}\n/*# sourceMappingURL=${canonicalMinifyURI}${filePath_CSS.replace(minifyDir, '')}.map*/`;
     afs.writeFile(filePath_CSS, cssOut, {encoding: 'utf8'});
 }
