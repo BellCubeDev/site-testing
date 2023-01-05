@@ -1,7 +1,8 @@
-import hljs from '../../../assets/site/highlight_js/es/highlight.js';
+import hljs from '../../../assets/site/highlight_js/highlight.js';
 
 // HLJS Language Definition
-import '../../../assets/site/highlight_js/languages/typescript.min.js';
+import typescript from '../../../assets/site/highlight_js/languages/typescript.js';
+hljs.registerLanguage('typescript', typescript);
 
 declare global {interface Window {
     fromInline: {

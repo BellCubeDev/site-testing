@@ -1,8 +1,11 @@
 import { trimWhitespace, capitalizeFirstLetter } from '../../../universal.js';
-import hljs from  '../../../assets/site/highlight_js/es/highlight.js';
+
+import hljs from  '../../../assets/site/highlight_js/highlight.js';
 
 // HLJS Language Definition
-import '../../../assets/site/highlight_js/languages/markdown.min.js';
+import markdown from '../../../assets/site/highlight_js/languages/markdown.js';
+hljs.registerLanguage('markdown', markdown);
+
 
 /*
     Thanks to Patrick Gillespie for the great ASCII art generator!
