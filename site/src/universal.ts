@@ -600,7 +600,7 @@ export class BellCubicSummary extends bcd_collapsibleParent {
         registerUpgrade(this.self, this, this.details, false, true);
     }
 
-    divertedCompletion(){requestAnimationFrame(()=>{
+    divertedCompletion(){queueMicrotask(()=>{
 
         const temp_inner = this.details.querySelector(`.${strs.classDetailsInner}`);
         if (!temp_inner) {this.divertedCompletion(); return;}
@@ -629,7 +629,7 @@ export class BellCubicSummary extends bcd_collapsibleParent {
     }
 
     handleKey(event:KeyboardEvent){
-        if (event.key === ' ' || event.key === 'Enter') requestAnimationFrame(() =>{
+        if (event.key === ' ' || event.key === 'Enter') queueMicrotask(() =>{
             this.toggle();
             this.correctFocus(true);
         });
@@ -1125,7 +1125,7 @@ export class BCDTabButton extends mdl.MaterialButton {
         //console.debug('Created tab button:', this);
         //console.debug('Is this tag pre-selected by the anchor?', window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase());
         if (this.setAnchor && window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase())
-            requestAnimationFrame( (() => {this.makeSelected();}).bind(this) );
+            queueMicrotask( (() => {this.makeSelected();}).bind(this) );
         else
             this.makeSelected(0);
     }
