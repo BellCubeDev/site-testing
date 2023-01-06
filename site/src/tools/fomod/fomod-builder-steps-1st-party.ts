@@ -12,13 +12,18 @@ import type * as fomod from './fomod-builder-classifications.js';
 
 export class Fomod implements updatableObject {
     parent: fomod.Fomod;
+    suppressUpdates = false;
 
     main: HTMLDivElement;
 
     nameInput: HTMLInputElement;
 
     /** The name of the mod */
-    get name(): string { return this.parent.metaName; } set name(value: string) { this.parent.metaName = value; this.update(); }
+    get name(): string { return this.parent.moduleName; } set name(value: string) {
+        console.log(`Updating module name to "${value}"`);
+        this.parent.moduleName = value;
+        this.update();
+    }
 
     imageInput: HTMLInputElement;
 
@@ -48,23 +53,24 @@ export class Fomod implements updatableObject {
         this.imageInput.addEventListener('change', boundUpdateFromInput);
     }
 
-    suppressUpdate = false;
     updateFromInput() {
-        if (this.suppressUpdate) return;
+        if (this.suppressUpdates) return;
 
         this.name = this.nameInput.value;
         this.image = this.imageInput.value;
     }
 
     update() {
-        this.suppressUpdate = true;
+        this.suppressUpdates = true;
 
         this.nameInput.value = this.name;
 
         this.imageInput.value = this.image;
-        this.imageInput.dispatchEvent(new Event('imput'));
+        this.imageInput.dispatchEvent(new Event('input'));
 
         this.sortOrderMenu.upgrades_proto?.dropdown?.makeSelected(this.sortOrderMenu.querySelector(`:scope li[option-value="${this.sortOrder}"]`)!);
+
+        this.suppressUpdates = false;
     }
 }
 
@@ -74,8 +80,10 @@ export class Fomod implements updatableObject {
 export class Option implements updatableObject {
     parent: fomod.Option;
 
+    suppressUpdates = false;
+
     /** The name of the option */
-    get name(): string { return this.parent.name; } set name(value: string) { this.parent.name = value; this.update(); }
+    get moduleName(): string { return this.parent.name; } set moduleName(value: string) { this.parent.name = value; this.update(); }
 
     input: HTMLInputElement;
     optionArea: HTMLDivElement;
@@ -92,11 +100,16 @@ export class Option implements updatableObject {
     }
 
     updateFromInput() {
-        this.name = this.input.value;
+        if (this.suppressUpdates) return;
+        this.moduleName = this.input.value;
     }
 
     update() {
-        this.input.value = this.name;
+        this.suppressUpdates = true;
+
+        this.input.value = this.moduleName; this.input.dispatchEvent(new Event('input'));
+
+        this.suppressUpdates = false;
     }
 
 }

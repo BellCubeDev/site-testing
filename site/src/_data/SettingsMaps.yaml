@@ -12,7 +12,7 @@ FOMODBuilder:
   keepNamesSynced:
     type: bool
     name: Keep FOMOD Names Synced
-    tooltip: Whether or not to keep the mod name stored in Info.xml and the "Module Name" stored in ModuleConfig.xml in sync.<br>When set, this will prioritize the name in Info.xml over the name in ModuleConfig.xml
+    tooltip: Whether or not to keep the mod name stored in Info.xml and the "Module Name" stored in ModuleConfig.xml in sync.<br>This setting will not make modifications when set but will synchronize the name as soon as one is edited.
 
   includeInfoSchema:
     type: bool

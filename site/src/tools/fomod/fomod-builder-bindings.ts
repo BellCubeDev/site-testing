@@ -8,7 +8,7 @@ export class modMetadata implements updatableObject {
     parent: Fomod;
 
     /** The name of the mod */
-    get name(): string { return this.parent.metaName; } set name(value: string) { this.parent.metaName = value; this.update(); }
+    get metaName(): string { return this.parent.metaName; } set metaName(value: string) { this.parent.metaName = value; this.update(); }
     nameInput: HTMLInputElement;
 
     /** The author of the mod */
@@ -41,11 +41,11 @@ export class modMetadata implements updatableObject {
         this.nameInput.addEventListener('change', boundUpdateFromInput);
     }
 
-    skipUpdating = false;
+    suppressUpdates = false;
     updateFromInput() {
-        if (this.skipUpdating) return;
+        if (this.suppressUpdates) return;
 
-        this.name = this.nameInput.value;
+        this.metaName = this.nameInput.value;
         this.author = this.authorInput.value;
         this.version = this.versionInput.value;
         this.url = this.urlInput.value;
@@ -56,14 +56,14 @@ export class modMetadata implements updatableObject {
     }
 
     update() {
-        this.skipUpdating = true;
+        this.suppressUpdates = true;
 
-        this.nameInput.value = this.name;               this.nameInput.dispatchEvent(new Event('input'));
+        this.nameInput.value = this.metaName;               this.nameInput.dispatchEvent(new Event('input'));
         this.authorInput.value = this.author;           this.authorInput.dispatchEvent(new Event('input'));
         this.versionInput.value = this.version;         this.versionInput.dispatchEvent(new Event('input'));
         this.idInput.value = this.id?.toString() ?? ''; this.idInput.dispatchEvent(new Event('input'));
         this.urlInput.value = this.url;                 this.urlInput.dispatchEvent(new Event('input'));
 
-        this.skipUpdating = false;
+        this.suppressUpdates = false;
     }
 }

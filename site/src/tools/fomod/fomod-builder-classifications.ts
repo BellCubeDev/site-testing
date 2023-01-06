@@ -24,21 +24,32 @@ $$ |  $$ |$$ |  $$ | \____$$\   $$ |$$\ $$ |      $$  __$$ |$$ |        $$ |$$\ 
 $$ |  $$ |$$$$$$$  |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |\$$$$$$$\   \$$$$  |$$$$$$$  |
 \__|  \__|\_______/ \_______/    \____/ \__|       \_______| \_______|   \____/ \______*/
 
-export abstract class XMLElement implements main.updatableObject {
+export abstract class FOMODElementProxy implements main.updatableObject {
     suppressUpdates = false;
     instanceElement: Element | undefined;
 
     objectsToUpdate: main.updatableObject[] = [];
 
     updateObjects() {
+        if (this.suppressUpdates) return;
+        this.suppressUpdates = true;
+
         this.objectsToUpdate.forEach(  (obj) => obj.update()  );
-        if (!this.suppressUpdates && window.FOMODBuilder.storage.settings.autoSaveAfterChange)  main.save();
+        if (!this.suppressUpdates && window.FOMODBuilder.storage.settings.autoSaveAfterChange) main.save();
+
+        this.suppressUpdates = false;
     }
 
     update() { this.updateObjects(); }
 
     constructor(instanceElement: Element | undefined = undefined) {
         this.instanceElement = instanceElement;
+
+        queueMicrotask(() => {
+            console.log('FOMODElementProxy constructor microtask - updating objects for Proxy Element', this);
+            this.suppressUpdates = false;
+            this.updateObjects();
+        });
     }
 
     asModuleXML?(document: XMLDocument): Element;
@@ -47,7 +58,7 @@ export abstract class XMLElement implements main.updatableObject {
 
 
 
-export abstract class dependency extends XMLElement {
+export abstract class dependency extends FOMODElementProxy {
     constructor(instanceElement: Element | undefined = undefined) {
         super(instanceElement);
     }
@@ -233,7 +244,7 @@ export type OptionType =
     | "CouldBeUseable"  // TODO: Check if this has a use
     | "Required"        // Permanently checked
     | "NotUseable";     // Permanently unchecked
-export class OptionTypeDescriptor extends XMLElement {
+export class OptionTypeDescriptor extends FOMODElementProxy {
     private _default: OptionType = "Optional";
     set default(value: OptionType) { this._default = value; this.updateObjects(); } get default(): OptionType { return this._default; }
 
@@ -308,7 +319,7 @@ export class OptionTypeDescriptor extends XMLElement {
     }
 }
 
-export class OptionTypeDescriptorWithDependency extends XMLElement {
+export class OptionTypeDescriptorWithDependency extends FOMODElementProxy {
     private _type: OptionType = "Optional";
     set type(value: OptionType) { this._type = value; this.updateObjects(); } get type(): OptionType { return this._type; }
 
@@ -349,7 +360,7 @@ export class OptionTypeDescriptorWithDependency extends XMLElement {
 
 
 
-export class Install extends XMLElement {
+export class Install extends FOMODElementProxy {
     static paths: string[][] = [];
 
     private _path!: string[];
@@ -418,7 +429,7 @@ export type SortOrder =
     | "Descending" // Reverse Alphabetical
     | "Explicit";  // Explicit order
 
-export abstract class Step extends XMLElement {
+export abstract class Step extends FOMODElementProxy {
     name = '';
     order: SortOrder = "Explicit";
     groups: Group[] = [];
@@ -449,7 +460,7 @@ export type groupSelectType =
     | "SelectAtMostOne"     // Requires users to select one or no options
     | "SelectAtLeastOne"    // Requires users to select at least one option
     | "SelectExactlyOne";   // Requires users to select exactly one option
-export class Group extends XMLElement {
+export class Group extends FOMODElementProxy {
     private _name = '';
     set name(value: string) { this._name = value; this.updateObjects(); } get name(): string { return this._name; }
 
@@ -481,7 +492,7 @@ export class Group extends XMLElement {
     }
 }
 
-export class Option extends XMLElement {
+export class Option extends FOMODElementProxy {
     // Actual Option Name
     private _name = '';
     set name(value: string) { this._name = value; this.updateObjects(); } get name(): string { return this._name; }
@@ -568,7 +579,7 @@ export class Option extends XMLElement {
     }
 }
 
-export class OptionDescription extends XMLElement {
+export class OptionDescription extends FOMODElementProxy {
     private _description = '';
     set description(value: string) { this._description = value; this.updateObjects(); } get description(): string { return this._description; }
 
@@ -585,7 +596,7 @@ export class OptionDescription extends XMLElement {
     }
 }
 
-export class OptionImage extends XMLElement {
+export class OptionImage extends FOMODElementProxy {
     private _image: string[] = [];
     set image(value: string[]) { this._image = value; this.updateObjects(); } get image(): string[] { return this._image; }
 
@@ -617,12 +628,26 @@ export class OptionImage extends XMLElement {
 
 
 
-export class Fomod extends XMLElement {
+export class Fomod extends FOMODElementProxy {
     private _metaName: string = '';
-    set metaName(value: string) { this._metaName = value; this.updateObjects(); } get metaName(): string { return this._metaName || this._moduleName; }
+    set metaName(value: string) {
+        this._metaName = value;
+        if (window.FOMODBuilder.storage.settings.keepNamesSynced) this._moduleName = value;
+        this.updateObjects();
+    }
+    get metaName(): string {
+        return this._metaName || (window.FOMODBuilder.storage.settings.keepNamesSynced ? this._moduleName : '');
+    }
 
     private _moduleName: string = '';
-    set moduleName(value: string) { this._moduleName = value; this.updateObjects(); } get moduleName(): string { return this._moduleName || this._metaName; }
+    set moduleName(value: string) {
+        this._moduleName = value;
+        if (window.FOMODBuilder.storage.settings.keepNamesSynced) this._metaName = value;
+        this.updateObjects();
+    }
+    get moduleName(): string {
+        return this._moduleName || (window.FOMODBuilder.storage.settings.keepNamesSynced ? this._metaName : '');
+    }
 
     private _metaImage: string = '';
     set metaImage(value: string) { this._metaImage = value; this.updateObjects(); } get metaImage(): string { return this._metaImage; }
@@ -709,11 +734,6 @@ export class Fomod extends XMLElement {
             new bindingsGeneric.modMetadata(this),
             new bindings1stParty.Fomod(this),
         );
-
-        requestAnimationFrame(() => {
-            this.updateObjects();
-            this.suppressUpdates = false;
-        });
 
     }
 

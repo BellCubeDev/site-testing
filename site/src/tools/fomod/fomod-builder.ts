@@ -220,4 +220,5 @@ window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
 
 export abstract class updatableObject {
     abstract update(): any;
+    suppressUpdates = false;
 }
