@@ -14,9 +14,6 @@
     "eslint-plugin-unicorn": "^45.0.0"
   },
   "dependencies": {
-    "@types/archiver": "^5.3.1",
-    "@types/highlightjs": "^9.12.2",
-    "@types/pretty-data": "^0.40.0",
     "@types/wicg-entries-api": "^2020.8.2",
     "@types/wicg-file-system-access": "^2020.9.5",
     "@zip.js/zip.js": "^2.6.58",
