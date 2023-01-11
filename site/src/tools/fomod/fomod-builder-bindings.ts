@@ -44,6 +44,7 @@ export class modMetadata implements updatableObject {
     suppressUpdates = false;
     updateFromInput() {
         if (this.suppressUpdates) return;
+        this.suppressUpdates = true;
 
         this.metaName = this.nameInput.value;
         this.author = this.authorInput.value;
@@ -53,9 +54,12 @@ export class modMetadata implements updatableObject {
         const [,id] = this.idInput.value.match(/^\s*(\d+)\s*$/) ?? [];
         if (id) this.id = parseInt(id);
         else this.id = null;
+
+        this.suppressUpdates = false;
     }
 
     update() {
+        if (this.suppressUpdates) return;
         this.suppressUpdates = true;
 
         this.nameInput.value = this.metaName;               this.nameInput.dispatchEvent(new Event('input'));

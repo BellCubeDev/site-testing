@@ -910,9 +910,8 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
     }
 
     selectByString(option: string){
-        //console.log("[BCD-DROPDOWN] Selecting option:", option);
         if (this.options_keys.includes(option)) this.selectedOption = option;
-        //console.log("[BCD-DROPDOWN] Selected option:", this.selectedOption);
+        else console.warn("[BCD-DROPDOWN] Attempted to select an option that does not exist:", option);
         this.updateOptions();
     }
 
@@ -962,6 +961,7 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
 
     override onItemSelected(option: HTMLLIElement) {
         this.selectedOption = option.innerText;
+        this.element_.dispatchEvent(new CustomEvent('bcd-dropdown-change', { detail: {dropdown: this, option: this.selectedOption} }));
         this.updateOptions();
     }
 
@@ -1760,8 +1760,7 @@ class RelativeImagePicker extends RelativeFilePicker {
 
         try {
             const fileHandle_ = dir.getFile(this.element.value);
-            const fs_ = loadFS();
-            const [fileHandle, fs] = await Promise.all([fileHandle_, fs_]);
+            const [fileHandle, fs] = await Promise.all([fileHandle_, loadFS()]);
 
             if (!fileHandle || fileHandle instanceof fs.InvalidNameError) {
                 this.hideImage();

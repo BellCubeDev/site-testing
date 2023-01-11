@@ -51,24 +51,30 @@ export class Fomod implements updatableObject {
 
         this.imageInput.addEventListener('input', boundUpdateFromInput);
         this.imageInput.addEventListener('change', boundUpdateFromInput);
+
+        this.sortOrderMenu.addEventListener('bcd-dropdown-change', boundUpdateFromInput);
     }
 
     updateFromInput() {
         if (this.suppressUpdates) return;
+        this.suppressUpdates = true;
 
         this.name = this.nameInput.value;
         this.image = this.imageInput.value;
+        this.sortOrder = this.sortOrderMenu.upgrades_proto?.dropdown?.selectedOption as fomod.SortOrder || console.error('Invalid sort order selected!');
+
+        this.suppressUpdates = false;
     }
 
     update() {
+        if (this.suppressUpdates) return;
         this.suppressUpdates = true;
 
-        this.nameInput.value = this.name;
+        this.nameInput.value = this.name; this.nameInput.dispatchEvent(new Event('input'));
 
-        this.imageInput.value = this.image;
-        this.imageInput.dispatchEvent(new Event('input'));
+        this.imageInput.value = this.image; this.imageInput.dispatchEvent(new Event('input'));
 
-        this.sortOrderMenu.upgrades_proto?.dropdown?.makeSelected(this.sortOrderMenu.querySelector(`:scope li[option-value="${this.sortOrder}"]`)!);
+        this.sortOrderMenu.upgrades_proto?.dropdown?.selectByString(this.sortOrder);
 
         this.suppressUpdates = false;
     }

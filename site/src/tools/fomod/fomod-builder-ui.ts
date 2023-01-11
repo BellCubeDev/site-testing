@@ -112,7 +112,10 @@ export function setStepEditorType(type: bcdBuilderType) {
 
 export async function openFolder_entry() {
     console.debug('Opening a folder!');
+
     const picked = await bcdFS.getUserPickedFolder(true);
+    if (!picked) return;
+
     console.debug('Picked folder:', picked);
     console.debug('Picked folder name:', picked?.handle.name);
     console.debug('Picked folder perms?', await picked?.handle.queryPermission({mode: 'readwrite'}));
@@ -196,16 +199,6 @@ export function autoSave() {
     if (!window.FOMODBuilder.storage.settings.autoSaveAfterChange) return;
     if (!window.FOMODBuilder.trackedFomod) return;
 
-    if (window.FOMODBuilder.storage.settings.autoCleanSave) cleanSave();
-    else save();
+    if (window.FOMODBuilder.storage.settings.autoCleanSave) return cleanSave();
+    else return save();
 }
-
-
-/*\    /$\                       /$\
-$$ |   $$ |                      $$ |
-$$ |   $$ | $$$$$$\   $$$$$$\  $$$$$$\    $$$$$$\  $$\   $$\
-\$$\  $$  |$$  __$$\ $$  __$$\ \_$$  _|  $$  __$$\ \$$\ $$  |
- \$$\$$  / $$ /  $$ |$$ |  \__|  $$ |    $$$$$$$$ | \$$$$  /
-  \$$$  /  $$ |  $$ |$$ |        $$ |$$\ $$   ____| $$  $$<
-   \$  /   \$$$$$$  |$$ |        \$$$$  |\$$$$$$$\ $$  /\$$\
-    \_/     \______/ \__|         \____/  \_______|\__/  \_*/

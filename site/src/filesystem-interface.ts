@@ -26,12 +26,13 @@ export function getFolderFromFolder<TCreate extends true|false>(this: Folder, cr
             try {
 
                 const handle = this.handle.getDirectoryHandle(prop, {create}).catch(e => {
+                    if (!(e instanceof Error)) throw e;
+
                     if (e instanceof DOMException && e.name === 'NotFoundError') {
                         delete this.childDirsC[name];
                         return null;
                     }
-                    // Name is not allowed
-                    else if (e instanceof TypeError && e.message === 'Name is not allowed.')
+                    else if (e instanceof InvalidNameError || e.message === 'Name is not allowed.' || e.message === 'Cannot get a file with an empty name.')
                         throw new InvalidNameError('Folder name is not allowed.', prop);
                     else
                         throw e;
@@ -154,9 +155,11 @@ export class Folder {
 
         const fileName = parts.pop()!;
 
+        if (!fileName) throw new InvalidNameError('File name is empty.', name);
+
         // Get the file
         // eslint-disable-next-line @typescript-eslint/no-this-alias
-        let currentFolder: Folder|InvalidNameError|null = this;
+        let currentFolder: Folder|null = this;
         for (let i = 0; i < parts.length; i++) {
             const debug_targetPath = parts.slice(0, i + 1).join('/');
 
@@ -164,12 +167,14 @@ export class Folder {
 
                 currentFolder = await currentFolder[create ? 'childDirsC' : 'childDirs'][parts[i]!]!;
                 console.log('Entered folder: ', debug_targetPath, currentFolder);
-                if (!currentFolder || currentFolder instanceof InvalidNameError) return currentFolder;
+                if (!currentFolder) return currentFolder;
 
             } catch (e) {
+                if (!(e instanceof Error)) throw e;
+
                 if (e instanceof DOMException && e.name === 'NotFoundError')
                     console.info(`Could not get folder "${debug_targetPath}" for file:`, debug_fullPath, e);
-                else if (e instanceof TypeError && e.message === 'Name is not allowed.')
+                else if (e instanceof InvalidNameError || e.message === 'Name is not allowed.' || e.message === 'Cannot get a file with an empty name.')
                     console.info(`Could not get folder "${debug_targetPath}" for file due to invalid name:`, debug_fullPath, e);
                 else
                     console.error(`Error getting folder "${debug_targetPath}" for file:`, debug_fullPath, e);
@@ -222,22 +227,30 @@ export class writeableFolder extends Folder {
 /** Returns a folder picked by the user
     @throws if the user cancels the dialog or if permission is denied
 */
-export async function getUserPickedFolder(write: boolean): Promise<Folder>
+export async function getUserPickedFolder(write: boolean): Promise<Folder|null>
 
 /** Returns a folder picked by the user
     @throws if the user cancels the dialog or if permission is denied
 */
-export async function getUserPickedFolder(write: true): Promise<writeableFolder>
+export async function getUserPickedFolder(write: true): Promise<writeableFolder|null>
 
 /** Returns a folder picked by the user
     @throws if the user cancels the dialog or if permission is denied
 */
-export async function getUserPickedFolder(write?: boolean): Promise<Folder> {
+export async function getUserPickedFolder(write?: boolean): Promise<Folder|null> {
     // Construct a string to represent the permissions we need
     const permStr: 'read'|'readwrite' = `read${write ? 'write' : ''}`;
 
-    // Get the directory
-    const thisHandle = await window.showDirectoryPicker({mode: permStr});
+    // Get a directory
+    let thisHandle: FileSystemDirectoryHandle;
+    try {
+        thisHandle = await window.showDirectoryPicker({mode: permStr});
+    } catch (e) {
+        if (!(e instanceof DOMException && e.name === 'AbortError')) throw e;
+
+        console.info('User cancelled the folder picker');
+        return null;
+    }
 
     // Fetch current permission state
     let permState = await thisHandle.queryPermission({mode: permStr});
@@ -250,5 +263,8 @@ export async function getUserPickedFolder(write?: boolean): Promise<Folder> {
                                         new writeableFolder(thisHandle, true) :
                                         new Folder(thisHandle);
 
-    else throw new Error(`Permission denied: current state is ${permState}`);
+    else {
+        console.info(`Permission denied: current state is ${permState}`);
+        return null;
+    }
 }
