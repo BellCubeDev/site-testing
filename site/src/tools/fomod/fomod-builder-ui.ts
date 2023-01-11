@@ -9,7 +9,7 @@ import * as xml from './fomod-builder-xml-translator.js';
 
 import type {prettyData as prettyData__} from '../../../untyped-modules';
 import prettyData_ from '../../included_node_modules/pretty-data/pretty-data.js';
-import { afterDelay } from '../../universal';
+
 const prettyData = prettyData_ as unknown as prettyData__;
 
 console.log(prettyData.pd);
@@ -210,10 +210,10 @@ export function autoSave() {
     if (!window.FOMODBuilder.trackedFomod) return;
 
     if (saveTimeout !== null) clearTimeout(saveTimeout);
-    saveTimeout = afterDelay(500, async () => {
+    saveTimeout = bcdUniversal.afterDelay(500, async () => {
         if (window.FOMODBuilder.storage.settings.autoCleanSave) await cleanSave();
         else await save();
-        
+
         saveTimeout = null;
     });
 }
