@@ -5,6 +5,7 @@ import * as bindingsGeneric from './fomod-builder-bindings.js';
 import * as bindings1stParty from './fomod-builder-steps-1st-party.js';
 import * as bindingsVortex from './fomod-builder-steps-vortex.js';
 import * as bindingsMO2 from './fomod-builder-steps-mo2.js';
+import * as ui from './fomod-builder-ui.js';
 
 
 /*x eslint-disable i18n-text/no-en */// FOMODs are XML files with a schema written in English, so disallowing English makes little sense.
@@ -35,7 +36,7 @@ export abstract class FOMODElementProxy implements main.updatableObject {
         this.suppressUpdates = true;
 
         this.objectsToUpdate.forEach(  (obj) => obj.update()  );
-        if (!this.suppressUpdates && window.FOMODBuilder.storage.settings.autoSaveAfterChange) main.save();
+        if (window.FOMODBuilder.storage.settings.autoSaveAfterChange) ui.autoSave();
 
         this.suppressUpdates = false;
     }
@@ -713,7 +714,7 @@ export class Fomod extends FOMODElementProxy {
 
         this.metaName =         metaName || infoInstanceElement?.getElementsByTagName("Name")           [0]?.textContent            || '';
         this.moduleName =     moduleName ||     instanceElement?.getElementsByTagName("moduleName")     [0]?.textContent            || '';
-        this.metaImage =       metaImage || infoInstanceElement?.getElementsByTagName("Name")           [0]?.getAttribute("path")   || '';
+        this.metaImage =       metaImage ||     instanceElement?.getElementsByTagName("moduleImage")    [0]?.getAttribute("path")   || '';
         this.metaAuthor =     metaAuthor || infoInstanceElement?.getElementsByTagName("Author")         [0]?.textContent            || '';
         this.metaVersion =   metaVersion || infoInstanceElement?.getElementsByTagName("Version")        [0]?.textContent            || '';
         this.metaUrl =           metaUrl || infoInstanceElement?.getElementsByTagName("Website")        [0]?.textContent            || '';

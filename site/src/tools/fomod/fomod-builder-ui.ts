@@ -9,6 +9,7 @@ import * as xml from './fomod-builder-xml-translator.js';
 
 import type {prettyData as prettyData__} from '../../../untyped-modules';
 import prettyData_ from '../../included_node_modules/pretty-data/pretty-data.js';
+import { afterDelay } from '../../universal';
 const prettyData = prettyData_ as unknown as prettyData__;
 
 console.log(prettyData.pd);
@@ -110,7 +111,11 @@ export function setStepEditorType(type: bcdBuilderType) {
     window.FOMODBuilder.storage.preferences!.stepsBuilder = type;
 }
 
+let loadingFomod = false;
 export async function openFolder_entry() {
+    if (loadingFomod) return;
+    loadingFomod = true;
+
     console.debug('Opening a folder!');
 
     const picked = await bcdFS.getUserPickedFolder(true);
@@ -135,6 +140,8 @@ export async function openFolder_entry() {
     const [moduleStr, infoStr] = await Promise.all([moduleStr_, infoStr_]);
 
     xml.translateWhole(moduleStr, infoStr, true);
+
+    setTimeout(()=> loadingFomod = false, 100);
 }
 
 let saving = false;
@@ -186,19 +193,27 @@ export async function save() {
     saving = false;
 }
 
-export function cleanSave(){
+export async function cleanSave(){
+    if (saving) return;
     if (!window.FOMODBuilder.trackedFomod) throw new Error('No FOMOD is currently loaded.');
 
     window.FOMODBuilder.trackedFomod!.infoDoc = window.domParser.parseFromString('<fomod/>', 'text/xml');
     window.FOMODBuilder.trackedFomod!.moduleDoc = window.domParser.parseFromString('<config/>', 'text/xml');
 
-    save();
+    await save();
 }
 
+let saveTimeout:null|number = null;
 export function autoSave() {
+    if (loadingFomod) return;
     if (!window.FOMODBuilder.storage.settings.autoSaveAfterChange) return;
     if (!window.FOMODBuilder.trackedFomod) return;
 
-    if (window.FOMODBuilder.storage.settings.autoCleanSave) return cleanSave();
-    else return save();
+    if (saveTimeout !== null) clearTimeout(saveTimeout);
+    saveTimeout = afterDelay(500, async () => {
+        if (window.FOMODBuilder.storage.settings.autoCleanSave) await cleanSave();
+        else await save();
+        
+        saveTimeout = null;
+    });
 }
