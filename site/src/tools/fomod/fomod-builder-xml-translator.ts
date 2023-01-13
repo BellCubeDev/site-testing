@@ -11,7 +11,7 @@ export function translateWhole(module: string, info: string, setWindowValues = f
 
     console.log("Documents fetched!", {moduleDoc, infoDoc});
 
-    const obj = new classes.Fomod(moduleDoc.getOrCreateChild("config"), infoDoc.getOrCreateChild("fomod"));
+    const obj = new classes.Fomod(moduleDoc.getOrCreateChildByTag("config"), infoDoc.getOrCreateChildByTag("fomod"));
 
     if (setWindowValues) {
         window.FOMODBuilder.trackedFomod = {

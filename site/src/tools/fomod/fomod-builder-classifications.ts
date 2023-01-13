@@ -397,8 +397,7 @@ export class Install extends FOMODElementProxy {
     }
 
     override asModuleXML(document: XMLDocument): Element {
-        this.instanceElement =
-            this.instanceElement ?? document.createElement("install");
+        this.instanceElement ??= document.createElement("install");
 
         const path = this.path.join("/");
         const isFolder = this.path[this.path.length - 1] === '';
@@ -430,7 +429,7 @@ export type SortOrder =
     | "Descending" // Reverse Alphabetical
     | "Explicit";  // Explicit order
 
-export abstract class Step extends FOMODElementProxy {
+export class Step extends FOMODElementProxy {
     name = '';
     order: SortOrder = "Explicit";
     groups: Group[] = [];
@@ -484,7 +483,7 @@ export class Group extends FOMODElementProxy {
         this.instanceElement.setAttribute("name", this.name);
         this.instanceElement.setAttribute("type", this.type);
 
-        const options = this.instanceElement.appendChild(document.getOrCreateChild("plugins"));
+        const options = this.instanceElement.appendChild(document.getOrCreateChildByTag("plugins"));
         options.setAttribute("order", this.sortOrder);
 
         for (const option of this.options) options.appendChild(option.asModuleXML(document));
@@ -697,38 +696,51 @@ export class Fomod extends FOMODElementProxy {
     constructor(
         instanceElement?: Element,
         infoInstanceElement?: Element,
-        metaName: string = '',
-        moduleName: string = '',
-        metaImage: string = '',
-        metaAuthor: string = '',
-        metaVersion: string = '',
-        metaId: number|null|'' = '',
-        metaUrl: string = '',
-        installs: Install[] = [],
-        steps: Step[] = [],
+        metaName?: string,
+        moduleName?: string,
+        metaImage?: string,
+        metaAuthor?: string,
+        metaVersion?: string,
+        metaId?: number|null,
+        metaUrl?: string,
+        installs?: Install[],
+        steps?: Step[],
         conditions?: DependencyGroup
     ) {
         super(instanceElement);
         this.suppressUpdates = true;
         this.infoInstanceElement = infoInstanceElement;
 
-        this.metaName =         metaName || infoInstanceElement?.getElementsByTagName("Name")           [0]?.textContent            || '';
-        this.moduleName =     moduleName ||     instanceElement?.getElementsByTagName("moduleName")     [0]?.textContent            || '';
-        this.metaImage =       metaImage ||     instanceElement?.getElementsByTagName("moduleImage")    [0]?.getAttribute("path")   || '';
-        this.metaAuthor =     metaAuthor || infoInstanceElement?.getElementsByTagName("Author")         [0]?.textContent            || '';
-        this.metaVersion =   metaVersion || infoInstanceElement?.getElementsByTagName("Version")        [0]?.textContent            || '';
-        this.metaUrl =           metaUrl || infoInstanceElement?.getElementsByTagName("Website")        [0]?.textContent            || '';
+        this.metaName =         metaName ?? infoInstanceElement?.getElementsByTagName("Name")           [0]?.textContent                        ?? '';
+        this.moduleName =     moduleName ??     instanceElement?.getElementsByTagName("moduleName")     [0]?.textContent                        ?? '';
+        this.metaImage =       metaImage ??     instanceElement?.getElementsByTagName("moduleImage")    [0]?.getAttribute("path")               ?? '';
+        this.metaAuthor =     metaAuthor ?? infoInstanceElement?.getElementsByTagName("Author")         [0]?.textContent                        ?? '';
+        this.metaVersion =   metaVersion ?? infoInstanceElement?.getElementsByTagName("Version")        [0]?.textContent                        ?? '';
+        this.metaUrl =           metaUrl ?? infoInstanceElement?.getElementsByTagName("Website")        [0]?.textContent                        ?? '';
 
-        if (metaId !== '') this.metaId = metaId;
+        if (metaId !== undefined) this.metaId = metaId;
         else {
             const [,id] = infoInstanceElement?.getElementsByTagName("Id")[0]?.textContent?.match(/^\s*(\d+)\s*$/) ?? [];
             if (id) this.metaId = parseInt(id);
             else this.metaId = null;
         }
 
-        this.installs = installs;
+        const stepsElem = instanceElement?.getElementsByTagName("installSteps")[0];
+        this.sortingOrder =         null || stepsElem?.getAttribute("order") as SortOrder || 'Explicit';
+        this.steps = steps || [...stepsElem?.children ?? []].map(step => new Step(step));
+
+
+        const conditionalInstallsElem = instanceElement?.getElementsByTagName("conditionalFileInstalls")[0];
+        const requiredInstallsElem = instanceElement?.getElementsByTagName("requiredInstallFiles")[0];
+
+        if (installs) this.installs = installs;
+        else {
+            const conditionalInstalls = [...conditionalInstallsElem?.children ?? []].map(install => new Install(install));
+            const requiredInstalls = [...requiredInstallsElem?.children ?? []].map(install => new Install(install));
+            this.installs = [...conditionalInstalls, ...requiredInstalls];
+        }
+
         this.conditions = conditions;
-        this.steps = steps;
 
 
         this.objectsToUpdate.push(
@@ -741,20 +753,22 @@ export class Fomod extends FOMODElementProxy {
     override asModuleXML(document: XMLDocument): Element {
         if (document.documentElement !== this.instanceElement) {
             document.removeChild(document.documentElement);
-            this.instanceElement = document.getOrCreateChild("config");
+            this.instanceElement = document.getOrCreateChildByTag("config");
         }
         this.instanceElement.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
         this.instanceElement.setAttribute("xsi:noNamespaceSchemaLocation", "http://qconsulting.ca/fo3/ModConfig5.0.xsd");
 
-        this.instanceElement.getOrCreateChild("moduleName").textContent = this.metaName;
-        this.instanceElement.getOrCreateChild("moduleImage").setAttribute('path', this.metaImage);
+        this.instanceElement.getOrCreateChildByTag("moduleName").textContent = this.metaName;
+
+        if (this.metaImage) this.instanceElement.getOrCreateChildByTag("moduleImage").setAttribute('path', this.metaImage);
+        else                this.instanceElement.removeChildByTag     ("moduleImage");
+
+        if (this.conditions)
+            this.instanceElement.appendChild(this.conditions.asModuleXML(document));
 
         for (const install of this.installs) {
             this.instanceElement.appendChild(install.asModuleXML(document));
         }
-
-        if (this.conditions)
-            this.instanceElement.appendChild(this.conditions.asModuleXML(document));
 
         for (const step of this.steps) {
             this.instanceElement.appendChild(step.asModuleXML(document));
@@ -766,7 +780,7 @@ export class Fomod extends FOMODElementProxy {
     override asInfoXML(document: XMLDocument): Element {
         if (document.documentElement !== this.infoInstanceElement) {
             document.removeChild(document.documentElement);
-            this.infoInstanceElement = document.getOrCreateChild("fomod");
+            this.infoInstanceElement = document.getOrCreateChildByTag("fomod");
         }
 
         // Set schema info
@@ -778,11 +792,20 @@ export class Fomod extends FOMODElementProxy {
 
         // Set actual data
         const url = this.getURLAsString();
-        if (this.metaName)          this.infoInstanceElement.getOrCreateChild("Name").textContent    = this.metaName;
-        if (this.metaAuthor)        this.infoInstanceElement.getOrCreateChild("Author").textContent  = this.metaAuthor;
-        if (this.metaId !== null)   this.infoInstanceElement.getOrCreateChild("Id").textContent      = this.metaId.toString();
-        if (url)                    this.infoInstanceElement.getOrCreateChild("Website").textContent = url;
-        if (this.metaVersion)       this.infoInstanceElement.getOrCreateChild("Version").textContent = this.metaVersion;
+        if (this.metaName)          this.infoInstanceElement.getOrCreateChildByTag("Name").textContent    = this.metaName;
+        else                        this.infoInstanceElement.removeChildByTag     ("Name");
+
+        if (this.metaAuthor)        this.infoInstanceElement.getOrCreateChildByTag("Author").textContent  = this.metaAuthor;
+        else                        this.infoInstanceElement.removeChildByTag     ("Author");
+
+        if (this.metaId !== null)   this.infoInstanceElement.getOrCreateChildByTag("Id").textContent      = this.metaId.toString();
+        else                        this.infoInstanceElement.removeChildByTag     ("Id");
+
+        if (url)                    this.infoInstanceElement.getOrCreateChildByTag("Website").textContent = url;
+        else                        this.infoInstanceElement.removeChildByTag     ("Website");
+
+        if (this.metaVersion)       this.infoInstanceElement.getOrCreateChildByTag("Version").textContent = this.metaVersion;
+        else                        this.infoInstanceElement.removeChildByTag     ("Version");
 
         return this.infoInstanceElement;
     }

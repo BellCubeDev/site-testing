@@ -26,7 +26,7 @@ $$ |  $$ |  $$ |$$\ $$ |$$ |$$ |  $$ |$$\ $$ |$$   ____| \____$$\
 
 
 /** Rearranged and better-typed parameters for `setTimeout` */
-export function afterDelay<TCallback extends (...args: any) => any = any>(timeout: number, callback: TCallback|string, ...args: Parameters<TCallback>): number {
+export function afterDelay<TCallback extends (...args: any) => any = any>(timeout: number, callback: TCallback|string, ...args: Parameters<TCallback>): ReturnType<Window['setTimeout']> {
     // @ts-ignore: the `Parameters` utility type returns a tuple, which inherently has an iterator function--regardless of what TypeScript thinks
     return window.setTimeout(callback, timeout, ...(args || []));
 }
@@ -62,6 +62,11 @@ export function trimWhitespace(str: string, trailingNewline = false): string {
 
 export function preventPropagation(event: Event): void {
     event.stopPropagation();
+}
+
+export function registerForChange<TElement extends HTMLElement>(element: TElement, callback: (this: TElement, ev: HTMLElementEventMap["input"]|HTMLElementEventMap["change"]) => unknown, options?: boolean|AddEventListenerOptions): void {
+    element.addEventListener('change', callback, options);
+    element.addEventListener('input', callback, options);
 }
 
 export function setProxies<TObj>(obj: TObj, handler: TObj extends Record<string, any> ? ProxyHandler<TObj> : ProxyHandler<any>): TObj {
@@ -174,8 +179,23 @@ function ___getOrCreateChild(this:Document|Element, tagName: string) {
 
     return child;
 }
-Element.prototype.getOrCreateChild = ___getOrCreateChild;
-Document.prototype.getOrCreateChild = ___getOrCreateChild;
+Element.prototype.getOrCreateChildByTag = ___getOrCreateChild;
+Document.prototype.getOrCreateChildByTag = ___getOrCreateChild;
+
+function ___removeChildByTag(this:Document|Element, tagName: string, count: number = 1) {
+    const children = [...this.getElementsByTagName(tagName)];
+    let removedCount = 0;
+    for (let i = 0; removedCount <= count && i < children.length; i++) {
+        const child = children[i];
+        if (!child || child.tagName !== tagName) continue;
+
+        child.remove();
+        removedCount++;
+    }
+}
+
+Element.prototype.removeChildByTag = ___removeChildByTag;
+Document.prototype.removeChildByTag = ___removeChildByTag;
 
 
 
@@ -188,14 +208,17 @@ $$ |  $$ |$$  __$$ | \____$$\ $$ |$$ |              $$ |  $$ |  $$ |$$ |  $$ |$$
 $$$$$$$  |\$$$$$$$ |$$$$$$$  |$$ |\$$$$$$$\       $$$$$$\ $$ |  $$ |$$ |  \$$$$  |
  \______/  \_______|\_______/ \__| \_______|      \______|\__|  \__|\__|   \___*/
 
-interface getOrCreateChild {
+interface DocAndElementInjections {
     /** Returns the first element with the specified tag name or creates one if it does not exist */
-    getOrCreateChild<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
-    getOrCreateChild(tagName: string):Element;
+    getOrCreateChildByTag<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
+    getOrCreateChildByTag(tagName: string):Element;
+
+    removeChildByTag<K extends keyof HTMLElementTagNameMap>(tagName: K, count?: number): void;
+    removeChildByTag(tagName: string, count?: number): void;
 }
 
 declare global {
-    interface Element extends getOrCreateChild {
+    interface Element extends DocAndElementInjections {
         upgrades?: Record<string, InstanceType<BCDComponentI>>;
         upgrades_proto?: Partial<{
             tooltip: BCDTooltip;
@@ -207,7 +230,7 @@ declare global {
             dropdown: BCDDropdown
         }>
     }
-    interface Document extends getOrCreateChild {}
+    interface Document extends DocAndElementInjections {}
 
     interface Window {
         /** Variables set by the page */
@@ -1498,8 +1521,7 @@ export abstract class bcdDynamicTextArea_base {
         this.adjust();
 
         const boundAdjust = this.adjust.bind(this);
-        this.element.addEventListener('input', boundAdjust);
-        this.element.addEventListener('change', boundAdjust);
+        registerForChange(this.element, boundAdjust);
 
         const resizeObserver = new ResizeObserver(boundAdjust);
         resizeObserver.observe(this.element);
@@ -1587,8 +1609,7 @@ class RelativeFilePicker {
 
         registerUpgrade(element, this, null, false, true);
 
-        this.element.addEventListener('change', this.boundOnChange);
-        this.element.addEventListener('input', this.boundOnChange);
+        registerForChange(this.element, this.boundOnChange);
 
 
         /* Create the following button:
@@ -1894,7 +1915,7 @@ export class SettingsGrid {
                 if (element instanceof HTMLInputElement) element.checked = !!this.getSetting(key, true);
                 else throw new Error("Settings Grid template has a checkbox that is not an INPUT element!");
 
-                element.addEventListener('change', (() => this.setSetting(key, element.checked)).bind(this));
+                registerForChange(element, (() => this.setSetting(key, element.checked)).bind(this));
                 settingsToUpdate.push(() => {
                     if (element.checked !== !!this.getSetting(key))
                         element.click();

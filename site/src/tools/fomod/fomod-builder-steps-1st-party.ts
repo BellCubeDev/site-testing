@@ -9,6 +9,7 @@
 
 import type { updatableObject } from './fomod-builder.js';
 import type * as fomod from './fomod-builder-classifications.js';
+import { registerForChange } from '../../universal.js';
 
 export class Fomod implements updatableObject {
     parent: fomod.Fomod;
@@ -46,12 +47,8 @@ export class Fomod implements updatableObject {
 
         const boundUpdateFromInput = this.updateFromInput.bind(this);
 
-        this.nameInput.addEventListener('input', boundUpdateFromInput);
-        this.nameInput.addEventListener('change', boundUpdateFromInput);
-
-        this.imageInput.addEventListener('input', boundUpdateFromInput);
-        this.imageInput.addEventListener('change', boundUpdateFromInput);
-
+        registerForChange(this.nameInput, boundUpdateFromInput);
+        registerForChange(this.imageInput, boundUpdateFromInput);
         this.sortOrderMenu.addEventListener('bcd-dropdown-change', boundUpdateFromInput);
     }
 
@@ -98,11 +95,10 @@ export class Option implements updatableObject {
         this.parent = parent;
         this.optionArea = optionArea;
 
-        this.input = optionArea.querySelector(':scope > [identifier="nameInput"]')!.getOrCreateChild('input');
+        this.input = optionArea.querySelector(':scope > [identifier="nameInput"]')!.getOrCreateChildByTag('input');
 
         const boundUpdateFromInput = this.updateFromInput.bind(this);
-        this.input.addEventListener('input', boundUpdateFromInput);
-        this.input.addEventListener('change', boundUpdateFromInput);
+        registerForChange(this.input, boundUpdateFromInput);
     }
 
     updateFromInput() {

@@ -3,6 +3,7 @@
 
 import type { updatableObject } from './fomod-builder.js';
 import type { Fomod } from './fomod-builder-classifications.js';
+import { registerForChange } from '../../universal.js';
 
 export class modMetadata implements updatableObject {
     parent: Fomod;
@@ -30,15 +31,19 @@ export class modMetadata implements updatableObject {
     constructor(parent: Fomod) {
         this.parent = parent;
 
-        this.nameInput = document.getElementById("metadata-mod-name")!.getOrCreateChild('input');
-        this.authorInput = document.getElementById("metadata-mod-author")!.getOrCreateChild('input');
-        this.versionInput = document.getElementById("metadata-mod-version")!.getOrCreateChild('input');
-        this.idInput = document.getElementById("metadata-mod-id")!.getOrCreateChild('input');
-        this.urlInput = document.getElementById("metadata-mod-url")!.getOrCreateChild('input');
+        this.nameInput = document.getElementById("metadata-mod-name")!.getOrCreateChildByTag('input');
+        this.authorInput = document.getElementById("metadata-mod-author")!.getOrCreateChildByTag('input');
+        this.versionInput = document.getElementById("metadata-mod-version")!.getOrCreateChildByTag('input');
+        this.idInput = document.getElementById("metadata-mod-id")!.getOrCreateChildByTag('input');
+        this.urlInput = document.getElementById("metadata-mod-url")!.getOrCreateChildByTag('input');
 
         const boundUpdateFromInput = this.updateFromInput.bind(this);
-        this.nameInput.addEventListener('input', boundUpdateFromInput);
-        this.nameInput.addEventListener('change', boundUpdateFromInput);
+
+        registerForChange(this.nameInput, boundUpdateFromInput);
+        registerForChange(this.authorInput, boundUpdateFromInput);
+        registerForChange(this.versionInput, boundUpdateFromInput);
+        registerForChange(this.idInput, boundUpdateFromInput);
+        registerForChange(this.urlInput, boundUpdateFromInput);
     }
 
     suppressUpdates = false;

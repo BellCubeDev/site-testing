@@ -55,8 +55,11 @@
         @include imageColumn();
 
         >.builder-steps-mod-image {
+            max-height: 50vmin;
+
             padding: 8px;
             border-radius: 4px;
+
             background: #1c1c1c;
         }
     }

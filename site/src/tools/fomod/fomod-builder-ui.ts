@@ -210,10 +210,9 @@ export function autoSave() {
     if (!window.FOMODBuilder.trackedFomod) return;
 
     if (saveTimeout !== null) clearTimeout(saveTimeout);
-    saveTimeout = bcdUniversal.afterDelay(500, async () => {
-        if (window.FOMODBuilder.storage.settings.autoCleanSave) await cleanSave();
-        else await save();
-
+    saveTimeout = bcdUniversal.afterDelay(500, () => {
         saveTimeout = null;
+        if (window.FOMODBuilder.storage.settings.autoCleanSave) cleanSave();
+        else save();
     });
 }
