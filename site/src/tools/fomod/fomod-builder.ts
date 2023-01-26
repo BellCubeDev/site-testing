@@ -132,7 +132,7 @@ const fetchedStorage = JSON.parse(   localStorage.getItem('BellCubeDev_FOMOD_BUI
 window.FOMODBuilder = {
 
     ui: {
-        openFolder: fomodUI.openFolder_entry,
+        openFolder: fomodUI.openFolder,
         save: fomodUI.save,
         cleanSave: fomodUI.cleanSave,
         attemptRepair: () => {},
@@ -173,14 +173,9 @@ function storageProxyHandler_set<TObj>(target: TObj, prop: keyof TObj, value: TO
 window.FOMODBuilder.storage = bcdUniversal.setProxies(window.FOMODBuilder.storage, {get: storageProxyHandler_get, set: storageProxyHandler_set});
 saveStorage();
 
-window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
-
-    console.debug('Initializing the FOMOD Builder!');
-
-    bcdUniversal.registerBCDComponents(fomodUI.bcdDropdownSortingOrder, fomodUI.bcdDropdownOptionState);
-    bcdUniversal.updateSettings();
-
-    window.FOMODBuilder.ui.setStepEditorType(window.FOMODBuilder.storage.preferences.stepsBuilder);
+let noSupportModal: bcdUniversal.BCDModalDialog|null = null;
+export function getNoSupportModal(): bcdUniversal.BCDModalDialog|null {
+    if (noSupportModal) return noSupportModal;
 
     const APIs:bcdUniversal.objOf<Function> = {
         /* File System Access API */'<a href="https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API" target="_blank" rel="noopener noreferrer">File System Access API</a>': window.showOpenFilePicker,
@@ -190,35 +185,43 @@ window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
         if (!testFunct) unavailableAPIs.push(api);
     }
 
-    if (unavailableAPIs && unavailableAPIs.length) {
-        const noSupportModal = document.getElementById('no-support-modal');
-        noSupportModal?.setAttribute('open-by-default', '');
+    const noSupportModal_elem = document.getElementById('no-support-modal') as HTMLDialogElement|null;
+    if (!noSupportModal_elem) {
+        noSupportModal = null;
+        return null;
+    }
 
-        const replaceMeElem = noSupportModal?.getElementsByClassName('replace_me_txt')[0] as HTMLElement|undefined;
+    if (unavailableAPIs.length) noSupportModal_elem.setAttribute('open-by-default', '');
 
-        if (replaceMeElem) {
+    const replaceMeElem = noSupportModal_elem.getElementsByClassName('js-bcd-modal-body')[0]?.getElementsByClassName('replace_me_txt')[0] as HTMLElement|undefined;
 
-            const lastAPITested = unavailableAPIs.pop();
-            replaceMeElem.innerHTML = unavailableAPIs.join(', ');
+    if (replaceMeElem) {
 
-            if (lastAPITested) {
-                if (unavailableAPIs.length > 1) replaceMeElem.innerHTML += `, and ${lastAPITested}`;
+        const lastAPITested = unavailableAPIs.pop();
+        replaceMeElem.innerHTML = unavailableAPIs.join(', ');
 
-                else if (unavailableAPIs.length) replaceMeElem.innerHTML += ` and ${lastAPITested}`;
+        if (lastAPITested) {
+            if (unavailableAPIs.length > 1) replaceMeElem.innerHTML += `, and ${lastAPITested}`;
 
-                else replaceMeElem.innerHTML += lastAPITested;
-            }
+            else if (unavailableAPIs.length) replaceMeElem.innerHTML += ` and ${lastAPITested}`;
 
+            else replaceMeElem.innerHTML += lastAPITested;
         }
 
     }
-};
 
-
-
-
-
-export abstract class updatableObject {
-    abstract update(): any;
-    suppressUpdates = false;
+    noSupportModal = noSupportModal_elem.upgrades_proto?.modalDialog ?? null;
+    return noSupportModal;
 }
+
+window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
+
+    console.debug('Initializing the FOMOD Builder!');
+
+    bcdUniversal.registerBCDComponents(fomodUI.bcdDropdownSortingOrder, fomodUI.bcdDropdownOptionState);
+    bcdUniversal.updateSettings();
+
+    window.FOMODBuilder.ui.setStepEditorType(window.FOMODBuilder.storage.preferences.stepsBuilder);
+
+    getNoSupportModal();
+};

@@ -3,6 +3,7 @@
     "excluded": [
         ".config.js",
         "zip.js/dist/",
-        "pretty-data/test/"
+        "test/",
+        "test.js"
     ]
 }

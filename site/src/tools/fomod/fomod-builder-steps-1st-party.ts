@@ -7,13 +7,11 @@
     @namespace - fomod-builder-steps
  */
 
-import type { updatableObject } from './fomod-builder.js';
 import type * as fomod from './fomod-builder-classifications.js';
-import { registerForChange } from '../../universal.js';
+import { registerForEvents, UpdatableObject } from '../../universal.js';
 
-export class Fomod implements updatableObject {
+export class Fomod extends UpdatableObject {
     parent: fomod.Fomod;
-    suppressUpdates = false;
 
     main: HTMLDivElement;
 
@@ -34,56 +32,51 @@ export class Fomod implements updatableObject {
     sortOrderMenu: HTMLMenuElement;
     get sortOrder(): fomod.SortOrder { return this.parent.sortingOrder; } set sortOrder(value: fomod.SortOrder) { this.parent.sortingOrder = value; this.update(); }
 
+    addStepBtn: HTMLButtonElement;
+
     constructor(parent: fomod.Fomod) {
+        super();
+
         this.parent = parent;
 
         this.main = document.getElementById("steps-builder-container") as HTMLDivElement;
 
         this.nameInput = this.main.querySelector('.builder-steps-mod-name') as HTMLInputElement;
+        registerForEvents(this.nameInput, {change: this.updateFromInput_bound});
 
         this.imageInput = this.main.querySelector('.builder-steps-mod-image input') as HTMLInputElement;
+        registerForEvents(this.imageInput, {change: this.updateFromInput_bound});
 
         this.sortOrderMenu = this.main.querySelector('.bcd-dropdown-sorting-order') as HTMLMenuElement;
+        registerForEvents(this.sortOrderMenu, {dropdownInput: this.updateFromInput_bound});
 
-        const boundUpdateFromInput = this.updateFromInput.bind(this);
-
-        registerForChange(this.nameInput, boundUpdateFromInput);
-        registerForChange(this.imageInput, boundUpdateFromInput);
-        this.sortOrderMenu.addEventListener('bcd-dropdown-change', boundUpdateFromInput);
+        this.addStepBtn = this.main.querySelector('.builder-steps-add-step-btn') as HTMLButtonElement;
+        registerForEvents(this.addStepBtn, {activate: parent.addStep_bound});
     }
 
-    updateFromInput() {
-        if (this.suppressUpdates) return;
-        this.suppressUpdates = true;
-
+    override updateFromInput_() {
         this.name = this.nameInput.value;
         this.image = this.imageInput.value;
         this.sortOrder = this.sortOrderMenu.upgrades_proto?.dropdown?.selectedOption as fomod.SortOrder || console.error('Invalid sort order selected!');
-
-        this.suppressUpdates = false;
     }
+    readonly updateFromInput_bound = this.updateFromInput.bind(this);
 
-    update() {
-        if (this.suppressUpdates) return;
-        this.suppressUpdates = true;
+    override update_() {
 
         this.nameInput.value = this.name; this.nameInput.dispatchEvent(new Event('input'));
 
         this.imageInput.value = this.image; this.imageInput.dispatchEvent(new Event('input'));
 
         this.sortOrderMenu.upgrades_proto?.dropdown?.selectByString(this.sortOrder);
-
-        this.suppressUpdates = false;
     }
+    readonly update_bound = this.update.bind(this);
 }
 
 
 
 // Option Name
-export class Option implements updatableObject {
+export class Option extends UpdatableObject {
     parent: fomod.Option;
-
-    suppressUpdates = false;
 
     /** The name of the option */
     get moduleName(): string { return this.parent.name; } set moduleName(value: string) { this.parent.name = value; this.update(); }
@@ -92,26 +85,22 @@ export class Option implements updatableObject {
     optionArea: HTMLDivElement;
 
     constructor(parent: fomod.Option, optionArea: HTMLDivElement) {
+        super()
         this.parent = parent;
         this.optionArea = optionArea;
 
         this.input = optionArea.querySelector(':scope > [identifier="nameInput"]')!.getOrCreateChildByTag('input');
 
         const boundUpdateFromInput = this.updateFromInput.bind(this);
-        registerForChange(this.input, boundUpdateFromInput);
+        registerForEvents(this.input, {change: boundUpdateFromInput});
     }
 
-    updateFromInput() {
-        if (this.suppressUpdates) return;
+    override updateFromInput_() {
         this.moduleName = this.input.value;
     }
 
-    update() {
-        this.suppressUpdates = true;
-
+    override update_() {
         this.input.value = this.moduleName; this.input.dispatchEvent(new Event('input'));
-
-        this.suppressUpdates = false;
     }
 
 }

@@ -42,6 +42,15 @@ layout: compress_html
         window.bcd_init_functions={};
 
         window.clickEvt = ('onclick' in window) ? 'click' : 'mousedown';
+        window.baseURL = "{{ site.baseurl }}";
+
+        function callInit(name) {
+            if (window.bcd_init_functions[name]) {
+                const funct = window.bcd_init_functions[name];
+                if (typeof funct === 'function') return funct();
+            }
+            setTimeout(callInit, 100, name);
+        }
 
         try   {window.startWithDrawer=performance.getEntriesByType("navigation").find(e => e.type=='navigate') && new URL(document.referrer).host === window.location.host;}
         catch {window.startWithDrawer=false}
@@ -54,8 +63,8 @@ layout: compress_html
         ))));
     </script>
 
-    <script       type="module" src="{{ site.baseurl }}{% link assets/site/mdl/material.js %}"></script> <!--onload="window.bcd_init_functions.material()"-->
-    <script async type="module" src="{{ site.baseurl }}{% link universal.js %}" onload="window.bcd_init_functions.universal()"></script> <!-- the setTimeout was taken from https://stackoverflow.com/a/38296629/13076790 -->
+    <script       type="module" src="{{ site.baseurl }}{% link assets/site/mdl/material.js %}"></script>
+    <script async type="module" src="{{ site.baseurl }}{% link universal.js %}" onload="callInit('universal')"></script>
 
     <link rel="stylesheet" href="{{ site.baseurl }}{% link main.css %}">
 

@@ -1,3 +1,5 @@
+@import 'button-colors';
+
 $warn-color: #d5b900ee;
 $warn-color-dim: #d5b90088;
 
@@ -17,4 +19,16 @@ $warn-color-dim: #d5b90088;
     .mdl-textfield__error {
         color: $warn-color;
     }
+}
+
+#bcd-stepBTN-builder {
+    @include customColoredButton(209deg, 100%, 50%, 1, 0.2, 0.1, true);
+}
+
+#bcd-stepBTN-vortex {
+    @include customColoredButton(31deg, 67%, 50%, 1, 0.1, 0.6, true);
+}
+
+#bcd-stepBTN-mo2 {
+    @include customColoredButton(199deg, 82%, 61%, 1, 0.1, 0.1, true);
 }

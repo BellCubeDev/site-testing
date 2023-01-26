@@ -4,6 +4,10 @@
         padding-right: 16px;
     }
 
+    .mdl-navigation__link--icon > span {
+        width: max-content;
+    }
+
     &.sideBar_cont {
         display: grid;
         grid-template-columns: minmax(0, auto) min-content;

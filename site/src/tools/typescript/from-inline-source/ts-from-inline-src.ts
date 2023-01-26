@@ -2,6 +2,7 @@ import hljs from '../../../assets/site/highlight_js/highlight.js';
 
 // HLJS Language Definition
 import typescript from '../../../assets/site/highlight_js/languages/typescript.js';
+import { registerForEvents } from '../../../universal.js';
 hljs.registerLanguage('typescript', typescript);
 
 declare global {interface Window {

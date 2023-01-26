@@ -2,7 +2,7 @@
 layout: page
 title: Tools - FOMOD Builder
 extra_head: >
-    <script async type="module" src="fomod-builder.js" onload="window.bcd_init_functions.fomodBuilder()"></script>
+    <script async type="module" src="fomod-builder.js" onload="callInit('fomodBuilder')"></script>
 description: >
     The FOMOD Builder is a tool for creating FOMOD installers, a popular XML-based format for video game mod installers. It is the first of its kind to feature intuitive tooltips, dark mode, and eventually more. It is, at this time, incomplete.
 # , full schema support, Real-time renders, auditing
@@ -32,6 +32,113 @@ redirect_from:
     </div>
 </template>
 
+<template id="builder-main-steps-step">
+    <div class="builder-steps-step">
+
+        <!-- Step Summary -->
+        <div class="builder-steps-step-sum js-bcd-summary adjacent">
+            <i class="material-icons open-icon-90CC">expand_more</i>
+            <h3 class="builder-steps-step-title">Step: <span class="name">Choose Version (1/2)</span></h3>
+            <sub><span class="builder-steps-step-group-count" unitWord="Group">6 Groups</span>, <span class="builder-steps-step-option-count" unitWord="Option">17 Options</span></sub>
+        </div>
+
+        <!-- Step Body -->
+        <div class="builder-steps-step-body js-bcd-details adjacent" data-margin-top="8px">
+
+            <div class="builder-steps-group-container"></div>
+
+        </div>
+
+    </div>
+</template>
+
+<template id="builder-main-steps-group">
+    <!-- Group Summary -->
+    <div class="builder-steps-group-sum js-bcd-summary adjacent">
+        <i class="material-icons open-icon-90CC">expand_more</i>
+        <h4 class="builder-steps-group-title">Group: <span class="name">Choose Version</span></h4>
+        <sub><span class="builder-steps-step-option-count" unitWord="Option">17 Options</span></sub>
+    </div>
+
+    <!-- Group Body -->
+    <div class="builder-steps-group-body js-bcd-details adjacent" data-margin-top="8px">
+
+        <div class="buildersteps-opt-container"></div>
+
+    </div></div>
+</template>
+
+<template id="builder-main-steps-option">
+    <!-- Option Summary -->
+    <div class="builder-steps-opt-sum js-bcd-summary adjacent">
+        <i class="material-icons open-icon-90CC">expand_more</i>
+        <h5 class="builder-steps-opt-title">Option: <span class="name">Single Texture</span></h5>
+        <sub><span class="builder-steps-opt-file-count" unitWord="Install">1 Install</span>, <span class="builder-steps-opt-flag-count" unitWord="Flag">0 Flags</span></sub>
+    </div>
+
+    <!-- Option Body -->
+    <div class="builder-steps-opt-body js-bcd-details adjacent" data-margin-top="8px"><div>
+        <!--
+            _name_backend = "";
+
+            _description!: option_description;
+            _image!: option_image;
+
+            _conditionFlags: dependency_flag[] = [];
+            _conditionFlags_container: Element | undefined;
+
+            _files: dependency_file[] = [];
+            _files_container: Element | undefined;
+            _typeDescriptor!: PluginTypeDescriptor;
+        -->
+
+        <!-- Option Image -->
+        <div class="builder-steps-opt-image">
+            <img>
+            <div class="js-relative-file-picker--container">
+                <input class="bcd-builder-input js-relative-image-picker" relative-to="FOMODBuilder" placeholder="Option Image Path" value="assets/site/images/example-image.png" />
+            </div>
+        </div>
+
+        <div class="builder-steps-body-left">
+
+            <!-- Option Name -->
+            <div class="item-with-fake-label" identifier="nameInput"><h4>Option Name</h4>
+                <input class="bcd-builder-input" placeholder="Option Name" value="Single Texture" />
+            </div>
+
+            <!-- Option Description -->
+            <div class="item-with-fake-label" identifier="descInput"><h4>Description</h4>
+                <textarea class="bcd-builder-input js-dynamic-textarea-height" placeholder="Option Description" rows="1">This is the single texture version of the mod. It will replace the texture of the scroll with a single texture.</textarea>
+            </div>
+
+            <!-- Plugin Type -->
+            <div class="item-with-fake-label item-with-fake-label--one-liner" identifier="typeButton"><h4>Default Selection Type:</h4>
+                <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
+                <menu class="bcd-dropdown-option-state mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect mdl-js-ripple-effect--ignore-events"></menu>
+            </div>
+
+            <div class="item-with-fake-label" identifier="editTypeConditions"><h4>Selection Type Conditions</h4>
+                <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+                    Edit
+                </button>
+            </div>
+
+            <!-- Condition Flags -->
+            <div class="item-with-fake-label" identifier="conditionFlags"><h4>Condition Flags to Set</h4>
+                <div class="builder-steps-opt-set-flags"></div>
+            </div>
+
+            <!-- Files -->
+            <div class="item-with-fake-label" identifier="installs"><h4>Files & Folders to Install</h4>
+                <div class="builder-steps-opt-files"></div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
 <!--
     MO2 - Info.xml
     https://github.com/Holt59/mo2-merge/blob/master/plugins/installer_fomod/src/fomodinstallerdialog.cpp#L626-L639
@@ -48,19 +155,32 @@ redirect_from:
     https://github.com/Nexus-Mods/fomod-installer
 -->
 
-<!-- Note for later: https://a11y-dialog.netlify.app/ -->
 <dialog id="no-support-modal" class="js-bcd-modal">
-    <h1>Support Notice</h1>
-    <p>The FOMOD Builder is currently only supported on Chromium-based browsers. While I do eventually plan to provide support for Firefox, Safari, and the like, Chromium-based browsers include powerful web APIs for things like <a href="https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API" target="_blank" rel="noreferrer noopener">manipulation of files and directories</a> that the FOMOD Builder relies on at the moment. In the future, support for other browsers maybe added.</p>
-    <br />
-    <br />
-    <p>Your browser does not support at least one of the APIs tested. Please use a different browser. You may still exit this dialog and attempt to use the FOMOD Builder, however BellCube makes no guarantees as to whether or not it will work.</p>
-    <hr />
-    <h2> Missing APIs: </h2>
-    <p class="replace_me_txt"></p>
+    <div class="js-bcd-modal-body">
+        <h1>Support Notice</h1>
+        <p>The FOMOD Builder is currently only supported on Chromium-based browsers. While I do eventually plan to provide support for Firefox, Safari, and the like, Chromium-based browsers include powerful web APIs for things like <a href="https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API" target="_blank" rel="noreferrer noopener">manipulation of files and directories</a> that the FOMOD Builder relies on at the moment. In the future, support for other browsers maybe added.</p>
+        <br />
+        <br />
+        <p>Your browser does not support at least one of the APIs tested. Please use a different browser. You may still exit this dialog and attempt to use the FOMOD Builder, however BellCube makes no guarantees as to whether or not it will work.</p>
+        <hr />
+        <h2> Missing APIs: </h2>
+        <p class="replace_me_txt"></p>
+    </div>
 
     <div autofocus class="js-bcd-modal-buttons">
-        <button class="js-bcd-modal-close mdl-button w128 mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--colored">Close</button>
+        <button class="js-bcd-modal-close mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--colored" width="128">Close</button>
+    </div>
+</dialog>
+
+<dialog id="opening-other-project-modal" class="js-bcd-modal">
+    <div class="js-bcd-modal-body">
+        <h1>Opening Another Project</h1>
+        <p>Are you sure you want to open another project? There is already open</p>
+    </div>
+
+    <div autofocus class="js-bcd-modal-buttons">
+        <button class="js-bcd-modal-close mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--colored" data-modal-message="confirm" width="256">Open Another Project</button>
+        <button class="js-bcd-modal-close mdl-button mdl-js-button mdl-js-ripple-effect mdl-button--raised mdl-button--colored" data-modal-message="deny" width="192">Take Me Back</button>
     </div>
 </dialog>
 
@@ -238,101 +358,11 @@ redirect_from:
             </div>
 
             <!-- Steps Container -->
-            <div class="builder-steps-step">
+            <div class="builder-steps-steps-container"></div>
 
-                <!-- Step Summary -->
-                <div class="builder-steps-step-sum js-bcd-summary adjacent">
-                    <i class="material-icons open-icon-90CC">expand_more</i>
-                    <h3 class="builder-steps-step-title">Choose Version (1/2)</h3>
-                    <sub><span class="builder-steps-step-group-count" unitWord="Group">6 Groups</span>, <span class="builder-steps-step-option-count" unitWord="Option">17 Options</span></sub>
-                </div>
-
-                <!-- Step Body -->
-                <div class="builder-steps-step-body js-bcd-details adjacent" data-margin-top="8px">
-
-                    <!-- Group Summary -->
-                    <div class="builder-steps-group-sum js-bcd-summary adjacent">
-                        <i class="material-icons open-icon-90CC">expand_more</i>
-                        <h4 class="builder-steps-group-title">Choose Version</h4>
-                        <sub><span class="builder-steps-step-option-count" unitWord="Option">17 Options</span></sub>
-                    </div>
-
-                    <!-- Group Body -->
-                    <div class="builder-steps-group-body js-bcd-details adjacent" data-margin-top="8px">
-
-                        <!-- Option Summary -->
-                        <div class="builder-steps-opt-sum js-bcd-summary adjacent">
-                            <i class="material-icons open-icon-90CC">expand_more</i>
-                            <h5 class="builder-steps-opt-title">Single Texture</h5>
-                            <sub><span class="builder-steps-opt-file-count" unitWord="Install">1 Install</span>, <span class="builder-steps-opt-flag-count" unitWord="Flag">0 Flags</span></sub>
-                        </div>
-
-                        <!-- Option Body -->
-                        <div class="builder-steps-opt-body js-bcd-details adjacent" data-margin-top="8px"><div>
-                            <!--
-                                _name_backend = "";
-
-                                _description!: option_description;
-                                _image!: option_image;
-
-                                _conditionFlags: dependency_flag[] = [];
-                                _conditionFlags_container: Element | undefined;
-
-                                _files: dependency_file[] = [];
-                                _files_container: Element | undefined;
-                                _typeDescriptor!: PluginTypeDescriptor;
-                            -->
-
-                            <!-- Option Image -->
-                            <div class="builder-steps-opt-image">
-                                <img>
-                                <div class="js-relative-file-picker--container">
-                                    <input class="bcd-builder-input js-relative-image-picker" relative-to="FOMODBuilder" placeholder="Option Image Path" value="assets/site/images/example-image.png" />
-                                </div>
-                            </div>
-
-                            <div class="builder-steps-body-left">
-
-                                <!-- Option Name -->
-                                <div class="item-with-fake-label" identifier="nameInput"><h4>Option Name</h4>
-                                    <input class="bcd-builder-input" placeholder="Option Name" value="Single Texture" />
-                                </div>
-
-                                <!-- Option Description -->
-                                <div class="item-with-fake-label" identifier="descInput"><h4>Description</h4>
-                                    <textarea class="bcd-builder-input js-dynamic-textarea-height" placeholder="Option Description" rows="1">This is the single texture version of the mod. It will replace the texture of the scroll with a single texture.</textarea>
-                                </div>
-
-                                <!-- Plugin Type -->
-                                <div class="item-with-fake-label item-with-fake-label--one-liner" identifier="typeButton"><h4>Default Selection Type:</h4>
-                                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
-                                    <menu class="bcd-dropdown-option-state mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect mdl-js-ripple-effect--ignore-events"></menu>
-                                </div>
-
-                                <div class="item-with-fake-label" identifier="editTypeConditions"><h4>Selection Type Conditions</h4>
-                                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
-                                        Edit
-                                    </button>
-                                </div>
-
-                                <!-- Condition Flags -->
-                                <div class="item-with-fake-label" identifier="conditionFlags"><h4>Condition Flags to Set</h4>
-                                    <div class="builder-steps-opt-set-flags"></div>
-                                </div>
-
-                                <!-- Files -->
-                                <div class="item-with-fake-label" identifier="installs"><h4>Files & Folders to Install</h4>
-                                    <div class="builder-steps-opt-files"></div>
-                                </div>
-
-                            </div>
-
-                        </div>
-                    </div></div>
-
-                </div>
-
-            </div>
+            <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-add-step-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+                Add Step
+            </button>
         </div>
 
 

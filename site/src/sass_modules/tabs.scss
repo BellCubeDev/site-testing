@@ -1,3 +1,5 @@
+@import 'button-colors';
+
 .tab-content {
     min-height: 70vh;
     min-width: 100%;
@@ -62,4 +64,8 @@
     padding-top: 44px;
     margin-left: -300px;
     z-index: 2;
+}
+
+.js-tab-list-button, .js-tab-list-button.mdl-button:focus:not(:active) {
+    @include customColoredButton(160deg, 33%, 30%, 1, 1, 1);
 }

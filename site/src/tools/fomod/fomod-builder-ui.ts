@@ -7,16 +7,14 @@ import * as bcdUniversal from '../../universal.js';
 import * as bcdFS from '../../filesystem-interface.js';
 import * as xml from './fomod-builder-xml-translator.js';
 
+import pluralize from '../../included_node_modules/plural/index.js';
+
 import type {prettyData as prettyData__} from '../../../untyped-modules';
 import prettyData_ from '../../included_node_modules/pretty-data/pretty-data.js';
-
 const prettyData = prettyData_ as unknown as prettyData__;
 
-console.log(prettyData.pd);
-
-prettyData.pd.step = '    ';
-
 // reconstruct array of shifts to use 4 spaces instead of 2 //
+prettyData.pd.step = '    ';
 prettyData.pd.shift = ['\n'];
 for(let i = 0; i < prettyData.pd.maxdeep; i++){
     prettyData.pd.shift.push(prettyData.pd.shift[i]+prettyData.pd.step);
@@ -24,6 +22,8 @@ for(let i = 0; i < prettyData.pd.maxdeep; i++){
 
 const xmlBeautify = prettyData.pd.xml.bind(prettyData.pd);
 const xmlMinify = prettyData.pd.xmlmin.bind(prettyData.pd);
+
+
 
 export class bcdDropdownSortingOrder extends bcdUniversal.BCDDropdown {
     static readonly asString = 'FOMOD Builder - Sorting Order Dropdown';
@@ -60,13 +60,13 @@ export class bcdDropdownOptionState extends bcdUniversal.BCDDropdown {
 
 
 export interface windowUI {
-    openFolder: () => void;
-    save: () => void;
-    cleanSave: () => void;
-    attemptRepair: () => void;
-    setStepEditorType: (type: bcdBuilderType) => void;
-    openTypeConditions: (elem: HTMLElement) => void;
-    openConditions: (elem: HTMLElement) => void;
+    openFolder: typeof openFolder;
+    save: typeof save;
+    cleanSave: typeof cleanSave;
+    attemptRepair: () => unknown;
+    setStepEditorType: typeof setStepEditorType;
+    openTypeConditions: (elem: HTMLElement) => unknown;
+    openConditions: (elem: HTMLElement) => unknown;
 }
 
 
@@ -92,11 +92,11 @@ export function setStepEditorType(type: bcdBuilderType) {
         });
 
         thisElem.classList.add('active_');
-        requestAnimationFrame(requestAnimationFrame.bind(window,()=>{
+        bcdUniversal.nestAnimationFrames(2, ()=>{
             thisElem.classList.add('active');
             thisElem.ariaHidden = 'false';
             thisElem.removeAttribute('hidden');
-        }));
+        });
     }
 
     if (otherSteps.length === 0) transitionPhaseTwo();
@@ -111,6 +111,30 @@ export function setStepEditorType(type: bcdBuilderType) {
     window.FOMODBuilder.storage.preferences!.stepsBuilder = type;
 }
 
+export async function showOpenAnotherFolderDialog() {
+    const dialog = document.getElementById('opening-other-project-modal')!.upgrades_proto!.modalDialog!;
+    const result = await dialog.show();
+    if (result !== 'confirm') {
+        console.debug(`User cancelled opening another folder with response "${result}"`);
+        return false;
+    } else {
+        console.debug(`User confirmed opening another folder with response "${result}"`);
+        return true;
+    }
+}
+
+export async function openFolder() {
+    if (loadingFomod) return;
+
+    if (window.FOMODBuilder.directory && !await showOpenAnotherFolderDialog())
+        return;
+
+    if ('showDirectoryPicker' in window) return await openFolder_entry();
+
+    console.warn('No directory picker available for your system!');
+    fomod.getNoSupportModal()?.show();
+}
+
 let loadingFomod = false;
 export async function openFolder_entry() {
     if (loadingFomod) return;
@@ -119,7 +143,7 @@ export async function openFolder_entry() {
     console.debug('Opening a folder!');
 
     const picked = await bcdFS.getUserPickedFolder(true);
-    if (!picked) return;
+    if (!picked) return loadingFomod = false;
 
     console.debug('Picked folder:', picked);
     console.debug('Picked folder name:', picked?.handle.name);
@@ -141,7 +165,10 @@ export async function openFolder_entry() {
 
     xml.translateWhole(moduleStr, infoStr, true);
 
-    setTimeout(()=> loadingFomod = false, 100);
+    await new Promise<void>(r =>bcdUniversal.afterDelay(100, ()=> {
+        loadingFomod = false;
+        r();
+    }));
 }
 
 let saving = false;
@@ -153,7 +180,7 @@ export async function save() {
 
     if (!window.FOMODBuilder.directory) {
         const picked = await bcdFS.getUserPickedFolder(true);
-        if (!picked) return;
+        if (!picked) return saving = false;
         window.FOMODBuilder.directory = picked;
     }
 
@@ -190,6 +217,7 @@ export async function save() {
 
     // Once we're done saving, note it as such.
     await Promise.all([writeInfoPromise, writeModulePromise]);
+    hasUnsavedChanges = false;
     saving = false;
 }
 
@@ -200,14 +228,18 @@ export async function cleanSave(){
     window.FOMODBuilder.trackedFomod!.infoDoc = window.domParser.parseFromString('<fomod/>', 'text/xml');
     window.FOMODBuilder.trackedFomod!.moduleDoc = window.domParser.parseFromString('<config/>', 'text/xml');
 
-    await save();
+    return await save();
 }
 
 let saveTimeout:null|number = null;
+let hasUnsavedChanges = false;
 export function autoSave() {
-    if (loadingFomod) return;
-    if (!window.FOMODBuilder.storage.settings.autoSaveAfterChange) return;
+    if (saving || loadingFomod) return;
     if (!window.FOMODBuilder.trackedFomod) return;
+
+    hasUnsavedChanges = true;
+
+    if (!window.FOMODBuilder.storage.settings.autoSaveAfterChange) return;
 
     if (saveTimeout !== null) clearTimeout(saveTimeout);
     saveTimeout = bcdUniversal.afterDelay(500, () => {
@@ -216,3 +248,12 @@ export function autoSave() {
         else save();
     });
 }
+
+window.addEventListener('beforeunload', (event) => {
+    console.log(`Has unsaved changes? ${hasUnsavedChanges}`);
+    if (hasUnsavedChanges) {
+        event.preventDefault();
+        event.returnValue = '';
+        return '';
+    }
+});

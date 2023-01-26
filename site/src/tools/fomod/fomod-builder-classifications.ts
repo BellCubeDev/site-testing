@@ -1,5 +1,5 @@
 import * as main from "./fomod-builder.js"; // Brings in global things
-import { objOf } from '../../universal.js';
+import { objOf, UpdatableObject } from '../../universal.js';
 
 import * as bindingsGeneric from './fomod-builder-bindings.js';
 import * as bindings1stParty from './fomod-builder-steps-1st-party.js';
@@ -25,29 +25,24 @@ $$ |  $$ |$$ |  $$ | \____$$\   $$ |$$\ $$ |      $$  __$$ |$$ |        $$ |$$\ 
 $$ |  $$ |$$$$$$$  |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |\$$$$$$$\   \$$$$  |$$$$$$$  |
 \__|  \__|\_______/ \_______/    \____/ \__|       \_______| \_______|   \____/ \______*/
 
-export abstract class FOMODElementProxy implements main.updatableObject {
-    suppressUpdates = false;
+export abstract class FOMODElementProxy extends UpdatableObject {
     instanceElement: Element | undefined;
 
-    objectsToUpdate: main.updatableObject[] = [];
+    objectsToUpdate: UpdatableObject[] = [];
 
     updateObjects() {
-        if (this.suppressUpdates) return;
-        this.suppressUpdates = true;
-
         this.objectsToUpdate.forEach(  (obj) => obj.update()  );
-        if (window.FOMODBuilder.storage.settings.autoSaveAfterChange) ui.autoSave();
-
-        this.suppressUpdates = false;
+        ui.autoSave();
     }
 
-    update() { this.updateObjects(); }
+    override update_() { this.updateObjects(); }
 
     constructor(instanceElement: Element | undefined = undefined) {
+        super();
+        this.suppressUpdates = true;
         this.instanceElement = instanceElement;
 
         queueMicrotask(() => {
-            console.log('FOMODElementProxy constructor microtask - updating objects for Proxy Element', this);
             this.suppressUpdates = false;
             this.updateObjects();
         });
@@ -625,8 +620,13 @@ export class OptionImage extends FOMODElementProxy {
     }
 }
 
+type ObjAsJSON<TObj> = Partial<{[k in keyof TObj]: TObj[k] extends Function ? never : TObj[k] extends object ? ObjAsJSON<TObj[k]> : TObj[k]}>
 
-
+const a = {
+    metaName: 'string',
+    moduleName: 'string',
+    metaId: 1
+} satisfies ObjAsJSON<Fomod>;
 
 export class Fomod extends FOMODElementProxy {
     private _metaName: string = '';
@@ -665,7 +665,7 @@ export class Fomod extends FOMODElementProxy {
     private _infoInstanceElement: Element | undefined;
     set infoInstanceElement(value: Element | undefined) { this._infoInstanceElement = value; this.updateObjects(); } get infoInstanceElement(): Element | undefined { return this._infoInstanceElement; }
 
-    _metaUrl:URL|string = '';
+    private _metaUrl:URL|string = '';
     get metaUrl():URL|string { return this._metaUrl; } set metaUrl(url:URL|string) {
         if (url instanceof URL) this._metaUrl = url;
         else {
@@ -693,6 +693,12 @@ export class Fomod extends FOMODElementProxy {
     steps: Step[];
     sortingOrder: SortOrder = 'Explicit';
 
+    addStep() {
+        this.steps.push(new Step());
+        this.updateObjects();
+    }
+    readonly addStep_bound = this.addStep.bind(this);
+
     constructor(
         instanceElement?: Element,
         infoInstanceElement?: Element,
@@ -708,7 +714,6 @@ export class Fomod extends FOMODElementProxy {
         conditions?: DependencyGroup
     ) {
         super(instanceElement);
-        this.suppressUpdates = true;
         this.infoInstanceElement = infoInstanceElement;
 
         this.metaName =         metaName ?? infoInstanceElement?.getElementsByTagName("Name")           [0]?.textContent                        ?? '';

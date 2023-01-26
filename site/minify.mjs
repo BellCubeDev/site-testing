@@ -3,6 +3,8 @@ import * as path from 'path';
 import * as afs from 'fs/promises';
 import * as fs from 'fs';
 
+import * as yaml from 'yaml';
+
 import * as uglify from 'terser';
 import convertToES6 from 'cjs-to-module';
 
@@ -16,8 +18,8 @@ import moduleDetector from 'js-module-formats';
 
 import pathConfig from './minify-paths-config.json' assert {type: 'json'};
 
-process.env.logToFile = 'true';
-process.env.doDebug = 'true';
+//process.env.logToFile = 'true';
+//process.env.doDebug = 'true';
 
 // If requested, redirect all console output to minify.log
 if (process.env.logToFile?.trim().replace(/^"(.*)"$/, '$1') === 'true') {
@@ -92,6 +94,8 @@ const absoluteMinifyDir = path.resolve(minifyDir);
 const minifyDirURI = new URL(`file://${absoluteMinifyDir}/`);
 const canonicalMinifyURI = doInlineSources ? minifyDirURI.href : `https://raw.githubusercontent.com/${process.env.repository || 'BellCubeDev/site-testing'}/deployment/`;
 
+const config = yaml.parse(await afs.readFile('_config.yml', 'utf8'));
+
 setTimeout(evalFilesInDir.bind(undefined, minifyDir), 100);
 
 /** @param {string} dirPath Directory to traverse */
@@ -110,7 +114,10 @@ async function evalFileOrDir(thisPath) {
     thisPath = path.normalize(thisPath).replace(/\\/g, '/');
     if (doDebug) console.log('DEBUG: Evaluating file or directory:', thisPath);
     //console.log('Evaluating file or directory:', thisPath);
-    if (path.basename(thisPath).startsWith('_')) return console.log('Skipping path due to underscore:', thisPath);
+    if (path.basename(thisPath).startsWith('_')) {
+        if (doDebug) console.log('Skipping path due to underscore:', thisPath);
+        return;
+    }
 
     const stat = await afs.lstat(thisPath);
     if (stat.isDirectory()) {
@@ -118,7 +125,10 @@ async function evalFileOrDir(thisPath) {
         return evalFilesInDir(thisPath);
     }
 
-    if (pathConfig.excluded.some(str => thisPath.includes(str))) return console.log('Skipping path due to exclusion:', thisPath);
+    if (pathConfig.excluded.some(str => thisPath.includes(str))) {
+        if (doDebug) console.log('Skipping path due to exclusion:', thisPath);
+        return;
+    }
 
     // eslint-disable-next-line prefer-const
     let [,isSassDir, isOriginal, isMinified, ext] = thisPath.match(/(sass_modules)|(?:\.(original))?(?:\.(min))?\.([^.]+)$/) || [];
@@ -126,7 +136,10 @@ async function evalFileOrDir(thisPath) {
 
     if (doDebug) console.log('DEBUG: Evaluating file with...', JSON.stringify({path: thisPath, isSassDir, isOriginal, isMinified, ext}, undefined, 2));
 
-    if (isSassDir || isOriginal || isMinified || !ext) return console.log('Skipping path due to extension or SASS dir:', thisPath);
+    if (isSassDir || isOriginal || isMinified || !ext) {
+        if (doDebug) console.log('Skipping path due to extension or SASS dir:', thisPath);
+        return;
+    }
 
     switch (ext) {
         case 'js' : return minifyJSFile(thisPath);
@@ -144,7 +157,10 @@ async function minifyJSFile(filePath) {
 
         // Check if we've already processed this file
         const stat = await afs.stat(filePath);
-        if (stat.birthtime.getTime() > stat.mtime.getTime() + 4000) return console.log('Skipping file due to birthtime:', filePath);
+        if (stat.birthtime.getTime() > stat.mtime.getTime() + 4000) {
+            if (doDebug) console.log('Skipping file due to birthtime:', filePath);
+            return;
+        }
 
         console.log('Minifying', filePath);
         minifiedAnyFile = true;
@@ -163,9 +179,20 @@ async function minifyJSFile(filePath) {
         const tempCache = {...minifiedVarCache};
 
         let strToMinify = fileContents;
-        const moduleTye = moduleDetector.detect(fileContents);
+        const moduleTye = moduleDetector.detect(fileContents) || 'es';
         if (doDebug) console.log(`DEBUG: Detected module type for ${filePath}:\n    "${moduleTye}"`);
-        if (moduleTye !== 'es') strToMinify = convertToES6(strToMinify);
+
+        if (moduleTye !== 'es') {
+            console.log(JSON.stringify({filePath, minifyDir, absoluteMinifyDir}));
+            strToMinify = convertToES6(strToMinify)
+                // Handle module imports
+                .replace(/^module ([^\b]+) from/m, 'import $1 from')
+                // Handle JSON imports
+                .replace(/import (\w+) from ("|')(\.?)(\.?)((?:\\\2|["'](?<!\2)|[^"'])*\.[Jj][Ss][Oo][Nn])\2;?/g, (str, varName, quoteType, leadingDot01, leadingDot02, jsonPath) =>
+                leadingDot01 ? `const ${varName} = await fetch(${quoteType}${leadingDot02}${path.normalize(path.join(config.baseurl || '', path.normalize(filePath).replace(/[\\/][^\\/]+$/, '').replace(path.normalize(minifyDir), ''), jsonPath)).replace(/\\/g, '/')}${quoteType}).then(r => r.json())`
+                             : `const ${varName} = await fetch(${quoteType}${                                                                                jsonPath.replace(/^\//, '')                                                                               }${quoteType}).then(r => r.json())`
+                );
+        }
         //if (path.basename(filePath, '.js') === 'highlight') strToMinify += 'window.hljs = module.exports;';
 
         afs.writeFile(filePath.replace(/\.js$/, '.original.js'), strToMinify, {encoding: 'utf8'});
@@ -295,7 +322,7 @@ async function minifyJSFile(filePath) {
             afs.writeFile(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${urlFilePath.replace(/\.js$/, '.original.js')}"]`), {encoding: 'utf8'});
         }
     } catch (err) {
-        console.error(`Minifying JS file "${filePath}" threw an error:\n${JSON.stringify(err, null, 4)}`);
+        console.error(`Minifying JS file "${filePath}" threw an error:\n${JSON.stringify(err, null, 4)}`, err);
         return;
     }
 }
@@ -329,13 +356,27 @@ async function minifySassFile(filePath) {
 
         await finishMinifyingCSS(filePath, sassCompiled.css, sassMap);
     } catch (err) {
-        console.error(`Minifying SASS file "${filePath}" threw an error:\n${JSON.stringify(err, null, 4)}`);
+        if ('file' in err) delete err.file;
+        if ('input' in err) delete err.input;
+        if ('source' in err) delete err.source;
+        if ('sourceMappingURL' in err) delete err.sourceMappingURL;
+        console.error(`Minifying SASS file "${filePath}" threw an error:\n${JSON.stringify(err, null, 4)}`, err);
         return;
     }
 }
 
 async function minifyCSSFile(filePath) {
     try {
+
+        // If there is a Sass version of this file, skip the CSS file
+        try {
+            await afs.access(filePath.replace(/\.css$/, '.scss'), fs.constants.R_OK);
+            if (doDebug) console.log(`Skipping CSS file "${filePath}" because there is a Sass file`);
+            return;
+        } catch (err) {
+            if (doDebug) console.log(`No Sass file found for "${filePath}"`);
+        }
+
         console.log('Minifying', filePath);
         //const rawFileStr = await afs.readFile(filePath, 'utf8');
 
@@ -345,7 +386,11 @@ async function minifyCSSFile(filePath) {
 
         await finishMinifyingCSS(filePath, css);
     } catch (err) {
-        console.error(`Minifying CSS file "${filePath}" threw an error:\n${JSON.stringify(err, null, 4)}`);
+        if ('file' in err) delete err.file;
+        if ('input' in err) delete err.input;
+        if ('source' in err) delete err.source;
+        if ('sourceMappingURL' in err) delete err.sourceMappingURL;
+        console.error(`Minifying CSS file "${filePath}" threw an error:\n${JSON.stringify(err, null, 4)}`, err);
         return;
     }
 }

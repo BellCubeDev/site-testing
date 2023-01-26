@@ -31,6 +31,31 @@ export function afterDelay<TCallback extends (...args: any) => any = any>(timeou
     return window.setTimeout(callback, timeout, ...(args || []));
 }
 
+export abstract class UpdatableObject {
+    update() {
+        if (this.suppressUpdates) return;
+        this.suppressUpdates = true;
+        this.update_();
+        this.suppressUpdates = false;
+    }
+    protected update_() {return;}
+
+    updateFromInput() {
+        if (this.suppressUpdates) return;
+        this.suppressUpdates = true;
+        this.updateFromInput_();
+        this.suppressUpdates = false;
+    }
+    protected updateFromInput_() {return;}
+
+    suppressUpdates = false;
+}
+
+export function nestAnimationFrames(num: number, callback: () => unknown) {
+    if (num <= 0) return callback();
+    requestAnimationFrame(() => nestAnimationFrames(num - 1, callback));
+}
+
 // ================================
 // ======== TYPE UTILITIES ========
 // ================================
@@ -64,10 +89,71 @@ export function preventPropagation(event: Event): void {
     event.stopPropagation();
 }
 
-export function registerForChange<TElement extends HTMLElement>(element: TElement, callback: (this: TElement, ev: HTMLElementEventMap["input"]|HTMLElementEventMap["change"]) => unknown, options?: boolean|AddEventListenerOptions): void {
-    element.addEventListener('change', callback, options);
-    element.addEventListener('input', callback, options);
+type EventElement = HTMLElement|typeof window|typeof document;
+
+interface EventTypes<TElement extends EventElement = EventElement> {
+    activate?: (this: TElement, ev: TElement extends HTMLElement ? (MouseEvent|KeyboardEvent) : (Event|KeyboardEvent)) => unknown;
+
+    change?: (this: TElement, ev: Event) => unknown;
+
+    dropdownInput?: (this: TElement, ev: Event) => unknown;
+
+    exit?: (this: TElement, ev: KeyboardEvent) => unknown;
+
+    anyKey?: (this: TElement, ev: KeyboardEvent) => unknown;
+    key?: (this: TElement, ev: KeyboardEvent) => unknown;
 }
+
+const keyTypes: Record<string, keyof EventTypes> = {
+    'Enter': 'activate',
+    ' ': 'activate',
+    'Escape': 'exit',
+    'Esc': 'exit',
+};
+
+export function registerForEvents<TElement extends EventElement>(element: TElement, events: EventTypes<TElement>, options?: boolean|AddEventListenerOptions): void {
+    let handling = false;
+    function wrapCallback<TCallback extends (this: TElement, ...args: any[]) => any>(callback: TCallback): ((this: ThisParameterType<TCallback>, ...args: Parameters<TCallback>)=>ReturnType<TCallback>|void) {
+        return function(this: ThisParameterType<TCallback>, ...args: Parameters<TCallback>) {
+            if (handling) return;
+            handling = true;
+            queueMicrotask(() => handling = false);
+            return callback.call(this, ...args) as ReturnType<TCallback>;
+        };
+    }
+
+    // Wrap all the callbacks!
+    events = Object.fromEntries(Object.entries(events).map(([key, value]) => [key, wrapCallback(value)]));
+
+    function handleKey(this: TElement, ev: Event) {
+        if ( !(ev instanceof KeyboardEvent) ) return;
+        const functionName = keyTypes[ev.key] || 'anyKey';
+        events[functionName]?.call(element, ev);
+    }
+
+    element.addEventListener('keydown', handleKey, options);
+
+    for (const evt in events) switch (evt) {
+        case 'activate': // @ts-ignore - my logic is perfectly valid, but TypeScript doesn't know that 🤷‍♂️
+            element.addEventListener(window.clickEvt, events[evt]!, options);
+            break;
+
+        case 'change':
+            element.addEventListener('change', events[evt]!, options);
+            element.addEventListener('input', events[evt]!, options);
+            break;
+
+        case 'exit':
+            break;
+
+        case 'anyKey':
+            break;
+
+        case 'dropdownInput':
+            element.addEventListener('bcd-dropdown-change', events[evt]!, options);
+    }
+}
+window.registerForEvents = registerForEvents;
 
 export function setProxies<TObj>(obj: TObj, handler: TObj extends Record<string, any> ? ProxyHandler<TObj> : ProxyHandler<any>): TObj {
     if (!obj || typeof obj !== 'object') return obj;
@@ -135,9 +221,9 @@ export function focusAnyElement(element:HTMLElement|undefined, preventScrolling:
     element.focus({preventScroll: preventScrolling});
 
     // Wrap inside two requestAnimationFrame calls to ensure the browser could focus the element before removing the tabindex attribute.
-    requestAnimationFrame(() => {requestAnimationFrame(() => {
+    nestAnimationFrames(2, () => {
         if (!hadTabIndex) element.removeAttribute('tabindex');
-    });});
+    });
 }
 
 
@@ -217,18 +303,18 @@ interface DocAndElementInjections {
     removeChildByTag(tagName: string, count?: number): void;
 }
 
+interface PrototypedUpgrades {
+    tooltip: BCDTooltip;
+    dropdown: BCDDropdown;
+    modalDialog: BCDModalDialog;
+}
+
 declare global {
     interface Element extends DocAndElementInjections {
         upgrades?: Record<string, InstanceType<BCDComponentI>>;
-        upgrades_proto?: Partial<{
-            tooltip: BCDTooltip;
-            dropdown: BCDDropdown;
-        }>
-        targetingComponents?: Record<string, BCDComponentI>;
-        targetingComponents_proto?: Partial<{
-            tooltip: BCDTooltip;
-            dropdown: BCDDropdown
-        }>
+        upgrades_proto?: Partial<PrototypedUpgrades>
+        targetingComponents?: Record<string, InstanceType<BCDComponentI>>;
+        targetingComponents_proto?: Partial<PrototypedUpgrades>
     }
     interface Document extends DocAndElementInjections {}
 
@@ -256,6 +342,8 @@ declare global {
         lazyStylesLoaded: true|undefined;
 
         BCDSettingsDropdown: typeof BCDSettingsDropdown;
+
+        registerForEvents: typeof registerForEvents;
     }
 }
 
@@ -293,6 +381,17 @@ function registerUpgrade(subject: Element, upgrade: InstanceType<BCDComponentI>,
         if (target) forEachChildAndOrParent(target, propagateToTargetChildren, child => {
             if (!child.targetingComponents_proto) child.targetingComponents_proto = {};
             child.targetingComponents_proto!.dropdown = upgrade;
+        });
+    }
+
+    if (upgrade instanceof BCDModalDialog) {
+        forEachChildAndOrParent(subject, propagateToSubjectToChildren, child => {
+            if (!child.upgrades_proto) child.upgrades_proto = {};
+            child.upgrades_proto!.modalDialog = upgrade;
+        });
+        if (target) forEachChildAndOrParent(target, propagateToTargetChildren, child => {
+            if (!child.targetingComponents_proto) child.targetingComponents_proto = {};
+            child.targetingComponents_proto!.modalDialog = upgrade;
         });
     }
 }
@@ -427,7 +526,7 @@ $$ |  $$\ $$ |  $$ |$$ |$$ |$$  __$$ |$$ |  $$ | \____$$\ $$ |$$ |  $$ |$$ |$$  
 
 
 
-abstract class bcd_collapsibleParent {
+abstract class BCD_CollapsibleParent {
     // For children to set
     details!:HTMLElement;
     details_inner!:HTMLElement;
@@ -465,32 +564,31 @@ abstract class bcd_collapsibleParent {
         );
     }
 
-    /** Open the collapsible menu. */
-    open(doSetDuration:boolean = true, instant = false) {//this.debugCheck();
+    /** Open the collapsible menu content */
+    open(doSetDuration = true, instant = false) {//this.debugCheck();
 
         if (instant) this.instantTransition();
         else if (doSetDuration) this.evaluateDuration(doSetDuration);
 
         this.details_inner.setAttribute('disabled', 'true');
         this.details_inner.ariaHidden = 'false';
-        this.details_inner.style.visibility = 'none';
-
+        this.details_inner.style.visibility = 'visible';
 
         this.details.classList.add(strs.classIsOpen);
         this.summary.classList.add(strs.classIsOpen);
 
-        requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=>requestAnimationFrame(()=> {
+        nestAnimationFrames(3, () => {
 
             this.details_inner.style.marginTop = this.details.getAttribute('data-margin-top') || '0';
 
-            if (instant) requestAnimationFrame(()=>requestAnimationFrame(()=>
+            if (instant) nestAnimationFrames(2, ()=>
                 this.evaluateDuration.bind(this, doSetDuration, true)
-            ));
+            );
 
-        }))));
+        });
     }
 
-    /** Close the collapsible menu. */
+    /** Close the collapsible content */
     close(doSetDuration:boolean = true, instant = false) {//this.debugCheck();
 
         if (instant) this.instantTransition();
@@ -500,24 +598,25 @@ abstract class bcd_collapsibleParent {
 
         this.details.classList.remove(strs.classIsOpen);
         this.summary.classList.remove(strs.classIsOpen);
+        BCD_CollapsibleParent.setDisabled(this.details_inner, true);
 
-        if (instant) requestAnimationFrame(()=>requestAnimationFrame(() => {
+        if (instant) nestAnimationFrames(2, () => {
             this.evaluateDuration(doSetDuration, false);
-        }));
+        });
     }
 
     onTransitionEnd(event?:TransitionEvent):void {
         if (event && event.propertyName !== 'margin-top') return;
 
         if (this.isOpen()) {
-            this.details_inner.setAttribute('disabled', 'false');
+            BCD_CollapsibleParent.setDisabled(this.details_inner, false);
             return;
         }
 
         requestAnimationFrame(() => {
-            this.details_inner.setAttribute('disabled', 'true');
             this.details_inner.ariaHidden = 'true';
             this.details_inner.style.visibility = 'none';
+            BCD_CollapsibleParent.setDisabled(this.details_inner, true);
         });
     }
 
@@ -532,6 +631,35 @@ abstract class bcd_collapsibleParent {
         this.onTransitionEnd();
     }
 
+    static setDisabled(elm:Element, disabled:boolean):void {
+        for (const child of elm.children)
+            this.setDisabled(child, disabled);
+
+        const wasDisabled = elm.getAttribute('data-was-disabled') as 'true'|'false'|null;
+        const oldTabIndex = elm.getAttribute('data-old-tabindex');
+
+        if (disabled) {
+            if (wasDisabled === null) elm.setAttribute('data-was-disabled', elm.hasAttribute('disabled') ? 'true' : 'false');
+            elm.setAttribute('disabled', '');
+
+            if (elm instanceof HTMLElement) {
+                if (oldTabIndex === null) elm.setAttribute('data-old-tabindex', elm.getAttribute('tabindex') || '');
+                elm.tabIndex = -1;
+            }
+
+            console.log('set disabled', elm instanceof HTMLElement, elm);
+
+        } else if (wasDisabled === 'false' || wasDisabled === null) {
+            elm.removeAttribute('data-was-disabled');
+            elm.removeAttribute('disabled');
+            elm.setAttribute('tabindex', oldTabIndex || '');
+
+        } else /* wasDisabled === 'true' */ {
+            elm.removeAttribute('data-was-disabled');
+            elm.setAttribute('tabindex', oldTabIndex || '');
+        }
+    }
+
     /* Determines what the transition and animation duration of the collapsible menu is */
     evaluateDuration(doRun:boolean = true, opening:boolean=true) {//this.debugCheck();
         if (doRun && this.details_inner) {
@@ -544,7 +672,7 @@ abstract class bcd_collapsibleParent {
     }
 }
 
-export class BellCubicDetails extends bcd_collapsibleParent {
+export class BellCubicDetails extends BCD_CollapsibleParent {
     static readonly cssClass = "js-bcd-details";
     static readonly asString = "BellCubicDetails";
 
@@ -597,15 +725,14 @@ export class BellCubicDetails extends bcd_collapsibleParent {
 }
 bcdComponents.push(BellCubicDetails);
 
-export class BellCubicSummary extends bcd_collapsibleParent {
+export class BellCubicSummary extends BCD_CollapsibleParent {
     static readonly cssClass = 'js-bcd-summary';
     static readonly asString = 'BellCubicSummary';
 
     constructor(element:HTMLElement) {
         super(element);
         this.summary = element;
-        this.summary.addEventListener(window.clickEvt, this.handleClick.bind(this));
-        this.summary.addEventListener('keypress', this.handleKey.bind(this));
+        registerForEvents(this.summary, {activate: this.activate.bind(this)});
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
 
         if (this.adjacent) {
@@ -635,27 +762,26 @@ export class BellCubicSummary extends bcd_collapsibleParent {
     });}
 
     correctFocus(keyDown?: boolean) {
-        if (!this.isOpen()) focusAnyElement(this.summary as HTMLElement);
-        if (this.isOpen() || !keyDown) requestAnimationFrame(() => {requestAnimationFrame(() => {
+        if (keyDown) focusAnyElement(this.summary as HTMLElement);
+        else return nestAnimationFrames(2, () => {
             this.summary.blur();
-        });});
+        });
     }
 
-    handleClick(event?:MouseEvent){
+    activate(event?:MouseEvent|KeyboardEvent){
         //console.log(event);
+        if (!event) return;
 
-        // @ts-expect-error: Property 'path' and 'pointerType' DO exist on type 'MouseEvent', but not in Firefox or presumably Safari
-        if (!event || (('pointerType' in event) && !event.pointerType) || (event.path && event.path?.slice(0, 5).map((el:HTMLElement) => el.tagName === 'A').includes(true))) return;
+        if (
+            // Make sure the pointer type is valid
+            (('pointerType' in event) && !event.pointerType)
+
+            // Reject the event if there's an <a> element within the first 5 elements of the path
+            || ('path' in event && event.path && event.path instanceof Array && event.path?.slice(0, 5).some((el:HTMLElement) => el.tagName === 'A'))
+        ) return;
 
         this.toggle();
-        this.correctFocus();
-    }
-
-    handleKey(event:KeyboardEvent){
-        if (event.key === ' ' || event.key === 'Enter') queueMicrotask(() =>{
-            this.toggle();
-            this.correctFocus(true);
-        });
+        this.correctFocus(event instanceof KeyboardEvent);
     }
 }
 bcdComponents.push(BellCubicSummary);
@@ -717,6 +843,7 @@ export class BCDModalDialog extends EventTarget {
         this.element_.ariaModal = 'true';
         this.element_.setAttribute('role', 'dialog');
         this.element_.ariaHidden = 'true';
+        this.element_.hidden = true;
 
         const body = document.body ?? document.documentElement.getElementsByTagName('body')[0];
 
@@ -733,9 +860,9 @@ export class BCDModalDialog extends EventTarget {
 
         afterDelay(1000, function (this: BCDModalDialog) { // Lets the DOM settle and gives JavaScript a chance to modify the element
 
-            const closeButtons = this.element_.getElementsByClassName('js-bcd-modal-close');
+            const closeButtons = this.element_.getElementsByClassName('js-bcd-modal-close') as HTMLCollectionOf<HTMLElement>;
             for (const button of closeButtons) {
-                button.addEventListener(window.clickEvt, this.boundHideFunction);
+                registerForEvents(button, {activate: this.boundHideFunction});
             }
 
             if (this.element_.hasAttribute('open-by-default')) this.show();
@@ -770,6 +897,15 @@ export class BCDModalDialog extends EventTarget {
         //console.debug("[BCD-MODAL] Modals to show (after assignment):", bcdModalDialog.modalsToShow);
         BCDModalDialog.evalQueue();
         //console.debug("[BCD-MODAL] Modals to show (after eval):", bcdModalDialog.modalsToShow);
+
+        return new Promise<string|null>((resolve) => {
+            this.addEventListener('afterHide', (evt) => {
+                if ('detail' in evt && typeof evt.detail === 'string')
+                    resolve(evt.detail);
+                else
+                    resolve(null);
+            }, {once: true});
+        });
     }
 
     /** Event sent just before the modal is shown
@@ -790,9 +926,10 @@ export class BCDModalDialog extends EventTarget {
         /* 'Before' Event */ if (!this.dispatchEvent(BCDModalDialog.beforeShowEvent) || !this.element_.dispatchEvent(BCDModalDialog.beforeShowEvent)) return;
 
         BCDModalDialog.obfuscator.classList.add(mdl.MaterialLayout.cssClasses.IS_DRAWER_OPEN);
-        BCDModalDialog.obfuscator.addEventListener(window.clickEvt, this.boundHideFunction);
+        registerForEvents(BCDModalDialog.obfuscator, {activate: this.boundHideFunction});
 
         this.element_.ariaHidden = 'false';
+        this.element_.hidden = false;
 
         if ('show' in this.element_) this.element_.show();
         else this.element_.setAttribute('open', '');
@@ -808,33 +945,41 @@ export class BCDModalDialog extends EventTarget {
 
         The event is first sent for the class and, if not canceled and if `PreventDefault()` was not called, the event is sent for the element.
     */
-    static readonly beforeHideEvent = new CustomEvent('beforeHide', {cancelable: true, bubbles: false, composed: false});
+    static getBeforeHideEvent(msg: string|null = null) {return new CustomEvent('beforeHide', {cancelable: true, bubbles: false, composed: false, detail: msg});}
 
     /** Event sent just after the modal is hidden
 
         The event is first sent for the class and, if not canceled and if PreventDefault() was not called, the event is sent for the element.
     */
-    static readonly afterHideEvent = new CustomEvent('afterHide', {cancelable: false, bubbles: false, composed: false});
+    static getAfterHideEvent(msg: string|null = null) {return new CustomEvent('afterHide', {cancelable: false, bubbles: false, composed: false, detail: msg});}
 
     // Storing the bound function lets us remove the event listener from the obfuscator after the modal is hidden
     boundHideFunction = this.hide.bind(this);
 
     hide(evt?: Event){
         //console.debug("[BCD-MODAL] Hiding modal:", this);
+
+        let msg = null;
+        if (evt && evt.currentTarget instanceof Element)
+            msg = evt.currentTarget.getAttribute('data-modal-message');
+
         if (evt) evt.stopImmediatePropagation();
-        /* 'Before' Event */ if (!this.dispatchEvent(BCDModalDialog.beforeHideEvent) ||!this.element_.dispatchEvent(BCDModalDialog.beforeHideEvent)) return;
+        /* 'Before' Event */ if (!this.dispatchEvent(BCDModalDialog.getBeforeHideEvent(msg)) ||!this.element_.dispatchEvent(BCDModalDialog.getBeforeHideEvent(msg))) return;
 
         this.element_.ariaHidden = 'true';
 
         if ('close' in this.element_) this.element_.close();
         else this.element_.removeAttribute('open');
 
+        this.element_.hidden = true;
+
         BCDModalDialog.obfuscator.classList.remove(mdl.MaterialLayout.cssClasses.IS_DRAWER_OPEN);
         BCDModalDialog.obfuscator.removeEventListener(window.clickEvt, this.boundHideFunction);
 
         BCDModalDialog.shownModal = null;
 
-        /* 'After' Event */  if (this.dispatchEvent(BCDModalDialog.afterHideEvent)) this.element_.dispatchEvent(BCDModalDialog.afterHideEvent);
+
+        /* 'After' Event */  if (this.dispatchEvent(BCDModalDialog.getAfterHideEvent(msg))) this.element_.dispatchEvent(BCDModalDialog.getAfterHideEvent(msg));
 
         BCDModalDialog.evalQueue();
     }
@@ -902,6 +1047,7 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
         if (this.forElement_) {
             this.forElement_.ariaHasPopup = 'true';
 
+            // MDL has custom handling for keyboard vs mouse events, so I'll register them raw
             this.forElement_.addEventListener(window.clickEvt, this.boundForClick_);
             this.forElement_.addEventListener('keydown', this.boundForKeydown_);
         }
@@ -976,7 +1122,7 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
             this.options_[option] = temp_clickCallback;
         }
 
-        li.addEventListener(window.clickEvt, temp_clickCallback?.bind(this));
+        if (temp_clickCallback) registerForEvents(li, {activate: temp_clickCallback.bind(this)});
 
         this.onCreateOption?.(option);
         return li;
@@ -1140,15 +1286,16 @@ export class BCDTabButton extends mdl.MaterialButton {
         this.boundTab = boundTab;
         this.name = name;
 
+        // Check if the page was reloaded
+        const entry = window.performance.getEntriesByType("navigation")?.[0];
         this.setAnchor = element.parentElement?.hasAttribute('do-tab-anchor') ?? false;
 
-        this.element_.addEventListener(window.clickEvt, this.onClick.bind(this));
-        this.element_.addEventListener('keypress', this.onKeyPress.bind(this));
+        registerForEvents(this.element_, {activate: this.activate.bind(this)});
 
-        //console.debug('Created tab button:', this);
-        //console.debug('Is this tag pre-selected by the anchor?', window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase());
-        if (this.setAnchor && window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase())
-            queueMicrotask( (() => {this.makeSelected();}).bind(this) );
+        if (entry && 'type' in entry && entry.type === 'reload')
+            this.makeSelected(0);
+        else if (this.setAnchor && window.location.hash.toLowerCase() === `#tab-${name}`.toLowerCase())
+            queueMicrotask(this.makeSelected.bind(this));
         else
             this.makeSelected(0);
     }
@@ -1228,21 +1375,15 @@ export class BCDTabButton extends mdl.MaterialButton {
 
     /** Sets `window.location.hash` to the value of `bcdTabButton.anchorToSet` in three animation frames. */
     static setAnchorIn3AnimFrames() {
-        requestAnimationFrame( () => { requestAnimationFrame( () => { requestAnimationFrame( () => {
+        nestAnimationFrames(3,  () => {
                     if (BCDTabButton.anchorToSet === '') window.history.replaceState(null, '', window.location.pathname);
                     else window.location.hash = BCDTabButton.anchorToSet;
-        });                          });                            });
+        });
     }
 
-    onClick(event?: MouseEvent): void {
+    activate(): void {
         this.makeSelected();
         this.element_.blur();
-    }
-
-    onKeyPress(event: KeyboardEvent): void {
-        if (event.key === 'Enter' || event.key === ' ') {
-            this.onClick();
-        }
     }
 }
 bcdComponents.push(BCDTabButton);
@@ -1336,11 +1477,6 @@ export class BCDTooltip {
         this.boundElement.addEventListener('touchcancel', boundTouch, {passive: true}); this.element.addEventListener('touchcancel', boundTouch, {passive: true});
     }
 
-    handleKeyDown(event: KeyboardEvent): void {
-        if (event.key === 'Escape') this.hide();
-    }
-    readonly boundKeyDown = this.handleKeyDown.bind(this);
-
     handleTouch(event: TouchEvent) {
         if (event.targetTouches.length > 0) this.handleHoverEnter(undefined, true);
         else this.handleHoverLeave();
@@ -1365,7 +1501,7 @@ export class BCDTooltip {
 
     showPart1() {
         this.element.classList.add('active_');
-        window.addEventListener('keydown', this.boundKeyDown, {once: true});
+        registerForEvents(window, {exit: this.hide_bound});
     }
 
     showPart2() {
@@ -1382,8 +1518,6 @@ export class BCDTooltip {
     handleHoverLeave(event?: MouseEvent|FocusEvent) { this.hide(); }
 
     hide() {
-        window.removeEventListener('keydown', this.boundKeyDown);
-
         this.element.classList.remove('active_');
 
         afterDelay(10, () => {
@@ -1391,6 +1525,7 @@ export class BCDTooltip {
                 this.element.classList.remove('active');
         });
     }
+    readonly hide_bound = this.hide.bind(this);
 
     setPosition() {
         //console.log(`Setting position of tooltip to the ${this.position} of `, this.boundElement);
@@ -1521,7 +1656,7 @@ export abstract class bcdDynamicTextArea_base {
         this.adjust();
 
         const boundAdjust = this.adjust.bind(this);
-        registerForChange(this.element, boundAdjust);
+        registerForEvents(this.element, {change: boundAdjust});
 
         const resizeObserver = new ResizeObserver(boundAdjust);
         resizeObserver.observe(this.element);
@@ -1609,7 +1744,7 @@ class RelativeFilePicker {
 
         registerUpgrade(element, this, null, false, true);
 
-        registerForChange(this.element, this.boundOnChange);
+        registerForEvents(this.element, {change: this.boundOnChange});
 
 
         /* Create the following button:
@@ -1632,7 +1767,7 @@ class RelativeFilePicker {
         this.button.appendChild(icon);
         this.element.after(this.button);
 
-        this.button.addEventListener(window.clickEvt, this.boundOnButtonClick);
+        registerForEvents(this.button, {activate: this.boundOnButtonClick});
     }
 
     onChange() {
@@ -1915,7 +2050,7 @@ export class SettingsGrid {
                 if (element instanceof HTMLInputElement) element.checked = !!this.getSetting(key, true);
                 else throw new Error("Settings Grid template has a checkbox that is not an INPUT element!");
 
-                registerForChange(element, (() => this.setSetting(key, element.checked)).bind(this));
+                registerForEvents(element, {change: (() => this.setSetting(key, element.checked)).bind(this)});
                 settingsToUpdate.push(() => {
                     if (element.checked !== !!this.getSetting(key))
                         element.click();

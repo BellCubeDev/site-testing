@@ -1,4 +1,4 @@
-@mixin customColoredButton($hue, $sat, $lum, $alpha: 1, $satShiftIntensity: 1, $lumShiftIntensity: 1, $doAltRipple: false) {
+@mixin customColoredButton($hue, $sat, $lum, $alpha: 1, $satShiftIntensity: 0.5, $lumShiftIntensity: 0.3, $doAltRipple: false) {
 
     @if $doAltRipple {
         .mdl-ripple {
@@ -6,21 +6,21 @@
         }
     }
 
+    padding: 0 40px;
+    margin: 6px 0 5px;
+    height: 40px;
+
+    border-radius: 4px;
+    color: #ffffff;
+    -webkit-tap-highlight-color: #fff4;
+
     // Normal State
     &, &:focus:not(:active, .active) {
-        background-color: hsla($hue, $sat, $lum, $alpha - 0.15);
-        color: #ffffff;
+        background-color: hsla($hue, $sat, $lum, $alpha - 0.05);
 
-        padding: 0 40px;
-        margin: 6px 0 5px;
-        height: 40px;
-
-        -webkit-tap-highlight-color: #fff4;
         box-shadow: 2px 2px 3px #0001;
 
         text-shadow: 2px 2px 10px #000b;
-
-        border-radius: 4px;
     }
 
     // Hover State
@@ -40,18 +40,20 @@
     }
 }
 
-#bcd-stepBTN-builder {
-    @include customColoredButton(209deg, 100%, 50%, 1, 0.2, 0.1, true);
-}
+.mdl-button--raised.mdl-button--colored {
+    &.bcd-button-open {
+        @include customColoredButton(209, 90%, 50%);
+    }
 
-#bcd-stepBTN-vortex {
-    @include customColoredButton(31deg, 67%, 50%, 1, 0.1, 0.6, true);
-}
+    &.bcd-button-openDir {
+        @include customColoredButton(187, 90%, 36%);
+    }
 
-#bcd-stepBTN-mo2 {
-    @include customColoredButton(199deg, 82%, 61%, 1, 0.1, 0.1, true);
-}
+    &.bcd-button-openFile {
+        @include customColoredButton(229, 90%, 62%);
+    }
 
-.js-tab-list-button, .js-tab-list-button.mdl-button:focus:not(:active) {
-    @include customColoredButton(160deg, 33%, 30%);
+    &.bcd-button-save {
+        @include customColoredButton(151, 90%, 30%);
+    }
 }

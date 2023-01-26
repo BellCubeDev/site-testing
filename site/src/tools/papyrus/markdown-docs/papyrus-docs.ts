@@ -1,4 +1,4 @@
-import { trimWhitespace, capitalizeFirstLetter } from '../../../universal.js';
+import { trimWhitespace, capitalizeFirstLetter, registerForEvents } from '../../../universal.js';
 
 import hljs from  '../../../assets/site/highlight_js/highlight.js';
 
@@ -42,10 +42,10 @@ export function ___bcdLoad_autoPapyDocsInit() { //@ts-ignore Cannot find name 'a
     elem_papy_docs_mdOutput = temp_elements[3]!;
 
     elem_papy_docs_filePicker = temp_elements[4]!;
-    elem_papy_docs_filePicker.addEventListener(window.clickEvt, generateDocs_file);
+    registerForEvents(elem_papy_docs_filePicker, {activate: generateDocs_file});
 
     elem_papy_docs_folderPicker = temp_elements[5]!;
-    elem_papy_docs_folderPicker.addEventListener(window.clickEvt, generateDocs_folder);
+    registerForEvents(elem_papy_docs_folderPicker, {activate: generateDocs_folder});
 
 } //@ts-ignore: Property 'bcd_init_functions' does not exist on type 'Window & typeof globalThis'.
 window.bcd_init_functions.papyDocs = ___bcdLoad_autoPapyDocsInit;

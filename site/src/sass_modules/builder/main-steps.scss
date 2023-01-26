@@ -1,8 +1,10 @@
+@import 'button-colors';
+
 .builderStep {
     &:not(.active_) { display: none; }
 
     opacity: 0; &.active { opacity: 1; }
-    transition-duration: 100ms;
+    transition-duration: 200ms;
     transition-timing-function: ease-in-out;
     transition-property: opacity;
 }
@@ -37,7 +39,7 @@
 
     border-radius: 8px;
     padding: 12px;
-    margin-top: 32px;
+    margin: 32px 0;
 }
 
 @mixin imageColumn() {
@@ -145,4 +147,16 @@
 
 .builder-steps-condition-edit-btn {
     width: min(256px, 100%);
+}
+
+.mdl-button--raised.mdl-button--colored {
+    &.builder-steps-add-step-btn {
+        @include customColoredButton(286deg, 56%, 48%, 1, 0.2, 0.5, true);
+        width: min(128px, 100%);
+        border-radius: 32px;
+    }
+
+    &.builder-steps-condition-edit-btn {
+        @include customColoredButton(105deg, 74%, 35%)
+    }
 }

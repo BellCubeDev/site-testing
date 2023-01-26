@@ -36,6 +36,9 @@
 }
 
 article {
+    // Firefox, why? Why do you need to be different?
+    max-width: min(100% - 52px, 11in);
     max-width: min(100cqw - 52px, 11in);
+
     grid-column: 2;
 }
