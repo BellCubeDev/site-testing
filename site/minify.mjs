@@ -85,6 +85,8 @@ if (!minifyDir) throw new Error('No minifyDir environment variable was provided'
 
 const doDebug = process.env.doDebug?.trim().replace(/^"(.*)"$/, '$1') === 'true';
 
+const singleBuild = process.env.singleBuild?.trim().replace(/^"(.*)"$/, '$1') === 'true';
+
 const doInlineSources = process.env.doInlineSources?.trim().replace(/^"(.*)"$/, '$1') === 'true';
 //console.log('doInlineSources:', process.env.doInlineSources);
 //console.log('doInlineSources:', process.env.doInlineSources?.trim().replace(/^"(.*)"$/, '$1'));
@@ -157,7 +159,7 @@ async function minifyJSFile(filePath) {
 
         // Check if we've already processed this file
         const stat = await afs.stat(filePath);
-        if (stat.birthtime.getTime() > stat.mtime.getTime() + 4000) {
+        if (!singleBuild && stat.birthtime.getTime() > stat.mtime.getTime() + 4000) {
             if (doDebug) console.log('Skipping file due to birthtime:', filePath);
             return;
         }

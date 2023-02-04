@@ -87,6 +87,7 @@ jobs:
           echo "minifyDir=$GITHUB_WORKSPACE/_generated/ts_out/" >> $GITHUB_ENV
           echo "doDebug=true" >> $GITHUB_ENV
           echo "repository=$GITHUB_REPOSITORY" >> $GITHUB_ENV
+          echo "singleBuild=true" >> $GITHUB_ENV
 
       - name: Minify JavaScript and CSS
         # Output dir: [in-place] $GITHUB_WORKSPACE/_generated/ts_out/

@@ -20,8 +20,6 @@ Write-Host
 Write-Host "Compiling TypeScript files..." -ForegroundColor cyan
 Write-Host
 
-$env:minifyDir = "..\_generated\ts_out\"
-
 try {
     npx tsc --build --verbose tsconfig.json
 } catch {
@@ -34,6 +32,10 @@ Write-Host
 Write-Host
 Write-Host "Minifying files..." -ForegroundColor cyan
 Write-Host
+
+$env:minifyDir = "..\_generated\ts_out\"
+$env:debug = "true"
+$env:singleBuild = "true"
 
 try {
     node "$PSScriptRoot\..\site\minify.mjs"
