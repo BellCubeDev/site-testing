@@ -38,6 +38,7 @@ export abstract class UpdatableObject {
         this.update_();
         this.suppressUpdates = false;
     }
+    readonly update_bound = this.update.bind(this);
     protected update_() {return;}
 
     updateFromInput() {
@@ -46,7 +47,18 @@ export abstract class UpdatableObject {
         this.updateFromInput_();
         this.suppressUpdates = false;
     }
+        readonly updateFromInput_bound = this.updateFromInput.bind(this);
+
     protected updateFromInput_() {return;}
+
+    destroy() {
+        this.suppressUpdates = true;
+        queueMicrotask(() => this.suppressUpdates = true);
+        this.destroy_();
+    }
+    readonly destroy_bound = this.destroy.bind(this);
+
+    protected destroy_() {return;}
 
     suppressUpdates = false;
 }
@@ -647,7 +659,7 @@ abstract class BCD_CollapsibleParent {
                 elm.tabIndex = -1;
             }
 
-            console.log('set disabled', elm instanceof HTMLElement, elm);
+            //console.log('set disabled', elm instanceof HTMLElement, elm);
 
         } else if (wasDisabled === 'false' || wasDisabled === null) {
             elm.removeAttribute('data-was-disabled');

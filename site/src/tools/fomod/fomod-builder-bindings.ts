@@ -1,11 +1,11 @@
-/** This file contains code to update the information displayed within the FOMOD Builder UI
+/** This file contains code to update the information displayed within the mainClasses.Fomod Builder UI
  */
 
-import type { Fomod } from './fomod-builder-classifications.js';
+import * as mainClasses from './fomod-builder-classifications.js';
 import { registerForEvents, UpdatableObject } from '../../universal.js';
 
-export class modMetadata extends UpdatableObject {
-    parent: Fomod;
+export class ModMetadata extends UpdatableObject {
+    parent: mainClasses.Fomod;
 
     /** The name of the mod */
     get metaName(): string { return this.parent.metaName; } set metaName(value: string) { this.parent.metaName = value; this.update(); }
@@ -27,7 +27,7 @@ export class modMetadata extends UpdatableObject {
     get url(): string { return this.parent.getURLAsString(); } set url(value: URL|string) { this.parent.metaUrl = value; this.update(); }
     urlInput: HTMLInputElement;
 
-    constructor(parent: Fomod) {
+    constructor(parent: mainClasses.Fomod) {
         super();
         this.parent = parent;
 
@@ -54,7 +54,6 @@ export class modMetadata extends UpdatableObject {
         if (id) this.id = parseInt(id);
         else this.id = null;
     }
-    readonly updateFromInput_bound = this.updateFromInput.bind(this);
 
     override update_() {
         this.nameInput.value = this.metaName;               this.nameInput.dispatchEvent(new Event('input'));
@@ -63,5 +62,5 @@ export class modMetadata extends UpdatableObject {
         this.idInput.value = this.id?.toString() ?? ''; this.idInput.dispatchEvent(new Event('input'));
         this.urlInput.value = this.url;                 this.urlInput.dispatchEvent(new Event('input'));
     }
-    readonly update_bound = this.update.bind(this);
 }
+mainClasses.addUpdateObjects(mainClasses.Fomod, ModMetadata);

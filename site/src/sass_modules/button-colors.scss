@@ -1,3 +1,4 @@
+/** Create a custom-colored MDL button with all of the necessary bells and whistles to make the button look and act great! */
 @mixin customColoredButton($hue, $sat, $lum, $alpha: 1, $satShiftIntensity: 0.5, $lumShiftIntensity: 0.3, $doAltRipple: false) {
 
     @if $doAltRipple {

@@ -1,8 +1,13 @@
 import * as mdl from '../../assets/site/mdl/material.js';
+import * as bcdUniversal from '../../universal.js';
+
 import * as fomodClasses from './fomod-builder-classifications.js';
 import * as fomod from './fomod-builder.js';
 
-import * as bcdUniversal from '../../universal.js';
+import './fomod-builder-bindings.js';
+import './fomod-builder-steps-1st-party.js';
+import './fomod-builder-steps-vortex.js';
+import './fomod-builder-steps-mo2.js';
 
 import * as bcdFS from '../../filesystem-interface.js';
 import * as xml from './fomod-builder-xml-translator.js';
@@ -23,9 +28,51 @@ for(let i = 0; i < prettyData.pd.maxdeep; i++){
 const xmlBeautify = prettyData.pd.xml.bind(prettyData.pd);
 const xmlMinify = prettyData.pd.xmlmin.bind(prettyData.pd);
 
+export function updatePluralDisplay(element: Element, count: number) {
+    // eslint-disable-next-line prefer-template
+    element.textContent = count + ' ' + pluralize(element.getAttribute('unitWord') ?? '', count);
+}
+
+export enum DropdownToLang {
+    Explicit = "Manual",
+    Ascending = "Alphabetical",
+    Descending = "Reverse Alphabetical",
+
+    SelectAny = "Allow Any Selections",
+    SelectAll = "Force-Select Everything",
+    SelectExactlyOne = "Require One Selection",
+    SelectAtMostOne = "Require One or No Selections",
+    SelectAtLeastOne = "Require One or More Selections",
+
+    NotUsable = "Not Useable",
+    CouldBeUsable = "Could Be Useable",
+}
+
+export enum LangToDropdown {
+    Manual = "Explicit",
+    Alphabetical = "Ascending",
+    "Reverse Alphabetical" = "Descending",
+
+    "Allow Any Selections" = "SelectAny",
+    "Force-Select Everything" = "SelectAll",
+    "Require One Selection" = "SelectExactlyOne",
+    "Require One or No Selections" = "SelectAtMostOne",
+    "Require One or More Selections" = "SelectAtLeastOne",
+
+    "Not Useable" = "NotUsable",
+    "Could Be Useable" = "CouldBeUsable",
+}
 
 
-export class bcdDropdownSortingOrder extends bcdUniversal.BCDDropdown {
+export function translateDropdown(str: string): string {
+    if (typeof str !== 'string') return str;
+    if (str in DropdownToLang) return DropdownToLang[str as keyof typeof DropdownToLang];
+    if (str in LangToDropdown) return LangToDropdown[str as keyof typeof LangToDropdown];
+    return str;
+}
+
+
+export class BCDDropdownSortingOrder extends bcdUniversal.BCDDropdown {
     static readonly asString = 'FOMOD Builder - Sorting Order Dropdown';
     static readonly cssClass = 'bcd-dropdown-sorting-order';
 
@@ -34,11 +81,34 @@ export class bcdDropdownSortingOrder extends bcdUniversal.BCDDropdown {
     }
 
     override options() {
-        return {'Explicit':null, 'Ascending':null, 'Descending':null};
+        return {
+            'Manual':null,
+            'Alphabetical':null,
+            'Reverse Alphabetical':null
+        };
     }
 }
 
-export class bcdDropdownOptionState extends bcdUniversal.BCDDropdown {
+export class BCDDropdownGroupType extends bcdUniversal.BCDDropdown {
+    static readonly asString = 'FOMOD Builder - Group Type Dropdown';
+    static readonly cssClass = 'bcd-dropdown-group-type';
+
+    constructor(element: Element) {
+        super(element, element.previousElementSibling!, true);
+    }
+
+    override options() {
+        return {
+            "Allow Any Selections": null,
+            "Force-Select Everything": null,
+            "Require One Selection": null,
+            "Require One or No Selections": null,
+            "Require One or More Selections": null,
+        };
+    }
+}
+
+export class BCDDropdownOptionState extends bcdUniversal.BCDDropdown {
     static readonly asString = 'FOMOD Builder - Option State Dropdown';
     static readonly cssClass = 'bcd-dropdown-option-state';
 
@@ -59,7 +129,7 @@ export class bcdDropdownOptionState extends bcdUniversal.BCDDropdown {
 
 
 
-export interface windowUI {
+export interface WindowUI {
     openFolder: typeof openFolder;
     save: typeof save;
     cleanSave: typeof cleanSave;
@@ -70,9 +140,9 @@ export interface windowUI {
 }
 
 
-export type bcdBuilderType = 'builder'|'vortex'|'mo2';
+export type BCDBuilderType = 'builder'|'vortex'|'mo2';
 
-export function setStepEditorType(type: bcdBuilderType) {
+export function setStepEditorType(type: BCDBuilderType) {
     const thisElem = document.getElementById(`steps-${type}-container`)!;
     const otherSteps = thisElem.parentElement!.querySelectorAll(`.builderStep:not(#steps-${type}-container).active`)!;
 
@@ -92,10 +162,11 @@ export function setStepEditorType(type: bcdBuilderType) {
         });
 
         thisElem.classList.add('active_');
+        thisElem.ariaHidden = 'false';
+        thisElem.removeAttribute('hidden');
+
         bcdUniversal.nestAnimationFrames(2, ()=>{
             thisElem.classList.add('active');
-            thisElem.ariaHidden = 'false';
-            thisElem.removeAttribute('hidden');
         });
     }
 
@@ -135,7 +206,9 @@ export async function openFolder() {
     fomod.getNoSupportModal()?.show();
 }
 
-let loadingFomod = false;
+// eslint-disable-next-line import/no-mutable-exports
+export let loadingFomod = false;
+
 export async function openFolder_entry() {
     if (loadingFomod) return;
     loadingFomod = true;

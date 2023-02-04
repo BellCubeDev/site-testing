@@ -34,14 +34,14 @@ FOMODBuilder:
     name: Include Branding Comment
     tooltip: Should a comment be added to the top of the FOMOD to identify it as a FOMOD built with FOMOD Builder?<br><hr>This setting has no impact on the functionality of the FOMOD.
 
-  defaultGroupSortingOrder:
+  defaultSortingOrder:
     type: string
     name: Default Sorting Order
-    tooltip: How should groups and options be sorted by default?<br><hr>This is merely a convenience, can be changed at any time, and has no functional impact on the FOMOD.
+    tooltip: How should steps, groups and options be sorted by default?<br><hr>This is merely a convenience, can be changed at any time, and has no functional impact on the FOMOD.
     options:
-      explicit: Manual
-      ascending: Alphabetical
-      descending: Reverse Alphabetical
+      Explicit: Manual
+      Ascending: Alphabetical
+      Descending: Reverse Alphabetical
 
   defaultGroupSelectType:
     type: string

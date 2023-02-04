@@ -17,7 +17,7 @@ declare global {interface Window {
     zip?: importedZipJS|Promise<importedZipJS>;//typeof import('../../included_node_modules/@zip.js/zip.js/lib/zip-no-worker.js');
     domParser: DOMParser;
     FOMODBuilder: {
-        ui: fomodUI.windowUI
+        ui: fomodUI.WindowUI
         directory?: bcdFS.writeableFolder;
         storage: builderStorage;
         fomodClass: typeof fomodClasses.Fomod;
@@ -64,10 +64,10 @@ export interface builderStorage {
 
         /** What should the default Group Sorting Order be?
             @default 'Explicit' */
-        defaultGroupSortingOrder: fomodClasses.SortOrder; // 'Explicit'
+        defaultSortingOrder: fomodClasses.SortOrder; // 'Explicit'
         /** What should the default Group Selection type be?
             @default 'SelectAtLeastOne' */
-        defaultGroupSelectType: fomodClasses.groupSelectType; // 'SelectAtLeastOne'
+        defaultGroupSelectType: fomodClasses.GroupSelectType; // 'SelectAtLeastOne'
 
         /** Whether we should format XML documents on save
             @default true */
@@ -75,7 +75,7 @@ export interface builderStorage {
     }
     /** Things that the code has determined that the user prefers */
     preferences: {
-        stepsBuilder: fomodUI.bcdBuilderType, // 'builder'
+        stepsBuilder: fomodUI.BCDBuilderType, // 'builder'
     }
 }
 
@@ -94,7 +94,7 @@ const defaultStorage: builderStorage =  {
         saveConfigInXML: false,
         brandingComment: false,
 
-        defaultGroupSortingOrder: 'Explicit',
+        defaultSortingOrder: 'Explicit',
         defaultGroupSelectType: 'SelectAtLeastOne',
 
         formatXML: true,
@@ -218,7 +218,7 @@ window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
 
     console.debug('Initializing the FOMOD Builder!');
 
-    bcdUniversal.registerBCDComponents(fomodUI.bcdDropdownSortingOrder, fomodUI.bcdDropdownOptionState);
+    bcdUniversal.registerBCDComponents(fomodUI.BCDDropdownSortingOrder, fomodUI.BCDDropdownOptionState, fomodUI.BCDDropdownGroupType);
     bcdUniversal.updateSettings();
 
     window.FOMODBuilder.ui.setStepEditorType(window.FOMODBuilder.storage.preferences.stepsBuilder);

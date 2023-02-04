@@ -16,7 +16,7 @@ export function getFolderFromFolder<TCreate extends true|false>(this: Folder, cr
             if (!prop) throw new InvalidNameError('Folder name cannot be empty.', prop);
 
     // Make the name case-insensitive
-    const name = prop.toLowerCase();
+    const name = prop.trim().toLowerCase();
 
     // Fetch/create folder if it doesn't already exist
     if (!(name in target)){
@@ -68,7 +68,7 @@ export function getFileFromFolder<TCreate extends true|false> (this: Folder, cre
     if (!prop) throw new Error('Cannot get a file with an empty name.', {cause: 'invalid-argument'});
 
     // Make the name case-insensitive
-    const name = prop.toLowerCase();
+    const name = prop.trim().toLowerCase();
 
     // Fetch/create file if it doesn't already exist
         if (!(name in target) || target[name] === null) {

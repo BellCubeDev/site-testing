@@ -3,6 +3,12 @@
 $warn-color: #d5b900ee;
 $warn-color-dim: #d5b90088;
 
+#manage-fomod-container {
+    margin: 8px;
+    > button:first-child { width: 240px; }
+    > button { width: 144px; }
+}
+
 #metadata-mod-url {
     &.is-invalid .mdl-textfield__label {
         color: $warn-color;

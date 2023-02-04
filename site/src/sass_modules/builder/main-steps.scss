@@ -27,7 +27,7 @@
     }
 }
 
-.builder-steps-opt-body .bcd-builder-input {
+.builder-steps-option-body .bcd-builder-input {
     margin-right: 0;
 }
 
@@ -71,22 +71,18 @@
     @include fomodStepsBuilderCard(215deg, 76%, 23%);
 }
 
-.builder-steps-step-body > .js-bcd-details-inner {
-    @include fomodStepsBuilderCard(101deg, 78%, 18%);
+.builder-steps-group {
+    @include fomodStepsBuilderCard(37deg, 69%, 16%);
 }
 
-.builder-steps-group-body > .js-bcd-details-inner {
-    @include fomodStepsBuilderCard(319deg, 76%, 22%, -1);
-}
+.builder-steps-option {
+    @include fomodStepsBuilderCard(160deg, 0%, 9%);
 
-.builder-steps-opt-body > .js-bcd-details-inner {
-    @include fomodStepsBuilderCard(160deg, 0%, 11%);
-
-    >* { @include imageColumn(); }
+    .js-bcd-details-inner > * { @include imageColumn(); }
 
 }
 
-.builder-steps-opt-image, .builder-steps-mod-image {
+.builder-steps-option-image, .builder-steps-mod-image {
     height: 100%;
 
     display: grid;
@@ -112,6 +108,10 @@
     width: auto;
     grid-row: 1;
     gap: 24px;
+
+    &--enforce-width {
+        max-width: 40vw;
+    }
 }
 
 .item-with-fake-label {
@@ -150,9 +150,9 @@
 }
 
 .mdl-button--raised.mdl-button--colored {
-    &.builder-steps-add-step-btn {
+    &.builder-steps-add-child-btn {
         @include customColoredButton(286deg, 56%, 48%, 1, 0.2, 0.5, true);
-        width: min(128px, 100%);
+        width: 160px;
         border-radius: 32px;
     }
 

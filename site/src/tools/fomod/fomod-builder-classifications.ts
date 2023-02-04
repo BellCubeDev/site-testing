@@ -1,10 +1,6 @@
-import * as main from "./fomod-builder.js"; // Brings in global things
+import * as main from './fomod-builder.js'; // Brings in global things
 import { objOf, UpdatableObject } from '../../universal.js';
 
-import * as bindingsGeneric from './fomod-builder-bindings.js';
-import * as bindings1stParty from './fomod-builder-steps-1st-party.js';
-import * as bindingsVortex from './fomod-builder-steps-vortex.js';
-import * as bindingsMO2 from './fomod-builder-steps-mo2.js';
 import * as ui from './fomod-builder-ui.js';
 
 
@@ -25,6 +21,13 @@ $$ |  $$ |$$ |  $$ | \____$$\   $$ |$$\ $$ |      $$  __$$ |$$ |        $$ |$$\ 
 $$ |  $$ |$$$$$$$  |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |\$$$$$$$\   \$$$$  |$$$$$$$  |
 \__|  \__|\_______/ \_______/    \____/ \__|       \_______| \_______|   \____/ \______*/
 
+/** A map of FOMODElementProxy classes and the classes they should create for update purposes */
+export const UpdateObjects =new Map<FOMODElementProxy|Function, ({new(param: any): UpdatableObject} & Omit<typeof UpdatableObject, 'new'>)[]>();
+export function addUpdateObjects<TClass extends Omit<typeof FOMODElementProxy, 'new'> & {new(...any:any):any}>(obj: TClass, ...updatables: ({new(param: InstanceType<TClass>): UpdatableObject} & Omit<typeof UpdatableObject, 'new'>)[]) {
+    UpdateObjects.get(obj)?.push(...updatables) ||
+    UpdateObjects.set(obj, updatables);
+}
+
 export abstract class FOMODElementProxy extends UpdatableObject {
     instanceElement: Element | undefined;
 
@@ -37,12 +40,20 @@ export abstract class FOMODElementProxy extends UpdatableObject {
 
     override update_() { this.updateObjects(); }
 
+    protected override destroy_(): void {
+        this.objectsToUpdate.forEach(  (obj) => obj.destroy()  );
+        if ('steps' in this && this.steps instanceof Array) this.steps.forEach(  (step) => step.destroy()  );
+        if ('groups' in this && this.groups instanceof Array) this.groups.forEach(  (group) => group.destroy()  );
+        if ('options' in this && this.options instanceof Array) this.options.forEach(  (option) => option.destroy()  );
+    }
+
     constructor(instanceElement: Element | undefined = undefined) {
         super();
         this.suppressUpdates = true;
         this.instanceElement = instanceElement;
 
         queueMicrotask(() => {
+            for (const updatable of UpdateObjects.get(this.constructor) ?? []) this.objectsToUpdate.push(new updatable(this));
             this.suppressUpdates = false;
             this.updateObjects();
         });
@@ -52,9 +63,15 @@ export abstract class FOMODElementProxy extends UpdatableObject {
     asInfoXML?(document: XMLDocument): Element;
 }
 
+interface InheritedFOMODData {
+    base?: Fomod,
+    tree?: FomodTree,
+    containers?: Record<string, HTMLDivElement>,
+    treeKeys: symbol[],
+}
 
 
-export abstract class dependency extends FOMODElementProxy {
+export abstract class Dependency extends FOMODElementProxy {
     constructor(instanceElement: Element | undefined = undefined) {
         super(instanceElement);
     }
@@ -64,7 +81,7 @@ export abstract class dependency extends FOMODElementProxy {
 
 
 
-export abstract class DependencyBaseVersionCheck extends dependency {
+export abstract class DependencyBaseVersionCheck extends Dependency {
     private _version = '';
     set version(value: string) { this._version = value; this.updateObjects(); } get version(): string { return this._version; }
 }
@@ -81,43 +98,46 @@ $$ |  $$\ $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \
  \______/  \______/ \__|  \__| \_______|\__|   \____/ \__| \______/ \__|  \__|\______*/
 
 export const flags:objOf<Flag> = {};
-
 export class Flag {
     name = '';
     values = new Set<string>();
     getters:unknown[] = [];
     setters:unknown[] = [];
 
-    constructor(name = '', value = '') {
-        this.name = name;
-        this.values.add(value);
-
+    private constructor(name = '', value:string|null = null) {
+        this.name ??= name;
+        if (typeof value === 'string') this.values.add(value);
         flags[name] = this;
     }
 
-    /** @returns whether or not a vale was removed from the `values` Set */
+    static get(name: string): Flag {
+        return flags[name] ?? new Flag(name);
+    }
+
+    static setValue(name: string, value: string): Flag {
+        const flag = Flag.get(name);
+        flag.values.add(value);
+        return flag;
+    }
+
+    /** @returns whether or not a value was removed from the `values` Set */
     removeValue(value:string): boolean {
         return this.values.delete(value);
     }
 }
 
-export function setNewFlagValue(name: string, value: string): Flag {
-    if (!flags[name]) flags[name] = new Flag(name, value);
-    return flags[name]!;
-}
-
-export type DependencyFileState = "Active" | "Inactive" | "Missing";
-export type DependencyGroupOperator = "And" | "Or";
-export class DependencyGroup extends dependency {
+export type DependencyFileState = 'Active' | 'Inactive' | 'Missing';
+export type DependencyGroupOperator = 'And' | 'Or';
+export class DependencyGroup extends Dependency {
     private _operator: DependencyGroupOperator = 'And';
     set operator(value: DependencyGroupOperator) { this._operator = value; this.updateObjects(); } get operator(): DependencyGroupOperator { return this._operator; }
 
-    private _children: dependency[] = [];
-    set children(value: dependency[]) { this._children = value; this.updateObjects(); } get children(): dependency[] { return this._children; }
+    private _children: Dependency[] = [];
+    set children(value: Dependency[]) { this._children = value; this.updateObjects(); } get children(): Dependency[] { return this._children; }
 
     constructor(
         instanceElement: Element | undefined = undefined,
-        operator: DependencyGroupOperator = "And",
+        operator: DependencyGroupOperator = 'And',
         parseChildren = false
     ) {
         super(instanceElement);
@@ -125,7 +145,7 @@ export class DependencyGroup extends dependency {
         if (instanceElement) {
             this._operator =
                 (instanceElement.getAttribute(
-                    "operator"
+                    'operator'
                 ) as DependencyGroupOperator) || operator;
         }
 
@@ -137,9 +157,8 @@ export class DependencyGroup extends dependency {
     }
 
     // <moduleDependencies operator="And">
-    override asModuleXML(document: XMLDocument, nodeName = "dependencies"): Element {
-        if (!this.instanceElement)
-            this.instanceElement = document.createElement(nodeName);
+    override asModuleXML(document: XMLDocument, nodeName = 'dependencies'): Element {
+        this.instanceElement ??= document.createElement(nodeName);
 
         if (this.instanceElement && this.instanceElement.tagName !== nodeName) {
             this.instanceElement.remove();
@@ -150,84 +169,102 @@ export class DependencyGroup extends dependency {
             }
         }
 
-        this.instanceElement.setAttribute("operator", this.operator);
+        this.instanceElement.setAttribute('operator', this.operator);
         for (const child of this.children) {
             this.instanceElement.appendChild(child.asModuleXML(document));
         }
         return this.instanceElement;
     }
 }
-export class DependencyFlag extends dependency {
+
+type DependencyFlagTags = 'flag' | 'flagDependency';
+export class DependencyFlag extends Dependency {
     private _flag = '';
     set flag(value: string) { this._flag = value; this.updateObjects(); } get flag(): string { return this._flag; }
 
     private _value = '';
     set value(value: string) { this._value = value; this.updateObjects(); } get value(): string { return this._value; }
 
-    // <flagDependency flag='' value='' />
+    readonly type:DependencyFlagTags;
+
+    constructor(type: DependencyFlagTags, instanceElement: Element | undefined = undefined) {
+        super(instanceElement);
+        this.type = type;
+        if (instanceElement) {
+            this.flag = instanceElement.getAttribute('name') ?? '';
+            this.value = instanceElement.getAttribute('value') || instanceElement.textContent || '';
+        }
+    }
+
+    // <flagDependency flag="" value="" />
     override asModuleXML(document: XMLDocument): Element {
-        const thisElement = document.createElement("flagDependency");
-        thisElement.setAttribute("flag", this.flag);
-        thisElement.setAttribute("value", this.value);
-        return thisElement;
+        this.instanceElement ??= document.createElement(this.type);
+
+        this.instanceElement.setAttribute('name', this.flag);
+        if (this.type === 'flagDependency')
+            this.instanceElement.setAttribute('value', this.value);
+        else
+            this.instanceElement.textContent = this.value;
+
+        return this.instanceElement;
     }
 }
-export class DependencyFile extends dependency {
+export class DependencyFile extends Dependency {
     private _file = '';
     set file(value: string) { this._file = value; this.updateObjects(); } get file(): string { return this._file; }
 
-    private _state: DependencyFileState = "Active";
+    private _state: DependencyFileState = 'Active';
     set state(value: DependencyFileState) { this._state = value; this.updateObjects(); } get state(): DependencyFileState { return this._state; }
 
     // <fileDependency file="2" state="Active" />
     override asModuleXML(document: XMLDocument): Element {
-        const thisElement = document.createElement("fileDependency");
-        thisElement.setAttribute("file", this.file);
-        thisElement.setAttribute("state", this.state);
+        const thisElement = document.createElement('fileDependency');
+        thisElement.setAttribute('file', this.file);
+        thisElement.setAttribute('state', this.state);
         return thisElement;
     }
 }
 
 
 export class DependencyScriptExtender extends DependencyBaseVersionCheck {
-    // <foseDependency version='' />
+    // <foseDependency version="" />
     override asModuleXML(document: XMLDocument): Element {
-        const thisElement = document.createElement("foseDependency");
-        thisElement.setAttribute("version", this.version);
+        const thisElement = document.createElement('foseDependency');
+        thisElement.setAttribute('version', this.version);
         return thisElement;
     }
 }
 export class DependencyGameVersion extends DependencyBaseVersionCheck {
-    // <gameDependency version='' />
+    // <gameDependency version="" />
     override asModuleXML(document: XMLDocument): Element {
-        const thisElement = document.createElement("gameDependency");
-        thisElement.setAttribute("version", this.version);
+        const thisElement = document.createElement('gameDependency');
+        thisElement.setAttribute('version', this.version);
         return thisElement;
     }
 }
 export class DependencyModManager extends DependencyBaseVersionCheck {
     // <fommDependency version="1" />
     override asModuleXML(document: XMLDocument): Element {
-        const thisElement = document.createElement("fommDependency");
-        thisElement.setAttribute("version", this.version);
+        const thisElement = document.createElement('fommDependency');
+        thisElement.setAttribute('version', this.version);
         return thisElement;
     }
 }
 
-function parseDependency(dependency: Element): dependency {
+function parseDependency(dependency: Element): Dependency {
     const type = dependency.tagName;
     switch (type) {
-        case "dependencies":
+        case 'dependencies':
             return new DependencyGroup(dependency, undefined, true);
-        case "fileDependency":
+        case 'fileDependency':
             return new DependencyFile(dependency);
-        case "flagDependency":
-            return new DependencyFlag(dependency);
-        case "foseDependency":
+        case 'flagDependency':
+            return new DependencyFlag('flagDependency', dependency);
+        case 'foseDependency':
             return new DependencyScriptExtender(dependency);
-        case "gameDependency":
+        case 'gameDependency':
             return new DependencyGameVersion(dependency);
-        case "fommDependency":
+        case 'fommDependency':
             return new DependencyModManager(dependency);
         default:
             throw new TypeError(`Unknown dependency type: ${type}`);
@@ -235,18 +272,17 @@ function parseDependency(dependency: Element): dependency {
 }
 
 export type OptionType =
-    | "Optional"        // Unchecked but checkable
-    | "Recommended"     // Checked but uncheckable
-    | "CouldBeUseable"  // TODO: Check if this has a use
-    | "Required"        // Permanently checked
-    | "NotUseable";     // Permanently unchecked
+    | 'Optional'        // Unchecked but checkable
+    | 'Recommended'     // Checked but uncheckable
+    | 'CouldBeUseable'  // TODO: Check if this has a use
+    | 'Required'        // Permanently checked
+    | 'NotUseable';     // Permanently unchecked
 export class OptionTypeDescriptor extends FOMODElementProxy {
-    private _default: OptionType = "Optional";
+    private _default: OptionType = 'Optional';
     set default(value: OptionType) { this._default = value; this.updateObjects(); } get default(): OptionType { return this._default; }
 
     private _dependencies: OptionTypeDescriptorWithDependency[] = [];
     set dependencies(value: OptionTypeDescriptorWithDependency[]) { this._dependencies = value; this.updateObjects(); } get dependencies(): OptionTypeDescriptorWithDependency[] { return this._dependencies; }
-
 
     private _basicElement: Element | undefined = undefined;
     set basicElement(value: Element | undefined) { this._basicElement = value; this.updateObjects(); } get basicElement(): Element | undefined { return this._basicElement; }
@@ -254,69 +290,58 @@ export class OptionTypeDescriptor extends FOMODElementProxy {
     private _complexElement: Element | undefined = undefined;
     set complexElement(value: Element | undefined) { this._complexElement = value; this.updateObjects(); } get complexElement(): Element | undefined { return this._complexElement; }
 
-    private _complexTypeElement: Element | undefined = undefined;
-    set complexTypeElement(value: Element | undefined) { this._complexTypeElement = value; this.updateObjects(); } get complexTypeElement(): Element | undefined { return this._complexTypeElement; }
-
-    private _complexPatternElement: Element | undefined = undefined;
-    set complexPatternElement(value: Element | undefined) { this._complexPatternElement = value; this.updateObjects(); } get complexPatternElement(): Element | undefined { return this._complexPatternElement; }
-
-
     constructor(
-        element?: Element,
-        defaultType: OptionType = "Optional",
+        instanceElement?: Element,
+        defaultType: OptionType = 'Optional',
         dependencies: OptionTypeDescriptorWithDependency[] = []
     ) {
-        super(element);
+        super(instanceElement);
         this.default = defaultType;
         this.dependencies = dependencies;
+
+        this.basicElement = instanceElement?.getElementsByTagName('type')[0];
+        this.complexElement = instanceElement?.getElementsByTagName('dependencyType')[0];
+
+        if (this.basicElement) {
+            this.default = this.basicElement.getAttribute('name') as OptionType;
+        } else if (this.complexElement) {
+            const defaultTypeElement = this.complexElement.getElementsByTagName('defaultType')[0];
+            if (defaultTypeElement) this.default = defaultTypeElement.getAttribute('default') as OptionType;
+
+            const patternElement = this.complexElement.getElementsByTagName('patterns')[0];
+            for (const dependency of patternElement?.children || [])
+                this.dependencies.push(new OptionTypeDescriptorWithDependency(dependency));
+        }
     }
 
     override asModuleXML(document: XMLDocument): Element {
-        this.instanceElement =
-            this.instanceElement ?? document.createElement("typeDescriptor");
+        this.instanceElement ??= document.createElement('typeDescriptor');
 
-        if (this.dependencies.length === 0) {
+        if (this.dependencies.length == 0) {
             this.complexElement?.remove();
-            this.complexElement = undefined;
 
-            this.basicElement =
-                this.basicElement ??
-                this.instanceElement.appendChild(document.createElement("type"));
-            this.basicElement.setAttribute("default", this.default);
+            this.basicElement ??= this.instanceElement.appendChild(document.createElement('type'));
+            this.basicElement.setAttribute('name', this.default);
 
             return this.instanceElement;
         }
 
-        this.complexElement =
-            this.complexElement ??
-            this.instanceElement.appendChild(
-                document.createElement("dependencyType")
-            );
+        this.basicElement?.remove();
+        this.complexElement ??= this.instanceElement.appendChild(  document.createElement('dependencyType'))  ;
 
-        this.complexTypeElement =
-            this.complexTypeElement ??
-            this.complexElement.appendChild(
-                document.createElement("defaultType")
-            );
-        this.complexTypeElement.setAttribute("name", this.default);
+        const complexTypeElement = this.complexElement.getOrCreateChildByTag('defaultType');
+        complexTypeElement.setAttribute('default', this.default);
 
-        this.complexPatternElement =
-            this.complexPatternElement ??
-            this.complexElement.appendChild(
-                document.createElement("patterns")
-            );
-        for (const dependency of this.dependencies) {
-            this.complexPatternElement.appendChild(
-                dependency.asModuleXML(document)
-            );
-        }
+        const complexPatternElement = this.complexElement.getOrCreateChildByTag('patterns');
+        for (const dependency of this.dependencies)
+            complexPatternElement.appendChild(  dependency.asModuleXML(document) );
 
         return this.instanceElement;
     }
 }
 
 export class OptionTypeDescriptorWithDependency extends FOMODElementProxy {
-    private _type: OptionType = "Optional";
+    private _type: OptionType = 'Optional';
     set type(value: OptionType) { this._type = value; this.updateObjects(); } get type(): OptionType { return this._type; }
 
     private _typeElement: Element | undefined = undefined;
@@ -325,19 +350,19 @@ export class OptionTypeDescriptorWithDependency extends FOMODElementProxy {
     private _dependency!: DependencyGroup;
     set dependency(value: DependencyGroup) { this._dependency = value; this.updateObjects(); } get dependency(): DependencyGroup { return this._dependency; }
 
-    constructor(dependency: DependencyGroup, type: OptionType = "Optional") {
-        super();
-        this.dependency = dependency;
+    constructor(instanceElement?: Element, dependency?: DependencyGroup, type: OptionType = 'Optional') {
+        super(instanceElement);
+        this.dependency = dependency ?? new DependencyGroup();
         this.type = type;
     }
 
     override asModuleXML(document: XMLDocument): Element {
         this.instanceElement =
-            this.instanceElement ?? document.createElement("pattern");
+            this.instanceElement ?? document.createElement('pattern');
 
         this.typeElement = this.typeElement
-                                    ?? this.instanceElement.appendChild(document.createElement("type"));
-        this.typeElement.setAttribute("name", this.type);
+                                    ?? this.instanceElement.appendChild(document.createElement('type'));
+        this.typeElement.setAttribute('name', this.type);
 
         this.instanceElement.appendChild(this.dependency.asModuleXML(document));
 
@@ -364,8 +389,8 @@ export class Install extends FOMODElementProxy {
 
     async updateFile(pathOrFile: string|string[] | FileSystemHandle): Promise<void> {
 
-        if (typeof pathOrFile === "string") {
-            const filePath: string[] = pathOrFile.split("/");
+        if (typeof pathOrFile === 'string') {
+            const filePath: string[] = pathOrFile.split('/');
             Install.paths.push(filePath);
             this.path = filePath;
         }
@@ -380,7 +405,7 @@ export class Install extends FOMODElementProxy {
             return;
         }
 
-        throw new Error("Could not resolve path - most likely outside of the root directory");
+        throw new Error('Could not resolve path - most likely outside of the root directory');
     }
 
     constructor(
@@ -392,9 +417,9 @@ export class Install extends FOMODElementProxy {
     }
 
     override asModuleXML(document: XMLDocument): Element {
-        this.instanceElement ??= document.createElement("install");
+        this.instanceElement ??= document.createElement('install');
 
-        const path = this.path.join("/");
+        const path = this.path.join('/');
         const isFolder = this.path[this.path.length - 1] === '';
 
         this.instanceElement.appendChild(
@@ -420,213 +445,258 @@ $$ |  $$ |$$ |  $$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \____$$\
           \_*/
 
 export type SortOrder =
-    | "Ascending"  // Alphabetical
-    | "Descending" // Reverse Alphabetical
-    | "Explicit";  // Explicit order
+    | 'Ascending'  // Alphabetical
+    | 'Descending' // Reverse Alphabetical
+    | 'Explicit';  // Explicit order
 
 export class Step extends FOMODElementProxy {
-    name = '';
-    order: SortOrder = "Explicit";
-    groups: Group[] = [];
+    inherited: InheritedFOMODData;
+
+    private _name = '';
+    set name(value: string) { this._name = value; this.updateObjects(); } get name(): string { return this._name; }
+
+    private _sortingOrder: SortOrder = window.FOMODBuilder.storage.settings.defaultSortingOrder;
+    set sortingOrder(value: SortOrder) { this._sortingOrder = value; this.updateObjects(); } get sortingOrder(): SortOrder { return this._sortingOrder; }
+
+    private _groups: Group[] = [];
+    set groups(value: Group[]) { this._groups = value; this.updateObjects(); } get groups(): Group[] { return this._groups; }
+
+    groupsContainers: Record<string, HTMLDivElement> = {};
+
+    conditions: DependencyGroup | undefined;
+
+    addGroup(xmlElement?: ConstructorParameters<typeof Group>[1], symbol?: symbol) {
+        this.groups.push(new Group({
+            base: this.inherited.base,
+            containers: this.groupsContainers,
+            tree: this.inherited.tree,
+            treeKeys: [...this.inherited.treeKeys, symbol ?? Symbol()]
+        }, xmlElement));
+        this.inherited.base?.updateObjects() || this.updateObjects();
+    }
+    readonly addGroup_bound = this.addGroup.bind(this);
+
+
+    constructor(inherited: InheritedFOMODData, instanceElement?: Element | undefined) {
+        super(instanceElement);
+        this.inherited = inherited;
+
+        if (inherited.tree && inherited.treeKeys[0])
+            inherited.tree.steps[inherited.treeKeys[0]] = {
+                step: this,
+                groups: {}
+            };
+
+
+
+        if (this.instanceElement) {
+            this.name = this.instanceElement.getAttribute('name') ?? '';
+
+            const groupsElem = this.instanceElement.getElementsByTagName('optionalFileGroups')[0];
+            if (groupsElem) {
+                this.sortingOrder = groupsElem.getAttribute('order') as SortOrder || window.FOMODBuilder.storage.settings.defaultSortingOrder;
+
+                for (const group of groupsElem.children ?? [])
+                    this.addGroup(group);
+            }
+        }
+
+        if (this.groups.length == 0) this.addGroup();
+    }
 
     // <installStep name="THE FIRST OF MANY STEPS">
     // <optionalFileGroups order="Explicit">
 
     override asModuleXML(document: XMLDocument): Element {
-        this.instanceElement =
-            this.instanceElement ?? document.createElement("installStep");
+        this.instanceElement ??= document.createElement('installStep');
 
-        this.instanceElement.setAttribute("name", this.name);
+        this.instanceElement.setAttribute('name', this.name);
 
-        const optionalFileGroups = this.instanceElement.appendChild(
-            document.createElement("optionalFileGroups")
-        );
-        optionalFileGroups.setAttribute("order", this.order);
+        const visibility = this.conditions?.asModuleXML(document, 'visible');
+        if (visibility) this.instanceElement.appendChild(visibility);
+        else this.instanceElement.removeChildByTag('visible');
+
+        const optionalFileGroups = this.instanceElement.getOrCreateChildByTag('optionalFileGroups');
+        optionalFileGroups.setAttribute('order', this.sortingOrder);
+
 
         for (const group of this.groups) optionalFileGroups.appendChild(group.asModuleXML(document));
+        this.instanceElement.appendChild(optionalFileGroups);
 
         return this.instanceElement;
     }
 }
 
-export type groupSelectType =
-    | "SelectAll"           // Force-selects all options
-    | "SelectAny"           // Allows users to select any number of options
-    | "SelectAtMostOne"     // Requires users to select one or no options
-    | "SelectAtLeastOne"    // Requires users to select at least one option
-    | "SelectExactlyOne";   // Requires users to select exactly one option
+export type GroupSelectType =
+    | 'SelectAll'           // Force-selects all options
+    | 'SelectAny'           // Allows users to select any number of options
+    | 'SelectAtMostOne'     // Requires users to select one or no options
+    | 'SelectAtLeastOne'    // Requires users to select at least one option
+    | 'SelectExactlyOne';   // Requires users to select exactly one option
 export class Group extends FOMODElementProxy {
+    inherited: InheritedFOMODData;
+
     private _name = '';
     set name(value: string) { this._name = value; this.updateObjects(); } get name(): string { return this._name; }
 
-    private _type: groupSelectType = "SelectAny";
-    set type(value: groupSelectType) { this._type = value; this.updateObjects(); } get type(): groupSelectType { return this._type; }
+    private _type: GroupSelectType = window.FOMODBuilder.storage.settings.defaultGroupSelectType;
+    set type(value: GroupSelectType) { this._type = value; this.updateObjects(); } get type(): GroupSelectType { return this._type; }
 
-    private _sortOrder: SortOrder = "Explicit";
-    set sortOrder(value: SortOrder) { this._sortOrder = value; this.updateObjects(); } get sortOrder(): SortOrder { return this._sortOrder; }
+    private _sortingOrder: SortOrder = window.FOMODBuilder.storage.settings.defaultSortingOrder;
+    set sortingOrder(value: SortOrder) { this._sortingOrder = value; this.updateObjects(); } get sortingOrder(): SortOrder { return this._sortingOrder; }
 
     private _options: Option[] = [];
     set options(value: Option[]) { this._options = value; this.updateObjects(); } get options(): Option[] { return this._options; }
 
+    optionsContainers: Record<string, HTMLDivElement> = {};
+
+    addOption(xmlElement?: ConstructorParameters<typeof Option>[1], symbol?: symbol) {
+        this.options.push(new Option({
+            base: this.inherited.base,
+            containers: this.optionsContainers,
+            tree: this.inherited.tree,
+            treeKeys: [...this.inherited.treeKeys, symbol ?? Symbol()]
+        }, xmlElement));
+        this.inherited.base?.updateObjects() || this.updateObjects();
+    }
+    readonly addOption_bound = this.addOption.bind(this);
+
+    constructor(inherited: InheritedFOMODData, instanceElement?: Element | undefined) {
+        super(instanceElement);
+        this.inherited = inherited;
+
+        if (inherited.tree && inherited.treeKeys[0] && inherited.tree.steps[inherited.treeKeys[0]] && inherited.treeKeys[1])
+            inherited.tree.steps[inherited.treeKeys[0]]!.groups[inherited.treeKeys[1]] = {
+                group: this,
+                options: {}
+            };
+
+
+
+        if (this.instanceElement) {
+            this.name = this.instanceElement.getAttribute('name') ?? '';
+            this.type = this.instanceElement.getAttribute('type') as GroupSelectType
+                || window.FOMODBuilder.storage.settings.defaultGroupSelectType;
+
+            const optionsElem = this.instanceElement.getElementsByTagName('plugins')[0];
+            if (optionsElem){
+                this.sortingOrder = optionsElem.getAttribute('order') as SortOrder || window.FOMODBuilder.storage.settings.defaultSortingOrder;
+
+                for (const option of optionsElem.children ?? [])
+                    this.addOption(option);
+            }
+        }
+
+        if (this.options.length == 0) this.addOption();
+    }
 
     // <group name="Banana Types" type="SelectAny">
     // <plugins order="Explicit">
 
     override asModuleXML(document: XMLDocument): Element {
-        this.instanceElement = this.instanceElement ?? document.createElement("group");
+        this.instanceElement = this.instanceElement ?? document.createElement('group');
 
-        this.instanceElement.setAttribute("name", this.name);
-        this.instanceElement.setAttribute("type", this.type);
+        this.instanceElement.setAttribute('name', this.name);
+        this.instanceElement.setAttribute('type', this.type);
 
-        const options = this.instanceElement.appendChild(document.getOrCreateChildByTag("plugins"));
-        options.setAttribute("order", this.sortOrder);
+        if (this.options.length > 0) {
+        const options = this.instanceElement.getOrCreateChildByTag('plugins');
+        options.setAttribute('order', this.sortingOrder);
 
         for (const option of this.options) options.appendChild(option.asModuleXML(document));
+    } else
+        this.instanceElement.removeChildByTag('plugins');
 
         return this.instanceElement;
     }
 }
 
 export class Option extends FOMODElementProxy {
-    // Actual Option Name
+    inherited: InheritedFOMODData;
+
     private _name = '';
     set name(value: string) { this._name = value; this.updateObjects(); } get name(): string { return this._name; }
 
-    // Description
-    private _description!: OptionDescription;
-    set description(value: OptionDescription) { this._description = value; this.updateObjects(); } get description(): OptionDescription { return this._description; }
+    private _description!: string;
+    set description(value: string) { this._description = value; this.updateObjects(); } get description(): string { return this._description; }
 
+    private _image!: string;
+    set image(value: string) { this._image = value; this.updateObjects(); } get image(): string { return this._image; }
 
-    // Image
-    private _image!: OptionImage;
-    set image(value: OptionImage) { this._image = value; this.updateObjects(); } get image(): OptionImage { return this._image; }
-
-    // Flags
     private _conditionFlags: DependencyFlag[] = [];
     set conditionFlags(value: DependencyFlag[]) { this._conditionFlags = value; this.updateObjects(); } get conditionFlags(): DependencyFlag[] { return this._conditionFlags; }
 
-    private _conditionFlagsContainer: Element | undefined;
-    set conditionFlagsContainer(value: Element | undefined) { this._conditionFlagsContainer = value; this.updateObjects(); } get conditionFlagsContainer(): Element | undefined { return this._conditionFlagsContainer; }
-
-
-    // Files
     private _files: DependencyFile[] = [];
     set files(value: DependencyFile[]) { this._files = value; this.updateObjects(); } get files(): DependencyFile[] { return this._files; }
 
-    private _filesContainer: Element | undefined;
-    set filesContainer(value: Element | undefined) { this._filesContainer = value; this.updateObjects(); } get filesContainer(): Element | undefined { return this._filesContainer; }
-
-
-    // Type Descriptor
     private _typeDescriptor!: OptionTypeDescriptor;
     set typeDescriptor(value: OptionTypeDescriptor) { this._typeDescriptor = value; this.updateObjects(); } get typeDescriptor(): OptionTypeDescriptor { return this._typeDescriptor; }
 
-    constructor(
-        element?: Element,
-        name = '',
-        description: OptionDescription | string = '',
-        image: OptionImage | string[] | FileSystemFileHandle = [],
-        conditionFlags: DependencyFlag[] = [],
-        files: DependencyFile[] = [],
-        typeDescriptor: OptionTypeDescriptor = new OptionTypeDescriptor()
-    ) {
-        super(element);
-        this.name = name; // Stored as an attribute
+    constructor(inherited: InheritedFOMODData, instanceElement?: Element | undefined) {
+        super(instanceElement);
+        this.inherited = inherited;
 
-        this.description =
-            description instanceof OptionDescription
-                ? description
-                : new OptionDescription(undefined, description);   this.description.objectsToUpdate.push(this);
+        if (inherited.tree && inherited.treeKeys[0] && inherited.treeKeys[1] && inherited.treeKeys[2] && inherited.tree.steps[inherited.treeKeys[0]]?.groups[inherited.treeKeys[1]])
+            inherited.tree.steps[inherited.treeKeys[0]]!.groups[inherited.treeKeys[1]]!.options[inherited.treeKeys[2]] = this;
 
+        const typeDescriptor: Element|undefined = this.instanceElement?.getElementsByTagName('typeDescriptor')[0];
+        this.typeDescriptor = new OptionTypeDescriptor(typeDescriptor);
 
-        this.image = image instanceof OptionImage
-                    ? image
-                    : new OptionImage(undefined, image);           this.image.objectsToUpdate.push(this);
+        if (!this.instanceElement) return;
 
+        this.name = this.instanceElement.getAttribute('name') || '';
+        this.description = this.instanceElement.getElementsByTagName('description')[0]?.textContent || '';
+        this.image = this.instanceElement.getElementsByTagName('image')[0]?.getAttribute('path') || '';
 
+        for (const flag of this.instanceElement.getElementsByTagName('flag') ?? [])
+            this.conditionFlags.push(new DependencyFlag('flag', flag));
 
-        this.conditionFlags = conditionFlags;                       this.conditionFlags.forEach(flag => flag.objectsToUpdate.push(this));
-        this.files = files;                                         this.files.forEach(file => file.objectsToUpdate.push(this));
-
-        this.typeDescriptor = typeDescriptor;                       this.typeDescriptor.objectsToUpdate.push(this);
+        for (const file of this.instanceElement.getElementsByTagName('file') ?? [])
+            this.files.push(new DependencyFile(file));
     }
 
     override asModuleXML(document: XMLDocument): Element {
         this.instanceElement =
-            this.instanceElement ?? document.createElement("option");
+            this.instanceElement ?? document.createElement('plugin');
 
-        this.instanceElement.setAttribute("name", this.name);
+        this.instanceElement.setAttribute('name', this.name);
 
-        this.instanceElement.appendChild(this.description.asModuleXML(document));
-        this.instanceElement.appendChild(this.image.asModuleXML(document));
+        const description  = this.instanceElement.getOrCreateChildByTag('description');
+        description.textContent = this.description;
+        this.instanceElement.appendChild(description);
 
-        for (const conditionFlag of this.conditionFlags) {
-            this.instanceElement.appendChild(conditionFlag.asModuleXML(document));
+        if (this.image) {
+            const image = this.instanceElement.getOrCreateChildByTag('image');
+
+            image.setAttribute('path', this.image);
+            this.instanceElement.appendChild(image);
         }
+        else this.instanceElement.removeChildByTag('image');
 
-        for (const file of this.files) {
-            this.instanceElement.appendChild(file.asModuleXML(document));
-        }
+        if (this.conditionFlags.length > 0) {
+            const conditionFlags = this.instanceElement.getOrCreateChildByTag('conditionFlags');
+
+            for (const flag of this.conditionFlags) conditionFlags.appendChild(flag.asModuleXML(document));
+            this.instanceElement.appendChild(conditionFlags);
+        } else
+            this.instanceElement.removeChildByTag('conditionFlags');
+
+        if (this.files.length > 0) {
+            const files = this.instanceElement.getOrCreateChildByTag('files');
+
+            for (const file of this.files) files.appendChild(file.asModuleXML(document));
+            this.instanceElement.appendChild(files);
+        } else if (this.conditionFlags.length == 0) {
+            const emptyFilesElem = this.instanceElement.getOrCreateChildByTag('files');
+            this.instanceElement.appendChild(emptyFilesElem);
+        } else
+            this.instanceElement.removeChildByTag('files');
 
         this.instanceElement.appendChild(this.typeDescriptor.asModuleXML(document));
 
         return this.instanceElement;
     }
 }
-
-export class OptionDescription extends FOMODElementProxy {
-    private _description = '';
-    set description(value: string) { this._description = value; this.updateObjects(); } get description(): string { return this._description; }
-
-    constructor(element?: Element, description = '') {
-        super(element);
-        this.description = description;
-    }
-
-    override asModuleXML(document: XMLDocument): Element {
-        this.instanceElement =
-            this.instanceElement ?? document.createElement("description");
-        this.instanceElement.textContent = this.description;
-        return this.instanceElement;
-    }
-}
-
-export class OptionImage extends FOMODElementProxy {
-    private _image: string[] = [];
-    set image(value: string[]) { this._image = value; this.updateObjects(); } get image(): string[] { return this._image; }
-
-    constructor(element?: Element, image: string[] | FileSystemFileHandle = []) {
-        super(element);
-
-        var tempImg: string[] | FileSystemFileHandle = image;
-
-        if (!(tempImg instanceof Array))
-            window.FOMODBuilder.directory
-                ?.handle.resolve(tempImg)
-                .then((path) => (this.image = path ?? []));
-        else this.image = tempImg;
-    }
-
-    override asModuleXML(document: XMLDocument): Element {
-        this.instanceElement =
-            this.instanceElement ?? document.createElement("image");
-
-        this.instanceElement.setAttribute(
-            "path",
-            (this.image as string[]).join("\\")
-        );
-
-        return this.instanceElement;
-    }
-}
-
-type ObjAsJSON<TObj> = Partial<{[k in keyof TObj]: TObj[k] extends Function ? never : TObj[k] extends object ? ObjAsJSON<TObj[k]> : TObj[k]}>
-
-const a = {
-    metaName: 'string',
-    moduleName: 'string',
-    metaId: 1
-} satisfies ObjAsJSON<Fomod>;
 
 export class Fomod extends FOMODElementProxy {
     private _metaName: string = '';
@@ -691,10 +761,23 @@ export class Fomod extends FOMODElementProxy {
 
     conditions: DependencyGroup | undefined;
     steps: Step[];
-    sortingOrder: SortOrder = 'Explicit';
 
-    addStep() {
-        this.steps.push(new Step());
+    sortingOrder: SortOrder = window.FOMODBuilder.storage.settings.defaultSortingOrder;
+
+    tree: FomodTree;
+    treeKey: [] = [];
+    private _parent = null;
+    get parent(): null { return this._parent; }
+
+    stepsContainers: Record<string, HTMLDivElement> = {};
+
+    addStep(xmlElement?: ConstructorParameters<typeof Step>[1], symbol?: symbol) {
+        this.steps.push(new Step({
+            base: this,
+            containers: this.stepsContainers,
+            tree: this.tree,
+            treeKeys: [...this.treeKey, symbol ?? Symbol()]
+        }, xmlElement));
         this.updateObjects();
     }
     readonly addStep_bound = this.addStep.bind(this);
@@ -702,82 +785,98 @@ export class Fomod extends FOMODElementProxy {
     constructor(
         instanceElement?: Element,
         infoInstanceElement?: Element,
-        metaName?: string,
-        moduleName?: string,
-        metaImage?: string,
-        metaAuthor?: string,
-        metaVersion?: string,
-        metaId?: number|null,
-        metaUrl?: string,
-        installs?: Install[],
-        steps?: Step[],
-        conditions?: DependencyGroup
     ) {
         super(instanceElement);
+        this.tree = {
+            fomod: this,
+            steps: {}
+        };
         this.infoInstanceElement = infoInstanceElement;
 
-        this.metaName =         metaName ?? infoInstanceElement?.getElementsByTagName("Name")           [0]?.textContent                        ?? '';
-        this.moduleName =     moduleName ??     instanceElement?.getElementsByTagName("moduleName")     [0]?.textContent                        ?? '';
-        this.metaImage =       metaImage ??     instanceElement?.getElementsByTagName("moduleImage")    [0]?.getAttribute("path")               ?? '';
-        this.metaAuthor =     metaAuthor ?? infoInstanceElement?.getElementsByTagName("Author")         [0]?.textContent                        ?? '';
-        this.metaVersion =   metaVersion ?? infoInstanceElement?.getElementsByTagName("Version")        [0]?.textContent                        ?? '';
-        this.metaUrl =           metaUrl ?? infoInstanceElement?.getElementsByTagName("Website")        [0]?.textContent                        ?? '';
-
-        if (metaId !== undefined) this.metaId = metaId;
-        else {
-            const [,id] = infoInstanceElement?.getElementsByTagName("Id")[0]?.textContent?.match(/^\s*(\d+)\s*$/) ?? [];
-            if (id) this.metaId = parseInt(id);
-            else this.metaId = null;
-        }
-
-        const stepsElem = instanceElement?.getElementsByTagName("installSteps")[0];
-        this.sortingOrder =         null || stepsElem?.getAttribute("order") as SortOrder || 'Explicit';
-        this.steps = steps || [...stepsElem?.children ?? []].map(step => new Step(step));
+        this.metaName =    infoInstanceElement?.getElementsByTagName('Name')           [0]?.textContent                        ?? '';
+        this.moduleName =      instanceElement?.getElementsByTagName('moduleName')     [0]?.textContent                        ?? '';
+        this.metaImage =       instanceElement?.getElementsByTagName('moduleImage')    [0]?.getAttribute('path')               ?? '';
+        this.metaAuthor =  infoInstanceElement?.getElementsByTagName('Author')         [0]?.textContent                        ?? '';
+        this.metaVersion = infoInstanceElement?.getElementsByTagName('Version')        [0]?.textContent                        ?? '';
+        this.metaUrl =     infoInstanceElement?.getElementsByTagName('Website')        [0]?.textContent                        ?? '';
 
 
-        const conditionalInstallsElem = instanceElement?.getElementsByTagName("conditionalFileInstalls")[0];
-        const requiredInstallsElem = instanceElement?.getElementsByTagName("requiredInstallFiles")[0];
+        const [,id] = infoInstanceElement?.getElementsByTagName('Id')[0]?.textContent?.match(/^\s*(\d+)\s*$/) ?? [];
+        if (id) this.metaId = parseInt(id);
+        else this.metaId = null;
 
-        if (installs) this.installs = installs;
-        else {
-            const conditionalInstalls = [...conditionalInstallsElem?.children ?? []].map(install => new Install(install));
-            const requiredInstalls = [...requiredInstallsElem?.children ?? []].map(install => new Install(install));
-            this.installs = [...conditionalInstalls, ...requiredInstalls];
-        }
+        const stepsElem = instanceElement?.getElementsByTagName('installSteps')[0];
+        this.sortingOrder =         null || stepsElem?.getAttribute('order') as SortOrder || 'Explicit';
 
-        this.conditions = conditions;
+        this.steps = [];
+        for (const step of (stepsElem?.children ?? [])) this.addStep(step);
+        if (this.steps.length == 0) this.addStep();
 
+        const conditionalInstallsElem = instanceElement?.getElementsByTagName('conditionalFileInstalls')[0];
+        const requiredInstallsElem = instanceElement?.getElementsByTagName('requiredInstallFiles')[0];
 
-        this.objectsToUpdate.push(
-            new bindingsGeneric.modMetadata(this),
-            new bindings1stParty.Fomod(this),
-        );
+        const conditionalInstalls = [...conditionalInstallsElem?.children ?? []].map(install => new Install(install));
+        const requiredInstalls = [...requiredInstallsElem?.children ?? []].map(install => new Install(install));
+        this.installs = [...conditionalInstalls, ...requiredInstalls];
 
+        const moduleDependencies = instanceElement?.getElementsByTagName('moduleDependencies')[0];
+        if (moduleDependencies) this.conditions = new DependencyGroup(moduleDependencies);
     }
 
     override asModuleXML(document: XMLDocument): Element {
         if (document.documentElement !== this.instanceElement) {
             document.removeChild(document.documentElement);
-            this.instanceElement = document.getOrCreateChildByTag("config");
+            this.instanceElement = document.getOrCreateChildByTag('config');
         }
-        this.instanceElement.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
-        this.instanceElement.setAttribute("xsi:noNamespaceSchemaLocation", "http://qconsulting.ca/fo3/ModConfig5.0.xsd");
 
-        this.instanceElement.getOrCreateChildByTag("moduleName").textContent = this.metaName;
+        this.instanceElement.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+        this.instanceElement.setAttribute('xsi:noNamespaceSchemaLocation', 'http://qconsulting.ca/fo3/ModConfig5.0.xsd');
 
-        if (this.metaImage) this.instanceElement.getOrCreateChildByTag("moduleImage").setAttribute('path', this.metaImage);
-        else                this.instanceElement.removeChildByTag     ("moduleImage");
+        const moduleName = this.instanceElement.getOrCreateChildByTag('moduleName');
+        moduleName.textContent = this.metaName;
+        this.instanceElement.appendChild(moduleName);
+
+        if (this.metaImage) {
+            const metaImage = this.instanceElement.getOrCreateChildByTag('moduleImage');
+            metaImage.setAttribute('path', this.metaImage);
+            this.instanceElement.appendChild(metaImage);
+        }
+        else                this.instanceElement.removeChildByTag     ('moduleImage');
 
         if (this.conditions)
-            this.instanceElement.appendChild(this.conditions.asModuleXML(document));
+            this.instanceElement.appendChild(this.conditions.asModuleXML(document, 'moduleDependencies'));
+        else
+            this.instanceElement.removeChildByTag('moduleDependencies');
 
-        for (const install of this.installs) {
-            this.instanceElement.appendChild(install.asModuleXML(document));
-        }
+        const requiredInstallFiles = this.instanceElement.getOrCreateChildByTag('requiredInstallFiles');
+        const optionalInstallList:Element[] = [];
+        //for (const install of this.installs) {
+        //    const installElem = install.asModuleXML(document);
+        //    if (install.dependencies.length > 0)
+        //        optionalDependencies.push(installElem);
+        //    else
+        //        requiredInstallFiles.appendChild(installElem);
+        //}
+        if (requiredInstallFiles.children.length) this.instanceElement.appendChild(requiredInstallFiles);
+        else                                      this.instanceElement.removeChildByTag('requiredInstallFiles');
 
-        for (const step of this.steps) {
-            this.instanceElement.appendChild(step.asModuleXML(document));
-        }
+        if (this.steps.length) {
+            const stepsContainer = this.instanceElement.getOrCreateChildByTag('installSteps');
+            stepsContainer.setAttribute('order', this.sortingOrder);
+
+            for (const step of this.steps)
+                stepsContainer.appendChild(step.asModuleXML(document));
+
+            this.instanceElement.appendChild(stepsContainer);
+        } else
+            this.instanceElement.removeChildByTag('installSteps');
+
+        if (optionalInstallList.length) {
+            const conditionalFileInstalls = this.instanceElement.getOrCreateChildByTag('conditionalFileInstalls');
+            for (const install of optionalInstallList) conditionalFileInstalls.appendChild(install);
+            this.instanceElement.appendChild(conditionalFileInstalls);
+        } else
+            this.instanceElement.removeChildByTag('conditionalFileInstalls');
 
         return this.instanceElement;
     }
@@ -785,33 +884,69 @@ export class Fomod extends FOMODElementProxy {
     override asInfoXML(document: XMLDocument): Element {
         if (document.documentElement !== this.infoInstanceElement) {
             document.removeChild(document.documentElement);
-            this.infoInstanceElement = document.getOrCreateChildByTag("fomod");
+            this.infoInstanceElement = document.getOrCreateChildByTag('fomod');
         }
 
         // Set schema info
-        this.infoInstanceElement.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        this.infoInstanceElement.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
         if (window.FOMODBuilder.storage.settings.includeInfoSchema)
-            this.infoInstanceElement.setAttribute("xsi:noNamespaceSchemaLocation", "https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd");
-        else if (this.infoInstanceElement.getAttribute("xsi:noNamespaceSchemaLocation") === "https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd")
-            this.infoInstanceElement.removeAttribute("xsi:noNamespaceSchemaLocation");
+            this.infoInstanceElement.setAttribute('xsi:noNamespaceSchemaLocation', 'https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd');
+        else if (this.infoInstanceElement.getAttribute('xsi:noNamespaceSchemaLocation') === 'https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd')
+            this.infoInstanceElement.removeAttribute('xsi:noNamespaceSchemaLocation');
 
         // Set actual data
         const url = this.getURLAsString();
-        if (this.metaName)          this.infoInstanceElement.getOrCreateChildByTag("Name").textContent    = this.metaName;
-        else                        this.infoInstanceElement.removeChildByTag     ("Name");
+        if (this.metaName)          this.infoInstanceElement.getOrCreateChildByTag('Name').textContent    = this.metaName;
+        else                        this.infoInstanceElement.removeChildByTag     ('Name');
 
-        if (this.metaAuthor)        this.infoInstanceElement.getOrCreateChildByTag("Author").textContent  = this.metaAuthor;
-        else                        this.infoInstanceElement.removeChildByTag     ("Author");
+        if (this.metaAuthor)        this.infoInstanceElement.getOrCreateChildByTag('Author').textContent  = this.metaAuthor;
+        else                        this.infoInstanceElement.removeChildByTag     ('Author');
 
-        if (this.metaId !== null)   this.infoInstanceElement.getOrCreateChildByTag("Id").textContent      = this.metaId.toString();
-        else                        this.infoInstanceElement.removeChildByTag     ("Id");
+        if (this.metaId !== null)   this.infoInstanceElement.getOrCreateChildByTag('Id').textContent      = this.metaId.toString();
+        else                        this.infoInstanceElement.removeChildByTag     ('Id');
 
-        if (url)                    this.infoInstanceElement.getOrCreateChildByTag("Website").textContent = url;
-        else                        this.infoInstanceElement.removeChildByTag     ("Website");
+        if (url)                    this.infoInstanceElement.getOrCreateChildByTag('Website').textContent = url;
+        else                        this.infoInstanceElement.removeChildByTag     ('Website');
 
-        if (this.metaVersion)       this.infoInstanceElement.getOrCreateChildByTag("Version").textContent = this.metaVersion;
-        else                        this.infoInstanceElement.removeChildByTag     ("Version");
+        if (this.metaVersion)       this.infoInstanceElement.getOrCreateChildByTag('Version').textContent = this.metaVersion;
+        else                        this.infoInstanceElement.removeChildByTag     ('Version');
 
         return this.infoInstanceElement;
     }
+}
+
+interface GroupTree {
+    group: Group,
+    options: {
+        [key: symbol]: Option,
+    }
+}
+
+interface StepTree {
+    step: Step,
+    groups: {
+        [key: symbol]: GroupTree
+    }
+}
+
+interface FomodTree {
+    fomod: Fomod,
+    steps: {
+        [key: symbol]: StepTree
+    }
+}
+
+function traverseTree<TTree extends Option|GroupTree|StepTree|FomodTree, TSymbolArr extends symbol[]>(tree: TTree | undefined, symbols: TSymbolArr): TTree | undefined | Exclude< Exclude< Exclude< TSymbolArr extends [symbol, symbol, symbol] ? Option : ( TSymbolArr extends [symbol, symbol] ? GroupTree | Option : ( TSymbolArr extends [symbol] ? StepTree | GroupTree | Option : StepTree | GroupTree | Option | TTree ) ), TTree extends Option ? Option|StepTree | GroupTree | FomodTree : never >, TTree extends GroupTree ? GroupTree|StepTree|FomodTree : never >, TTree extends StepTree ? StepTree|FomodTree : never > {
+    if (!tree || symbols.length == 0) return tree;
+
+    if (tree instanceof Option) {
+        console.warn('Option found in tree, but symbols remain');
+        return tree;
+    }
+
+    const [symbol, ...rest] = symbols;
+    if ('steps' in tree) return traverseTree(tree.steps[symbol!], rest) as ReturnType<typeof traverseTree<TTree, TSymbolArr>>;
+    if ('groups' in tree) return traverseTree(tree.groups[symbol!], rest) as ReturnType<typeof traverseTree<TTree, TSymbolArr>>;
+    if ('options' in tree) return traverseTree(tree.options[symbol!], rest) as ReturnType<typeof traverseTree<TTree, TSymbolArr>>;
+    throw new Error('Invalid tree!');
 }

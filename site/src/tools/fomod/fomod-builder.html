@@ -38,14 +38,35 @@ redirect_from:
         <!-- Step Summary -->
         <div class="builder-steps-step-sum js-bcd-summary adjacent">
             <i class="material-icons open-icon-90CC">expand_more</i>
-            <h3 class="builder-steps-step-title">Step: <span class="name">Choose Version (1/2)</span></h3>
-            <sub><span class="builder-steps-step-group-count" unitWord="Group">6 Groups</span>, <span class="builder-steps-step-option-count" unitWord="Option">17 Options</span></sub>
+            <h3 class="builder-steps-step-title">Step: "<span class="name"></span>"</h3>
+            <sub><span class="builder-steps-step-group-count" unitWord="Group">ERROR</span>, <span class="builder-steps-step-option-count" unitWord="Option">ERROR</span></sub>
         </div>
 
         <!-- Step Body -->
         <div class="builder-steps-step-body js-bcd-details adjacent" data-margin-top="8px">
 
+            <div class="builder-steps-body-left builder-steps-body-left--enforce-width">
+                <!-- Step Name -->
+                <div class="item-with-fake-label" identifier="nameInput"><h4>Step Name</h4>
+                    <input class="builder-steps-step-name bcd-builder-input" placeholder="Step Name" value="" />
+                </div>
+
+                <!-- Group Sorting Order -->
+                <div class="item-with-fake-label item-with-fake-label--one-liner" identifier="sortOrderButton"><h4>Group Sorting Order</h4>
+                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
+                    <menu class="bcd-dropdown-sorting-order mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
+                </div>
+
+                <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+                    Edit Visibility Conditions
+                </button>
+            </div>
+
             <div class="builder-steps-group-container"></div>
+
+            <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-add-child-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+                Add Group
+            </button>
 
         </div>
 
@@ -53,89 +74,103 @@ redirect_from:
 </template>
 
 <template id="builder-main-steps-group">
-    <!-- Group Summary -->
-    <div class="builder-steps-group-sum js-bcd-summary adjacent">
-        <i class="material-icons open-icon-90CC">expand_more</i>
-        <h4 class="builder-steps-group-title">Group: <span class="name">Choose Version</span></h4>
-        <sub><span class="builder-steps-step-option-count" unitWord="Option">17 Options</span></sub>
+    <div class="builder-steps-group">
+        <!-- Group Summary -->
+        <div class="builder-steps-group-sum js-bcd-summary adjacent">
+            <i class="material-icons open-icon-90CC">expand_more</i>
+            <h4 class="builder-steps-group-title">Group: "<span class="name"></span>"</h4>
+            <sub><span class="builder-steps-group-option-count" unitWord="Option">ERROR</span></sub>
+        </div>
+
+        <!-- Group Body -->
+        <div class="builder-steps-group-body js-bcd-details adjacent" data-margin-top="8px">
+
+            <div class="builder-steps-body-left builder-steps-body-left--enforce-width">
+                <!-- Option Name -->
+                <div class="item-with-fake-label" identifier="nameInput"><h4>Group Name</h4>
+                    <input class="builder-steps-group-name bcd-builder-input" placeholder="Group Name" value="" />
+                </div>
+
+                <!-- Group Sorting Order -->
+                <div class="item-with-fake-label item-with-fake-label--one-liner" identifier="sortOrderButton"><h4>Group Sorting Order</h4>
+                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
+                    <menu class="bcd-dropdown-sorting-order mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
+                </div>
+
+                <!-- Group Selection Type -->
+                <div class="item-with-fake-label item-with-fake-label--one-liner" identifier="sortOrderButton"><h4>Group Selection Type</h4>
+                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
+                    <menu class="bcd-dropdown-group-type mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
+                </div>
+            </div>
+
+            <div class="builder-steps-option-container"></div>
+
+            <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-add-child-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+                Add Option
+            </button>
+
+        </div>
     </div>
-
-    <!-- Group Body -->
-    <div class="builder-steps-group-body js-bcd-details adjacent" data-margin-top="8px">
-
-        <div class="buildersteps-opt-container"></div>
-
-    </div></div>
 </template>
 
 <template id="builder-main-steps-option">
-    <!-- Option Summary -->
-    <div class="builder-steps-opt-sum js-bcd-summary adjacent">
-        <i class="material-icons open-icon-90CC">expand_more</i>
-        <h5 class="builder-steps-opt-title">Option: <span class="name">Single Texture</span></h5>
-        <sub><span class="builder-steps-opt-file-count" unitWord="Install">1 Install</span>, <span class="builder-steps-opt-flag-count" unitWord="Flag">0 Flags</span></sub>
-    </div>
-
-    <!-- Option Body -->
-    <div class="builder-steps-opt-body js-bcd-details adjacent" data-margin-top="8px"><div>
-        <!--
-            _name_backend = "";
-
-            _description!: option_description;
-            _image!: option_image;
-
-            _conditionFlags: dependency_flag[] = [];
-            _conditionFlags_container: Element | undefined;
-
-            _files: dependency_file[] = [];
-            _files_container: Element | undefined;
-            _typeDescriptor!: PluginTypeDescriptor;
-        -->
-
-        <!-- Option Image -->
-        <div class="builder-steps-opt-image">
-            <img>
-            <div class="js-relative-file-picker--container">
-                <input class="bcd-builder-input js-relative-image-picker" relative-to="FOMODBuilder" placeholder="Option Image Path" value="assets/site/images/example-image.png" />
-            </div>
+    <div class="builder-steps-option">
+        <!-- Option Summary -->
+        <div class="builder-steps-option-sum js-bcd-summary adjacent">
+            <i class="material-icons open-icon-90CC">expand_more</i>
+            <h5 class="builder-steps-option-title">Option: "<span class="name"></span>"</h5>
+            <sub><span class="builder-steps-option-file-count" unitWord="Install">ERROR</span>, <span class="builder-steps-option-flag-count" unitWord="Flag">ERROR</span></sub>
         </div>
 
-        <div class="builder-steps-body-left">
+        <!-- Option Body -->
+        <div class="builder-steps-option-body js-bcd-details adjacent" data-margin-top="8px"><div>
 
-            <!-- Option Name -->
-            <div class="item-with-fake-label" identifier="nameInput"><h4>Option Name</h4>
-                <input class="bcd-builder-input" placeholder="Option Name" value="Single Texture" />
+            <!-- Option Image -->
+            <div class="builder-steps-option-image">
+                <img>
+                <div class="js-relative-file-picker--container">
+                    <input class="bcd-builder-input js-relative-image-picker" relative-to="FOMODBuilder" placeholder="Option Image Path" value="" />
+                </div>
             </div>
 
-            <!-- Option Description -->
-            <div class="item-with-fake-label" identifier="descInput"><h4>Description</h4>
-                <textarea class="bcd-builder-input js-dynamic-textarea-height" placeholder="Option Description" rows="1">This is the single texture version of the mod. It will replace the texture of the scroll with a single texture.</textarea>
-            </div>
+            <div class="builder-steps-body-left">
 
-            <!-- Plugin Type -->
-            <div class="item-with-fake-label item-with-fake-label--one-liner" identifier="typeButton"><h4>Default Selection Type:</h4>
-                <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
-                <menu class="bcd-dropdown-option-state mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect mdl-js-ripple-effect--ignore-events"></menu>
-            </div>
+                <!-- Option Name -->
+                <div class="item-with-fake-label"><h4>Option Name</h4>
+                    <input class="bcd-builder-input builder-steps-option-name" placeholder="Option Name" value="" />
+                </div>
 
-            <div class="item-with-fake-label" identifier="editTypeConditions"><h4>Selection Type Conditions</h4>
-                <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
-                    Edit
-                </button>
-            </div>
+                <!-- Option Description -->
+                <div class="item-with-fake-label"><h4>Description</h4>
+                    <textarea class="bcd-builder-input js-dynamic-textarea-height builder-steps-option-description" placeholder="Option Description" rows="1">This is the single texture version of the mod. It will replace the texture of the scroll with a single texture.</textarea>
+                </div>
 
-            <!-- Condition Flags -->
-            <div class="item-with-fake-label" identifier="conditionFlags"><h4>Condition Flags to Set</h4>
-                <div class="builder-steps-opt-set-flags"></div>
-            </div>
+                <!-- Plugin Type -->
+                <div class="item-with-fake-label item-with-fake-label--one-liner"><h4>Default Selection Type:</h4>
+                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
+                    <menu class="bcd-dropdown-option-state mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
+                </div>
 
-            <!-- Files -->
-            <div class="item-with-fake-label" identifier="installs"><h4>Files & Folders to Install</h4>
-                <div class="builder-steps-opt-files"></div>
+                <div class="item-with-fake-label"><h4>Selection Type Conditions</h4>
+                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+                        Edit
+                    </button>
+                </div>
+
+                <!-- Condition Flags -->
+                <div class="item-with-fake-label" identifier="conditionFlags"><h4>Condition Flags to Set</h4>
+                    <div class="builder-steps-option-set-flags"></div>
+                </div>
+
+                <!-- Files -->
+                <div class="item-with-fake-label" identifier="installs"><h4>Files & Folders to Install</h4>
+                    <div class="builder-steps-option-files"></div>
+                </div>
+
             </div>
 
         </div>
-
     </div>
 </template>
 
@@ -197,7 +232,7 @@ redirect_from:
         <div id="manage-fomod-container">
             <button onclick="window.FOMODBuilder.ui.openFolder()"
                 type="button"
-                class="mdl-button w192 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-openDir">
+                class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-openDir">
 
                 Select FOMOD Directory
             </button>
@@ -209,7 +244,7 @@ redirect_from:
 
             <button
                 type="button" onclick="window.FOMODBuilder.ui.save()"
-                class="mdl-button w144 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-save">
+                class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-save">
 
                 Save
             </button>
@@ -218,7 +253,7 @@ redirect_from:
 
             <button
                 type="button" onclick="window.FOMODBuilder.ui.cleanSave()"
-                class="mdl-button w144 mr8 mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-save">
+                class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-save">
 
                 Clean Save
             </button>
@@ -330,20 +365,19 @@ redirect_from:
 
                     <!-- Mod Name -->
                     <div class="item-with-fake-label" identifier="nameInput"><h4>Mod Name</h4>
-                        <input class="builder-steps-mod-name bcd-builder-input" placeholder="Mod Name" value="Retexture for The Scroll" />
+                        <input class="builder-steps-mod-name bcd-builder-input" placeholder="Mod Name" value="" />
                     </div>
 
                     <!-- Steps Sorting Order -->
                     <div class="item-with-fake-label item-with-fake-label--one-liner" identifier="sortOrderButton"><h4>Sorting Order</h4>
                         <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
-                        <menu class="bcd-dropdown-sorting-order mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect mdl-js-ripple-effect--ignore-events"></menu>
+                        <menu class="bcd-dropdown-sorting-order mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
                     </div>
 
-                    <div class="item-with-fake-label" identifier="editModConditions"><h4>Mod Conditions</h4>
-                        <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
-                            Edit
-                        </button>
-                    </div>
+                    <!-- FOMOD Conditions -->
+                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+                        Edit Visibility Conditions
+                    </button>
                 </div>
 
 
@@ -351,7 +385,7 @@ redirect_from:
                 <div class="builder-steps-mod-image">
                     <img>
                     <div class="js-relative-file-picker--container">
-                        <input class="bcd-builder-input js-relative-image-picker" relative-to="FOMODBuilder" placeholder="Mod Image Path" value="assets/site/images/example-image.png" />
+                        <input class="bcd-builder-input js-relative-image-picker" relative-to="FOMODBuilder" placeholder="Mod Image Path" value="" />
                     </div>
                 </div>
 
@@ -360,7 +394,7 @@ redirect_from:
             <!-- Steps Container -->
             <div class="builder-steps-steps-container"></div>
 
-            <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-add-step-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+            <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-add-child-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
                 Add Step
             </button>
         </div>
