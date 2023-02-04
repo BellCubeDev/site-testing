@@ -77,10 +77,7 @@ jobs:
 
         # Output dir: $GITHUB_WORKSPACE/_generated/ts_out/
         run: |
-          cd $GITHUB_WORKSPACE/site/src/
-          rm -f -r *.js
-
-          rsync -t -r -v -L $GITHUB_WORKSPACE/site/src/* $GITHUB_WORKSPACE/_generated/ts_out/
+          rsync -t -r -v -L -k --ignore-existing $GITHUB_WORKSPACE/site/src/* $GITHUB_WORKSPACE/_generated/ts_out/
 
       - name: Set Minification Directory
         run: |
