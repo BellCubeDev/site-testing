@@ -1,6 +1,7 @@
 [disabled="visual"] {
     filter: grayscale(25%) saturate(75%) contrast(75%) brightness(75%) blur(1px);
     cursor: not-allowed;
+    * { pointer-events: none; }
 }
 
 ::selection {

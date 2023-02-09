@@ -31,6 +31,10 @@ export function afterDelay<TCallback extends (...args: any) => any = any>(timeou
     return window.setTimeout(callback, timeout, ...(args || []));
 }
 
+export async function wait(timeout: number): Promise<void> {
+    return new Promise(resolve => afterDelay(timeout, resolve));
+}
+
 export abstract class UpdatableObject {
     update() {
         if (this.suppressUpdates) return;
@@ -329,6 +333,10 @@ declare global {
         targetingComponents_proto?: Partial<PrototypedUpgrades>
     }
     interface Document extends DocAndElementInjections {}
+
+    interface HTMLElement extends DocAndElementInjections {
+        onclick: EventTypes<HTMLElement>['activate']|null;
+    }
 
     interface Window {
         /** Variables set by the page */
@@ -2324,5 +2332,23 @@ export function bcd_universalJS_init():void {
     //const contResizeObserver = new ResizeObserver(resizeMain);
     //resizeMain();
     //contResizeObserver.observe(footer.firstElementChild ?? footer);
+
+    // =============================================================
+    // Register for more inclusive invents as a replacement for the `onclick` attribute
+    // =============================================================
+
+    afterDelay(150, () => {
+        const elements = document.querySelectorAll('[onclick]') as NodeListOf<HTMLElement>;
+        for (const element of elements) {
+            const funct = element.onclick as EventTypes<HTMLElement>['activate'];
+            if (!funct) continue;
+
+            registerForEvents(element, {activate: funct});
+
+            element.onclick = null;
+            element.removeAttribute('onclick');
+        }
+    });
+
 }
 window.bcd_init_functions.universal = bcd_universalJS_init;

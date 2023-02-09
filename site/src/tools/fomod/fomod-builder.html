@@ -219,7 +219,10 @@ redirect_from:
     </div>
 </dialog>
 
-<div role="tablist" do-tab-anchor class="tabs-list-container"> <!-- Holds the Tab buttons, which are filled in by JavaScript magic -->
+<!-- Holds the Tab buttons, which are filled in by JavaScript magic
+     Enabled once the user opens a FOMOD
+-->
+<div id="tablist" role="tablist" class="tabs-list-container" disabled="visual">
     <button role="tab" class="js-tab-list-button mdl-button mdl-js-ripple-effect" name="Management"></button>
     <button role="tab" class="js-tab-list-button mdl-button mdl-js-ripple-effect" name="Metadata"></button>
     <button role="tab" class="js-tab-list-button mdl-button mdl-js-ripple-effect" name="Steps"></button>

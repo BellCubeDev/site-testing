@@ -194,8 +194,11 @@ export async function showOpenAnotherFolderDialog() {
     }
 }
 
+let tabList: HTMLDivElement|null = null;
 export async function openFolder() {
     if (loadingFomod) return;
+
+    tabList ??= document.getElementById('tablist') as HTMLDivElement;
 
     if (window.FOMODBuilder.directory && !await showOpenAnotherFolderDialog())
         return;
@@ -203,6 +206,7 @@ export async function openFolder() {
     if ('showDirectoryPicker' in window) return await openFolder_entry();
 
     console.warn('No directory picker available for your system!');
+    tabList.setAttribute('disabled', 'visual');
     fomod.getNoSupportModal()?.show();
 }
 
@@ -238,10 +242,11 @@ export async function openFolder_entry() {
 
     xml.translateWhole(moduleStr, infoStr, true);
 
-    await new Promise<void>(r =>bcdUniversal.afterDelay(100, ()=> {
-        loadingFomod = false;
-        r();
-    }));
+    await bcdUniversal.wait(100);
+    loadingFomod = false;
+
+    tabList ??= document.getElementById('tablist') as HTMLDivElement;
+    tabList.removeAttribute('disabled');
 }
 
 let saving = false;
