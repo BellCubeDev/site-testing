@@ -195,13 +195,28 @@ export async function showOpenAnotherFolderDialog() {
 }
 
 let tabList: HTMLDivElement|null = null;
-export async function openFolder() {
+export async function openFolder(test = false) {
     if (loadingFomod) return;
 
     tabList ??= document.getElementById('tablist') as HTMLDivElement;
 
-    if (window.FOMODBuilder.directory && !await showOpenAnotherFolderDialog())
+    if ( (window.FOMODBuilder.directory || window.FOMODBuilder.trackedFomod) && !await showOpenAnotherFolderDialog())
         return;
+
+    if (test) {
+        if (loadingFomod) return;
+        loadingFomod = true;
+
+        window.loadTestFOMOD();
+
+        await bcdUniversal.wait(100);
+        loadingFomod = false;
+
+        tabList ??= document.getElementById('tablist') as HTMLDivElement;
+        tabList.removeAttribute('disabled');
+
+        return;
+    }
 
     if ('showDirectoryPicker' in window) return await openFolder_entry();
 
@@ -257,9 +272,10 @@ export async function save() {
     if (!window.FOMODBuilder.trackedFomod) throw new Error('No FOMOD is currently loaded.');
 
     if (!window.FOMODBuilder.directory) {
-        const picked = await bcdFS.getUserPickedFolder(true);
-        if (!picked) return saving = false;
-        window.FOMODBuilder.directory = picked;
+        //const picked = await bcdFS.getUserPickedFolder(true);
+        //if (!picked)
+            return saving = false;
+        //window.FOMODBuilder.directory = picked;
     }
 
     const fomodFolder = (await window.FOMODBuilder.directory.childDirsC['fomod'])!;

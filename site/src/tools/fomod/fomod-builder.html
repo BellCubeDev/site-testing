@@ -277,6 +277,19 @@ redirect_from:
 
                     THIS IS DANGEROUS! MAKE A BACKUP AND USE AT YOUR OWN RISK!
                 </p></div>
+
+            <br />
+            <button onclick="console.log('Click!'); window.FOMODBuilder.ui.openFolder(true)"
+                type="button"
+                class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect bcd-button-openDir"
+                style="width:15pc"
+            >
+                Load TEST FOMOD
+            </button>
+                <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
+                    Explore the FOMOD Builder in all its glory, no folder required! This will load a test FOMOD that is included with the program.
+                    It may well be possible to use this on an unsupported browser; however, it is not recommended.
+                </p></div>
         </div>
         <div id="settings-container" class="js-settings-grid" hidden data-templateID="builder-settings-toggle" data-settingsPath="FOMODBuilder.storage.settings">
             {{ site.data.SettingsMaps.FOMODBuilder | jsonify | escape }}
