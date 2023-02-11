@@ -3,6 +3,8 @@ import { objOf, UpdatableObject } from '../../universal.js';
 
 import * as ui from './fomod-builder-ui.js';
 
+// TODO: Change Step/Group/Option arrays to Sets (makes it easier to remove stuff)
+
 
 /*x eslint-disable i18n-text/no-en */// FOMODs are XML files with a schema written in English, so disallowing English makes little sense.
 
@@ -35,6 +37,9 @@ export abstract class FOMODElementProxy extends UpdatableObject {
 
     updateObjects() {
         this.objectsToUpdate.forEach(  (obj) => obj.update()  );
+        if ('steps' in this && this.steps instanceof Set) this.steps.forEach(  (step) => step.update()  );
+        if ('groups' in this && this.groups instanceof Set) this.groups.forEach(  (group) => group.update()  );
+        if ('options' in this && this.options instanceof Set) this.options.forEach(  (option) => option.update()  );
         ui.autoSave();
     }
 

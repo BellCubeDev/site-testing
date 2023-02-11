@@ -127,36 +127,64 @@ const keyTypes: Record<string, keyof EventTypes> = {
     'Esc': 'exit',
 };
 
+export function unregisterForEvents<TElement extends EventElement>(element: TElement, events: EventTypes<TElement>, options?: boolean|AddEventListenerOptions): void {
+    registerForEvents_(element, events, options, true);
+}
+
 export function registerForEvents<TElement extends EventElement>(element: TElement, events: EventTypes<TElement>, options?: boolean|AddEventListenerOptions): void {
+    registerForEvents_(element, events, options, false);
+}
+
+export const registerForEvents_wrappedFunctions = new Map<Function, Function>();
+export const registerForEvents_handledKeys = new Map<EventTypes<any>, (this: any, ev: Event)=>void>();
+
+function registerForEvents_<TElement extends EventElement>(element: TElement, events: EventTypes<TElement>, options?: boolean|AddEventListenerOptions, unregister = false): void {
     let handling = false;
+
+    const setListener = unregister ? element.removeEventListener.bind(element) : element.addEventListener.bind(element);
+
     function wrapCallback<TCallback extends (this: TElement, ...args: any[]) => any>(callback: TCallback): ((this: ThisParameterType<TCallback>, ...args: Parameters<TCallback>)=>ReturnType<TCallback>|void) {
-        return function(this: ThisParameterType<TCallback>, ...args: Parameters<TCallback>) {
-            if (handling) return;
-            handling = true;
-            queueMicrotask(() => handling = false);
-            return callback.call(this, ...args) as ReturnType<TCallback>;
-        };
+        let f = registerForEvents_wrappedFunctions.get(callback);
+
+        if (!f) {
+            f = function(this: ThisParameterType<TCallback>, ...args: Parameters<TCallback>) {
+                if (handling) return;
+                handling = true;
+                queueMicrotask(() => handling = false);
+                return callback.call(this, ...args) as ReturnType<TCallback>;
+            };
+
+            registerForEvents_wrappedFunctions.set(callback, f);
+        }
+
+        // @ts-ignore: The type is correct, but TypeScript doesn't know that
+        return f;
     }
 
     // Wrap all the callbacks!
     events = Object.fromEntries(Object.entries(events).map(([key, value]) => [key, wrapCallback(value)]));
 
-    function handleKey(this: TElement, ev: Event) {
-        if ( !(ev instanceof KeyboardEvent) ) return;
-        const functionName = keyTypes[ev.key] || 'anyKey';
-        events[functionName]?.call(element, ev);
+    let handleKey = registerForEvents_handledKeys.get(events);
+    if (!handleKey) {
+        handleKey = function(this: TElement, ev: Event) {
+            if ( !(ev instanceof KeyboardEvent) ) return;
+            const functionName = keyTypes[ev.key] || 'anyKey';
+            events[functionName]?.call(element, ev);
+        };
+
+        registerForEvents_handledKeys.set(events, handleKey);
     }
 
-    element.addEventListener('keydown', handleKey, options);
+    setListener('keydown', handleKey, options);
 
     for (const evt in events) switch (evt) {
         case 'activate': // @ts-ignore - my logic is perfectly valid, but TypeScript doesn't know that 🤷‍♂️
-            element.addEventListener(window.clickEvt, events[evt]!, options);
+            setListener(window.clickEvt, events[evt]!, options);
             break;
 
         case 'change':
-            element.addEventListener('change', events[evt]!, options);
-            element.addEventListener('input', events[evt]!, options);
+            setListener('change', events[evt]!, options);
+            setListener('input', events[evt]!, options);
             break;
 
         case 'exit':
@@ -166,7 +194,7 @@ export function registerForEvents<TElement extends EventElement>(element: TEleme
             break;
 
         case 'dropdownInput':
-            element.addEventListener('bcd-dropdown-change', events[evt]!, options);
+            setListener('bcd-dropdown-change', events[evt]!, options);
     }
 }
 window.registerForEvents = registerForEvents;

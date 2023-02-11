@@ -9,7 +9,7 @@
 
 import * as mainClasses from './fomod-builder-classifications.js';
 import * as mainUI from './fomod-builder-ui.js';
-import { registerForEvents, UpdatableObject } from '../../universal.js';
+import { registerForEvents, unregisterForEvents, UpdatableObject } from '../../universal.js';
 import { updatePluralDisplay } from './fomod-builder-ui.js';
 import { componentHandler } from '../../assets/site/mdl/material.js';
 
@@ -34,26 +34,37 @@ export class Fomod extends UpdatableObject {
 
     addStepBtn: HTMLButtonElement;
 
+    // I can't be bothered to explicitly set types on this
+    private changeEvtObj;
+    private dropdownEvtObj;
+    private addStepEvtObj;
+
     constructor(parent: mainClasses.Fomod) {
         super();
 
         this.parent = parent;
 
+
+        this.changeEvtObj = {change: this.updateFromInput_bound};
+        this.dropdownEvtObj = {dropdownInput: this.updateFromInput_bound};
+        this.addStepEvtObj = {activate: parent.addStep_bound.bind(parent, undefined, undefined)};
+
+
         this.main = document.getElementById("steps-builder-container") as HTMLDivElement;
         this.parent.stepsContainers['1st-party'] = this.main.querySelector('div.builder-steps-steps-container')!;
 
         this.nameInput = this.main.querySelector('.builder-steps-mod-name') as HTMLInputElement;
-        registerForEvents(this.nameInput, {change: this.updateFromInput_bound});
+        registerForEvents(this.nameInput, this.changeEvtObj);
 
         this.imageInput = this.main.querySelector('.builder-steps-mod-image input') as HTMLInputElement;
-        registerForEvents(this.imageInput, {change: this.updateFromInput_bound});
+        registerForEvents(this.imageInput, this.changeEvtObj);
 
         this.sortOrderMenu = this.main.querySelector('.bcd-dropdown-sorting-order') as HTMLMenuElement;
-        registerForEvents(this.sortOrderMenu, {dropdownInput: this.updateFromInput_bound});
+        registerForEvents(this.sortOrderMenu, this.dropdownEvtObj);
 
         this.addStepBtn = this.main.querySelector('.builder-steps-add-child-btn') as HTMLButtonElement;
 
-        registerForEvents(this.addStepBtn, {activate: parent.addStep_bound.bind(parent, undefined, undefined)});
+        registerForEvents(this.addStepBtn, this.addStepEvtObj);
     }
 
     override updateFromInput_() {
@@ -77,6 +88,10 @@ export class Fomod extends UpdatableObject {
         this.nameInput.value = '';
         this.imageInput.value = '';
         this.sortOrderMenu.upgrades_proto?.dropdown?.selectByString(window.FOMODBuilder.storage.settings.defaultSortingOrder);
+        unregisterForEvents(this.nameInput, this.changeEvtObj);
+        unregisterForEvents(this.imageInput, this.changeEvtObj);
+        unregisterForEvents(this.sortOrderMenu, this.dropdownEvtObj);
+        unregisterForEvents(this.addStepBtn, this.addStepEvtObj);
     }
 }
 mainClasses.addUpdateObjects(mainClasses.Fomod, Fomod);
