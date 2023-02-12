@@ -1,6 +1,6 @@
 @import 'button-colors';
 
-.builderStep {
+.fomod-editor-type {
     &:not(.active_) { display: none; }
 
     opacity: 0; &.active { opacity: 1; }
@@ -31,15 +31,111 @@
     margin-right: 0;
 }
 
+// Time to make an appearance!
+@keyframes builder-steps-remove-btn-fadeIn {
+    0% { filter: opacity(0); }
+    5% { filter: opacity(0.1); }
+    100% { filter: opacity(1); }
+}
+
+.builder-steps-remove-btn {
+    position: absolute;
+    right: 8px;
+
+    animation-name: builder-steps-remove-btn-fadeIn;
+    animation-duration: 210ms;
+    animation-timing-function: ease-in-out;
+
+    @media (prefers-reduced-motion: reduce) { animation-name: none; }
+}
+
+@keyframes sendInBigArtillery {
+    0% {
+        filter: opacity(0.67);
+        transform: scale(0.99);
+        margin-top: -90px;
+    }
+
+    100% {
+        filter: opacity(1);
+        transform: scale(1);
+        margin-top: 0;
+    }
+}
+@keyframes retractBigArtillery {
+    0% {
+        filter: opacity(1);
+        transform: scale(1);
+        margin-bottom: 0;
+    }
+
+    100% {
+        filter: opacity(0.67);
+        transform: scale(0.99);
+        margin-bottom: -90px;
+    }
+}
+
+@keyframes sendInArtillery {
+    0% {
+        filter: opacity(0.67);
+        transform: scale(0.99);
+        margin-top: -84px;
+    }
+
+    100% {
+        filter: opacity(1);
+        transform: scale(1);
+        margin-top: 0;
+    }
+}
+@keyframes retractArtillery {
+    0% {
+        filter: opacity(1);
+        transform: scale(1);
+        margin-bottom: 0;
+    }
+
+    100% {
+        filter: opacity(0.67);
+        transform: scale(0.99);
+        margin-bottom: -84px;
+    }
+}
+
 @mixin fomodStepsBuilderCard($hue, $sat, $val, $hueShiftMult: 1) {
-    //          184°, 87%, 41%
     background: hsl($hue, $sat, $val);
-    //          208°, 100%, 58%
     border-left: hsl($hue + ($hueShiftMult * 48deg), $sat + 13%, $val + 17%) 8px solid;
 
     border-radius: 8px;
     padding: 12px;
     margin: 32px 0;
+    padding-right: 48px;
+
+    position: relative;
+
+    transform: scale(1);
+    filter: opacity(1);
+
+    .animating-in {
+        animation: sendInArtillery 200ms ease-out;
+        @media (prefers-reduced-motion: reduce) { animation: none; }
+    }
+
+    .animating-out {
+        animation: retractArtillery 200ms ease-in-out;
+        margin-bottom: -84px;
+
+        // Make the last element go up instead of down
+        &:last-child {
+            animation-name: sendInArtillery;
+            animation-direction: reverse;
+            margin-top: -84px;
+            margin-bottom: 32px;
+        }
+
+        @media (prefers-reduced-motion: reduce) { animation: none !important; visibility: none; }
+    }
 }
 
 @mixin imageColumn() {
@@ -52,6 +148,8 @@
 
 #steps-builder-container {
     @include fomodStepsBuilderCard(184deg, 87%, 25%);
+    animation: none;
+    padding-right: 16px;
 
     >:first-child {
         @include imageColumn();
@@ -59,7 +157,7 @@
         >.builder-steps-mod-image {
             max-height: 50vmin;
 
-            padding: 8px;
+            padding: 10px 8px;
             border-radius: 4px;
 
             background: #1c1c1c;
@@ -69,6 +167,18 @@
 
 .builder-steps-step {
     @include fomodStepsBuilderCard(215deg, 76%, 23%);
+    .animating-in { animation-name: sendInArtillery; }
+
+    .animating-out {
+        animation-name: retractBigArtillery;
+        margin-bottom: -90px;
+
+        // Make the last element go up instead of down
+        &:last-child {
+            animation-name: sendInBigArtillery;
+            margin-top: -90px;
+        }
+    }
 }
 
 .builder-steps-group {
@@ -79,7 +189,6 @@
     @include fomodStepsBuilderCard(160deg, 0%, 9%);
 
     .js-bcd-details-inner > * { @include imageColumn(); }
-
 }
 
 .builder-steps-option-image, .builder-steps-mod-image {

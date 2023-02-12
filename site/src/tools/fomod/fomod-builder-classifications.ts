@@ -8,6 +8,28 @@ import * as ui from './fomod-builder-ui.js';
 
 /*x eslint-disable i18n-text/no-en */// FOMODs are XML files with a schema written in English, so disallowing English makes little sense.
 
+/** Function to pass into JSON.stringify to handle FOMODs */
+function JsonStringifyFomod(key: string, value: any) {
+    // Blacklisted Keys (generated at runtime or would cause recursion)
+    if (key === 'inherited') return undefined;
+    if (key === 'instanceElement') return undefined;
+    if (key === 'objectsToUpdate') return undefined;
+    if (key === 'suppressUpdates') return undefined;
+    if (key === 'updateObjects') return undefined;
+
+    // Blacklisted Value Types
+    if (typeof value === 'function') return undefined;
+
+    // Internal keys (start with _)
+    if (key.startsWith('_')) return undefined;
+
+    // Nap & Set support
+    if (value instanceof Set) return Array.from(value);
+    if (value instanceof Map) return Object.fromEntries(value.entries());
+
+    return value;
+}
+
 /*
     Thanks to Patrick Gillespie for the great ASCII art generator!
     https://patorjk.com/software/taag/#p=display&h=0&v=0&f=Big%20Money-nw
@@ -37,9 +59,9 @@ export abstract class FOMODElementProxy extends UpdatableObject {
 
     updateObjects() {
         this.objectsToUpdate.forEach(  (obj) => obj.update()  );
-        if ('steps' in this && this.steps instanceof Set) this.steps.forEach(  (step) => step.update()  );
-        if ('groups' in this && this.groups instanceof Set) this.groups.forEach(  (group) => group.update()  );
-        if ('options' in this && this.options instanceof Set) this.options.forEach(  (option) => option.update()  );
+        if ('steps' in this && this.steps instanceof Set) this.steps.forEach(  (step) => step.update.call(step)  );
+        if ('groups' in this && this.groups instanceof Set) this.groups.forEach(  (group) => group.update.call(group)  );
+        if ('options' in this && this.options instanceof Set) this.options.forEach(  (option) => option.update.call(option)  );
         ui.autoSave();
     }
 
@@ -47,9 +69,14 @@ export abstract class FOMODElementProxy extends UpdatableObject {
 
     protected override destroy_(): void {
         this.objectsToUpdate.forEach(  (obj) => obj.destroy()  );
-        if ('steps' in this && this.steps instanceof Array) this.steps.forEach(  (step) => step.destroy()  );
-        if ('groups' in this && this.groups instanceof Array) this.groups.forEach(  (group) => group.destroy()  );
-        if ('options' in this && this.options instanceof Array) this.options.forEach(  (option) => option.destroy()  );
+        if ('steps' in this && this.steps instanceof Set) this.steps.forEach(  (step) => step.destroy()  );
+        if ('groups' in this && this.groups instanceof Set) this.groups.forEach(  (group) => group.destroy()  );
+        if ('options' in this && this.options instanceof Set) this.options.forEach(  (option) => option.destroy()  );
+
+        // check if we can update the FOMOD base
+        if ('inherited' in this && this.inherited && typeof this.inherited === 'object')
+            if ('base' in this.inherited && this.inherited.base instanceof FOMODElementProxy)
+                this.inherited.base.updateObjects();
     }
 
     constructor(instanceElement: Element | undefined = undefined) {
@@ -68,11 +95,12 @@ export abstract class FOMODElementProxy extends UpdatableObject {
     asInfoXML?(document: XMLDocument): Element;
 }
 
-interface InheritedFOMODData {
+interface InheritedFOMODData<TType extends Step|Group|Option> {
     base?: Fomod,
-    tree?: FomodTree,
+    parent?: TType extends Step ? Fomod
+                : TType extends Group ? Step
+                : Group,
     containers?: Record<string, HTMLDivElement>,
-    treeKeys: symbol[],
 }
 
 
@@ -106,8 +134,8 @@ export const flags:objOf<Flag> = {};
 export class Flag {
     name = '';
     values = new Set<string>();
-    getters:unknown[] = [];
-    setters:unknown[] = [];
+    getters = new Set<Option>();
+    setters = new Set<Option>();
 
     private constructor(name = '', value:string|null = null) {
         this.name ??= name;
@@ -283,17 +311,10 @@ export type OptionType =
     | 'Required'        // Permanently checked
     | 'NotUseable';     // Permanently unchecked
 export class OptionTypeDescriptor extends FOMODElementProxy {
-    private _default: OptionType = 'Optional';
-    set default(value: OptionType) { this._default = value; this.updateObjects(); } get default(): OptionType { return this._default; }
+    private _defaultType: OptionType = 'Optional';
+    set defaultType(value: OptionType) { this._defaultType = value; this.updateObjects(); } get defaultType(): OptionType { return this._defaultType; }
 
-    private _dependencies: OptionTypeDescriptorWithDependency[] = [];
-    set dependencies(value: OptionTypeDescriptorWithDependency[]) { this._dependencies = value; this.updateObjects(); } get dependencies(): OptionTypeDescriptorWithDependency[] { return this._dependencies; }
-
-    private _basicElement: Element | undefined = undefined;
-    set basicElement(value: Element | undefined) { this._basicElement = value; this.updateObjects(); } get basicElement(): Element | undefined { return this._basicElement; }
-
-    private _complexElement: Element | undefined = undefined;
-    set complexElement(value: Element | undefined) { this._complexElement = value; this.updateObjects(); } get complexElement(): Element | undefined { return this._complexElement; }
+    dependencies: OptionTypeDescriptorWithDependency[] = [];
 
     constructor(
         instanceElement?: Element,
@@ -301,19 +322,22 @@ export class OptionTypeDescriptor extends FOMODElementProxy {
         dependencies: OptionTypeDescriptorWithDependency[] = []
     ) {
         super(instanceElement);
-        this.default = defaultType;
+        this.defaultType = defaultType;
         this.dependencies = dependencies;
 
-        this.basicElement = instanceElement?.getElementsByTagName('type')[0];
-        this.complexElement = instanceElement?.getElementsByTagName('dependencyType')[0];
+        const basicElement = instanceElement?.getElementsByTagName('type')[0];
+        const complexElement = instanceElement?.getElementsByTagName('dependencyType')[0];
 
-        if (this.basicElement) {
-            this.default = this.basicElement.getAttribute('name') as OptionType;
-        } else if (this.complexElement) {
-            const defaultTypeElement = this.complexElement.getElementsByTagName('defaultType')[0];
-            if (defaultTypeElement) this.default = defaultTypeElement.getAttribute('default') as OptionType;
+        if (basicElement) {
+            this.defaultType = basicElement.getAttribute('name') as OptionType;
 
-            const patternElement = this.complexElement.getElementsByTagName('patterns')[0];
+        }
+
+        if (complexElement) {
+            const defaultTypeElement = complexElement.getElementsByTagName('defaultType')[0];
+            if (defaultTypeElement) this.defaultType = defaultTypeElement.getAttribute('name') as OptionType || 'Optional';
+
+            const patternElement = complexElement.getElementsByTagName('patterns')[0];
             for (const dependency of patternElement?.children || [])
                 this.dependencies.push(new OptionTypeDescriptorWithDependency(dependency));
         }
@@ -322,24 +346,35 @@ export class OptionTypeDescriptor extends FOMODElementProxy {
     override asModuleXML(document: XMLDocument): Element {
         this.instanceElement ??= document.createElement('typeDescriptor');
 
-        if (this.dependencies.length == 0) {
-            this.complexElement?.remove();
+        let basicElement = this.instanceElement.getElementsByTagName('type')[0];
+        let complexElement = this.instanceElement.getElementsByTagName('dependencyType')[0];
 
-            this.basicElement ??= this.instanceElement.appendChild(document.createElement('type'));
-            this.basicElement.setAttribute('name', this.default);
+
+        if (this.dependencies.length == 0) {
+            complexElement?.remove();
+
+            basicElement = this.instanceElement.getOrCreateChildByTag('type');
+            this.instanceElement.appendChild(basicElement);
+
+            basicElement.setAttribute('name', this.defaultType);
 
             return this.instanceElement;
         }
 
-        this.basicElement?.remove();
-        this.complexElement ??= this.instanceElement.appendChild(  document.createElement('dependencyType'))  ;
 
-        const complexTypeElement = this.complexElement.getOrCreateChildByTag('defaultType');
-        complexTypeElement.setAttribute('default', this.default);
+        basicElement?.remove();
 
-        const complexPatternElement = this.complexElement.getOrCreateChildByTag('patterns');
+        complexElement = this.instanceElement.getOrCreateChildByTag('dependencyType')  ;
+        this.instanceElement.appendChild(complexElement);
+
+        const complexTypeElement = complexElement.getOrCreateChildByTag('defaultType');
+        complexTypeElement.setAttribute('default', this.defaultType);
+        complexElement.appendChild(complexTypeElement);
+
+        const complexPatternElement = complexElement.getOrCreateChildByTag('patterns');
         for (const dependency of this.dependencies)
             complexPatternElement.appendChild(  dependency.asModuleXML(document) );
+        complexElement.appendChild(complexPatternElement);
 
         return this.instanceElement;
     }
@@ -385,47 +420,58 @@ export class OptionTypeDescriptorWithDependency extends FOMODElementProxy {
 \_______|\__|  \__|\_______/    \____/  \_______|\__|\__|\______*/
 
 
+export const installs = new Set<Install>();
 
 export class Install extends FOMODElementProxy {
-    static paths: string[][] = [];
+    private _source: string[] = [];
+    set source(value: string[]) { this._source = value; this.updateObjects(); } get source(): string[] { return this._source; }
 
-    private _path!: string[];
-    set path(value: string[]) { this._path = value; this.updateObjects(); } get path(): string[] { return this._path; }
+    private _destination: string[] = [];
+    set destination(value: string[]) { this._destination = value; this.updateObjects(); } get destination(): string[] { return this._destination; }
+
+    dependencies: DependencyGroup|null = null;
+
+    private _priority: number = 0;
+    set priority(value: number) { this._priority = value; this.updateObjects(); } get priority(): number { return this._priority; }
 
     async updateFile(pathOrFile: string|string[] | FileSystemHandle): Promise<void> {
 
-        if (typeof pathOrFile === 'string') {
-            const filePath: string[] = pathOrFile.split('/');
-            Install.paths.push(filePath);
-            this.path = filePath;
-        }
+        if (pathOrFile instanceof FileSystemHandle)
+        pathOrFile = await window.FOMODBuilder.directory?.handle.resolve(pathOrFile) ?? '';
 
-        else if (pathOrFile instanceof FileSystemHandle) {
-            pathOrFile = await window.FOMODBuilder.directory?.handle.resolve(pathOrFile) ?? '';
-        }
+        if (typeof pathOrFile === 'string')
+            pathOrFile = pathOrFile.split('/');
 
-        if (pathOrFile instanceof Array) {
-            Install.paths.push(pathOrFile);
-            this.path = pathOrFile;
-            return;
-        }
+        if ( !(pathOrFile instanceof Array) ) throw new Error('Could not resolve path - most likely outside of the root directory');
 
-        throw new Error('Could not resolve path - most likely outside of the root directory');
+        this.source = pathOrFile;
     }
 
-    constructor(
-        element: Element,
-        file: string | string[] | FileSystemFileHandle = ['']
-    ) {
-        super(element);
-        this.updateFile(file);
+    /** Can be one of the following:
+        <file source="123" priority="0" destination="123" installIfUsable="true" alwaysInstall="true" />
+        <folder source="123" priority="0" destination="123" installIfUsable="true" alwaysInstall="true" />
+    */
+    constructor(instanceElement?: Element, dependencies?: DependencyGroup) {
+        super(instanceElement);
+
+        installs.add(this);
+
+        this.dependencies = dependencies ?? null;
+
+        if (!instanceElement) return;
+
+        this.source = instanceElement.getAttribute('source')?.split(/[/\\]/) ?? [];
+        this.destination = instanceElement.getAttribute('destination')?.split(/[/\\]/) ?? [];
+
+
+
     }
 
     override asModuleXML(document: XMLDocument): Element {
         this.instanceElement ??= document.createElement('install');
 
-        const path = this.path.join('/');
-        const isFolder = this.path[this.path.length - 1] === '';
+        const path = this.source.join('/');
+        const isFolder = this.source[this.source.length - 1] === '';
 
         this.instanceElement.appendChild(
             document.createElement(isFolder ? 'folder' : 'file')
@@ -455,7 +501,7 @@ export type SortOrder =
     | 'Explicit';  // Explicit order
 
 export class Step extends FOMODElementProxy {
-    inherited: InheritedFOMODData;
+    inherited: InheritedFOMODData<Step>;
 
     private _name = '';
     set name(value: string) { this._name = value; this.updateObjects(); } get name(): string { return this._name; }
@@ -463,36 +509,38 @@ export class Step extends FOMODElementProxy {
     private _sortingOrder: SortOrder = window.FOMODBuilder.storage.settings.defaultSortingOrder;
     set sortingOrder(value: SortOrder) { this._sortingOrder = value; this.updateObjects(); } get sortingOrder(): SortOrder { return this._sortingOrder; }
 
-    private _groups: Group[] = [];
-    set groups(value: Group[]) { this._groups = value; this.updateObjects(); } get groups(): Group[] { return this._groups; }
+    groups: Set<Group>;
 
     groupsContainers: Record<string, HTMLDivElement> = {};
 
     conditions: DependencyGroup | undefined;
 
     addGroup(xmlElement?: ConstructorParameters<typeof Group>[1], symbol?: symbol) {
-        this.groups.push(new Group({
+        this.groups.add(new Group({
             base: this.inherited.base,
             containers: this.groupsContainers,
-            tree: this.inherited.tree,
-            treeKeys: [...this.inherited.treeKeys, symbol ?? Symbol()]
+            parent: this,
         }, xmlElement));
-        this.inherited.base?.updateObjects() || this.updateObjects();
+        this.inherited.base?.updateObjects();
+        this.inherited.parent?.updateObjects();
+        this.updateObjects();
     }
     readonly addGroup_bound = this.addGroup.bind(this);
 
+    protected override destroy_() {
+        if (this.inherited.parent && this.inherited.parent.steps.size == 1) return false;
 
-    constructor(inherited: InheritedFOMODData, instanceElement?: Element | undefined) {
+        this.inherited.parent?.steps.delete(this);
+        super.destroy_();
+
+        return true;
+    }
+
+
+    constructor(inherited: InheritedFOMODData<Step>, instanceElement?: Element | undefined) {
         super(instanceElement);
         this.inherited = inherited;
-
-        if (inherited.tree && inherited.treeKeys[0])
-            inherited.tree.steps[inherited.treeKeys[0]] = {
-                step: this,
-                groups: {}
-            };
-
-
+        this.groups = new Set();
 
         if (this.instanceElement) {
             this.name = this.instanceElement.getAttribute('name') ?? '';
@@ -506,7 +554,7 @@ export class Step extends FOMODElementProxy {
             }
         }
 
-        if (this.groups.length == 0) this.addGroup();
+        if (this.groups.size == 0) this.addGroup();
     }
 
     // <installStep name="THE FIRST OF MANY STEPS">
@@ -539,7 +587,7 @@ export type GroupSelectType =
     | 'SelectAtLeastOne'    // Requires users to select at least one option
     | 'SelectExactlyOne';   // Requires users to select exactly one option
 export class Group extends FOMODElementProxy {
-    inherited: InheritedFOMODData;
+    inherited: InheritedFOMODData<Group>;
 
     private _name = '';
     set name(value: string) { this._name = value; this.updateObjects(); } get name(): string { return this._name; }
@@ -550,33 +598,31 @@ export class Group extends FOMODElementProxy {
     private _sortingOrder: SortOrder = window.FOMODBuilder.storage.settings.defaultSortingOrder;
     set sortingOrder(value: SortOrder) { this._sortingOrder = value; this.updateObjects(); } get sortingOrder(): SortOrder { return this._sortingOrder; }
 
-    private _options: Option[] = [];
-    set options(value: Option[]) { this._options = value; this.updateObjects(); } get options(): Option[] { return this._options; }
+    options: Set<Option>;
 
     optionsContainers: Record<string, HTMLDivElement> = {};
 
     addOption(xmlElement?: ConstructorParameters<typeof Option>[1], symbol?: symbol) {
-        this.options.push(new Option({
+        this.options.add(new Option({
             base: this.inherited.base,
             containers: this.optionsContainers,
-            tree: this.inherited.tree,
-            treeKeys: [...this.inherited.treeKeys, symbol ?? Symbol()]
+            parent: this,
         }, xmlElement));
-        this.inherited.base?.updateObjects() || this.updateObjects();
+        this.inherited.base?.updateObjects();
+        this.inherited.parent?.updateObjects();
+        this.updateObjects();
     }
     readonly addOption_bound = this.addOption.bind(this);
 
-    constructor(inherited: InheritedFOMODData, instanceElement?: Element | undefined) {
+    protected override destroy_(): void {
+        this.inherited.parent?.groups.delete(this);
+        super.destroy_();
+    }
+
+    constructor(inherited: InheritedFOMODData<Group>, instanceElement?: Element | undefined) {
         super(instanceElement);
         this.inherited = inherited;
-
-        if (inherited.tree && inherited.treeKeys[0] && inherited.tree.steps[inherited.treeKeys[0]] && inherited.treeKeys[1])
-            inherited.tree.steps[inherited.treeKeys[0]]!.groups[inherited.treeKeys[1]] = {
-                group: this,
-                options: {}
-            };
-
-
+        this.options = new Set();
 
         if (this.instanceElement) {
             this.name = this.instanceElement.getAttribute('name') ?? '';
@@ -592,7 +638,7 @@ export class Group extends FOMODElementProxy {
             }
         }
 
-        if (this.options.length == 0) this.addOption();
+        if (this.options.size == 0) this.addOption();
     }
 
     // <group name="Banana Types" type="SelectAny">
@@ -604,20 +650,24 @@ export class Group extends FOMODElementProxy {
         this.instanceElement.setAttribute('name', this.name);
         this.instanceElement.setAttribute('type', this.type);
 
-        if (this.options.length > 0) {
-        const options = this.instanceElement.getOrCreateChildByTag('plugins');
-        options.setAttribute('order', this.sortingOrder);
+        if (this.options.size > 0) {
+            const options = this.instanceElement.getOrCreateChildByTag('plugins');
+            options.setAttribute('order', this.sortingOrder);
 
-        for (const option of this.options) options.appendChild(option.asModuleXML(document));
-    } else
-        this.instanceElement.removeChildByTag('plugins');
+            for (const option of this.options) options.appendChild(option.asModuleXML(document));
+        } else
+            this.instanceElement.removeChildByTag('plugins');
 
         return this.instanceElement;
     }
 }
 
 export class Option extends FOMODElementProxy {
-    inherited: InheritedFOMODData;
+    inherited: InheritedFOMODData<Option>;
+    protected override destroy_(): void {
+        this.inherited.parent?.options.delete(this);
+        super.destroy_();
+    }
 
     private _name = '';
     set name(value: string) { this._name = value; this.updateObjects(); } get name(): string { return this._name; }
@@ -637,12 +687,9 @@ export class Option extends FOMODElementProxy {
     private _typeDescriptor!: OptionTypeDescriptor;
     set typeDescriptor(value: OptionTypeDescriptor) { this._typeDescriptor = value; this.updateObjects(); } get typeDescriptor(): OptionTypeDescriptor { return this._typeDescriptor; }
 
-    constructor(inherited: InheritedFOMODData, instanceElement?: Element | undefined) {
+    constructor(inherited: InheritedFOMODData<Option>, instanceElement?: Element | undefined) {
         super(instanceElement);
         this.inherited = inherited;
-
-        if (inherited.tree && inherited.treeKeys[0] && inherited.treeKeys[1] && inherited.treeKeys[2] && inherited.tree.steps[inherited.treeKeys[0]]?.groups[inherited.treeKeys[1]])
-            inherited.tree.steps[inherited.treeKeys[0]]!.groups[inherited.treeKeys[1]]!.options[inherited.treeKeys[2]] = this;
 
         const typeDescriptor: Element|undefined = this.instanceElement?.getElementsByTagName('typeDescriptor')[0];
         this.typeDescriptor = new OptionTypeDescriptor(typeDescriptor);
@@ -657,7 +704,7 @@ export class Option extends FOMODElementProxy {
             this.conditionFlags.push(new DependencyFlag('flag', flag));
 
         for (const file of this.instanceElement.getElementsByTagName('file') ?? [])
-            this.files.push(new DependencyFile(file));
+            {}// this.files.push(new FomodFile(file));
     }
 
     override asModuleXML(document: XMLDocument): Element {
@@ -765,23 +812,17 @@ export class Fomod extends FOMODElementProxy {
     installs: Install[];
 
     conditions: DependencyGroup | undefined;
-    steps: Step[];
+    steps: Set<Step>;
 
     sortingOrder: SortOrder = window.FOMODBuilder.storage.settings.defaultSortingOrder;
-
-    tree: FomodTree;
-    treeKey: [] = [];
-    private _parent = null;
-    get parent(): null { return this._parent; }
 
     stepsContainers: Record<string, HTMLDivElement> = {};
 
     addStep(xmlElement?: ConstructorParameters<typeof Step>[1], symbol?: symbol) {
-        this.steps.push(new Step({
+        this.steps.add(new Step({
             base: this,
             containers: this.stepsContainers,
-            tree: this.tree,
-            treeKeys: [...this.treeKey, symbol ?? Symbol()]
+            parent: this,
         }, xmlElement));
         this.updateObjects();
     }
@@ -792,10 +833,6 @@ export class Fomod extends FOMODElementProxy {
         infoInstanceElement?: Element,
     ) {
         super(instanceElement);
-        this.tree = {
-            fomod: this,
-            steps: {}
-        };
         this.infoInstanceElement = infoInstanceElement;
 
         this.metaName =    infoInstanceElement?.getElementsByTagName('Name')           [0]?.textContent                        ?? '';
@@ -813,9 +850,9 @@ export class Fomod extends FOMODElementProxy {
         const stepsElem = instanceElement?.getElementsByTagName('installSteps')[0];
         this.sortingOrder =         null || stepsElem?.getAttribute('order') as SortOrder || 'Explicit';
 
-        this.steps = [];
+        this.steps = new Set();
         for (const step of (stepsElem?.children ?? [])) this.addStep(step);
-        if (this.steps.length == 0) this.addStep();
+        if (this.steps.size == 0) this.addStep();
 
         const conditionalInstallsElem = instanceElement?.getElementsByTagName('conditionalFileInstalls')[0];
         const requiredInstallsElem = instanceElement?.getElementsByTagName('requiredInstallFiles')[0];
@@ -865,7 +902,7 @@ export class Fomod extends FOMODElementProxy {
         if (requiredInstallFiles.children.length) this.instanceElement.appendChild(requiredInstallFiles);
         else                                      this.instanceElement.removeChildByTag('requiredInstallFiles');
 
-        if (this.steps.length) {
+        if (this.steps.size > 0) {
             const stepsContainer = this.instanceElement.getOrCreateChildByTag('installSteps');
             stepsContainer.setAttribute('order', this.sortingOrder);
 
@@ -918,40 +955,4 @@ export class Fomod extends FOMODElementProxy {
 
         return this.infoInstanceElement;
     }
-}
-
-interface GroupTree {
-    group: Group,
-    options: {
-        [key: symbol]: Option,
-    }
-}
-
-interface StepTree {
-    step: Step,
-    groups: {
-        [key: symbol]: GroupTree
-    }
-}
-
-interface FomodTree {
-    fomod: Fomod,
-    steps: {
-        [key: symbol]: StepTree
-    }
-}
-
-function traverseTree<TTree extends Option|GroupTree|StepTree|FomodTree, TSymbolArr extends symbol[]>(tree: TTree | undefined, symbols: TSymbolArr): TTree | undefined | Exclude< Exclude< Exclude< TSymbolArr extends [symbol, symbol, symbol] ? Option : ( TSymbolArr extends [symbol, symbol] ? GroupTree | Option : ( TSymbolArr extends [symbol] ? StepTree | GroupTree | Option : StepTree | GroupTree | Option | TTree ) ), TTree extends Option ? Option|StepTree | GroupTree | FomodTree : never >, TTree extends GroupTree ? GroupTree|StepTree|FomodTree : never >, TTree extends StepTree ? StepTree|FomodTree : never > {
-    if (!tree || symbols.length == 0) return tree;
-
-    if (tree instanceof Option) {
-        console.warn('Option found in tree, but symbols remain');
-        return tree;
-    }
-
-    const [symbol, ...rest] = symbols;
-    if ('steps' in tree) return traverseTree(tree.steps[symbol!], rest) as ReturnType<typeof traverseTree<TTree, TSymbolArr>>;
-    if ('groups' in tree) return traverseTree(tree.groups[symbol!], rest) as ReturnType<typeof traverseTree<TTree, TSymbolArr>>;
-    if ('options' in tree) return traverseTree(tree.options[symbol!], rest) as ReturnType<typeof traverseTree<TTree, TSymbolArr>>;
-    throw new Error('Invalid tree!');
 }

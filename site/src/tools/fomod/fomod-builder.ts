@@ -137,8 +137,6 @@ window.FOMODBuilder = {
         cleanSave: fomodUI.cleanSave,
         attemptRepair: () => {},
         setStepEditorType: fomodUI.setStepEditorType,
-        openTypeConditions: () => {},
-        openConditions: () => {},
     },
 
     // Retrieves the browser storage entry if available, otherwise uses the defaults.
@@ -210,7 +208,7 @@ export function getNoSupportModal(): bcdUniversal.BCDModalDialog|null {
 
     }
 
-    noSupportModal = noSupportModal_elem.upgrades_proto?.modalDialog ?? null;
+    noSupportModal = noSupportModal_elem.upgrades?.getExtends(bcdUniversal.BCDModalDialog)?.[0] ?? null;
     return noSupportModal;
 }
 

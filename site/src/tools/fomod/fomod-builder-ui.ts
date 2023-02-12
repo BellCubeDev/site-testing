@@ -135,18 +135,17 @@ export interface WindowUI {
     cleanSave: typeof cleanSave;
     attemptRepair: () => unknown;
     setStepEditorType: typeof setStepEditorType;
-    openTypeConditions: (elem: HTMLElement) => unknown;
-    openConditions: (elem: HTMLElement) => unknown;
 }
 
 
 export type BCDBuilderType = 'builder'|'vortex'|'mo2';
 
+let firstSetEditor = true;
 export function setStepEditorType(type: BCDBuilderType) {
     const thisElem = document.getElementById(`steps-${type}-container`)!;
-    const otherSteps = thisElem.parentElement!.querySelectorAll(`.builderStep:not(#steps-${type}-container).active`)!;
+    const otherSteps = thisElem.parentElement!.querySelectorAll(`.fomod-editor-type:not(#steps-${type}-container)${firstSetEditor ? '' : '.active'}`)!;
 
-    if (thisElem.classList.contains('.active')) return;
+    if (!firstSetEditor && thisElem.classList.contains('.active')) return;
 
     if (type !== 'builder') {
         if (!window.lazyStylesLoaded) thisElem.classList.add('needs-lazy');
@@ -179,11 +178,12 @@ export function setStepEditorType(type: BCDBuilderType) {
         setTimeout(transitionPhaseTwo, 200);
     }
 
+    firstSetEditor = false;
     window.FOMODBuilder.storage.preferences!.stepsBuilder = type;
 }
 
 export async function showOpenAnotherFolderDialog() {
-    const dialog = document.getElementById('opening-other-project-modal')!.upgrades_proto!.modalDialog!;
+    const dialog = document.getElementById('opening-other-project-modal')!.upgrades!.getExtends(bcdUniversal.BCDModalDialog)[0]!;
     const result = await dialog.show();
     if (result !== 'confirm') {
         console.debug(`User cancelled opening another folder with response "${result}"`);

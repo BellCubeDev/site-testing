@@ -72,28 +72,31 @@
     }
 }
 
+.mdl-button--fab:first-child + .js-bcd-summary {
+    padding-top: 0;
+}
+
 .js-bcd-details {
     overflow: hidden;
     outline: none;
 
     > :not(.js-bcd-details-inner) { display: none; }
 
-    &.is-open > .js-bcd-details-inner { transition-timing-function: cubic-bezier(0, 0.3, 0.8, 1); }
     > .js-bcd-details-inner {
         transition-property: height, margin-top;
 
-        transition-timing-function: cubic-bezier(0.15, 0, 0.2, 1.15);
-
-        margin-top: -9999vh;
+        transition-timing-function: cubic-bezier(0.7, 0.8, 0.5, 0.8);
+        @media (prefers-reduced-motion: reduce) { transition-duration: 0s !important; }
 
         height: max-content;
-
         outline: none;
 
-        /* Defaults (overridden by universal.ts) */
-        animation-duration: 0ms;
-        transition-duration: 0ms;
+        // overridden by universal.ts
+        transition-duration: 1s;
+        margin-top: -9999vh;
     }
+
+    &.is-open > .js-bcd-details-inner { transition-timing-function: cubic-bezier(0, 0.3, 0.8, 1); }
 
     &.contPad01-left > .js-bcd-details-inner {
         padding-left: 12px;

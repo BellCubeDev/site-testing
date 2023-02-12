@@ -32,6 +32,18 @@ redirect_from:
     </div>
 </template>
 
+<!-- TODO: https://fontawesome.com/icons/trash-can?s=solid&f=classic -->
+
+<template id="builder-main-steps-delete-button">
+    <button disabled
+        class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect builder-steps-remove-btn"
+        style='width:32px;min-width:32px;height:32px;'>
+            <i class="material-icons" style="font-size:75%;font-variation-settings:'FILL' 0,">
+                delete
+            </i>
+    </button>
+</template>
+
 <template id="builder-main-steps-step">
     <div class="builder-steps-step">
 
@@ -57,14 +69,14 @@ redirect_from:
                     <menu class="bcd-dropdown-sorting-order mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
                 </div>
 
-                <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+                <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn">
                     Edit Visibility Conditions
                 </button>
             </div>
 
             <div class="builder-steps-group-container"></div>
 
-            <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-add-child-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+            <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-add-child-btn">
                 Add Group
             </button>
 
@@ -106,7 +118,7 @@ redirect_from:
 
             <div class="builder-steps-option-container"></div>
 
-            <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-add-child-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+            <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-add-child-btn">
                 Add Option
             </button>
 
@@ -153,7 +165,7 @@ redirect_from:
                 </div>
 
                 <div class="item-with-fake-label"><h4>Selection Type Conditions</h4>
-                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn">
                         Edit
                     </button>
                 </div>
@@ -373,7 +385,7 @@ redirect_from:
 
 
 
-        <div id="steps-builder-container" class="builderStep">
+        <div id="steps-builder-container" class="fomod-editor-type">
             <div>
 
                 <!-- Left Column -->
@@ -391,7 +403,7 @@ redirect_from:
                     </div>
 
                     <!-- FOMOD Conditions -->
-                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+                    <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn">
                         Edit Visibility Conditions
                     </button>
                 </div>
@@ -410,7 +422,7 @@ redirect_from:
             <!-- Steps Container -->
             <div class="builder-steps-steps-container"></div>
 
-            <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-add-child-btn" onclick="window.FOMODBuilder.ui.openConditions(this)">
+            <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-add-child-btn">
                 Add Step
             </button>
         </div>
@@ -421,7 +433,7 @@ redirect_from:
 
 
 
-        <div id="steps-vortex-container" class="builderStep js-vortex-steps">
+        <div id="steps-vortex-container" class="fomod-editor-type js-vortex-steps">
             <div id="vortex-steps-header">
                 <input class="bcd-vortex-input vortex-steps-title vortex-fake-header h4 js-dynamic-textarea-width" paddingPX=20 placeholder="Mod Name" value="Retexture for The Scroll" />
                 <br /><input class="bcd-vortex-input vortex-modal-subtitle js-dynamic-textarea-width" paddingPX=20 placeholder="Step Name" value="Choose Version (1/2)" />
@@ -588,7 +600,7 @@ redirect_from:
 
 
 
-        <div id="steps-mo2-container" class="builderStep needs-lazy"></div>
+        <div id="steps-mo2-container" class="fomod-editor-type needs-lazy"></div>
 
 
 

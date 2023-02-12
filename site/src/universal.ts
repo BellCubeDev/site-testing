@@ -347,18 +347,10 @@ interface DocAndElementInjections {
     removeChildByTag(tagName: string, count?: number): void;
 }
 
-interface PrototypedUpgrades {
-    tooltip: BCDTooltip;
-    dropdown: BCDDropdown;
-    modalDialog: BCDModalDialog;
-}
-
 declare global {
     interface Element extends DocAndElementInjections {
-        upgrades?: Record<string, InstanceType<BCDComponentI>>;
-        upgrades_proto?: Partial<PrototypedUpgrades>
-        targetingComponents?: Record<string, InstanceType<BCDComponentI>>;
-        targetingComponents_proto?: Partial<PrototypedUpgrades>
+        upgrades?: BCDComponentMap;
+        targetingComponents?: BCDComponentMap;
     }
     interface Document extends DocAndElementInjections {}
 
@@ -395,53 +387,36 @@ declare global {
     }
 }
 
+function ___getExtends<K extends abstract new (...args: any[]) => unknown>(this: BCDComponentMap, type: K) {
+    const returnVal:InstanceType<K>[] = [];
+    for (const [,value] of this) if (value instanceof type) returnVal.push(value as InstanceType<K>);
+    return returnVal;
+}
+
 function registerUpgrade(subject: Element, upgrade: InstanceType<BCDComponentI>, target?: Element|null, propagateToTargetChildren = false, propagateToSubjectToChildren = false): void {
     //console.log("registerUpgrade", {subject, upgrade, target, propagateToTargetChildren, propagateSubjectToChildren: propagateToSubjectToChildren});
     // Set the upgrade on the subject
     forEachChildAndOrParent(subject, propagateToSubjectToChildren, child => {
         //console.log("registerUpgrade: subject", child);
-        child.upgrades ??= {};
-        child.upgrades[upgrade.constructor.name] = upgrade;
+        if (!child.upgrades) {
+            const map = new Map() as BCDComponentMap;
+            map.getExtends = ___getExtends;
+            child.upgrades = map;
+        }
+
+        child.upgrades.set(upgrade.constructor, upgrade);
     });
 
     // Repeat for target
     if (target) forEachChildAndOrParent(target, propagateToTargetChildren, child => {
-        child.targetingComponents ??= {};
-        child.targetingComponents[upgrade.constructor.name] = upgrade;
+        if (!child.targetingComponents) {
+            const map = new Map() as BCDComponentMap;
+            map.getExtends = ___getExtends;
+            child.targetingComponents = map;
+        }
+
+        child.targetingComponents.set(upgrade.constructor, upgrade);
     });
-
-    if (upgrade instanceof BCDTooltip) {
-        forEachChildAndOrParent(subject, propagateToSubjectToChildren, child => {
-            if (!child.upgrades_proto) child.upgrades_proto = {};
-            child.upgrades_proto!.tooltip = upgrade;
-        });
-        if (target) forEachChildAndOrParent(target, propagateToTargetChildren, child => {
-            if (!child.targetingComponents_proto) child.targetingComponents_proto = {};
-            child.targetingComponents_proto!.tooltip = upgrade;
-        });
-    }
-
-    if (upgrade instanceof BCDDropdown) {
-        forEachChildAndOrParent(subject, propagateToSubjectToChildren, child => {
-            if (!child.upgrades_proto) child.upgrades_proto = {};
-            child.upgrades_proto!.dropdown = upgrade;
-        });
-        if (target) forEachChildAndOrParent(target, propagateToTargetChildren, child => {
-            if (!child.targetingComponents_proto) child.targetingComponents_proto = {};
-            child.targetingComponents_proto!.dropdown = upgrade;
-        });
-    }
-
-    if (upgrade instanceof BCDModalDialog) {
-        forEachChildAndOrParent(subject, propagateToSubjectToChildren, child => {
-            if (!child.upgrades_proto) child.upgrades_proto = {};
-            child.upgrades_proto!.modalDialog = upgrade;
-        });
-        if (target) forEachChildAndOrParent(target, propagateToTargetChildren, child => {
-            if (!child.targetingComponents_proto) child.targetingComponents_proto = {};
-            child.targetingComponents_proto!.modalDialog = upgrade;
-        });
-    }
 }
 
 function forEachChildAndOrParent(start: Element, doChildren: boolean, callback: (child: Element) => unknown): void {
@@ -482,6 +457,16 @@ interface BCDComponentI extends Function {
     readonly asString: string;
     readonly cssClass: string;
 }
+
+// Create a map that guarantee an instance of the key
+type BCDComponentMap = Map<BCDComponentI, InstanceType<BCDComponentI>> & {
+    get<K extends BCDComponentI>(key: K): InstanceType<K>|undefined;
+    set<K extends BCDComponentI>(key: K, value: InstanceType<K>): BCDComponentMap;
+
+    /** Fetches all classes that extend the specified class */
+    getExtends<K extends abstract new(...args:any[])=>unknown>(key: K): InstanceType<K>[];
+}
+
 
 /** Variable to store components that we'll be registering on DOM initialization */
 const bcdComponents:BCDComponentI[] = [];
@@ -574,7 +559,7 @@ $$ |  $$\ $$ |  $$ |$$ |$$ |$$  __$$ |$$ |  $$ | \____$$\ $$ |$$ |  $$ |$$ |$$  
 
 
 
-abstract class BCD_CollapsibleParent {
+export abstract class BCD_CollapsibleParent {
     // For children to set
     details!:HTMLElement;
     details_inner!:HTMLElement;
@@ -606,21 +591,44 @@ abstract class BCD_CollapsibleParent {
             requestAnimationFrame(() => {
                 if (this.isOpen()) this.open(doSetDuration, instant);
                 else this.close(doSetDuration, instant);
-
-                this.onTransitionEnd();
             }
         );
     }
 
+    stateChangePromise(desiredState?:boolean):Promise<void>{
+
+        if ((desiredState !== undefined && this.isOpen() === desiredState)
+            || getComputedStyle(this.details_inner).transitionDuration === '0s') {
+                return new Promise((resolve) => requestAnimationFrame(()=>{   this.onTransitionEnd(); resolve();  }) );
+        }
+
+        const transitionEndFunct = this.onTransitionEnd.bind(this);
+
+        return new Promise<void>((resolve) => {
+            function listener(event: TransitionEvent) {
+                if (event.propertyName !== 'margin-top') return;
+                removeListener();
+                transitionEndFunct(event);
+                resolve();
+            }
+
+            this.details_inner.addEventListener('transitionend', listener);
+
+            // Implemented as a separate function because it "avoids" a cyclic reference.
+            const details_inner = this.details_inner;
+            function removeListener(){ details_inner.removeEventListener('transitionend', listener); }
+        });
+    }
+
     /** Open the collapsible menu content */
     open(doSetDuration = true, instant = false) {//this.debugCheck();
+        const returnVal = this.stateChangePromise(true);
 
-        if (instant) this.instantTransition();
-        else if (doSetDuration) this.evaluateDuration(doSetDuration);
+        if (!instant) this.evaluateDuration(doSetDuration);
 
-        this.details_inner.setAttribute('disabled', 'true');
         this.details_inner.ariaHidden = 'false';
         this.details_inner.style.visibility = 'visible';
+        BCD_CollapsibleParent.setDisabled(this.details_inner, true);
 
         this.details.classList.add(strs.classIsOpen);
         this.summary.classList.add(strs.classIsOpen);
@@ -634,23 +642,44 @@ abstract class BCD_CollapsibleParent {
             );
 
         });
+
+        if (instant) return this.instantTransition();
+
+        return returnVal;
     }
 
+    hasClosedFinal = false;
     /** Close the collapsible content */
-    close(doSetDuration:boolean = true, instant = false) {//this.debugCheck();
+    close(doSetDuration:boolean = true, instant = false, final = false, duration?: number) {
+        //console.log(`Closing collapsible - doSetDuration: ${doSetDuration}, instant: ${instant}, final: ${final}, duration: ${duration}`);
 
-        if (instant) this.instantTransition();
-        else if (doSetDuration) this.evaluateDuration(doSetDuration, false);
+        if (this.hasClosedFinal) return;
 
+        if (final){
+            this.summary.upgrades!.getExtends(BCD_CollapsibleParent)[0]!.hasClosedFinal = true;
+            this.details.upgrades!.getExtends(BCD_CollapsibleParent)[0]!.hasClosedFinal = true;
+        }
+
+        if (duration === undefined) this.evaluateDuration(doSetDuration, false);
+        else this.details_inner.style.transitionDuration = `${duration}ms`;
+
+        const returnVal = this.stateChangePromise(false);
+
+        // Registers for the event twice because the event appears to fire twice, at least in Chromium browsers.
         this.details_inner.style.marginTop = `-${this.details_inner.offsetHeight + 32}px`;
 
         this.details.classList.remove(strs.classIsOpen);
         this.summary.classList.remove(strs.classIsOpen);
         BCD_CollapsibleParent.setDisabled(this.details_inner, true);
 
-        if (instant) nestAnimationFrames(2, () => {
-            this.evaluateDuration(doSetDuration, false);
-        });
+        if (instant) {
+            nestAnimationFrames(2, () => this.evaluateDuration(doSetDuration, false) );
+            return this.instantTransition();
+        }
+
+        if (final) this.summary.style.pointerEvents = 'none';
+
+        return returnVal;
     }
 
     onTransitionEnd(event?:TransitionEvent):void {
@@ -668,7 +697,7 @@ abstract class BCD_CollapsibleParent {
         });
     }
 
-    instantTransition():void {
+    instantTransition(): Promise<void> {
         if (this.details_inner) {
             this.details_inner.style.transitionDuration = `0s`;
             this.details_inner.style.animationDuration = `0s`;
@@ -677,6 +706,7 @@ abstract class BCD_CollapsibleParent {
             }
         }
         this.onTransitionEnd();
+        return new Promise((r) => r());
     }
 
     static setDisabled(elm:Element, disabled:boolean):void {
@@ -712,7 +742,7 @@ abstract class BCD_CollapsibleParent {
     evaluateDuration(doRun:boolean = true, opening:boolean=true) {//this.debugCheck();
         if (doRun && this.details_inner) {
             const contentHeight = this.details_inner.offsetHeight;
-            this.details_inner.style.transitionDuration = `${(opening ? 250 : 500) + ((opening ? 0.2 : 0.5) * (contentHeight + 32))}ms`;
+            this.details_inner.style.transitionDuration = `${(opening ? 250 : 300) + ((opening ? 0.3 : 0.35) * (contentHeight + 32))}ms`;
             for (const icon of this.openIcons90deg) {
                 (icon as HTMLElement).style.transitionDuration = `${ 250 + (0.15 * (contentHeight + 32)) }ms`;
             }
@@ -720,7 +750,7 @@ abstract class BCD_CollapsibleParent {
     }
 }
 
-export class BellCubicDetails extends BCD_CollapsibleParent {
+export class BCDDetails extends BCD_CollapsibleParent {
     static readonly cssClass = "js-bcd-details";
     static readonly asString = "BellCubicDetails";
 
@@ -748,7 +778,7 @@ export class BellCubicDetails extends BCD_CollapsibleParent {
 
         if (this.adjacent) {
             const temp_summary = this.self.previousElementSibling;
-            if (!temp_summary || !temp_summary.classList.contains(BellCubicSummary.cssClass)) /* Throw an error*/ {console.log(strs.errItem, this); throw new TypeError("[BCD-DETAILS] Error: Adjacent Details element must be preceded by a Summary element.");}
+            if (!temp_summary || !temp_summary.classList.contains(BCDSummary.cssClass)) /* Throw an error*/ {console.log(strs.errItem, this); throw new TypeError("[BCD-DETAILS] Error: Adjacent Details element must be preceded by a Summary element.");}
             this.summary = temp_summary as HTMLElement;
         } else {
             const temp_summary = this.self.ownerDocument.querySelector(`.js-bcd-summary[for="${this.details.id}"`);
@@ -758,22 +788,20 @@ export class BellCubicDetails extends BCD_CollapsibleParent {
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
         new ResizeObserver(this.reEvalOnSizeChange.bind(this)).observe(this.details_inner);
 
-        this.details_inner.addEventListener('transitionend', this.onTransitionEnd.bind(this));
-
-        bcd_ComponentTracker.registerComponent(this, BellCubicDetails, this.details);
+        bcd_ComponentTracker.registerComponent(this, BCDDetails, this.details);
         this.reEval(true, true);
         this.self.classList.add('initialized');
 
         registerUpgrade(this.self, this, this.summary, true);
     }
 
-    reEvalOnSizeChange(event: unknown) {
-        this.reEval(true, true);
+    reEvalOnSizeChange(entries: ResizeObserverEntry[], observer: ResizeObserver) {
+        if (!this.isOpen()) this.reEval(true, true);
     }
 }
-bcdComponents.push(BellCubicDetails);
+bcdComponents.push(BCDDetails);
 
-export class BellCubicSummary extends BCD_CollapsibleParent {
+export class BCDSummary extends BCD_CollapsibleParent {
     static readonly cssClass = 'js-bcd-summary';
     static readonly asString = 'BellCubicSummary';
 
@@ -785,7 +813,7 @@ export class BellCubicSummary extends BCD_CollapsibleParent {
 
         if (this.adjacent) {
             const temp_details = this.self.nextElementSibling;
-            if (!(temp_details && temp_details.classList.contains(BellCubicDetails.cssClass))) /* Throw an error*/ {console.log(strs.errItem, this); throw new TypeError("[BCD-SUMMARY] Error: Adjacent Summary element must be proceeded by a Details element.");}
+            if (!(temp_details && temp_details.classList.contains(BCDDetails.cssClass))) /* Throw an error*/ {console.log(strs.errItem, this); throw new TypeError("[BCD-SUMMARY] Error: Adjacent Summary element must be proceeded by a Details element.");}
             this.details = temp_details as HTMLElement;
         } else {
             const temp_details = this.self.ownerDocument.getElementById(this.summary.getAttribute('for') ?? '');
@@ -804,7 +832,7 @@ export class BellCubicSummary extends BCD_CollapsibleParent {
         if (!temp_inner) {this.divertedCompletion(); return;}
             else this.details_inner = temp_inner as HTMLElement;
 
-        bcd_ComponentTracker.registerComponent(this, BellCubicSummary, this.details);
+        bcd_ComponentTracker.registerComponent(this, BCDSummary, this.details);
         this.reEval(true, true);
         this.self.classList.add('initialized');
     });}
@@ -832,7 +860,7 @@ export class BellCubicSummary extends BCD_CollapsibleParent {
         this.correctFocus(event instanceof KeyboardEvent);
     }
 }
-bcdComponents.push(BellCubicSummary);
+bcdComponents.push(BCDSummary);
 
 /** Simple MDL Class to handle making JSON pretty again
     Takes the innerText of the element and parses it as JSON, then re-serializes it with 2 spaces per indent.
@@ -1220,7 +1248,7 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
 
         for (const item of this.optionElements) item.tabIndex = 0;
 
-        this.forElement_?.targetingComponents_proto?.tooltip?.hide();
+        this.forElement_?.targetingComponents?.get(BCDTooltip)?.hide();
 
         super.show(evt);
     }
@@ -1533,10 +1561,13 @@ export class BCDTooltip {
     handleHoverEnter(event?: MouseEvent|FocusEvent, bypassWait?: true) {
         const targetElement = event instanceof MouseEvent ? document.elementFromPoint(event?.x ?? 0, event?.y ?? 0) : event?.target;
 
-        if (targetElement instanceof Element && (
-            targetElement.upgrades_proto?.dropdown
-            || targetElement.targetingComponents_proto?.dropdown?.container_.classList.contains('is-visible')
-        )) return;
+        if (targetElement instanceof Element) {
+            for (const [,instance] of targetElement.upgrades ?? [])
+                if (instance instanceof BCDDropdown) return;
+
+            for (const [,instance] of targetElement.targetingComponents ?? [])
+                if (instance instanceof BCDDropdown && instance.container_.classList.contains('is-visible')) return;
+        }
 
         this.showPart1();
 

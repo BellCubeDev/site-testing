@@ -9,7 +9,7 @@
 
 import * as mainClasses from './fomod-builder-classifications.js';
 import * as mainUI from './fomod-builder-ui.js';
-import { registerForEvents, unregisterForEvents, UpdatableObject } from '../../universal.js';
+import { afterDelay, BCDDropdown, registerForEvents, unregisterForEvents, UpdatableObject, BCDSummary } from '../../universal.js';
 import { updatePluralDisplay } from './fomod-builder-ui.js';
 import { componentHandler } from '../../assets/site/mdl/material.js';
 
@@ -70,7 +70,7 @@ export class Fomod extends UpdatableObject {
     override updateFromInput_() {
         this.name = this.nameInput.value;
         this.image = this.imageInput.value;
-        const dropdownObj = this.sortOrderMenu.upgrades_proto?.dropdown;
+        const dropdownObj = this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0];
         if (dropdownObj) this.sortOrder = mainUI.translateDropdown(dropdownObj.selectedOption) as mainClasses.SortOrder;
     }
 
@@ -80,14 +80,14 @@ export class Fomod extends UpdatableObject {
 
         this.imageInput.value = this.image; this.imageInput.dispatchEvent(new Event('input'));
 
-        this.sortOrderMenu.upgrades_proto?.dropdown?.selectByString(mainUI.translateDropdown(this.sortOrder));
+        this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0]?.selectByString(mainUI.translateDropdown(this.sortOrder));
     }
 
     override destroy_(): void {
         this.suppressUpdates = true;
         this.nameInput.value = '';
         this.imageInput.value = '';
-        this.sortOrderMenu.upgrades_proto?.dropdown?.selectByString(window.FOMODBuilder.storage.settings.defaultSortingOrder);
+        this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0]?.selectByString(window.FOMODBuilder.storage.settings.defaultSortingOrder);
         unregisterForEvents(this.nameInput, this.changeEvtObj);
         unregisterForEvents(this.imageInput, this.changeEvtObj);
         unregisterForEvents(this.sortOrderMenu, this.dropdownEvtObj);
@@ -95,6 +95,52 @@ export class Fomod extends UpdatableObject {
     }
 }
 mainClasses.addUpdateObjects(mainClasses.Fomod, Fomod);
+
+const deleteButtonTemplate = (document.getElementById('builder-main-steps-delete-button') as HTMLTemplateElement).content.firstElementChild as HTMLButtonElement;
+
+async function prefabCardDestroy(card:Step|Group|Option) {
+    const main = card.main;
+
+        const previousElemStyle = (card.main.previousSibling as HTMLElement|null)?.style;
+        if (previousElemStyle) previousElemStyle.zIndex = '1';
+
+        const summary = card.main.querySelector(':scope > .js-bcd-summary')?.upgrades?.get(BCDSummary);
+        if (summary) await summary.close(false, false, true, 500);
+
+        main.classList.add('animating-out');
+        if (getComputedStyle(main).animationName === 'none') return card.main.remove();
+
+        function finalize() {
+            if (previousElemStyle) previousElemStyle.zIndex = '';
+            console.log(summary);
+            main.remove();
+        }
+
+        //afterDelay(400, finalize);
+        main.addEventListener('animationend', finalize, {once: true});
+}
+
+async function prefabCardUpdate(card:Step|Group|Option) {
+    const setWithSelf =
+        card instanceof Step ? card.parent.inherited.parent?.steps
+        : card instanceof Group ? card.parent.inherited.parent?.groups
+        : /*card instanceof Option ?*/ card.parent.inherited.parent?.options;
+
+    requestAnimationFrame(() => {
+        if (setWithSelf?.size === 1) {
+            card.deleteButton.style.opacity = '0.1';
+            card.deleteButton.style.pointerEvents = 'none';
+            card.deleteButton.disabled = true;
+            card.deleteButton.setAttribute('aria-disabled', 'true');
+
+        } else if (card.deleteButton.disabled) {
+            card.deleteButton.style.opacity = '1';
+            card.deleteButton.style.pointerEvents = 'auto';
+            card.deleteButton.disabled = false;
+            card.deleteButton.removeAttribute('aria-disabled');
+        }
+    });
+}
 
 const stepTemplate = (document.getElementById('builder-main-steps-step') as HTMLTemplateElement).content.firstElementChild as HTMLDivElement;
 /** Manages the first-party editor for FOMOD Steps */
@@ -113,6 +159,7 @@ export class Step extends UpdatableObject {
     sortOrderMenu: HTMLMenuElement;
 
     addGroupBtn: HTMLButtonElement;
+    deleteButton: HTMLButtonElement;
 
     constructor (parent: mainClasses.Step) {
         super();
@@ -134,32 +181,61 @@ export class Step extends UpdatableObject {
         this.groupCountDisplay = this.main.querySelector('span.builder-steps-step-group-count')!;
         this.optionCountDisplay = this.main.querySelector('span.builder-steps-step-option-count')!;
 
-        this.parent.inherited.containers?.['1st-party']?.appendChild(this.main);
+        this.deleteButton = deleteButtonTemplate.cloneNode(true) as HTMLButtonElement;
+        this.main.insertBefore(this.deleteButton, this.main.firstElementChild);
+        registerForEvents(this.deleteButton, {activate: parent.destroy.bind(parent)});
 
-        componentHandler.upgradeAllRegistered();
+        const stepContainer = this.parent.inherited.containers?.['1st-party'] as HTMLDivElement;
+        if (!stepContainer) {console.warn('Step container not found!'); return;}
+
+        if (this.main.style.animationName !== 'none'){
+            const previousSibling = stepContainer.lastElementChild instanceof HTMLElement ? stepContainer.lastElementChild : undefined;
+
+            if (previousSibling) {
+                const main = this.main;
+
+                previousSibling.style.zIndex = '1';
+                main.classList.add('animating-in');
+
+                // eslint-disable-next-line func-style -- I only want to init the function within an if statement
+                const removeIndex = function() {
+                    previousSibling.style.zIndex = '';
+                    main.classList.remove('animating-in');
+
+                    main.removeEventListener('animationend', removeIndex);
+                };
+
+                //afterDelay(400, removeIndex);
+                main.addEventListener('animationend', removeIndex, {once: true});
+            }
+        }
+
+        stepContainer.appendChild(this.main);
+
+        componentHandler.upgradeElements(this.main);
     }
 
     override update_() {
         this.nameInput.value = this.name; this.nameInput.dispatchEvent(new Event('input'));
-        this.sortOrderMenu.upgrades_proto?.dropdown?.selectByString(mainUI.translateDropdown(this.sortOrder));
+        this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0]?.selectByString(mainUI.translateDropdown(this.sortOrder));
 
         this.nameDisplay.textContent = this.name;
-        updatePluralDisplay(this.groupCountDisplay, this.parent.groups.length);
-        updatePluralDisplay(this.optionCountDisplay, this.parent.groups.reduce((acc, group) => acc + group.options.length, 0));
+        updatePluralDisplay(this.groupCountDisplay, this.parent.groups.size);
+        updatePluralDisplay(this.optionCountDisplay, [...this.parent.groups].reduce((currentCount, group) => currentCount + group.options.size, 0));
+
+        prefabCardUpdate(this);
     }
 
     override updateFromInput_() {
         this.name = this.nameInput.value;
 
-        const dropdownObj = this.sortOrderMenu.upgrades_proto?.dropdown;
+        const dropdownObj = this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0];
         if (dropdownObj) this.sortOrder = mainUI.translateDropdown(dropdownObj.selectedOption) as mainClasses.SortOrder;
 
         this.nameDisplay.textContent = this.name;
     }
 
-    override destroy_(): void {
-        this.main.remove();
-    }
+    override destroy_() { prefabCardDestroy(this); }
 }
 mainClasses.addUpdateObjects(mainClasses.Step, Step);
 
@@ -183,6 +259,7 @@ export class Group extends UpdatableObject {
     selectionTypeMenu: HTMLMenuElement;
 
     addOptionBtn: HTMLButtonElement;
+    deleteButton: HTMLButtonElement;
 
     constructor (parent: mainClasses.Group) {
         super();
@@ -206,39 +283,68 @@ export class Group extends UpdatableObject {
         this.nameDisplay = this.main.querySelector('span.name')!;
         this.optionCountDisplay = this.main.querySelector('span.builder-steps-group-option-count')!;
 
-        this.parent.inherited.containers?.['1st-party']?.appendChild(this.main);
+        this.deleteButton = deleteButtonTemplate.cloneNode(true) as HTMLButtonElement;
+        this.main.insertBefore(this.deleteButton, this.main.firstElementChild);
+        registerForEvents(this.deleteButton, {activate: parent.destroy.bind(parent)});
 
-        componentHandler.upgradeAllRegistered();
+        const groupContainer = this.parent.inherited.containers?.['1st-party'] as HTMLDivElement;
+        if (!groupContainer) {console.warn('Group container not found!'); return;}
+
+        if (this.main.style.animationName !== 'none'){
+            const previousSibling = groupContainer.lastElementChild instanceof HTMLElement ? groupContainer.lastElementChild : undefined;
+
+            if (previousSibling) {
+                const main = this.main;
+
+                previousSibling.style.zIndex = '1';
+                main.classList.add('animating-in');
+
+                // eslint-disable-next-line func-style, sonarjs/no-identical-functions -- I only want to init the function within an if statement
+                const removeIndex = function() {
+                    previousSibling.style.zIndex = '';
+                    main.classList.remove('animating-in');
+
+                    main.removeEventListener('animationend', removeIndex);
+                };
+
+                //afterDelay(400, removeIndex);
+                main.addEventListener('animationend', removeIndex, {once: true});
+            }
+        }
+
+        groupContainer.appendChild(this.main);
+
+        componentHandler.upgradeElements(this.main);
     }
 
     override update_() {
         this.nameInput.value = this.name; this.nameDisplay.textContent = this.name;
 
-        const dropdownObj = this.sortOrderMenu.upgrades_proto?.dropdown;
+        const dropdownObj = this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0];
         if (dropdownObj) this.sortOrder = mainUI.translateDropdown(dropdownObj.selectedOption) as mainClasses.SortOrder;
 
-        const dropdownObj2 = this.selectionTypeMenu.upgrades_proto?.dropdown;
+        const dropdownObj2 = this.selectionTypeMenu.upgrades?.getExtends(BCDDropdown)?.[0];
         if (dropdownObj2) this.selectionType = mainUI.translateDropdown(dropdownObj2.selectedOption) as mainClasses.GroupSelectType;
 
         this.nameDisplay.textContent = this.name;
-        updatePluralDisplay(this.optionCountDisplay, this.parent.options.length);
+        updatePluralDisplay(this.optionCountDisplay, this.parent.options.size);
+
+        prefabCardUpdate(this);
     }
 
     override updateFromInput_() {
         this.name = this.nameInput.value;
 
-        const dropdownObj = this.sortOrderMenu.upgrades_proto?.dropdown;
+        const dropdownObj =this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0];
         if (dropdownObj) this.sortOrder = mainUI.translateDropdown(dropdownObj.selectedOption) as mainClasses.SortOrder;
 
-        const dropdownObj2 = this.selectionTypeMenu.upgrades_proto?.dropdown;
+        const dropdownObj2 = this.selectionTypeMenu.upgrades?.getExtends(BCDDropdown)?.[0];
         if (dropdownObj2) this.selectionType = mainUI.translateDropdown(dropdownObj2.selectedOption) as mainClasses.GroupSelectType;
 
         this.nameDisplay.textContent = this.name;
     }
 
-    override destroy_(): void {
-        this.main.remove();
-    }
+    override destroy_() { prefabCardDestroy(this); }
 }
 mainClasses.addUpdateObjects(mainClasses.Group, Group);
 
@@ -264,6 +370,8 @@ export class Option extends UpdatableObject {
     editTypeButton: HTMLButtonElement;
     defaultTypeDropdown: HTMLMenuElement;
 
+    deleteButton: HTMLButtonElement;
+
     constructor (parent: mainClasses.Option) {
         super();
         this.parent = parent;
@@ -288,9 +396,39 @@ export class Option extends UpdatableObject {
         this.nameDisplay = this.main.querySelector('span.name')!;
         this.fileCountDisplay = this.main.querySelector('span.builder-steps-option-file-count')!;
         this.flagCountDisplay = this.main.querySelector('span.builder-steps-option-flag-count')!;
-        this.parent.inherited.containers?.['1st-party']?.appendChild(this.main);
 
-        componentHandler.upgradeAllRegistered();
+        this.deleteButton = deleteButtonTemplate.cloneNode(true) as HTMLButtonElement;
+        this.main.insertBefore(this.deleteButton, this.main.firstElementChild);
+        registerForEvents(this.deleteButton, {activate: parent.destroy.bind(parent)});
+
+        const optionContainer = this.parent.inherited.containers?.['1st-party'] as HTMLDivElement;
+        if (!optionContainer) {console.warn('Option container not found!'); return;}
+
+        if (this.main.style.animationName !== 'none'){
+            const previousSibling = optionContainer.lastElementChild instanceof HTMLElement ? optionContainer.lastElementChild : undefined;
+
+            if (previousSibling) {
+                const main = this.main;
+
+                previousSibling.style.zIndex = '1';
+                main.classList.add('animating-in');
+
+                // eslint-disable-next-line func-style, sonarjs/no-identical-functions -- I only want to init the function within an if statement
+                const removeIndex = function() {
+                    previousSibling.style.zIndex = '';
+                    main.classList.remove('animating-in');
+
+                    main.removeEventListener('animationend', removeIndex);
+                };
+
+                //afterDelay(400, removeIndex);
+                main.addEventListener('animationend', removeIndex, {once: true});
+            }
+        }
+
+        optionContainer.appendChild(this.main);
+
+        componentHandler.upgradeElements(this.main);
     }
 
     override update_() {
@@ -301,6 +439,8 @@ export class Option extends UpdatableObject {
         this.nameDisplay.textContent = this.name || '';
         updatePluralDisplay(this.fileCountDisplay, this.parent.files.length);
         updatePluralDisplay(this.flagCountDisplay, this.parent.conditionFlags.length);
+
+        prefabCardUpdate(this);
     }
 
     override updateFromInput_() {
@@ -308,14 +448,12 @@ export class Option extends UpdatableObject {
         this.description = this.descriptionInput.value || '';
         this.image = this.imageInput.value || '';
 
-        const dropdownObj = this.defaultTypeDropdown.upgrades_proto?.dropdown;
-        if (dropdownObj) this.parent.typeDescriptor.default = mainUI.translateDropdown(dropdownObj.selectedOption) as mainClasses.OptionType;
+        const dropdownObj = this.defaultTypeDropdown.upgrades?.getExtends(BCDDropdown)?.[0];
+        if (dropdownObj) this.parent.typeDescriptor.defaultType = mainUI.translateDropdown(dropdownObj.selectedOption) as mainClasses.OptionType;
 
         this.nameDisplay.textContent = this.name;
     }
 
-    override destroy_(): void {
-        this.main.remove();
-    }
+    override destroy_() { prefabCardDestroy(this); }
 }
 mainClasses.addUpdateObjects(mainClasses.Option, Option);
