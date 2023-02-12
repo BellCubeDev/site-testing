@@ -12,11 +12,14 @@
     text-shadow: 0 0 5px #00000033;
 }
 
+@media (prefers-reduced-motion: reduce) { * {transition-duration: 0s !important;} }
+
 *, .builder-steps-remove-btn {
     transition-duration: 0.2s;
     transition-property: filter, color, background-color, border-color, fill, text-shadow, box-shadow, opacity, filter, text-decoration-color;
     transition-timing-function: ease-out;
     filter: none;
+    transform: none;
 }
 
 [aria-hidden="true"], [aria-hidden="true"] * {
