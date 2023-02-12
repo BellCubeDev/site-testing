@@ -77,6 +77,7 @@
 			"ganalytics",
 			"ghpages",
 			"Haelfire",
+			"halflings",
 			"Haskill",
 			"haspopup",
 			"Hazak",
@@ -169,12 +170,14 @@
 			"strs",
 			"t",
 			"tabindex",
+			"tablist",
 			"Tahrodiis",
 			"Textfield",
 			"Thallassa",
 			"Thalmor",
 			"Tino",
 			"toymaker",
+			"truetype",
 			"typeofs",
 			"Ulfric",
 			"uncompiled",
@@ -195,7 +198,8 @@
 			"xkcd",
 			"xmlmin",
 			"Zijdel",
-			"zindex"
+			"zindex",
+			"zoomable"
 		],
 
 		"commentAnchors.workspace.excludeFiles": "**/{node_modules,.git,_generated,highlight_js,mdl}/**/*",
