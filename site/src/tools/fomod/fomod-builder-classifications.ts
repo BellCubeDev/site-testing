@@ -3,9 +3,6 @@ import { objOf, UpdatableObject } from '../../universal.js';
 
 import * as ui from './fomod-builder-ui.js';
 
-// TODO: Change Step/Group/Option arrays to Sets (makes it easier to remove stuff)
-
-
 /*x eslint-disable i18n-text/no-en */// FOMODs are XML files with a schema written in English, so disallowing English makes little sense.
 
 /** Function to pass into JSON.stringify to handle FOMODs */
@@ -45,7 +42,7 @@ $$ |  $$ |$$ |  $$ | \____$$\   $$ |$$\ $$ |      $$  __$$ |$$ |        $$ |$$\ 
 $$ |  $$ |$$$$$$$  |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |\$$$$$$$\   \$$$$  |$$$$$$$  |
 \__|  \__|\_______/ \_______/    \____/ \__|       \_______| \_______|   \____/ \______*/
 
-/** A map of FOMODElementProxy classes and the classes they should create for update purposes */
+/** A map of FOMODElementProxy classes and the classes they should create alongside themselves for update purposes */
 export const UpdateObjects =new Map<FOMODElementProxy|Function, ({new(param: any): UpdatableObject} & Omit<typeof UpdatableObject, 'new'>)[]>();
 export function addUpdateObjects<TClass extends Omit<typeof FOMODElementProxy, 'new'> & {new(...any:any):any}>(obj: TClass, ...updatables: ({new(param: InstanceType<TClass>): UpdatableObject} & Omit<typeof UpdatableObject, 'new'>)[]) {
     UpdateObjects.get(obj)?.push(...updatables) ||
@@ -57,12 +54,25 @@ export abstract class FOMODElementProxy extends UpdatableObject {
 
     objectsToUpdate: UpdatableObject[] = [];
 
-    updateObjects() {
-        this.objectsToUpdate.forEach(  (obj) => obj.update()  );
-        if ('steps' in this && this.steps instanceof Set) this.steps.forEach(  (step) => step.update.call(step)  );
-        if ('groups' in this && this.groups instanceof Set) this.groups.forEach(  (group) => group.update.call(group)  );
-        if ('options' in this && this.options instanceof Set) this.options.forEach(  (option) => option.update.call(option)  );
-        ui.autoSave();
+    propagateToChildren_wasTrue = false;
+    updateObjects(propagateToChildren = false) {
+        if (!this) return; // function sometimes gets called in the constructor - update will be called in a microtask later.
+        this.propagateToChildren_wasTrue ||= propagateToChildren;
+        queueMicrotask(()=>  this.propagateToChildren_wasTrue = false  );
+
+        if (!propagateToChildren) {
+            this.objectsToUpdate.forEach(  (obj) => obj instanceof FOMODElementProxy ? obj.updateObjects(this.propagateToChildren_wasTrue) : obj.update()  );
+            ui.autoSave();
+            return;
+        }
+
+        if ('steps' in this   &&   this.steps instanceof Set) this.steps.forEach(  (step) => step.updateObjects.call(step, true)  );
+        if ('groups' in this  &&  this.groups instanceof Set) this.groups.forEach(  (group) => group.updateObjects.call(group, true)  );
+        if ('options' in this && this.options instanceof Set) this.options.forEach(  (option) => option.updateObjects.call(option, true)  );
+
+        // We know that it didn't come from an actual update, so let's go through the update API this time
+        // Don't worry - when the update goes through, it'll just call this function again, but this time it'll be false
+        this.update();
     }
 
     override update_() { this.updateObjects(); }
@@ -76,7 +86,7 @@ export abstract class FOMODElementProxy extends UpdatableObject {
         // check if we can update the FOMOD base
         if ('inherited' in this && this.inherited && typeof this.inherited === 'object')
             if ('base' in this.inherited && this.inherited.base instanceof FOMODElementProxy)
-                this.inherited.base.updateObjects();
+                this.inherited.base.updateObjects(true);
     }
 
     constructor(instanceElement: Element | undefined = undefined) {
@@ -307,7 +317,7 @@ function parseDependency(dependency: Element): Dependency {
 export type OptionType =
     | 'Optional'        // Unchecked but checkable
     | 'Recommended'     // Checked but uncheckable
-    | 'CouldBeUseable'  // TODO: Check if this has a use
+    | 'CouldBeUseable'  // TODO: Check if this has a use - UPDATE: No use in Vortex
     | 'Required'        // Permanently checked
     | 'NotUseable';     // Permanently unchecked
 export class OptionTypeDescriptor extends FOMODElementProxy {
@@ -422,6 +432,25 @@ export class OptionTypeDescriptorWithDependency extends FOMODElementProxy {
 
 export const installs = new Set<Install>();
 
+function parseFiles(elem: Element|undefined): Install[] {
+    const localInstalls: Install[] = [];
+    if (!elem) return localInstalls;
+
+    const dependenciesElem = elem.getElementsByTagName('dependencies')[0];
+    const filesElem = elem.getElementsByTagName('files')[0] || elem;
+
+    let dependencies: DependencyGroup|undefined = undefined;
+    if (dependenciesElem) dependencies = new DependencyGroup(dependenciesElem);
+
+    for (const file of filesElem.children) {
+        const install = new Install(file, dependencies);
+        localInstalls.push(install);
+        installs.add(install);
+    }
+
+    return localInstalls;
+}
+
 export class Install extends FOMODElementProxy {
     private _source: string[] = [];
     set source(value: string[]) { this._source = value; this.updateObjects(); } get source(): string[] { return this._source; }
@@ -515,15 +544,16 @@ export class Step extends FOMODElementProxy {
 
     conditions: DependencyGroup | undefined;
 
-    addGroup(xmlElement?: ConstructorParameters<typeof Group>[1], symbol?: symbol) {
+    addGroup(xmlElement?: ConstructorParameters<typeof Group>[1]) {
         this.groups.add(new Group({
             base: this.inherited.base,
             containers: this.groupsContainers,
             parent: this,
         }, xmlElement));
-        this.inherited.base?.updateObjects();
-        this.inherited.parent?.updateObjects();
-        this.updateObjects();
+
+        if (this.inherited.base) this.inherited.base.updateObjects(true);
+        else if (this.inherited.parent) this.inherited.parent.updateObjects(true);
+        else this.updateObjects(true);
     }
     readonly addGroup_bound = this.addGroup.bind(this);
 
@@ -602,15 +632,16 @@ export class Group extends FOMODElementProxy {
 
     optionsContainers: Record<string, HTMLDivElement> = {};
 
-    addOption(xmlElement?: ConstructorParameters<typeof Option>[1], symbol?: symbol) {
+    addOption(xmlElement?: ConstructorParameters<typeof Option>[1]) {
         this.options.add(new Option({
             base: this.inherited.base,
             containers: this.optionsContainers,
             parent: this,
         }, xmlElement));
-        this.inherited.base?.updateObjects();
-        this.inherited.parent?.updateObjects();
-        this.updateObjects();
+
+        if (this.inherited.base) this.inherited.base.updateObjects(true);
+        else if (this.inherited.parent) this.inherited.parent.updateObjects(true);
+        else this.updateObjects(true);
     }
     readonly addOption_bound = this.addOption.bind(this);
 
@@ -818,13 +849,14 @@ export class Fomod extends FOMODElementProxy {
 
     stepsContainers: Record<string, HTMLDivElement> = {};
 
-    addStep(xmlElement?: ConstructorParameters<typeof Step>[1], symbol?: symbol) {
+    addStep(xmlElement?: ConstructorParameters<typeof Step>[1]) {
         this.steps.add(new Step({
             base: this,
             containers: this.stepsContainers,
             parent: this,
         }, xmlElement));
-        this.updateObjects();
+
+        this.updateObjects(true);
     }
     readonly addStep_bound = this.addStep.bind(this);
 
@@ -854,12 +886,9 @@ export class Fomod extends FOMODElementProxy {
         for (const step of (stepsElem?.children ?? [])) this.addStep(step);
         if (this.steps.size == 0) this.addStep();
 
-        const conditionalInstallsElem = instanceElement?.getElementsByTagName('conditionalFileInstalls')[0];
+        const conditionalInstallsElem = instanceElement?.getElementsByTagName('conditionalFileInstalls')[0]?.getElementsByTagName('patterns')[0];
         const requiredInstallsElem = instanceElement?.getElementsByTagName('requiredInstallFiles')[0];
-
-        const conditionalInstalls = [...conditionalInstallsElem?.children ?? []].map(install => new Install(install));
-        const requiredInstalls = [...requiredInstallsElem?.children ?? []].map(install => new Install(install));
-        this.installs = [...conditionalInstalls, ...requiredInstalls];
+        this.installs = [...parseFiles(conditionalInstallsElem), ...parseFiles(requiredInstallsElem)];
 
         const moduleDependencies = instanceElement?.getElementsByTagName('moduleDependencies')[0];
         if (moduleDependencies) this.conditions = new DependencyGroup(moduleDependencies);

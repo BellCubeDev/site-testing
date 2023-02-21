@@ -134,7 +134,7 @@
             margin-bottom: 32px;
         }
 
-        @media (prefers-reduced-motion: reduce) { animation: none !important; visibility: none; }
+        @media (prefers-reduced-motion: reduce) { animation: none !important; visibility: hidden; }
     }
 }
 

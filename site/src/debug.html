@@ -10,12 +10,9 @@ redirect_from:
 
 <a href="{{ site.baseurl }}{% link debug-extended.html %}" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Extended Debug Page</a> (where some of the larger variables are printed)
 
-<script defer>
-    document.getElementById("js-insert-builder-storage").innerText = JSON.stringify(JSON.parse(localStorage.getItem('BellCubeDev_FOMOD_BUILDER_DATA') ?? '{}'), null, 4)
+<script>
+    document.getElementById("js-insert-builder-storage").textContent = JSON.stringify(JSON.parse(localStorage.getItem('BellCubeDev_FOMOD_BUILDER_DATA') ?? '{}'), null, 4)
 </script>
-
-FOMOD Builder Storage:
-<pre><code id="js-insert-builder-storage"></code></pre>
 
 <button class="js-bcd-summary adjacent is-open" type="button"><i class="material-icons open-icon-90CC">expand_more</i>
     <h1>Page Variables</h1>
@@ -45,6 +42,7 @@ FOMOD Builder Storage:
     <h1>Site-Wide Variables</h1>
 </button>
 <div class="js-bcd-details adjacent is-open">
+    <br>FOMOD Builder Storage: <pre><code id="js-insert-builder-storage"></code></pre>
     <br />site.author:<pre><code class="js-bcd-prettyJSON">{{ site.author | jsonify | escape }}</code></pre>
     <br />site.baseurl:<pre><code class="js-bcd-prettyJSON">{{ site.baseurl | jsonify | escape }}</code></pre>
     <br />site.categories:<pre><code class="js-bcd-prettyJSON">{{ site.categories | jsonify | escape }}</code></pre>

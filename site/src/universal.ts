@@ -863,7 +863,7 @@ export class BCDSummary extends BCD_CollapsibleParent {
 bcdComponents.push(BCDSummary);
 
 /** Simple MDL Class to handle making JSON pretty again
-    Takes the innerText of the element and parses it as JSON, then re-serializes it with 2 spaces per indent.
+    Takes the textContent of the element and parses it as JSON, then re-serializes it with 2 spaces per indent.
 */
 export class bcd_prettyJSON {
     static readonly cssClass = 'js-bcd-prettyJSON';
@@ -873,10 +873,8 @@ export class bcd_prettyJSON {
         registerUpgrade(element, this, null, false, true);
         this.element_ = element;
 
-        const raw_json = element.innerText;
-        const json = JSON.parse(raw_json);
-
-        this.element_.innerText = JSON.stringify(json, null, 2);
+        const json = JSON.parse(element.textContent ?? '');
+        this.element_.textContent = JSON.stringify(json, null, 2);
 
         this.element_.classList.add('initialized');
     }
@@ -1161,20 +1159,22 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
     }
 
     updateOptions() {
-        const children: HTMLLIElement[] = [...(this.element_ as HTMLElement).getElementsByTagName('li') ];
+        const children: HTMLLIElement[] = [...this.element_.getElementsByTagName('li') ];
+        //console.log("[BCD-DROPDOWN] Updating options:", this, children, children.map((elm) => elm.textContent), this.selectedOption);
 
         if (this.doReorder) {
-            const goldenChild = children.find((elm) => (elm as HTMLLIElement).innerText === this.selectedOption);
+            const goldenChild = children.find((elm) => (elm as HTMLLIElement).textContent === this.selectedOption);
             if (!goldenChild) {
                 console.log("[BCD-DROPDOWN] Erroring instance:", this);
+
                 throw new Error('Could not find the selected option in the dropdown.');
             }
 
             this.makeSelected(goldenChild);
         }
 
-        const demonChildren = this.doReorder ? children.filter((elm) => (elm as HTMLLIElement).innerText !== this.selectedOption) : children;
-        demonChildren.sort( (a, b) => this.options_keys.indexOf(a.innerText) - this.options_keys.indexOf(b.innerText) );
+        const demonChildren = this.doReorder ? children.filter((elm) => (elm as HTMLLIElement).textContent !== this.selectedOption) : children;
+        demonChildren.sort( (a, b) => this.options_keys.indexOf(a.textContent ?? '') - this.options_keys.indexOf(b.textContent ?? '') );
 
         for (const child of demonChildren) {
             this.element_.removeChild(child);
@@ -1185,9 +1185,10 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
 
     createOption(option: string, clickCallback?: Function|null, addToList: boolean = false): HTMLLIElement {
         const li = document.createElement('li');
-        li.innerText = option;
+        li.textContent = option;
         li.setAttribute('option-value', option);
         li.classList.add('mdl-menu__item');
+
         this.registerItem(li);
 
         const temp_clickCallback = clickCallback ?? this.options_[option] ?? null;
@@ -1205,7 +1206,7 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
     }
 
     override onItemSelected(option: HTMLLIElement) {
-        this.selectedOption = option.innerText;
+        this.selectedOption = option.textContent ?? '';
         this.element_.dispatchEvent(new CustomEvent('bcd-dropdown-change', { detail: {dropdown: this, option: this.selectedOption} }));
         this.updateOptions();
     }
@@ -1217,7 +1218,7 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
         option.blur();
 
         for (const elm of this.selectionTextElements ?? []) {
-            elm.innerText = option.innerText;
+            elm.textContent = option.textContent;
         }
     }
 
@@ -1352,7 +1353,7 @@ export class BCDTabButton extends mdl.MaterialButton {
         if (!boundTab) throw new TypeError(`Could not find a tab with the name "${name}".`);
         if (!boundTab.parentElement) throw new TypeError(`Tab with name "${name}" has no parent element!`);
 
-        element.innerText = name;
+        element.textContent = name;
         element.setAttribute('type', 'button');
 
         super(element); // Now we can use `this`!
@@ -1614,11 +1615,8 @@ export class BCDTooltip {
 
         // Force recalc of styles
         const tipStyle = window.getComputedStyle(this.element);
-
-        const tipPaddingRight =  parseInt(tipStyle.paddingRight);
-        const tipPaddingLeft =   parseInt(tipStyle.paddingLeft);
-        const tipPaddingTop =    parseInt(tipStyle.paddingTop);
-        const tipPaddingBottom = parseInt(tipStyle.paddingBottom);
+        tipStyle.transition;
+        tipStyle.transform;
 
         //console.debug('Recalculated styles:', {transform: tipStyle.transform, transition: tipStyle.transition, width: tipStyle.width, height: tipStyle.height, offsetLeft: this.element.offsetLeft, offsetTop: this.element.offsetTop, offsetWidth: this.element.offsetWidth, offsetHeight: this.element.offsetHeight});
 
@@ -2054,8 +2052,8 @@ export class SettingsGrid {
         this.element = element;
         registerUpgrade(element, this, null, false, true);
 
-        this.settings = JSON.parse(element.innerText) as settingsGrid;
-        element.innerText = '';
+        this.settings = JSON.parse(element.textContent ?? '') as settingsGrid;
+        element.textContent = '';
 
         const settingsElemID = element.getAttribute("data-templateID");
         if (!settingsElemID) throw new Error("Settings Grid is missing the data-templateID attribute!");
@@ -2362,7 +2360,7 @@ export function bcd_universalJS_init():void {
     // Import Lazy-Loaded Styles
     // =============================================================
     afterDelay(100, () => {
-        const lazyStyles = JSON.parse(`[${document.getElementById('lazy-styles')?.innerText ?? ''}]`) as string[];
+        const lazyStyles = JSON.parse(`[${document.getElementById('lazy-styles')?.textContent ?? ''}]`) as string[];
 
         for (const style of lazyStyles) {
             const link = document.createElement('link');

@@ -53,16 +53,16 @@ export class Fomod extends UpdatableObject {
         this.main = document.getElementById("steps-builder-container") as HTMLDivElement;
         this.parent.stepsContainers['1st-party'] = this.main.querySelector('div.builder-steps-steps-container')!;
 
-        this.nameInput = this.main.querySelector('.builder-steps-mod-name') as HTMLInputElement;
+        this.nameInput = this.main.querySelector('input.builder-steps-mod-name')!;
         registerForEvents(this.nameInput, this.changeEvtObj);
 
-        this.imageInput = this.main.querySelector('.builder-steps-mod-image input') as HTMLInputElement;
+        this.imageInput = this.main.querySelector('.builder-steps-mod-image input')!;
         registerForEvents(this.imageInput, this.changeEvtObj);
 
-        this.sortOrderMenu = this.main.querySelector('.bcd-dropdown-sorting-order') as HTMLMenuElement;
+        this.sortOrderMenu = this.main.querySelector('menu.bcd-dropdown-sorting-order')!;
         registerForEvents(this.sortOrderMenu, this.dropdownEvtObj);
 
-        this.addStepBtn = this.main.querySelector('.builder-steps-add-child-btn') as HTMLButtonElement;
+        this.addStepBtn = this.main.querySelector('button.builder-steps-add-child-btn')!;
 
         registerForEvents(this.addStepBtn, this.addStepEvtObj);
     }
@@ -171,10 +171,10 @@ export class Step extends UpdatableObject {
         this.nameInput = this.main.querySelector('input.bcd-builder-input')!;
         registerForEvents(this.nameInput, {change: this.updateFromInput_bound});
 
-        this.sortOrderMenu = this.main.querySelector('.bcd-dropdown-sorting-order') as HTMLMenuElement;
+        this.sortOrderMenu = this.main.querySelector('menu.bcd-dropdown-sorting-order')!;
         registerForEvents(this.sortOrderMenu, {dropdownInput: this.updateFromInput_bound});
 
-        this.addGroupBtn = this.main.querySelector('.builder-steps-add-child-btn') as HTMLButtonElement;
+        this.addGroupBtn = this.main.querySelector('button.builder-steps-add-child-btn')!;
         registerForEvents(this.addGroupBtn, {activate: parent.addGroup_bound.bind(parent, undefined, undefined)});
 
         this.nameDisplay = this.main.querySelector('.builder-steps-step-title span.name')!;
@@ -212,7 +212,7 @@ export class Step extends UpdatableObject {
 
         stepContainer.appendChild(this.main);
 
-        componentHandler.upgradeElements(this.main);
+        queueMicrotask(()=>  componentHandler.upgradeElements(this.main)  );
     }
 
     override update_() {
@@ -314,17 +314,15 @@ export class Group extends UpdatableObject {
 
         groupContainer.appendChild(this.main);
 
-        componentHandler.upgradeElements(this.main);
+        queueMicrotask(()=>  componentHandler.upgradeElements(this.main)  );
     }
 
     override update_() {
         this.nameInput.value = this.name; this.nameDisplay.textContent = this.name;
 
-        const dropdownObj = this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0];
-        if (dropdownObj) this.sortOrder = mainUI.translateDropdown(dropdownObj.selectedOption) as mainClasses.SortOrder;
+        this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0]?.selectByString(mainUI.translateDropdown(this.sortOrder));
 
-        const dropdownObj2 = this.selectionTypeMenu.upgrades?.getExtends(BCDDropdown)?.[0];
-        if (dropdownObj2) this.selectionType = mainUI.translateDropdown(dropdownObj2.selectedOption) as mainClasses.GroupSelectType;
+        this.selectionTypeMenu.upgrades?.getExtends(BCDDropdown)?.[0]?.selectByString(mainUI.translateDropdown(this.selectionType));
 
         this.nameDisplay.textContent = this.name;
         updatePluralDisplay(this.optionCountDisplay, this.parent.options.size);
@@ -335,7 +333,7 @@ export class Group extends UpdatableObject {
     override updateFromInput_() {
         this.name = this.nameInput.value;
 
-        const dropdownObj =this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0];
+        const dropdownObj = this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0];
         if (dropdownObj) this.sortOrder = mainUI.translateDropdown(dropdownObj.selectedOption) as mainClasses.SortOrder;
 
         const dropdownObj2 = this.selectionTypeMenu.upgrades?.getExtends(BCDDropdown)?.[0];
@@ -428,7 +426,7 @@ export class Option extends UpdatableObject {
 
         optionContainer.appendChild(this.main);
 
-        componentHandler.upgradeElements(this.main);
+        queueMicrotask(()=>  componentHandler.upgradeElements(this.main)  );
     }
 
     override update_() {

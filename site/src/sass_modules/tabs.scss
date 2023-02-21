@@ -5,7 +5,7 @@
     min-width: 100%;
 
     opacity: 0; &.active { opacity: 1; }
-    &--hidden { visibility: none; }
+    &--hidden { visibility: hidden; }
 
     transition-duration: inherit;
     transition-timing-function: inherit;
@@ -64,6 +64,15 @@
     padding-top: 44px;
     margin-left: -300px;
     z-index: 2;
+
+    &--hidden {
+        opacity: 0;
+        margin-top: -120px !important;
+    }
+
+    transition-property: opacity, margin-top;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0, 0.3, 0.9, 1);
 }
 
 .js-tab-list-button, .js-tab-list-button.mdl-button:focus:not(:active) {
