@@ -49,6 +49,22 @@
     @media (prefers-reduced-motion: reduce) { animation-name: none; }
 }
 
+.builder-steps-drag-handle {
+    opacity: .5;
+
+    user-select: none;
+    cursor: grab;
+
+    position: absolute;
+    top: 16px;
+    left: 8px;
+}
+
+.no-sorting > * > .builder-steps-drag-handle {
+    opacity: 0;
+    pointer-events: none;
+}
+
 @keyframes sendInBigArtillery {
     0% {
         filter: opacity(0.67);
@@ -105,17 +121,24 @@
 
 @mixin fomodStepsBuilderCard($hue, $sat, $val, $hueShiftMult: 1) {
     background: hsl($hue, $sat, $val);
+
+    border: 0 solid black;
     border-left: hsl($hue + ($hueShiftMult * 48deg), $sat + 13%, $val + 17%) 8px solid;
 
     border-radius: 8px;
     padding: 12px;
     margin: 32px 0;
     padding-right: 48px;
+    padding-left: 32px;
 
     position: relative;
 
     transform: scale(1);
     filter: opacity(1);
+
+    > .js-bcd-summary {
+        padding: 4px;
+    }
 
     .animating-in {
         animation: sendInArtillery 200ms ease-out;
@@ -136,6 +159,20 @@
 
         @media (prefers-reduced-motion: reduce) { animation: none !important; visibility: hidden; }
     }
+
+    transition-property: filter, opacity;
+    transition-duration: 500ms;
+
+    .sortable-ghost {
+        filter: contrast(0.5) grayscale(1) opacity(0.5);
+        border: black 8px dashed;
+        padding-top: 4px;
+        padding-bottom: 4px;
+
+        .builder-steps-remove-btn {
+            right: 0;
+        }
+    }
 }
 
 @mixin imageColumn() {
@@ -150,6 +187,7 @@
     @include fomodStepsBuilderCard(184deg, 87%, 25%);
     animation: none;
     padding-right: 16px;
+    padding-left: 16px;
 
     >:first-child {
         @include imageColumn();
@@ -178,6 +216,14 @@
             animation-name: sendInBigArtillery;
             margin-top: -90px;
         }
+    }
+
+    > .builder-steps-drag-handle {
+        top: 19px;
+    }
+
+    > .builder-steps-remove-btn {
+        margin-top: 2px;
     }
 }
 
@@ -241,10 +287,6 @@
     > h4 {
         margin: 0;
     }
-}
-
-.builder-steps-step-sum {
-    padding-left: 8px;
 }
 
 // Disabled down here for clarity purposes

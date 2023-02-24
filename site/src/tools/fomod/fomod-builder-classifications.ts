@@ -20,7 +20,7 @@ function JsonStringifyFomod(key: string, value: any) {
     // Internal keys (start with _)
     if (key.startsWith('_')) return undefined;
 
-    // Nap & Set support
+    // Map & Set support
     if (value instanceof Set) return Array.from(value);
     if (value instanceof Map) return Object.fromEntries(value.entries());
 
@@ -77,16 +77,22 @@ export abstract class FOMODElementProxy extends UpdatableObject {
 
     override update_() { this.updateObjects(); }
 
+    updateWhole() {
+        if (  !('inherited' in this && this.inherited && typeof this.inherited === 'object')  ) return this.updateObjects(true);
+
+        if ('base' in this.inherited && this.inherited.base && this.inherited.base instanceof FOMODElementProxy) this.inherited.base.updateObjects(true);
+        else if ('parent' in this.inherited && this.inherited.parent && this.inherited.parent instanceof FOMODElementProxy) this.inherited.parent.updateObjects(true);
+
+        this.updateObjects(true);
+    }
+
     protected override destroy_(): void {
         this.objectsToUpdate.forEach(  (obj) => obj.destroy()  );
         if ('steps' in this && this.steps instanceof Set) this.steps.forEach(  (step) => step.destroy()  );
         if ('groups' in this && this.groups instanceof Set) this.groups.forEach(  (group) => group.destroy()  );
         if ('options' in this && this.options instanceof Set) this.options.forEach(  (option) => option.destroy()  );
 
-        // check if we can update the FOMOD base
-        if ('inherited' in this && this.inherited && typeof this.inherited === 'object')
-            if ('base' in this.inherited && this.inherited.base instanceof FOMODElementProxy)
-                this.inherited.base.updateObjects(true);
+        this.updateWhole();
     }
 
     constructor(instanceElement: Element | undefined = undefined) {
@@ -551,9 +557,7 @@ export class Step extends FOMODElementProxy {
             parent: this,
         }, xmlElement));
 
-        if (this.inherited.base) this.inherited.base.updateObjects(true);
-        else if (this.inherited.parent) this.inherited.parent.updateObjects(true);
-        else this.updateObjects(true);
+        this.updateWhole();
     }
     readonly addGroup_bound = this.addGroup.bind(this);
 
@@ -639,9 +643,7 @@ export class Group extends FOMODElementProxy {
             parent: this,
         }, xmlElement));
 
-        if (this.inherited.base) this.inherited.base.updateObjects(true);
-        else if (this.inherited.parent) this.inherited.parent.updateObjects(true);
-        else this.updateObjects(true);
+        this.updateWhole();
     }
     readonly addOption_bound = this.addOption.bind(this);
 

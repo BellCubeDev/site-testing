@@ -1,3 +1,4 @@
+/* eslint-disable import/first */
 import * as mdl from '../../assets/site/mdl/material.js';
 import * as bcdUniversal from '../../universal.js';
 
@@ -12,10 +13,14 @@ import './fomod-builder-steps-mo2.js';
 import * as bcdFS from '../../filesystem-interface.js';
 import * as xml from './fomod-builder-xml-translator.js';
 
-import pluralize from '../../included_node_modules/plural/index.js';
+import jszip from '../../included_node_modules/jszip/dist/jszip.js';
 
-import type {prettyData as prettyData__} from '../../../untyped-modules';
+import pluralize_ from '../../included_node_modules/plural/index.js';
+const pluralize = pluralize_ as (word: string, count: number) => string;
+
 import prettyData_ from '../../included_node_modules/pretty-data/pretty-data.js';
+import type {prettyData as prettyData__} from '../../../untyped-modules';
+
 const prettyData = prettyData_ as unknown as prettyData__;
 
 // reconstruct array of shifts to use 4 spaces instead of 2 //

@@ -4,17 +4,7 @@ import * as fomodClasses from  './fomod-builder-classifications.js';
 import * as bcdUniversal from '../../universal.js';
 import * as xml from './fomod-builder-xml-translator.js';
 
-import type * as zip_ from '../../included_node_modules/@zip.js/zip.js/index';
-type importedZipJS = typeof import("../../included_node_modules/@zip.js/zip.js/lib/zip-no-worker")
-let zip: importedZipJS|Promise<importedZipJS> = import('../../included_node_modules/@zip.js/zip.js/lib/zip-no-worker.js').then((module)=>{
-    zip = module;
-    window.zip = module;
-    return module;
-});
-
 declare global {interface Window {
-    /** WARNING: DO NOT USE IN THE FIRST FRAME!!! */
-    zip?: importedZipJS|Promise<importedZipJS>;//typeof import('../../included_node_modules/@zip.js/zip.js/lib/zip-no-worker.js');
     domParser: DOMParser;
     FOMODBuilder: {
         ui: fomodUI.WindowUI

@@ -31,13 +31,15 @@ declare global {
     }
 }
 
-const testInfo = `<fomod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd">
+const testInfo = `
+<fomod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd">
     <Name>Some Name™</Name>
     <Author>Best Author Ever!</Author>
     <Id>51238068465248570</Id>
     <Website>https://www.google.com/</Website>
     <Version>1.0.0</Version>
-</fomod>`;
+</fomod>
+`;
 
 const testModule = `
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://qconsulting.ca/fo3/ModConfig5.0.xsd">

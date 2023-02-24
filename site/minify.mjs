@@ -181,14 +181,15 @@ async function minifyJSFile(filePath) {
         const tempCache = {...minifiedVarCache};
 
         let strToMinify = fileContents;
-        const moduleTye = moduleDetector.detect(fileContents) || 'es';
+        const foundModuleType = Object.entries(pathConfig.moduleTypes).find(([pathExcerpt, moduleType]) => filePath.includes(pathExcerpt));
+        /** @type string */ const moduleTye = foundModuleType?.[1] || moduleDetector.detect(fileContents) || 'es';
         if (doDebug) console.log(`DEBUG: Detected module type for ${filePath}:\n    "${moduleTye}"`);
 
-        if (moduleTye !== 'es') {
+        if (moduleTye !== 'es' && moduleTye !== 'COMPATIBLE') {
             console.log(JSON.stringify({filePath, minifyDir, absoluteMinifyDir}));
             strToMinify = convertToES6(strToMinify)
                 // Handle module imports
-                .replace(/^module ([^\b]+) from/m, 'import $1 from')
+                .replace(/^module ([^\b]+) from/gm, 'import $1 from')
                 // Handle JSON imports
                 .replace(/import (\w+) from ("|')(\.?)(\.?)((?:\\\2|["'](?<!\2)|[^"'])*\.[Jj][Ss][Oo][Nn])\2;?/g, (str, varName, quoteType, leadingDot01, leadingDot02, jsonPath) =>
                 leadingDot01 ? `const ${varName} = await fetch(${quoteType}${leadingDot02}${path.normalize(path.join(config.baseurl || '', path.normalize(filePath).replace(/[\\/][^\\/]+$/, '').replace(path.normalize(minifyDir), ''), jsonPath)).replace(/\\/g, '/')}${quoteType}).then(r => r.json())`

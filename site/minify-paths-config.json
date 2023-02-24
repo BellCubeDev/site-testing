@@ -1,5 +1,8 @@
 {
     "notModule": [],
+    "moduleTypes": {
+        "dist/jszip.js": "COMPATIBLE"
+    },
     "excluded": [
         ".config.js",
         "zip.js/dist/",

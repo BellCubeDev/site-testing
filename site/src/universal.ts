@@ -327,6 +327,51 @@ function ___removeChildByTag(this:Document|Element, tagName: string, count: numb
 Element.prototype.removeChildByTag = ___removeChildByTag;
 Document.prototype.removeChildByTag = ___removeChildByTag;
 
+/** Changes the position of an item in the set
+ * @returns Whether or not the item could be moved
+*/
+function ___moveItem<T>(this: Set<T>, item:T, newAdjacentItem:T, relativePosition:'above'|'below' = 'below'): boolean {
+    if (!this.has(item) || !this.has(newAdjacentItem)) return false;
+
+    const arr = [...this];
+    const itemIndex = arr.indexOf(item);
+    const adjacentIndex = arr.indexOf(newAdjacentItem);
+
+    if (itemIndex === -1 || adjacentIndex === -1) return false;
+
+    arr.splice(itemIndex, 1);
+    arr.splice(adjacentIndex + (relativePosition === 'below' ? 1 : 0), 0, item);
+
+    this.clear();
+    arr.forEach(i => this.add(i));
+
+    return true;
+}
+Set.prototype.moveItem = ___moveItem;
+
+/** Changes the position of an item in the set using a provided index
+ * @returns Whether or not the item could be moved
+ * @param newIndex The new index of the item. If the index is negative, it will be treated as an offset from the end of the array.
+*/
+function ___moveIndex<T>(this: Set<T>, item:T, newIndex: number): boolean {
+    if (!this.has(item)) return false;
+
+    const arr = [...this];
+
+    const itemIndex = arr.indexOf(item);
+    if (itemIndex === -1) return false;
+
+    if (newIndex < 0) newIndex = arr.length + newIndex;
+
+    arr.splice(itemIndex, 1);
+    arr.splice(newIndex, 0, item);
+
+    this.clear();
+    arr.forEach(i => this.add(i));
+
+    return true;
+}
+Set.prototype.moveIndex = ___moveIndex;
 
 
 /*$$$$$\                      $$\                 $$$$$$\           $$\   $$\
@@ -349,13 +394,25 @@ interface DocAndElementInjections {
 
 declare global {
     interface Element extends DocAndElementInjections {
-        upgrades?: BCDComponentMap;
-        targetingComponents?: BCDComponentMap;
+        upgrades?: ComponentMap;
+        targetingComponents?: ComponentMap;
     }
     interface Document extends DocAndElementInjections {}
 
     interface HTMLElement extends DocAndElementInjections {
         onclick: EventTypes<HTMLElement>['activate']|null;
+    }
+
+    interface Set<T> {
+        /** Changes the position of an item in the set relative to another item
+         * @returns Whether or not the item could be moved
+        */
+        moveItem: typeof ___moveItem;
+
+        /** Changes the position of an item in the set using a provided index
+         * @returns Whether or not the item could be moved
+        */
+        moveIndex: typeof ___moveIndex;
     }
 
     interface Window {
@@ -387,19 +444,19 @@ declare global {
     }
 }
 
-function ___getExtends<K extends abstract new (...args: any[]) => unknown>(this: BCDComponentMap, type: K) {
+function ___getExtends<K extends abstract new (...args: any[]) => unknown>(this: ComponentMap, type: K) {
     const returnVal:InstanceType<K>[] = [];
     for (const [,value] of this) if (value instanceof type) returnVal.push(value as InstanceType<K>);
     return returnVal;
 }
 
-function registerUpgrade(subject: Element, upgrade: InstanceType<BCDComponentI>, target?: Element|null, propagateToTargetChildren = false, propagateToSubjectToChildren = false): void {
+export function registerUpgrade(subject: Element, upgrade: InstanceType<Component>, target?: Element|null, propagateToTargetChildren = false, propagateToSubjectToChildren = false): void {
     //console.log("registerUpgrade", {subject, upgrade, target, propagateToTargetChildren, propagateSubjectToChildren: propagateToSubjectToChildren});
     // Set the upgrade on the subject
     forEachChildAndOrParent(subject, propagateToSubjectToChildren, child => {
         //console.log("registerUpgrade: subject", child);
         if (!child.upgrades) {
-            const map = new Map() as BCDComponentMap;
+            const map = new Map() as ComponentMap;
             map.getExtends = ___getExtends;
             child.upgrades = map;
         }
@@ -410,7 +467,7 @@ function registerUpgrade(subject: Element, upgrade: InstanceType<BCDComponentI>,
     // Repeat for target
     if (target) forEachChildAndOrParent(target, propagateToTargetChildren, child => {
         if (!child.targetingComponents) {
-            const map = new Map() as BCDComponentMap;
+            const map = new Map() as ComponentMap;
             map.getExtends = ___getExtends;
             child.targetingComponents = map;
         }
@@ -450,18 +507,20 @@ if (window.location.search[0] === '?')
                             .forEach(param => window.queryParams[param[0]!.trim()] = param[1]?.trim() ?? '');
 
 
+export interface Component extends Function {
+    new(element: any, ...args: any[]): any;
+}
 
 /** Interface defining the readonly properties cssClass and asString to make identifying MDL Classes set up for my custom, painless registration functions a breeze */
-interface BCDComponentI extends Function {
-    new(element: any, ...args: any[]): any;
+export interface BCDComponentI extends Component {
     readonly asString: string;
     readonly cssClass: string;
 }
 
 // Create a map that guarantee an instance of the key
-type BCDComponentMap = Map<BCDComponentI, InstanceType<BCDComponentI>> & {
-    get<K extends BCDComponentI>(key: K): InstanceType<K>|undefined;
-    set<K extends BCDComponentI>(key: K, value: InstanceType<K>): BCDComponentMap;
+export type ComponentMap = Map<Component, InstanceType<Component>> & {
+    get<K extends Component>(key: K): InstanceType<K>|undefined;
+    set<K extends Component>(key: K, value: InstanceType<K>): ComponentMap;
 
     /** Fetches all classes that extend the specified class */
     getExtends<K extends abstract new(...args:any[])=>unknown>(key: K): InstanceType<K>[];
