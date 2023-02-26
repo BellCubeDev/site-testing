@@ -16,21 +16,19 @@
     -webkit-tap-highlight-color: #fff4;
 
     // Normal State
-    &, &:focus:not(:active, .active) {
-        background-color: hsla($hue, $sat, $lum, $alpha - 0.05);
+    background-color: hsla($hue, $sat, $lum, $alpha - 0.05);
 
-        box-shadow: 2px 2px 3px #0001;
+    box-shadow: 2px 2px 3px #0001;
 
-        text-shadow: 2px 2px 10px #000b;
-    }
+    text-shadow: 2px 2px 10px #000b;
 
     // Hover State
-    &:hover, :focus:hover {   &:not(:active, .active) {
+    &:is(:hover, :focus):not(:active, .active) {
         background-color: hsla($hue, $sat  - ((10 * $satShiftIntensity) * 1%), $lum + ((13 * $lumShiftIntensity * 1%)), $alpha);
         box-shadow: 3px 3px 4.5px #00000028;
 
         text-shadow: 1.5px 1.5px 7px #000d;
-    }}
+    }
 
     // Active State
     &:is(:active, .active) {

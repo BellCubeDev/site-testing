@@ -76,7 +76,6 @@ async function prefabCardDestroy(card:Step|Group|Option) {
 
         function finalize() {
             if (previousElemStyle) previousElemStyle.zIndex = '';
-            console.log(summary);
             main.remove();
         }
 
@@ -216,14 +215,13 @@ export class Fomod extends UpdatableObject {
     }
 
     override destroy_(): void {
-        this.suppressUpdates = true;
-        this.nameInput.value = '';
-        this.imageInput.value = '';
-        this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0]?.selectByString(window.FOMODBuilder.storage.settings.defaultSortingOrder);
         unregisterForEvents(this.nameInput, this.changeEvtObj);
         unregisterForEvents(this.imageInput, this.changeEvtObj);
         unregisterForEvents(this.sortOrderMenu, this.dropdownEvtObj);
         unregisterForEvents(this.addStepBtn, this.addStepEvtObj);
+        this.nameInput.value = '';
+        this.imageInput.value = '';
+        this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0]?.selectByString(window.FOMODBuilder.storage.settings.defaultSortingOrder);
     }
 
     onSort(event: Sortable__.SortableEvent, added = false) {

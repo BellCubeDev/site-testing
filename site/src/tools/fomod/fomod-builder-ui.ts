@@ -356,10 +356,9 @@ export function autoSave() {
 }
 
 window.addEventListener('beforeunload', (event) => {
-    console.log(`Has unsaved changes? ${hasUnsavedChanges}`);
-    if (hasUnsavedChanges) {
-        event.preventDefault();
-        event.returnValue = '';
-        return '';
-    }
+    if (!hasUnsavedChanges) return;
+    
+    event.preventDefault();
+    event.returnValue = '';
+    return '';
 });

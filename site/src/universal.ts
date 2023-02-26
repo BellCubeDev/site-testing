@@ -686,7 +686,7 @@ export abstract class BCD_CollapsibleParent {
 
         this.details_inner.ariaHidden = 'false';
         this.details_inner.style.visibility = 'visible';
-        BCD_CollapsibleParent.setDisabled(this.details_inner, true);
+        BCD_CollapsibleParent.setDisabled(this.details_inner, false, false);
 
         this.details.classList.add(strs.classIsOpen);
         this.summary.classList.add(strs.classIsOpen);
@@ -767,9 +767,9 @@ export abstract class BCD_CollapsibleParent {
         return new Promise((r) => r());
     }
 
-    static setDisabled(elm:Element, disabled:boolean):void {
+    static setDisabled(elm:HTMLElement, disabled:boolean, allowPointerEvents = true):void {
         for (const child of elm.children)
-            this.setDisabled(child, disabled);
+            this.setDisabled(child as HTMLElement, disabled);
 
         const wasDisabled = elm.getAttribute('data-was-disabled') as 'true'|'false'|null;
         const oldTabIndex = elm.getAttribute('data-old-tabindex');
@@ -778,10 +778,8 @@ export abstract class BCD_CollapsibleParent {
             if (wasDisabled === null) elm.setAttribute('data-was-disabled', elm.hasAttribute('disabled') ? 'true' : 'false');
             elm.setAttribute('disabled', '');
 
-            if (elm instanceof HTMLElement) {
-                if (oldTabIndex === null) elm.setAttribute('data-old-tabindex', elm.getAttribute('tabindex') || '');
-                elm.tabIndex = -1;
-            }
+            if (oldTabIndex === null) elm.setAttribute('data-old-tabindex', elm.getAttribute('tabindex') || '');
+            elm.tabIndex = -1;
 
             //console.log('set disabled', elm instanceof HTMLElement, elm);
 
@@ -794,6 +792,8 @@ export abstract class BCD_CollapsibleParent {
             elm.removeAttribute('data-was-disabled');
             elm.setAttribute('tabindex', oldTabIndex || '');
         }
+
+        elm.style.pointerEvents = allowPointerEvents ? '' : 'none';
     }
 
     /* Determines what the transition and animation duration of the collapsible menu is */
@@ -1906,12 +1906,12 @@ class RelativeFilePicker {
     }
 
     onChange() {
-        console.log('onChange', this.element.value, this);
+        //console.log('onChange', this.element.value, this);
     }
     readonly boundOnChange = this.onChange.bind(this);
 
     async onButtonClick() {
-        console.log('onButtonClick', this.element.value, this);
+        //console.log('onButtonClick', this.element.value, this);
 
         let fileHandle: FileSystemFileHandle;
         try {
@@ -2450,11 +2450,12 @@ export function bcd_universalJS_init():void {
 
     // =============================================================
     // Register for more inclusive invents as a replacement for the `onclick` attribute
+    // For buttons, register some events to assist in visual styling
     // =============================================================
 
     afterDelay(150, () => {
-        const elements = document.querySelectorAll('[onclick]') as NodeListOf<HTMLElement>;
-        for (const element of elements) {
+        const elementsWithClickEvt = document.querySelectorAll('[onclick]') as NodeListOf<HTMLElement>;
+        for (const element of elementsWithClickEvt) {
             const funct = element.onclick as EventTypes<HTMLElement>['activate'];
             if (!funct) continue;
 
@@ -2462,6 +2463,13 @@ export function bcd_universalJS_init():void {
 
             element.onclick = null;
             element.removeAttribute('onclick');
+        }
+
+        const buttons = document.querySelectorAll('button');
+        function blurElem(this: HTMLElement) { this.blur(); }
+        for (const button of buttons) {
+            button.addEventListener('mouseup', blurElem);
+            button.addEventListener('touchend', blurElem);
         }
     });
 

@@ -313,6 +313,7 @@ export const possibilities_Generic = [
     "Although, being a scientist, I have to admit I might&rsquo;ve just blinked for longer than usual",
     "Speaking without thinking is not the same as telling the truth",
     "Mine is downloading Couples Therapy.",
+    "&OpenCurlyDoubleQuote;Because&CloseCurlyDoubleQuote; is the tastiest reason.",
 ];
 
 

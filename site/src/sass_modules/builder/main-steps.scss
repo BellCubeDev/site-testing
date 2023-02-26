@@ -249,7 +249,7 @@
     justify-items: stretch;
 
     > img {
-        max-height: 50cqmin;
+        max-height: calc(50vmin - 42px);
         max-width: 100%;
         grid-column: 2;
     }

@@ -138,9 +138,9 @@ export class Folder {
         get: getFileFromFolder.bind(this, true),
     });
 
-    async getFile(name: string): Promise<FileSystemFileHandle|null|InvalidNameError>;
-    async getFile(name: string, create: true): Promise<FileSystemFileHandle|InvalidNameError>
-    async getFile(name: string, create?: boolean): Promise<FileSystemFileHandle|null|InvalidNameError> {
+    async getFile(name: string): Promise<FileSystemFileHandle|null>;
+    async getFile(name: string, create: true): Promise<FileSystemFileHandle>
+    async getFile(name: string, create?: boolean): Promise<FileSystemFileHandle|null> {
         // Split by forward slashes
         const parts = name.split('/');
 
@@ -151,7 +151,7 @@ export class Folder {
         });
 
         const debug_fullPath = [...parts];
-        console.log('Getting file:', debug_fullPath);
+        //console.log('Getting file:', debug_fullPath);
 
         const fileName = parts.pop()!;
 
@@ -166,16 +166,17 @@ export class Folder {
             try {
 
                 currentFolder = await currentFolder[create ? 'childDirsC' : 'childDirs'][parts[i]!]!;
-                console.log('Entered folder: ', debug_targetPath, currentFolder);
+                //console.log('Entered folder: ', debug_targetPath, currentFolder);
                 if (!currentFolder) return currentFolder;
 
             } catch (e) {
                 if (!(e instanceof Error)) throw e;
 
-                if (e instanceof DOMException && e.name === 'NotFoundError')
-                    console.info(`Could not get folder "${debug_targetPath}" for file:`, debug_fullPath, e);
-                else if (e instanceof InvalidNameError || e.message === 'Name is not allowed.' || e.message === 'Cannot get a file with an empty name.')
+                if (e instanceof InvalidNameError || e.message === 'Name is not allowed.' || e.message === 'Cannot get a file with an empty name.') {
                     console.info(`Could not get folder "${debug_targetPath}" for file due to invalid name:`, debug_fullPath, e);
+                    throw e;
+                } else if (e instanceof DOMException && e.name === 'NotFoundError')
+                    console.info(`Could not find folder "${debug_targetPath}" for file:`, debug_fullPath, e);
                 else
                     console.error(`Error getting folder "${debug_targetPath}" for file:`, debug_fullPath, e);
 
@@ -186,10 +187,13 @@ export class Folder {
         try {
             return await currentFolder[create ? 'childFilesC' : 'childFiles'][fileName]!;
         } catch (e) {
-            if (e instanceof DOMException && e.name === 'NotFoundError')
-                console.info(`Could not get file "${debug_fullPath}"`, e);
-            else if (e instanceof TypeError && e.message === 'Name is not allowed.')
-                console.info(`Could not get file "${debug_fullPath}" for file due to invalid name:`, debug_fullPath, e);
+            if (!(e instanceof Error)) throw e;
+
+            if (e instanceof InvalidNameError || e.message === 'Name is not allowed.' || e.message === 'Cannot get a file with an empty name.') {
+                console.info(`Could not get file "${fileName}" due to invalid name:`, debug_fullPath, e);
+                throw e;
+            } else if (e instanceof DOMException && e.name === 'NotFoundError')
+                console.info(`Could not find file "${debug_fullPath}"`, e);
             else
                 console.error(`Error getting file "${debug_fullPath}"`, e);
 
