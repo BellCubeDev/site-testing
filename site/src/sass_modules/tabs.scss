@@ -1,11 +1,11 @@
 @import 'button-colors';
 
 .tab-content {
-    min-height: 70vh;
     min-width: 100%;
+    overflow-y: clip;
 
     opacity: 0; &.active { opacity: 1; }
-    &--hidden { visibility: hidden; }
+    &--hidden { visibility: hidden; height: 0; }
 
     transition-duration: inherit;
     transition-timing-function: inherit;
@@ -61,7 +61,7 @@
 
     position: sticky;
     margin-top: -60px;
-    padding-top: 44px;
+    padding-top: 50px;
     margin-left: -300px;
     z-index: 2;
 

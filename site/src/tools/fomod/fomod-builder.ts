@@ -2,7 +2,6 @@ import * as bcdFS from '../../filesystem-interface.js';
 import * as fomodUI from './fomod-builder-ui.js';
 import * as fomodClasses from  './fomod-builder-classifications.js';
 import * as bcdUniversal from '../../universal.js';
-import * as xml from './fomod-builder-xml-translator.js';
 
 declare global {interface Window {
     domParser: DOMParser;

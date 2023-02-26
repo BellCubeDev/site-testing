@@ -667,8 +667,7 @@ export abstract class BCD_CollapsibleParent {
             function listener(event: TransitionEvent) {
                 if (event.propertyName !== 'margin-top') return;
                 removeListener();
-                transitionEndFunct(event);
-                resolve();
+                afterDelay(10, ()=>  {transitionEndFunct(event); resolve();}  );
             }
 
             this.details_inner.addEventListener('transitionend', listener);
