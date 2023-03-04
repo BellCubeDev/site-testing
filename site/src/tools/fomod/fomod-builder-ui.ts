@@ -147,6 +147,11 @@ export type BCDBuilderType = 'builder'|'vortex'|'mo2';
 
 let firstSetEditor = true;
 export function setStepEditorType(type: BCDBuilderType) {
+
+    const workingEditors = ['builder'];
+    if (!workingEditors.includes(type)) type = 'builder';
+
+
     const thisElem = document.getElementById(`steps-${type}-container`)!;
     const otherSteps = thisElem.parentElement!.querySelectorAll(`.fomod-editor-type:not(#steps-${type}-container)${firstSetEditor ? '' : '.active'}`)!;
 
@@ -357,7 +362,7 @@ export function autoSave() {
 
 window.addEventListener('beforeunload', (event) => {
     if (!hasUnsavedChanges) return;
-    
+
     event.preventDefault();
     event.returnValue = '';
     return '';

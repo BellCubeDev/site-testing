@@ -100,6 +100,31 @@ const config = yaml.parse(await afs.readFile('_config.yml', 'utf8'));
 
 setTimeout(evalFilesInDir.bind(undefined, minifyDir), 100);
 
+// Get font CSS packages
+const fontRoboto_ = fetch('https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en').then(res => res.text());
+const fontIcons_ = fetch('https://fonts.googleapis.com/icon?family=Material+Icons').then(res => res.text());
+
+const [fontRoboto, fontIcons] = await Promise.all([fontRoboto_, fontIcons_]);
+
+function cssReplaceFontSettings(css) {
+    return css.replace(/@font-face \{/g, '@font-face {font-display: swap;')
+            .replace(/font-family: '(.*?)';.*?src:/gs, '$& local("$1"),');
+}
+
+const fontRobotoStep2 = cssReplaceFontSettings(fontRoboto);
+// eslint-disable-next-line prefer-template
+const fontIconsStep2 = cssReplaceFontSettings(fontIcons).replace(/font-display: swap;/g, 'font-display: block;') + `
+.material-icons {
+    font-feature-settings: 'liga';
+    text-rendering: optimizeLegibility;
+    font-smooth: antialiased;
+}
+`;
+
+const pageTemplate = await afs.readFile(`${minifyDir}/_layouts/page.html`, 'utf8');
+const pageTemplateWithCSS = pageTemplate.replace('/* MINIFIER: REPLACE WITH FONT CSS */', await finishMinifyingCSS(false, fontRobotoStep2 + fontIconsStep2));
+afs.writeFile(`${minifyDir}/_layouts/page.html`, pageTemplateWithCSS);
+
 /** @param {string} dirPath Directory to traverse */
 async function evalFilesInDir(dirPath) {
     const files = await afs.readdir(dirPath);
@@ -189,7 +214,7 @@ async function minifyJSFile(filePath) {
             console.log(JSON.stringify({filePath, minifyDir, absoluteMinifyDir}));
             strToMinify = convertToES6(strToMinify)
                 // Handle module imports
-                .replace(/^module ([^\b]+) from/gm, 'import $1 from')
+                .replace(/^module ([^\s]+) from "/gm, 'import $1 from "')
                 // Handle JSON imports
                 .replace(/import (\w+) from ("|')(\.?)(\.?)((?:\\\2|["'](?<!\2)|[^"'])*\.[Jj][Ss][Oo][Nn])\2;?/g, (str, varName, quoteType, leadingDot01, leadingDot02, jsonPath) =>
                 leadingDot01 ? `const ${varName} = await fetch(${quoteType}${leadingDot02}${path.normalize(path.join(config.baseurl || '', path.normalize(filePath).replace(/[\\/][^\\/]+$/, '').replace(path.normalize(minifyDir), ''), jsonPath)).replace(/\\/g, '/')}${quoteType}).then(r => r.json())`
@@ -398,14 +423,16 @@ async function minifyCSSFile(filePath) {
     }
 }
 
+/** @returns {Promise<string|void>} */
 async function finishMinifyingCSS(filePath, css, startMap) {
     css ??= '';
-    const filePath_CSS = filePath.replace(/\.s?css$/, '.css');
+
+    const filePath_CSS = filePath ? filePath.replace(/\.s?css$/, '.css') : 'INTERNET';
+    const filePath_Original = filePath ? filePath.replace(/\.s?css$/, '.original.css') : 'INTERNET';
+    const originalURI = filePath ? canonicalMinifyURI + filePath.replace(minifyDir, '') : 'INTERNET';
+
     startMap ??= {version: 3, sources: [filePath], names: [], mappings: '', file: filePath_CSS};
 
-    const filePath_Original = filePath.replace(/\.s?css$/, '.original.css');
-
-    const originalURI = canonicalMinifyURI + filePath.replace(minifyDir, '');
     if (doDebug) console.log('Minifying CSS file', filePath, 'with original URI', originalURI);
     const processed = await postcss.process(css, {
         from: filePath_Original,
@@ -418,6 +445,8 @@ async function finishMinifyingCSS(filePath, css, startMap) {
             from: originalURI,
         },
     });
+
+    if (!filePath) return processed.css;
 
     processed.map.applySourceMap(new sourcemap.SourceMapConsumer(startMap), originalURI);
     const mapObj = processed.map.toJSON?.() || startMap || {};

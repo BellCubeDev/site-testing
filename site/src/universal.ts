@@ -2393,7 +2393,7 @@ export function bcd_universalJS_init():void {
     // =============================================================
     // Register all the things!
     // =============================================================
-    registerBCDComponents();
+    afterDelay(10, ()=>  registerBCDComponents() );
 
     // =============================================================
     // Modify links not in the main nav to not send a referrer

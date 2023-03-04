@@ -11,7 +11,7 @@
       "checkJs": false,                         /* Report errors in .js files. */
       // "jsx": "preserve",                     /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */
 
-      
+
       // Disabled because it didn't like some of the NPM modules the site uses
       "declaration": false,                      /* Generates corresponding '.d.ts' file. */
       "declarationMap": false,                   /* Generates a sourcemap for each corresponding '.d.ts' file. */
@@ -96,7 +96,7 @@
       "./src/**/*"
     ],
     "exclude": [
-      "src/included_node_modules/**/*.js",
+      "src/included_node_modules/**/*.ts",
     ],
 
     "watchOptions": {
