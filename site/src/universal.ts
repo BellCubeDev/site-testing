@@ -31,7 +31,8 @@ export function afterDelay<TCallback extends (...args: any) => any = any>(timeou
     return window.setTimeout(callback, timeout, ...(args || []));
 }
 
-export async function wait(timeout: number): Promise<void> {
+/** Promise that resolves after the specified timeout */
+export function wait(timeout: number): Promise<void> {
     return new Promise(resolve => afterDelay(timeout, resolve));
 }
 
@@ -772,28 +773,40 @@ export abstract class BCD_CollapsibleParent {
             this.setDisabled(child as HTMLElement, disabled);
 
         const wasDisabled = elm.getAttribute('data-was-disabled') as 'true'|'false'|null;
-        const oldTabIndex = elm.getAttribute('data-old-tabindex');
+        const oldTabIndex = elm.getAttribute('data-old-tabindex')
+
+        const forcePointerEvents = elm.getAttribute('data-force-pointer-events') as 'true'|'false'|null;
+        if (forcePointerEvents !== null) allowPointerEvents = (forcePointerEvents === 'true');
+
+        const forceDisabled = elm.getAttribute('data-force-disabled') as 'true'|'false'|null;
+        if (forceDisabled !== null) disabled = (forceDisabled === 'true');
 
         if (disabled) {
             if (wasDisabled === null) elm.setAttribute('data-was-disabled', elm.hasAttribute('disabled') ? 'true' : 'false');
             elm.setAttribute('disabled', '');
+            elm.ariaDisabled = 'true';
 
             if (oldTabIndex === null) elm.setAttribute('data-old-tabindex', elm.getAttribute('tabindex') || '');
             elm.tabIndex = -1;
 
             //console.log('set disabled', elm instanceof HTMLElement, elm);
 
-        } else if (wasDisabled === 'false' || wasDisabled === null) {
+        } else {
             elm.removeAttribute('data-was-disabled');
-            elm.removeAttribute('disabled');
-            elm.setAttribute('tabindex', oldTabIndex || '');
 
-        } else /* wasDisabled === 'true' */ {
-            elm.removeAttribute('data-was-disabled');
-            elm.setAttribute('tabindex', oldTabIndex || '');
+            if (wasDisabled === 'true') elm.setAttribute('disabled', '');
+            else elm.removeAttribute('disabled');
+
+            elm.ariaDisabled = wasDisabled === 'true' ? 'true' : 'false';
+
+            if (oldTabIndex !== null || elm.hasAttribute('data-old-tabindex')) {
+                oldTabIndex ? elm.setAttribute('tabindex', oldTabIndex) : elm.removeAttribute('tabindex');
+                elm.removeAttribute('data-old-tabindex');
+            }
         }
 
         elm.style.pointerEvents = allowPointerEvents ? '' : 'none';
+
     }
 
     /* Determines what the transition and animation duration of the collapsible menu is */

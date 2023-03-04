@@ -90,17 +90,28 @@ async function prefabCardUpdate(card:Step|Group|Option) {
         : /*card instanceof Option ?*/ card.parent.inherited.parent?.options;
 
     requestAnimationFrame(() => {
-        if (setWithSelf?.size === 1) {
-            card.deleteButton.style.opacity = '0.1';
-            card.deleteButton.style.pointerEvents = 'none';
-            card.deleteButton.disabled = true;
-            card.deleteButton.setAttribute('aria-disabled', 'true');
+        // We set the attributes in here so that the Details/Summary pair doesn't override them.
 
-        } else if (card.deleteButton.disabled) {
+        if (  setWithSelf?.size && setWithSelf.size > 1  ) {
             card.deleteButton.style.opacity = '1';
-            card.deleteButton.style.pointerEvents = 'auto';
+            card.deleteButton.ariaDisabled = 'false';
             card.deleteButton.disabled = false;
-            card.deleteButton.removeAttribute('aria-disabled');
+            card.deleteButton.setAttribute('data-force-disabled', 'false');
+            card.deleteButton.style.pointerEvents = 'auto';
+            card.deleteButton.setAttribute('data-force-pointer-events', 'true');
+            card.deleteButton.tabIndex = 0;
+            card.deleteButton.setAttribute('data-old-tabindex', '0');
+
+        } else {
+            card.deleteButton.style.opacity = '0.1';
+            card.deleteButton.ariaDisabled = 'true';
+            card.deleteButton.disabled = true;
+            card.deleteButton.setAttribute('data-force-disabled', 'true');
+            card.deleteButton.style.pointerEvents = 'none';
+            card.deleteButton.setAttribute('data-force-pointer-events', 'false');
+            card.deleteButton.tabIndex = -1;
+            card.deleteButton.setAttribute('data-old-tabindex', '-1');
+
         }
     });
 }

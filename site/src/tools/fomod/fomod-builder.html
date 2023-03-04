@@ -34,10 +34,11 @@ redirect_from:
 
 <!-- TODO: https://fontawesome.com/icons/trash-can?s=solid&f=classic -->
 
+
 <template id="builder-main-steps-delete-button">
-    <button disabled
+    <button type="button"
         class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect builder-steps-remove-btn"
-        style='width:32px;min-width:32px;height:32px;'>
+        style="width:32px;min-width:32px;height:32px;opacity:0.1;pointer-events:none;" disabled aria-disabled="true">
             <i class="material-icons" style="font-size:75%;font-variation-settings:'FILL' 0,">
                 delete
             </i>
