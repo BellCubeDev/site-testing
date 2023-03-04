@@ -57,7 +57,7 @@ redirect_from:
         <!-- Step Summary -->
         <div class="builder-steps-step-sum js-bcd-summary adjacent">
             <i class="material-icons open-icon-90CC">expand_more</i>
-            <h3 class="builder-steps-step-title">Step: "<span class="name"></span>"</h3>
+            <h1 class="h3 builder-steps-step-title">Step: "<span class="name"></span>"</h1>
             <sub><span class="builder-steps-step-group-count" unitWord="Group">ERROR</span>, <span class="builder-steps-step-option-count" unitWord="Option">ERROR</span></sub>
         </div>
 
@@ -66,12 +66,12 @@ redirect_from:
 
             <div class="builder-steps-body-left builder-steps-body-left--enforce-width">
                 <!-- Step Name -->
-                <div class="item-with-fake-label" identifier="nameInput"><h4>Step Name</h4>
+                <div class="item-with-fake-label"><h2 class="h4">Step Name</h2>
                     <input class="builder-steps-step-name bcd-builder-input" placeholder="Step Name" value="" />
                 </div>
 
                 <!-- Group Sorting Order -->
-                <div class="item-with-fake-label item-with-fake-label--one-liner" identifier="sortOrderButton"><h4>Group Sorting Order</h4>
+                <div class="item-with-fake-label item-with-fake-label--one-liner"><h2 class="h4">Group Sorting Order</h2>
                     <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
                     <menu class="bcd-dropdown-sorting-order mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
                 </div>
@@ -97,7 +97,7 @@ redirect_from:
         <!-- Group Summary -->
         <div class="builder-steps-group-sum js-bcd-summary adjacent">
             <i class="material-icons open-icon-90CC">expand_more</i>
-            <h4 class="builder-steps-group-title">Group: "<span class="name"></span>"</h4>
+            <h2 class="h4 builder-steps-group-title">Group: "<span class="name"></span>"</h2>
             <sub><span class="builder-steps-group-option-count" unitWord="Option">ERROR</span></sub>
         </div>
 
@@ -106,18 +106,18 @@ redirect_from:
 
             <div class="builder-steps-body-left builder-steps-body-left--enforce-width">
                 <!-- Option Name -->
-                <div class="item-with-fake-label" identifier="nameInput"><h4>Group Name</h4>
+                <div class="item-with-fake-label"><h3 class="h4">Group Name</h3>
                     <input class="builder-steps-group-name bcd-builder-input" placeholder="Group Name" value="" />
                 </div>
 
                 <!-- Group Sorting Order -->
-                <div class="item-with-fake-label item-with-fake-label--one-liner" identifier="sortOrderButton"><h4>Group Sorting Order</h4>
+                <div class="item-with-fake-label item-with-fake-label--one-liner"><h3 class="h4">Group Sorting Order</h3>
                     <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
                     <menu class="bcd-dropdown-sorting-order mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
                 </div>
 
                 <!-- Group Selection Type -->
-                <div class="item-with-fake-label item-with-fake-label--one-liner" identifier="sortOrderButton"><h4>Group Selection Type</h4>
+                <div class="item-with-fake-label item-with-fake-label--one-liner"><h3 class="h4">Group Selection Type</h3>
                     <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
                     <menu class="bcd-dropdown-group-type mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
                 </div>
@@ -138,7 +138,7 @@ redirect_from:
         <!-- Option Summary -->
         <div class="builder-steps-option-sum js-bcd-summary adjacent">
             <i class="material-icons open-icon-90CC">expand_more</i>
-            <h5 class="builder-steps-option-title">Option: "<span class="name"></span>"</h5>
+            <h3 class="h4 builder-steps-option-title">Option: "<span class="name"></span>"</h3>
             <sub><span class="builder-steps-option-file-count" unitWord="Install">ERROR</span>, <span class="builder-steps-option-flag-count" unitWord="Flag">ERROR</span></sub>
         </div>
 
@@ -156,34 +156,38 @@ redirect_from:
             <div class="builder-steps-body-left">
 
                 <!-- Option Name -->
-                <div class="item-with-fake-label"><h4>Option Name</h4>
+                <div class="item-with-fake-label"><h4 class="h4">Option Name</h4>
                     <input class="bcd-builder-input builder-steps-option-name" placeholder="Option Name" value="" />
                 </div>
 
                 <!-- Option Description -->
-                <div class="item-with-fake-label"><h4>Description</h4>
+                <div class="item-with-fake-label"><h4 class="h4">Description</h4>
                     <textarea class="bcd-builder-input js-dynamic-textarea-height builder-steps-option-description" placeholder="Option Description" rows="1">This is the single texture version of the mod. It will replace the texture of the scroll with a single texture.</textarea>
                 </div>
 
                 <!-- Plugin Type -->
-                <div class="item-with-fake-label item-with-fake-label--one-liner"><h4>Default Selection Type:</h4>
+                <div class="item-with-fake-label item-with-fake-label--one-liner"><h4 class="h4">Default Selection Type:</h4>
                     <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
                     <menu class="bcd-dropdown-option-state mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
                 </div>
 
-                <div class="item-with-fake-label"><h4>Selection Type Conditions</h4>
+                <div class="item-with-fake-label"><h4 class="h4">Selection Type Conditions</h4>
                     <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn">
                         Edit
                     </button>
                 </div>
 
                 <!-- Condition Flags -->
-                <div class="item-with-fake-label" identifier="conditionFlags"><h4>Condition Flags to Set</h4>
-                    <div class="builder-steps-option-set-flags"></div>
+                <div class="uilder-steps-option-set-flags-sum js-bcd-summary adjacent">
+                    <i class="material-icons open-icon-90CC">expand_more</i>
+                    <h4 class="h4">Condition Flags to Set</h4>
+                </div>
+                <div class="builder-steps-option-set-flags-body js-bcd-details adjacent" data-margin-top="8px">
                 </div>
 
+
                 <!-- Files -->
-                <div class="item-with-fake-label" identifier="installs"><h4>Files & Folders to Install</h4>
+                <div class="item-with-fake-label"><h4 class="h4">Files & Folders to Install</h4>
                     <div class="builder-steps-option-files"></div>
                 </div>
 
@@ -399,12 +403,12 @@ redirect_from:
                 <div class="builder-steps-body-left">
 
                     <!-- Mod Name -->
-                    <div class="item-with-fake-label" identifier="nameInput"><h4>Mod Name</h4>
+                    <div class="item-with-fake-label"><h1 class="h3">Mod Name</h1>
                         <input class="builder-steps-mod-name bcd-builder-input" placeholder="Mod Name" value="" />
                     </div>
 
                     <!-- Steps Sorting Order -->
-                    <div class="item-with-fake-label item-with-fake-label--one-liner" identifier="sortOrderButton"><h4>Sorting Order</h4>
+                    <div class="item-with-fake-label item-with-fake-label--one-liner"><h1 class="h3">Sorting Order</h1>
                         <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
                         <menu class="bcd-dropdown-sorting-order mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
                     </div>

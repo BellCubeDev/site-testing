@@ -119,6 +119,19 @@ const fontIconsStep2 = cssReplaceFontSettings(fontIcons).replace(/font-display: 
     text-rendering: optimizeLegibility;
     font-smooth: antialiased;
 }
+
+/* from material-blue.scss - injected here so the font loads sooner */
+.material-icons {
+    font-family: 'Material Icons';
+    font-weight: 400;
+    font-style: normal;
+    font-size: 24px;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    word-wrap: normal;
+}
 `;
 
 const pageTemplate = await afs.readFile(`${minifyDir}/_layouts/page.html`, 'utf8');

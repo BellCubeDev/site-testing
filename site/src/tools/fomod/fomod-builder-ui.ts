@@ -18,20 +18,10 @@ import jszip from '../../included_node_modules/jszip/dist/jszip.js';
 import pluralize_ from '../../included_node_modules/plural/index.js';
 const pluralize = pluralize_ as (word: string, count: number) => string;
 
-import prettyData_ from '../../included_node_modules/pretty-data/pretty-data.js';
-import type {prettyData as prettyData__} from '../../../untyped-modules';
+import vkBeautify_ from '../../included_node_modules/vkbeautify/index.js';
+import type vkBeautify__ from '../../../node_modules/@types/vkbeautify/index';
 
-const prettyData = prettyData_ as unknown as prettyData__;
-
-// reconstruct array of shifts to use 4 spaces instead of 2 //
-prettyData.pd.step = '    ';
-prettyData.pd.shift = ['\n'];
-for(let i = 0; i < prettyData.pd.maxdeep; i++){
-    prettyData.pd.shift.push(prettyData.pd.shift[i]+prettyData.pd.step);
-}
-
-const xmlBeautify = prettyData.pd.xml.bind(prettyData.pd);
-const xmlMinify = prettyData.pd.xmlmin.bind(prettyData.pd);
+const vkBeautify = vkBeautify_ as unknown as typeof vkBeautify__;
 
 export function updatePluralDisplay(element: Element, count: number) {
     // eslint-disable-next-line prefer-template
@@ -308,8 +298,8 @@ export async function save() {
 
     // Tell the browser to save Info.xml
     let infoString = window.FOMODBuilder.trackedFomod!.obj.asInfoXML(infoDoc).outerHTML || '<!-- ERROR - Serialized document was empty! -->';
-    if (window.FOMODBuilder.storage.settings.formatXML) infoString = xmlBeautify(infoString);
-    else infoString = xmlMinify(infoString, true);
+    if (window.FOMODBuilder.storage.settings.formatXML) infoString = vkBeautify.xml(infoString);
+    else infoString = vkBeautify.xmlmin(infoString, true);
 
     console.log({infoString});
 
@@ -317,8 +307,8 @@ export async function save() {
 
     // Tell the browser to save ModuleConfig.xml
     let moduleString = window.FOMODBuilder.trackedFomod!.obj.asModuleXML(moduleDoc).outerHTML || '<!-- ERROR - Serialized document was empty! -->';
-    if (window.FOMODBuilder.storage.settings.formatXML) moduleString = xmlBeautify(moduleString);
-    else moduleString = xmlMinify(moduleString, true);
+    if (window.FOMODBuilder.storage.settings.formatXML) moduleString = vkBeautify.xml(moduleString);
+    else moduleString = vkBeautify.xmlmin(moduleString, true);
 
     console.log({moduleString});
 

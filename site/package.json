@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@types/sortablejs": "^1.15.0",
+    "@types/vkbeautify": "^0.99.2",
     "@types/wicg-entries-api": "^2020.8.2",
     "@types/wicg-file-system-access": "^2020.9.5",
     "cjs-to-module": "^1.0.0",
@@ -25,12 +26,12 @@
     "jszip": "^3.10.1",
     "plural": "^1.1.0",
     "postcss": "^8.4.19",
-    "pretty-data": "^0.40.0",
     "sass": "^1.56.1",
     "sortablejs": "^1.15.0",
     "terser": "^5.16.1",
     "tsc-watch": "^5.0.3",
     "typescript": "^4.9.3",
+    "vkbeautify": "^0.99.3",
     "yaml": "^2.2.1"
   }
 }

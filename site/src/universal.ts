@@ -2005,7 +2005,9 @@ class RelativeImagePicker extends RelativeFilePicker {
 
             // change width and height to viewBox
             svg.removeAttribute('width'); svg.removeAttribute('height');
-            svg.setAttribute('viewBox', '0 0 48 48');
+
+            // No longer needed as the SVG ships with a viewBox
+            //svg.setAttribute('viewBox', '0 0 48 48');
         }
 
         svg ??= RelativeImagePicker.noImageDoc.querySelector('svg') as SVGSVGElement;
