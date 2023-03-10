@@ -257,7 +257,7 @@ export const possibilities_Generic = [
     "The Chip is my invention, my property, MINE.",
     "We are writers, my love. We don&rsquo;t cry; we bleed on paper.", // - A.Y.
     "<code>79 + 1 = 80</code>", // - Sigismund
-    "...the hit 2010 video game Fallout: New Vegas...", // - Sigismund
+    "&hellip;the hit 2010 video game Fallout: New Vegas&hellip;", // - Sigismund
     "And He said to me, It is done! I am the Alpha and the Omega, the Beginning and the End. I will give of the fountain of the water of life freely to him who thirsts.",
     "28 STAB WOUNDS",
     "Now be a good courier and deliver it!",
@@ -314,7 +314,16 @@ export const possibilities_Generic = [
     "Speaking without thinking is not the same as telling the truth",
     "Mine is downloading Couples Therapy.",
     "&OpenCurlyDoubleQuote;Because&CloseCurlyDoubleQuote; is the tastiest reason.",
-    "How many wives do you have?"
+    "How many wives do you have?",
+    "i like horses and i&rsquo;ve got uncontrollable forehead acne",
+    "do not abuse the banana privilieges",
+    "if you get me a quarter-pounder with cheese i will love you and your children <i>for all eternity</i>",
+    "i want a girl in ohio so everytime i visit her i can get that sweet, cheap ohio gas",
+    "dwayne<br>or the rock<br>but what about&hellip;<br>the johnson",
+    "i just wanna see the girl of by dreams spitting blood out of a wolf",
+    "women can be serial killers too<br>#feminism",
+    "when it doesn't work, spit on it",
+    "i love a good clavicle",
 ];
 
 
