@@ -314,6 +314,7 @@ export const possibilities_Generic = [
     "Speaking without thinking is not the same as telling the truth",
     "Mine is downloading Couples Therapy.",
     "&OpenCurlyDoubleQuote;Because&CloseCurlyDoubleQuote; is the tastiest reason.",
+    "How many wives do you have?"
 ];
 
 
