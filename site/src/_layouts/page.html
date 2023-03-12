@@ -80,7 +80,7 @@ layout: compress_html
 <body>
     <a class="hidden" hidden disabled tab-index='-999' aria-hidden="true" id="debug-link" href="{{ site.baseurl }}{% link debug.html %}">PAY NO ATTENTION TO ME. I'M USED IN THE JAVASCRIPT CONTROLLING THE SITE.</a>
     <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
-        <div class="mdl-layout__drawer" tabindex="-256">
+        <div class="mdl-layout__drawer">
             <span class="mdl-layout-title">
                 <picture>
                     <source srcset="{{ site.baseurl }}{% link assets/site/images/icon.avif %}" type="image/avif" />
@@ -93,11 +93,15 @@ layout: compress_html
                 <div class="nav-content" style="height:max-content;display:flex;flex-direction:column;flex-wrap:nowrap;align-content:center;align-items:stretch;">
                     <!-- https://fonts.google.com/icons -->
                     <h2>Site</h2>
-                    <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link index.html %}">
+                    <a aria-label="Homepage" class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link index.html %}">
                         <i class="material-icons">home</i>
                         <span>Homepage</span>
                     </a>
-                    <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link sitemap/Sitemap.html %}">
+                    <a aria-label="About BellCube" class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link about-me.html %}">
+                        <i class="material-icons">menu_book</i>
+                        <span>About BellCube</span>
+                    </a>
+                    <a aria-label="Sitemap" class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link sitemap/Sitemap.html %}">
                         <i class="material-icons">map</i>
                         <span>Sitemap</span>
                     </a>
@@ -106,18 +110,22 @@ layout: compress_html
                         <i class="material-icons open-icon-90CC">expand_more</i><h3>Tools</h3>
                     </button>
                     <div class="js-bcd-details adjacent is-open">
-                        <a class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}{% link tools/fomod/fomod-builder.html %}">
-                            <i class="material-icons">build_circle</i>
+                        <a aria-label="FOMOD Builder" class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}{% link tools/fomod/fomod-builder.html %}">
+                            <i class="material-icons">rebase_edit</i>
                             <span>FOMOD Builder</span>
                         </a>
-                        <a class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}{% link tools/papyrus/markdown-docs/papyrus-docs.html %}">
-                            <i class="material-icons">code</i>
+                        <a aria-label="Auto Papyrus Docs Tool" class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}{% link tools/papyrus/markdown-docs/papyrus-docs.html %}">
+                            <i class="material-icons">integration_instructions</i>
                             <span>Auto Papyrus Docs</span>
                         </a>
-                        <a class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}{% link tools/typescript/from-inline-source/ts-from-inline-src.html %}">
+                        <a aria-label="TypeScript from Inline Source Tool" class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}{% link tools/typescript/from-inline-source/ts-from-inline-src.html %}">
                             <i class="material-icons">compress</i>
-                            <span>TS&&nbsp; &lt;--&nbsp; Inline Source</span>
+                            <span>TS <i class="material-icons">arrow_back</i> Inline Source</span>
                         </a>
+                        {%raw%}<!-- <a aria-label="TypeScript from Inline Source Tool" class="mdl-navigation__link mdl-navigation__link--icon"  href="{{ site.baseurl }}{% link tools/ban-generator/ban-generator.html %}">
+                            <i class="material-icons material-icons--outlined">local_police</i>
+                            <span>Nexus Ban Generator</span>
+                        </a> -->{%endraw%}
                     </div>
 
                     <!-- Currently testing to see which of these two is broken OR if nesting is perfectly balanced with no exploits-->
@@ -125,7 +133,7 @@ layout: compress_html
                         <i class="material-icons open-icon-90CC">expand_more</i><h3>Documentation</h3>
                     </button>
                     <div class="js-bcd-details adjacent contPad01-left">
-                        <a class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link documentation/linear-spell-progression/linear-spell-progression.html %}"><div class="center-vert">
+                        <a aria-label="Linear Spell Progression Docs" class="mdl-navigation__link mdl-navigation__link--icon" href="{{ site.baseurl }}{% link documentation/linear-spell-progression/linear-spell-progression.html %}"><div class="center-vert">
                             <i class="material-icons" style="padding-left: 0;">book</i>
                             <span>Linear Spell<br />Progression</span>
                         </div></a>
@@ -146,7 +154,7 @@ layout: compress_html
                     </a>
                     <a class="mdl-navigation__link mdl-navigation__link--icon" target="_blank"
                         href="https://github.com/BellCubeDev">
-                        <img alt="" style="padding-left:0;max-width: 24px;" src="{{ site.baseurl }}{% link assets/site/images/SVGs/GitHub.svg %}">
+                        <img alt="" width="24" height="24" style="padding-left:0" src="{{ site.baseurl }}{% link assets/site/images/SVGs/GitHub.svg %}">
                         <span>GitHub Page</span>
                     </a>
                 </div>

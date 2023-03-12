@@ -3162,9 +3162,8 @@ export class MaterialLayout {
             this.obfuscator_.classList.add(MaterialLayout.cssClasses.IS_DRAWER_OPEN);
         }
 
-        this.drawer_.setAttribute('aria-hidden', 'false');
-        this.drawer_.removeAttribute('disabled', 'false');
-        this.drawer_.removeAttribute('tabindex');
+        const drawerEvent = new CustomEvent('drawerOpen', {bubbles: true});
+        this.drawer_.dispatchEvent(drawerEvent);
 
         var drawerButton = this.element_.querySelector(`.${MaterialLayout.cssClasses.DRAWER_BTN}`);
         drawerButton.setAttribute('aria-expanded', 'true');
@@ -3185,9 +3184,8 @@ export class MaterialLayout {
             this.obfuscator_.classList.remove(MaterialLayout.cssClasses.IS_DRAWER_OPEN);
         }
 
-        this.drawer_.setAttribute('aria-hidden', 'true');
-        this.drawer_.setAttribute('tabindex', '-256');
-        this.drawer_.setAttribute('disabled', 'true');
+        const drawerEvent = new CustomEvent('drawerClose', {bubbles: true});
+        this.drawer_.dispatchEvent(drawerEvent);
 
         var drawerButton = this.element_.querySelector(`.${MaterialLayout.cssClasses.DRAWER_BTN}`);
         drawerButton.setAttribute('aria-expanded', 'false');
@@ -3316,11 +3314,6 @@ export class MaterialLayout {
             this.element_.appendChild(this.obfuscator_);
 
             if (!this.obfuscator_) throw new Error('MDL: No obfuscator found!');
-
-
-            this.drawer_.setAttribute('aria-hidden', 'true');
-            this.drawer_.setAttribute('tabindex', '-256');
-            this.drawer_.setAttribute('disabled', 'true');
 
             drawerButton.addEventListener(window.clickEvt, this.drawerToggleHandler_.bind(this));
             drawerButton.addEventListener('keydown', this.drawerToggleHandler_.bind(this));

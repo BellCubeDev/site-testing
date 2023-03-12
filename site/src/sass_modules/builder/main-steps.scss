@@ -181,6 +181,24 @@
     gap: 32px;
     align-items: start;
     grid-template-columns: minmax(0, 1fr) minmax(0, 40vw);
+    grid-template-rows: 1fr;
+}
+
+.builder-steps-option-outcomes {
+    @include imageColumn();
+
+    row-gap: 0;
+
+    grid-column: 1/-1;
+    > hr { grid-column: 1/-1; }
+
+    >:nth-child(2), >:nth-child(3) { grid-column: 1; }
+    >:nth-child(4), >:last-child  { grid-column: 2; }
+
+    > .js-bcd-summary { grid-row: 2; }
+    > .js-bcd-details { grid-row: 3; }
+
+    padding-bottom: 16px;
 }
 
 #steps-builder-container {

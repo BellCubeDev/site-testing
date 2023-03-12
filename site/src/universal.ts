@@ -80,7 +80,6 @@ export function nestAnimationFrames(num: number, callback: () => unknown) {
 /** Convenience type to quickly create an indexed Object with the specified type */
 export type objOf<T> = {[key:string]: T};
 
-
 // ==================================
 // ======== STRING UTILITIES ========
 // ==================================
@@ -417,6 +416,8 @@ declare global {
     }
 
     interface Window {
+        domParser: DOMParser;
+
         /** Variables set by the page */
         //bcdPageVars: Partial<{}>
 
@@ -444,6 +445,7 @@ declare global {
         registerForEvents: typeof registerForEvents;
     }
 }
+window.domParser = new DOMParser();
 
 function ___getExtends<K extends abstract new (...args: any[]) => unknown>(this: ComponentMap, type: K) {
     const returnVal:InstanceType<K>[] = [];
@@ -508,12 +510,12 @@ if (window.location.search[0] === '?')
                             .forEach(param => window.queryParams[param[0]!.trim()] = param[1]?.trim() ?? '');
 
 
-export interface Component extends Function {
+export interface Component {
     new(element: any, ...args: any[]): any;
 }
 
 /** Interface defining the readonly properties cssClass and asString to make identifying MDL Classes set up for my custom, painless registration functions a breeze */
-export interface BCDComponentI extends Component {
+export interface BCDComponent extends Component {
     readonly asString: string;
     readonly cssClass: string;
 }
@@ -529,7 +531,7 @@ export type ComponentMap = Map<Component, InstanceType<Component>> & {
 
 
 /** Variable to store components that we'll be registering on DOM initialization */
-const bcdComponents:BCDComponentI[] = [];
+const bcdComponents:BCDComponent[] = [];
 
 
 
@@ -773,7 +775,7 @@ export abstract class BCD_CollapsibleParent {
             this.setDisabled(child as HTMLElement, disabled);
 
         const wasDisabled = elm.getAttribute('data-was-disabled') as 'true'|'false'|null;
-        const oldTabIndex = elm.getAttribute('data-old-tabindex')
+        const oldTabIndex = elm.getAttribute('data-old-tabindex');
 
         const forcePointerEvents = elm.getAttribute('data-force-pointer-events') as 'true'|'false'|null;
         if (forcePointerEvents !== null) allowPointerEvents = (forcePointerEvents === 'true');
@@ -1467,10 +1469,12 @@ export class BCDTabButton extends mdl.MaterialButton {
             if (sibling === this.element_) {
                 sibling.classList.add('active');
                 sibling.setAttribute('aria-pressed', 'true');
+                sibling.setAttribute('aria-selected', 'true');
             }
             else {
                 sibling.classList.remove('active');
                 sibling.setAttribute('aria-pressed', 'false');
+                sibling.setAttribute('aria-selected', 'false');
             }
         }
 
@@ -2003,11 +2007,8 @@ class RelativeImagePicker extends RelativeFilePicker {
             RelativeImagePicker.noImageDoc = new DOMParser().parseFromString(str, 'text/html');
             svg = RelativeImagePicker.noImageDoc.querySelector('svg') as SVGSVGElement;
 
-            // change width and height to viewBox
+            if (!svg.hasAttribute('viewBox')) svg.setAttribute('viewBox', `0 0 ${svg.getAttribute('width') || '0'} ${svg.getAttribute('height') || '0'}`);
             svg.removeAttribute('width'); svg.removeAttribute('height');
-
-            // No longer needed as the SVG ships with a viewBox
-            //svg.setAttribute('viewBox', '0 0 48 48');
         }
 
         svg ??= RelativeImagePicker.noImageDoc.querySelector('svg') as SVGSVGElement;
@@ -2081,6 +2082,53 @@ class RelativeImagePicker extends RelativeFilePicker {
     }
 }
 bcdComponents.push(RelativeImagePicker);
+
+class DOMSvg {
+    static readonly asString = 'BCD - DOM SVG';
+    static readonly cssClass = 'js-dom-svg';
+
+    svgSrc: string;
+    element: HTMLElement;
+
+    constructor(element: HTMLElement) {
+        const src = element.getAttribute('src');
+        if (!src) throw new Error('The DOM SVG must have a src attribute.');
+
+        this.svgSrc = src;
+        this.element = element;
+        this.initSvg();
+    }
+
+    async initSvg() {
+        try {
+            const svgRes = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(this.svgSrc)}`, {
+                cache: 'force-cache',
+            });
+
+            if (!svgRes.ok) {
+                this.element.classList.add('js-dom-svg--error', 'js-dom-svg--loaded');
+                return this.element.innerHTML = `<p>Could not load the image!</p><br><code>${svgRes.status}: ${svgRes.statusText || (svgRes.status == 408 ? 'Fetching the graphic took too long!' : '')}</code>`;
+            }
+
+            const svgTxt = await svgRes.text();
+
+            const svgDoc = window.domParser.parseFromString(svgTxt, 'image/svg+xml');
+
+            const svg = svgDoc.querySelector('svg') as SVGSVGElement;
+            if (!svg) throw new Error('Could not find the SVG element in the SVG document.');
+
+            this.element.appendChild(svg);
+            this.element.classList.add('js-dom-svg--loaded');
+        } catch (e) {
+            if ( ! (e instanceof Error) ) throw e;
+            console.warn('Could not load the SVG image.', e);
+
+            this.element.classList.add('js-dom-svg--error', 'js-dom-svg--loaded');
+            return this.element.innerHTML = `<p>Could not load the image!</p><br>JavaScript Error: <code>${e.message}</code>`;
+        }
+    }
+}
+bcdComponents.push(DOMSvg);
 
 
 /*$$$$$\              $$\       $$\     $$\                                      $$$$$$\            $$\       $$\
@@ -2340,7 +2388,7 @@ $$ |  $$ |\$$$$$$$\ \$$$$$$$ |$$ |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |  \$$$
     @throws nothing - this function gracefully handles errors in the form of `console.error` calls instead of throwing actual errors
     @returns whether or not an error occurred with the error as the return value
 */
-export function registerBCDComponent(component:BCDComponentI):boolean|Error {
+export function registerBCDComponent(component:BCDComponent):boolean|Error {
     try{
 
         mdl.componentHandler.register({
@@ -2364,7 +2412,7 @@ export function registerBCDComponent(component:BCDComponentI):boolean|Error {
 /** Tell MDL about our shiny new components
     @param components The components to register. Defaults to the global bcdComponents array if not specified.
 */
-export function registerBCDComponents(...components:BCDComponentI[]):void{
+export function registerBCDComponents(...components:BCDComponent[]):void{
 
     const componentArr = components.length ? components : bcdComponents;
 
@@ -2488,5 +2536,54 @@ export function bcd_universalJS_init():void {
         }
     });
 
+    // =============================================================
+    // Add IDs to all headers - ONLY FOR USE IN SAME-PAGE LINKS
+    // =============================================================
+    afterDelay(200, () => {
+        const headers = document.querySelectorAll(':is(nav, main) :is(h1, h2, h3, h4, h5, h6)');
+        for (const header of headers) {
+            if (header.id) continue;
+            header.id = header.textContent?.trim().replace(/['"+=?!@#$%^*]+/gi, '').replace(/&+/gi, 'and').replace(/[^a-z0-9]+/gi, '-').toLowerCase() ?? '';
+        }
+
+        const navHeaders = document.querySelectorAll('nav :is(h1, h2, h3, h4, h5, h6)');
+        for (const header of navHeaders) { if (header.id) header.id = `nav-${header.id}`; }
+
+        // Scroll to the hash if it exists
+        if (window.location.hash.startsWith('#'))  {
+            if (window.location.hash === '#') window.scrollTo(0, 0);
+            else {
+                const elem = document.getElementById(window.location.hash.substring(1));
+
+                if (elem) elem.scrollIntoView({ behavior: 'smooth' });
+                else console.info(`No element with ID "${window.location.hash.substring(1)}" found!`);
+            }
+        }
+
+    });
+
+    // =============================================================
+    // Register for the drawer open/close events
+    // =============================================================
+
+    const drawer = document.querySelector('.mdl-layout__drawer') as HTMLDivElement;
+
+    drawer.addEventListener('drawerOpen', drawerOpenHandler);
+    drawer.addEventListener('drawerClose', drawerCloseHandler);
+
+    if (drawer.classList.contains('is-visible')) drawerOpenHandler.call(drawer);
+    else drawerCloseHandler.call(drawer);
+
 }
 window.bcd_init_functions.universal = bcd_universalJS_init;
+
+
+function drawerOpenHandler(this: HTMLDivElement) {
+    this.removeAttribute('aria-hidden');
+    BCD_CollapsibleParent.setDisabled(this, false);
+}
+
+function drawerCloseHandler(this: HTMLDivElement) {
+    this.setAttribute('aria-hidden', 'true');
+    BCD_CollapsibleParent.setDisabled(this, true);
+}

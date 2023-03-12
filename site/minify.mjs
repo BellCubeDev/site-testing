@@ -101,41 +101,58 @@ const config = yaml.parse(await afs.readFile('_config.yml', 'utf8'));
 setTimeout(evalFilesInDir.bind(undefined, minifyDir), 100);
 
 // Get font CSS packages
-const fontRoboto_ = fetch('https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en').then(res => res.text());
-const fontIcons_ = fetch('https://fonts.googleapis.com/icon?family=Material+Icons').then(res => res.text());
+const fontLocations = [
+    'https://fonts.googleapis.com/css?family=Roboto:regular,bold,italic,thin,light,bolditalic,black,medium&amp;lang=en',
+    {
+        hrefs: [
+            'https://fonts.googleapis.com/icon?family=Material+Icons',
+            'https://fonts.googleapis.com/css2?family=Material+Icons+Outlined',
+        ],
+        before: [[/material-icons-outlined/g, 'material-icons--outlined']],
+        after: [[/font-display: swap;/g, 'font-display: block;']],
+        append: `
+        .material-icons, .material-icons--outlined {
+            font-feature-settings: 'liga';
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        `
+    },
+];
 
-const [fontRoboto, fontIcons] = await Promise.all([fontRoboto_, fontIcons_]);
+/** @type string[] */
+const fontStylesheets = await Promise.all(fontLocations.map(async url => {
+    if (typeof url === 'string') {
+        const res = await fetch(url);
+        return cssReplaceFontSettings(await res.text());
+    } else {
+        const cssPromises = [];
+        for (const href of url.hrefs) {
+            // I've got reasons far beyond your comprehension... stupid static analysis tool.
+            cssPromises.push(async function() {
+                const res = await fetch(href);
+                let css = await res.text();
+
+                url.before?.forEach(([regex, replace]) => css = css.replace(regex, replace));
+                css = cssReplaceFontSettings(css);
+                url.after?.forEach(([regex, replace]) => css = css.replace(regex, replace));
+
+                return css;
+            }());
+        }
+        const cssArr = await Promise.all(cssPromises);
+        return cssArr.join('\n') + (url.append ?? '');
+    }
+}));
 
 function cssReplaceFontSettings(css) {
     return css.replace(/@font-face \{/g, '@font-face {font-display: swap;')
             .replace(/font-family: '(.*?)';.*?src:/gs, '$& local("$1"),');
 }
 
-const fontRobotoStep2 = cssReplaceFontSettings(fontRoboto);
-// eslint-disable-next-line prefer-template
-const fontIconsStep2 = cssReplaceFontSettings(fontIcons).replace(/font-display: swap;/g, 'font-display: block;') + `
-.material-icons {
-    font-feature-settings: 'liga';
-    text-rendering: optimizeLegibility;
-    font-smooth: antialiased;
-}
-
-/* from material-blue.scss - injected here so the font loads sooner */
-.material-icons {
-    font-family: 'Material Icons';
-    font-weight: 400;
-    font-style: normal;
-    font-size: 24px;
-    line-height: 1;
-    letter-spacing: normal;
-    text-transform: none;
-    display: inline-block;
-    word-wrap: normal;
-}
-`;
-
 const pageTemplate = await afs.readFile(`${minifyDir}/_layouts/page.html`, 'utf8');
-const pageTemplateWithCSS = pageTemplate.replace('/* MINIFIER: REPLACE WITH FONT CSS */', await finishMinifyingCSS(false, fontRobotoStep2 + fontIconsStep2));
+const pageTemplateWithCSS = pageTemplate.replace('/* MINIFIER: REPLACE WITH FONT CSS */', await finishMinifyingCSS(false, fontStylesheets.join('\n')));
 afs.writeFile(`${minifyDir}/_layouts/page.html`, pageTemplateWithCSS);
 
 /** @param {string} dirPath Directory to traverse */
@@ -435,7 +452,7 @@ async function minifyCSSFile(filePath) {
         return;
     }
 }
-
+ 
 /** @returns {Promise<string|void>} */
 async function finishMinifyingCSS(filePath, css, startMap) {
     css ??= '';

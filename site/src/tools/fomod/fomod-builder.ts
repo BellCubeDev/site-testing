@@ -4,7 +4,6 @@ import * as fomodClasses from  './fomod-builder-classifications.js';
 import * as bcdUniversal from '../../universal.js';
 
 declare global {interface Window {
-    domParser: DOMParser;
     FOMODBuilder: {
         ui: fomodUI.WindowUI
         directory?: bcdFS.writeableFolder;
@@ -17,9 +16,6 @@ declare global {interface Window {
         };
     };
 }}
-
-window.domParser = new DOMParser();
-const domParser = window.domParser;
 
 export interface builderStorage {
     storageRevision: number,
