@@ -43,7 +43,7 @@ $$ |  $$ |$$$$$$$  |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |\$$$$$$$\   \$$$$  |
 \__|  \__|\_______/ \_______/    \____/ \__|       \_______| \_______|   \____/ \______*/
 
 /** A map of FOMODElementProxy classes and the classes they should create alongside themselves for update purposes */
-export const UpdateObjects =new Map<FOMODElementProxy|Function, ({new(param: any): UpdatableObject} & Omit<typeof UpdatableObject, 'new'>)[]>();
+export const UpdateObjects = new Map<FOMODElementProxy|Function, ({new(param: any): UpdatableObject} & Omit<typeof UpdatableObject, 'new'>)[]>();
 export function addUpdateObjects<TClass extends Omit<typeof FOMODElementProxy, 'new'> & {new(...any:any):any}>(obj: TClass, ...updatables: ({new(param: InstanceType<TClass>): UpdatableObject} & Omit<typeof UpdatableObject, 'new'>)[]) {
     UpdateObjects.get(obj)?.push(...updatables) ||
     UpdateObjects.set(obj, updatables);
@@ -69,6 +69,7 @@ export abstract class FOMODElementProxy extends UpdatableObject {
         if ('steps' in this   &&   this.steps instanceof Set) this.steps.forEach(  (step) => step.updateObjects.call(step, true)  );
         if ('groups' in this  &&  this.groups instanceof Set) this.groups.forEach(  (group) => group.updateObjects.call(group, true)  );
         if ('options' in this && this.options instanceof Set) this.options.forEach(  (option) => option.updateObjects.call(option, true)  );
+        if ('flags'  in this  &&  this.flags  instanceof Set) this.flags   .forEach(  (flag) =>   flag.updateObjects  .call(flag,    true)  );
 
         // We know that it didn't come from an actual update, so let's go through the update API this time
         // Don't worry - when the update goes through, it'll just call this function again, but this time it'll be false
@@ -111,11 +112,12 @@ export abstract class FOMODElementProxy extends UpdatableObject {
     asInfoXML?(document: XMLDocument): Element;
 }
 
-interface InheritedFOMODData<TType extends Step|Group|Option> {
+interface InheritedFOMODData<TType extends Step|Group|Option|Dependency> {
     base?: Fomod,
     parent?: TType extends Step ? Fomod
-                : TType extends Group ? Step
-                : Group,
+        : TType extends Group ? Step
+        : TType extends Option ? Group
+        /* TT extends Dependency */ : Option,
     containers?: Record<string, HTMLDivElement>,
 }
 
@@ -148,31 +150,49 @@ $$ |  $$\ $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \
 
 export const flags:objOf<Flag> = {};
 export class Flag {
-    name = '';
-    values = new Set<string>();
-    getters = new Set<Option>();
-    setters = new Set<Option>();
+    name: string;
 
-    private constructor(name = '', value:string|null = null) {
-        this.name ??= name;
-        if (typeof value === 'string') this.values.add(value);
+    getters = new Set<DependencyFlag>();
+    gettersByValue: Record<string, Set<DependencyFlag>> = {};
+
+    setters = new Set<DependencyFlag>();
+    settersByValue: Record<string, Set<DependencyFlag>> = {};
+
+    private cachedValues: Map<DependencyFlag, string> = new Map();
+
+    private constructor(name: string) {
+        this.name = name;
         flags[name] = this;
     }
 
-    static get(name: string): Flag {
-        return flags[name] ?? new Flag(name);
+    get values(): Set<string> {
+        const values = new Set<string>();
+        for (const getter of this.getters) values.add(getter.value);
+        return values;
     }
 
-    static setValue(name: string, value: string): Flag {
-        const flag = Flag.get(name);
-        flag.values.add(value);
-        return flag;
+    static get(name: string): Flag { return flags[name] ?? new Flag(name); }
+
+    updateGetter(getter: DependencyFlag) { this.getters.add(getter); }
+    updateSetter(setter: DependencyFlag) {
+        this.setters.add(setter);
+
+        const oldValue = this.cachedValues.get(setter);
+        if (oldValue !== setter.value) {
+            if (oldValue) {
+                if (!this.settersByValue[oldValue]) this.settersByValue[oldValue] = new Set();
+                this.settersByValue[oldValue]!.delete(setter);
+            }
+
+            if (!this.settersByValue[setter.value]) this.settersByValue[setter.value] = new Set();
+            this.settersByValue[setter.value]!.add(setter);
+        }
+
+        this.cachedValues.set(setter, setter.value);
     }
 
-    /** @returns whether or not a value was removed from the `values` Set */
-    removeValue(value:string): boolean {
-        return this.values.delete(value);
-    }
+    static updateGetter(getter: DependencyFlag) { Flag.get(getter.flag).updateGetter(getter); }
+    static updateSetter(option: Option, setter: DependencyFlag) { Flag.get(setter.flag).updateSetter(setter); }
 }
 
 export type DependencyFileState = 'Active' | 'Inactive' | 'Missing';
@@ -235,14 +255,23 @@ export class DependencyFlag extends Dependency {
     set value(value: string) { this._value = value; this.updateObjects(); } get value(): string { return this._value; }
 
     readonly type:DependencyFlagTags;
+    readonly inherited?: InheritedFOMODData<Dependency>;
 
-    constructor(type: DependencyFlagTags, instanceElement: Element | undefined = undefined) {
+    constructor(type: DependencyFlagTags, inherited?: InheritedFOMODData<Dependency>, instanceElement: Element | undefined = undefined) {
         super(instanceElement);
         this.type = type;
+        this.inherited = inherited;
         if (instanceElement) {
             this.flag = instanceElement.getAttribute('name') ?? '';
             this.value = instanceElement.getAttribute('value') || instanceElement.textContent || '';
         }
+    }
+
+    override update_() {
+        if (!this.inherited) return;
+
+        if (this.type === 'flagDependency') Flag.updateGetter(this);
+        else if (this.inherited.parent) Flag.updateSetter(this.inherited.parent, this);
     }
 
     // <flagDependency flag="" value="" />
@@ -300,7 +329,7 @@ export class DependencyModManager extends DependencyBaseVersionCheck {
     }
 }
 
-function parseDependency(dependency: Element): Dependency {
+function parseDependency(dependency: Element, inherited?: InheritedFOMODData<Dependency>): Dependency {
     const type = dependency.tagName;
     switch (type) {
         case 'dependencies':
@@ -308,7 +337,7 @@ function parseDependency(dependency: Element): Dependency {
         case 'fileDependency':
             return new DependencyFile(dependency);
         case 'flagDependency':
-            return new DependencyFlag('flagDependency', dependency);
+            return new DependencyFlag('flagDependency', inherited, dependency);
         case 'foseDependency':
             return new DependencyScriptExtender(dependency);
         case 'gameDependency':
@@ -546,14 +575,14 @@ export class Step extends FOMODElementProxy {
 
     groups: Set<Group>;
 
-    groupsContainers: Record<string, HTMLDivElement> = {};
+    groupContainers: Record<string, HTMLDivElement> = {};
 
     conditions: DependencyGroup | undefined;
 
     addGroup(xmlElement?: ConstructorParameters<typeof Group>[1]) {
         this.groups.add(new Group({
             base: this.inherited.base,
-            containers: this.groupsContainers,
+            containers: this.groupContainers,
             parent: this,
         }, xmlElement));
 
@@ -634,12 +663,12 @@ export class Group extends FOMODElementProxy {
 
     options: Set<Option>;
 
-    optionsContainers: Record<string, HTMLDivElement> = {};
+    optionContainers: Record<string, HTMLDivElement> = {};
 
     addOption(xmlElement?: ConstructorParameters<typeof Option>[1]) {
         this.options.add(new Option({
             base: this.inherited.base,
-            containers: this.optionsContainers,
+            containers: this.optionContainers,
             parent: this,
         }, xmlElement));
 
@@ -711,11 +740,11 @@ export class Option extends FOMODElementProxy {
     private _image!: string;
     set image(value: string) { this._image = value; this.updateObjects(); } get image(): string { return this._image; }
 
-    private _conditionFlags: DependencyFlag[] = [];
-    set conditionFlags(value: DependencyFlag[]) { this._conditionFlags = value; this.updateObjects(); } get conditionFlags(): DependencyFlag[] { return this._conditionFlags; }
+    flagsToSet: Set<DependencyFlag> = new Set();
+    flagsContainers: Record<string, HTMLDivElement> = {};
 
-    private _files: DependencyFile[] = [];
-    set files(value: DependencyFile[]) { this._files = value; this.updateObjects(); } get files(): DependencyFile[] { return this._files; }
+    files: Set<DependencyFile> = new Set();
+    filesContainers: Record<string, HTMLDivElement> = {};
 
     private _typeDescriptor!: OptionTypeDescriptor;
     set typeDescriptor(value: OptionTypeDescriptor) { this._typeDescriptor = value; this.updateObjects(); } get typeDescriptor(): OptionTypeDescriptor { return this._typeDescriptor; }
@@ -733,11 +762,16 @@ export class Option extends FOMODElementProxy {
         this.description = this.instanceElement.getElementsByTagName('description')[0]?.textContent || '';
         this.image = this.instanceElement.getElementsByTagName('image')[0]?.getAttribute('path') || '';
 
+        const inheritedForFlags = {
+            base: this.inherited.base,
+            parent: this,
+            containers: this.flagsContainers,
+        };
         for (const flag of this.instanceElement.getElementsByTagName('flag') ?? [])
-            this.conditionFlags.push(new DependencyFlag('flag', flag));
+            this.flagsToSet.add(new DependencyFlag('flag', inheritedForFlags, flag));
 
         for (const file of this.instanceElement.getElementsByTagName('file') ?? [])
-            {}// this.files.push(new FomodFile(file));
+            {}// this.files.add(new FomodFile(file));
     }
 
     override asModuleXML(document: XMLDocument): Element {
@@ -758,24 +792,27 @@ export class Option extends FOMODElementProxy {
         }
         else this.instanceElement.removeChildByTag('image');
 
-        if (this.conditionFlags.length > 0) {
-            const conditionFlags = this.instanceElement.getOrCreateChildByTag('conditionFlags');
+        if (this.flagsToSet.size > 0) {
+            const flagsToSet = this.instanceElement.getOrCreateChildByTag('conditionFlags');
 
-            for (const flag of this.conditionFlags) conditionFlags.appendChild(flag.asModuleXML(document));
-            this.instanceElement.appendChild(conditionFlags);
+            for (const flag of this.flagsToSet) flagsToSet.appendChild(flag.asModuleXML(document));
+            this.instanceElement.appendChild(flagsToSet);
         } else
             this.instanceElement.removeChildByTag('conditionFlags');
 
-        if (this.files.length > 0) {
+        if (this.files.size > 0) {
             const files = this.instanceElement.getOrCreateChildByTag('files');
-
             for (const file of this.files) files.appendChild(file.asModuleXML(document));
             this.instanceElement.appendChild(files);
-        } else if (this.conditionFlags.length == 0) {
+
+        } else if (this.flagsToSet.size == 0) { // Create an empty `files` element if there are no flags to set to comply with the spec
             const emptyFilesElem = this.instanceElement.getOrCreateChildByTag('files');
             this.instanceElement.appendChild(emptyFilesElem);
-        } else
-            this.instanceElement.removeChildByTag('files');
+
+        }
+        // Don't remove the `files` element for now. Once the Builder can parse files, this will be uncommented
+        // else
+        // this.instanceElement.removeChildByTag('files');
 
         this.instanceElement.appendChild(this.typeDescriptor.asModuleXML(document));
 
@@ -849,12 +886,12 @@ export class Fomod extends FOMODElementProxy {
 
     sortingOrder: SortOrder = window.FOMODBuilder.storage.settings.defaultSortingOrder;
 
-    stepsContainers: Record<string, HTMLDivElement> = {};
+    stepContainers: Record<string, HTMLDivElement> = {};
 
     addStep(xmlElement?: ConstructorParameters<typeof Step>[1]) {
         this.steps.add(new Step({
             base: this,
-            containers: this.stepsContainers,
+            containers: this.stepContainers,
             parent: this,
         }, xmlElement));
 

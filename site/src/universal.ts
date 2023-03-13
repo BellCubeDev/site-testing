@@ -73,6 +73,13 @@ export function nestAnimationFrames(num: number, callback: () => unknown) {
     requestAnimationFrame(() => nestAnimationFrames(num - 1, callback));
 }
 
+export async function animationFrames(num: number): Promise<void> {
+    return new Promise(resolve => nestAnimationFrames(num, resolve));
+}
+export function anAnimationFrame(): Promise<void> {
+    return animationFrames(1);
+}
+
 // ================================
 // ======== TYPE UTILITIES ========
 // ================================

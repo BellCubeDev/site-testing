@@ -9,7 +9,7 @@
 
 import * as mainClasses from './fomod-builder-classifications.js';
 import * as mainUI from './fomod-builder-ui.js';
-import { registerUpgrade, BCDDropdown, registerForEvents, unregisterForEvents, UpdatableObject, BCDSummary } from '../../universal.js';
+import { anAnimationFrame, registerUpgrade, BCDDropdown, registerForEvents, unregisterForEvents, UpdatableObject, BCDSummary } from '../../universal.js';
 import { updatePluralDisplay } from './fomod-builder-ui.js';
 import { componentHandler } from '../../assets/site/mdl/material.js';
 
@@ -59,20 +59,126 @@ export const sortableSettings_options = {
     draggable: '.builder-steps-option',
 } as const satisfies Sortable__.Options;
 
-const deleteButtonTemplate = (document.getElementById('builder-main-steps-delete-button') as HTMLTemplateElement).content.firstElementChild as HTMLButtonElement;
-const dragHandleTemplate = (document.getElementById('builder-main-steps-drag-handle') as HTMLTemplateElement).content.firstElementChild as HTMLButtonElement;
+abstract class CardBase extends UpdatableObject {
+    abstract parent?: mainClasses.DependencyFlag|mainClasses.Option|mainClasses.Group|mainClasses.Step|mainClasses.Fomod;
+    abstract parentGroup?: Set<NonNullable<CardBase['parent']>>;
 
-async function prefabCardDestroy(card:Step|Group|Option) {
-    const main = card.main;
+    abstract children?: Set<mainClasses.FOMODElementProxy>;
+    abstract childrenContainer?: HTMLDivElement;
+    abstract childClass?: Omit<typeof mainClasses.FOMODElementProxy, 'new'> & (new(...args: any[]) => mainClasses.FOMODElementProxy);
 
-        const previousElemStyle = (card.main.previousSibling as HTMLElement|null)?.style;
+    main!: HTMLDivElement;
+    deleteButton?: HTMLButtonElement;
+    dragHandle?: HTMLButtonElement;
+
+    sortable?: InstanceType<typeof Sortable>;
+
+    async updateCard() {
+        return await Promise.all([
+            this.updateDeleteButton(),
+            this.updateSortingHandler(),
+        ]);
+    }
+
+    override update_() {
+        this.updateCard();
+    }
+
+    async updateDeleteButton() {
+        if (!this.deleteButton) return;
+        await anAnimationFrame();
+
+        // We set the attributes in here so that the Details/Summary pair doesn't override them.
+
+        if (  this.parentGroup?.size && this.parentGroup.size > 1  ) {
+            this.deleteButton.style.opacity = '1';
+            this.deleteButton.ariaDisabled = 'false';
+            this.deleteButton.disabled = false;
+            this.deleteButton.setAttribute('data-force-disabled', 'false');
+            this.deleteButton.style.pointerEvents = 'auto';
+            this.deleteButton.setAttribute('data-force-pointer-events', 'true');
+            this.deleteButton.tabIndex = 0;
+            this.deleteButton.setAttribute('data-old-tabindex', '0');
+
+        } else {
+            this.deleteButton.style.opacity = '0.1';
+            this.deleteButton.ariaDisabled = 'true';
+            this.deleteButton.disabled = true;
+            this.deleteButton.setAttribute('data-force-disabled', 'true');
+            this.deleteButton.style.pointerEvents = 'none';
+            this.deleteButton.setAttribute('data-force-pointer-events', 'false');
+            this.deleteButton.tabIndex = -1;
+            this.deleteButton.setAttribute('data-old-tabindex', '-1');
+
+        }
+    }
+
+    async updateSortingHandler() {
+        if (!this.sortable) return;
+        await anAnimationFrame();
+
+        if ((this.children?.size || 0) > 1) {
+            this.sortable?.option('ignore', undefined);
+            this.childrenContainer?.classList.remove('no-sorting');
+        } else {
+            this.sortable?.option('ignore', '*');
+            this.childrenContainer?.classList.add('no-sorting');
+        }
+    }
+
+    onSort(event: Sortable__.SortableEvent, added = false) {
+        if (!this.childClass) return;
+        if (event.from !== event.to && !added) return console.debug('Not sorting', this, event);
+        if (event.newIndex === undefined || (!added && event.newIndex === event.oldIndex)) return console.debug('No index change', this, event);
+
+        const displayItem = event.item.upgrades?.get(this.childClass);
+        if (!displayItem) return console.error('Child Class instance not found!', this, event);
+
+        this.children?.moveIndex(displayItem.parent, event.newIndex);
+        this.parent?.update();
+    }
+    readonly onSort_bound = this.onSort.bind(this);
+
+    onAdd(event: Sortable__.SortableEvent) {
+        if (!this.childClass) return;
+        if (event.from === event.to || event.to !== this.childrenContainer) return console.debug('Not adding', this, event);
+
+        const displayItem = event.item.upgrades?.get(this.childClass);
+        if (!displayItem) return console.error('The FOMOD Builder binding for this item was not found!', this, event);
+
+        if (displayItem.parent.inherited) displayItem.parent.inherited.parent = this.parent;
+
+        this.children?.add(displayItem.parent);
+        this.onSort(event, true);
+
+        this.parent?.updateWhole();
+    }
+    readonly onAdd_bound = this.onAdd.bind(this);
+
+    onRemove(event: Sortable__.SortableEvent) {
+        if (!this.childClass) return;
+        if (event.from === event.to || event.from !== this.childrenContainer) return console.debug('Not removing', this, event);
+
+        const displayItem = event.item.upgrades?.get(this.childClass);
+        if (!displayItem) return console.error('Step not found!', this, event);
+
+        this.children?.delete(displayItem.parent);
+
+        this.parent?.updateWhole();
+    }
+    readonly onRemove_bound = this.onRemove.bind(this);
+
+    override async destroy_() {
+        const main = this.main;
+
+        const previousElemStyle = (this.main.previousSibling as HTMLElement|null)?.style;
         if (previousElemStyle) previousElemStyle.zIndex = '1';
 
-        const summary = card.main.querySelector(':scope > .js-bcd-summary')?.upgrades?.get(BCDSummary);
+        const summary = this.main.querySelector(':scope > .js-bcd-summary')?.upgrades?.get(BCDSummary);
         if (summary) await summary.close(false, false, true, 500);
 
         main.classList.add('animating-out');
-        if (getComputedStyle(main).animationName === 'none') return card.main.remove();
+        if (getComputedStyle(main).animationName === 'none') return this.main.remove();
 
         function finalize() {
             if (previousElemStyle) previousElemStyle.zIndex = '';
@@ -81,73 +187,20 @@ async function prefabCardDestroy(card:Step|Group|Option) {
 
         //afterDelay(400, finalize);
         main.addEventListener('animationend', finalize, {once: true});
-}
-
-async function prefabCardUpdate(card:Step|Group|Option) {
-    const setWithSelf =
-        card instanceof Step ? card.parent.inherited.parent?.steps
-        : card instanceof Group ? card.parent.inherited.parent?.groups
-        : /*card instanceof Option ?*/ card.parent.inherited.parent?.options;
-
-    requestAnimationFrame(() => {
-        // We set the attributes in here so that the Details/Summary pair doesn't override them.
-
-        if (  setWithSelf?.size && setWithSelf.size > 1  ) {
-            card.deleteButton.style.opacity = '1';
-            card.deleteButton.ariaDisabled = 'false';
-            card.deleteButton.disabled = false;
-            card.deleteButton.setAttribute('data-force-disabled', 'false');
-            card.deleteButton.style.pointerEvents = 'auto';
-            card.deleteButton.setAttribute('data-force-pointer-events', 'true');
-            card.deleteButton.tabIndex = 0;
-            card.deleteButton.setAttribute('data-old-tabindex', '0');
-
-        } else {
-            card.deleteButton.style.opacity = '0.1';
-            card.deleteButton.ariaDisabled = 'true';
-            card.deleteButton.disabled = true;
-            card.deleteButton.setAttribute('data-force-disabled', 'true');
-            card.deleteButton.style.pointerEvents = 'none';
-            card.deleteButton.setAttribute('data-force-pointer-events', 'false');
-            card.deleteButton.tabIndex = -1;
-            card.deleteButton.setAttribute('data-old-tabindex', '-1');
-
-        }
-    });
-}
-
-async function prefabSortableUpdate(bindingWithSortable: Fomod|Step|Group) {
-    let setWithChildren: Set<mainClasses.FOMODElementProxy>;
-    let childrenDiv: HTMLDivElement|undefined;
-
-    if (bindingWithSortable instanceof Fomod)  {
-        setWithChildren = bindingWithSortable.parent.steps;
-        childrenDiv = bindingWithSortable.parent.stepsContainers['1st-party'];
-    } else if (bindingWithSortable instanceof Step)  {
-        setWithChildren = bindingWithSortable.parent.groups;
-        childrenDiv = bindingWithSortable.parent.groupsContainers['1st-party'];
-    } else /*if (bindingWithSortable instanceof Group) */ {
-        setWithChildren = bindingWithSortable.parent.options;
-        childrenDiv = bindingWithSortable.parent.optionsContainers['1st-party'];
     }
 
-    requestAnimationFrame(() => {
-        if (setWithChildren.size === 1) {
-            bindingWithSortable.sortable.option('ignore', '*');
-            childrenDiv?.classList.add('no-sorting');
-        } else {
-            bindingWithSortable.sortable.option('ignore', undefined);
-            childrenDiv?.classList.remove('no-sorting');
-        }
-    });
 }
 
+const deleteButtonTemplate = (document.getElementById('builder-main-steps-delete-button') as HTMLTemplateElement).content.firstElementChild as HTMLButtonElement;
+const dragHandleTemplate = (document.getElementById('builder-main-steps-drag-handle') as HTMLTemplateElement).content.firstElementChild as HTMLButtonElement;
 
 /** Manages the first-party editor for entire FOMODs */
-export class Fomod extends UpdatableObject {
+export class Fomod extends CardBase {
     parent: mainClasses.Fomod;
-
-    main: HTMLDivElement;
+    parentGroup: undefined;
+    get childClass() { return mainClasses.Step; }
+    get children() { return this.parent.steps; }
+    get childrenContainer() { return this.parent.stepContainers['1st-party']; }
 
     nameInput: HTMLInputElement;
 
@@ -163,8 +216,6 @@ export class Fomod extends UpdatableObject {
     get sortOrder(): mainClasses.SortOrder { return this.parent.sortingOrder; } set sortOrder(value: mainClasses.SortOrder) { this.parent.sortingOrder = value; }
 
     addStepBtn: HTMLButtonElement;
-
-    sortable: InstanceType<typeof Sortable>;
 
     // I can't be bothered to explicitly set types on this
     private changeEvtObj;
@@ -183,7 +234,7 @@ export class Fomod extends UpdatableObject {
 
         this.main = document.getElementById("steps-builder-container") as HTMLDivElement;
         const stepsContainer = this.main.querySelector<HTMLDivElement>('div.builder-steps-steps-container')!;
-        this.parent.stepsContainers['1st-party'] = stepsContainer;
+        this.parent.stepContainers['1st-party'] = stepsContainer;
 
         const sortableEvents = {
             onSort: this.onSort_bound,
@@ -222,10 +273,10 @@ export class Fomod extends UpdatableObject {
 
         this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0]?.selectByString(mainUI.translateDropdown(this.sortOrder));
 
-        prefabSortableUpdate(this);
+        this.updateCard();
     }
 
-    override destroy_(): void {
+    override async destroy_() {
         unregisterForEvents(this.nameInput, this.changeEvtObj);
         unregisterForEvents(this.imageInput, this.changeEvtObj);
         unregisterForEvents(this.sortOrderMenu, this.dropdownEvtObj);
@@ -234,52 +285,18 @@ export class Fomod extends UpdatableObject {
         this.imageInput.value = '';
         this.sortOrderMenu.upgrades?.getExtends(BCDDropdown)?.[0]?.selectByString(window.FOMODBuilder.storage.settings.defaultSortingOrder);
     }
-
-    onSort(event: Sortable__.SortableEvent, added = false) {
-        if (event.from !== event.to && !added) return console.debug('Not sorting', this, event);
-        if (event.newIndex === undefined || (!added && event.newIndex === event.oldIndex)) return console.debug('No index change', this, event);
-
-        const displayStep = event.item.upgrades?.get(Step);
-        if (!displayStep) return console.error('Step not found!', this, event);
-
-        this.parent.steps.moveIndex(displayStep.parent, event.newIndex);
-        this.parent.update();
-    }
-    readonly onSort_bound = this.onSort.bind(this);
-
-    onAdd(event: Sortable__.SortableEvent) {
-        if (event.from === event.to || event.to !== this.parent.stepsContainers['1st-party']) return console.debug('Not adding', this, event);
-        const displayStep = event.item.upgrades?.get(Step);
-        if (!displayStep) return console.error('Step not found!', this, event);
-
-        displayStep.parent.inherited.parent = this.parent;
-
-        this.parent.steps.add(displayStep.parent);
-        this.onSort(event, true);
-
-        this.parent.updateWhole();
-    }
-    readonly onAdd_bound = this.onAdd.bind(this);
-
-    onRemove(event: Sortable__.SortableEvent) {
-        if (event.from === event.to || event.from !== this.parent.stepsContainers['1st-party']) return console.debug('Not removing', this, event);
-        const displayStep = event.item.upgrades?.get(Step);
-        if (!displayStep) return console.error('Step not found!', this, event);
-
-        this.parent.steps.delete(displayStep.parent);
-
-        this.parent.updateWhole();
-    }
-    readonly onRemove_bound = this.onRemove.bind(this);
 }
 mainClasses.addUpdateObjects(mainClasses.Fomod, Fomod);
 
 const stepTemplate = (document.getElementById('builder-main-steps-step') as HTMLTemplateElement).content.firstElementChild as HTMLDivElement;
 /** Manages the first-party editor for FOMOD Steps */
-export class Step extends UpdatableObject {
+export class Step extends CardBase {
     parent: mainClasses.Step;
+    get parentGroup() { return this.parent.inherited?.parent?.steps; }
+    get childClass() { return mainClasses.Group; }
+    get children() { return this.parent.groups; }
+    get childrenContainer() { return this.parent.groupContainers['1st-party']; }
 
-    main: HTMLDivElement;
     nameDisplay: HTMLSpanElement;
     groupCountDisplay: HTMLSpanElement;
     optionCountDisplay: HTMLSpanElement;
@@ -291,9 +308,6 @@ export class Step extends UpdatableObject {
     sortOrderMenu: HTMLMenuElement;
 
     addGroupBtn: HTMLButtonElement;
-    deleteButton: HTMLButtonElement;
-
-    sortable: InstanceType<typeof Sortable>;
 
     constructor (parent: mainClasses.Step) {
         super();
@@ -302,7 +316,7 @@ export class Step extends UpdatableObject {
         this.main = stepTemplate.cloneNode(true) as HTMLDivElement;
 
         const groupsContainer = this.main.querySelector<HTMLDivElement>('div.builder-steps-group-container')!;
-        this.parent.groupsContainers['1st-party'] = groupsContainer;
+        this.parent.groupContainers['1st-party'] = groupsContainer;
 
 
         const sortableEvents = {
@@ -372,8 +386,7 @@ export class Step extends UpdatableObject {
         updatePluralDisplay(this.groupCountDisplay, this.parent.groups.size);
         updatePluralDisplay(this.optionCountDisplay, [...this.parent.groups].reduce((currentCount, group) => currentCount + group.options.size, 0));
 
-        prefabCardUpdate(this);
-        prefabSortableUpdate(this);
+        this.updateCard();
     }
 
     override updateFromInput_() {
@@ -384,51 +397,20 @@ export class Step extends UpdatableObject {
 
         this.nameDisplay.textContent = this.name;
     }
-
-    override destroy_() { prefabCardDestroy(this); }
-
-    onSort(event: Sortable__.SortableEvent) {
-        if (event.newIndex === undefined || (event.from === event.to && event.newIndex === event.oldIndex)) return console.warn('Invalid sort event!', this, event);
-        const displayGroup = event.item.upgrades?.get(Group);
-        if (!displayGroup) return console.error('Group not found!', this, event);
-
-        this.parent.groups.moveIndex(displayGroup.parent, event.newIndex);
-        this.parent.update();
-    }
-    readonly onSort_bound = this.onSort.bind(this);
-
-    onAdd(event: Sortable__.SortableEvent) {
-        if (event.from === event.to || event.to !== this.parent.groupsContainers['1st-party']) return console.warn('Invalid add event!', this, event);
-        const displayGroup = event.item.upgrades?.get(Group);
-        if (!displayGroup) return console.error('Group not found!', this, event);
-
-        displayGroup.parent.inherited.parent = this.parent;
-
-        this.parent.groups.add(displayGroup.parent);
-        this.onSort(event);
-        this.parent.updateWhole();
-    }
-    readonly onAdd_bound = this.onAdd.bind(this);
-
-    onRemove(event: Sortable__.SortableEvent) {
-        if (event.from === event.to || event.from !== this.parent.groupsContainers['1st-party']) return console.warn('Invalid remove event!', this, event);
-        const displayGroup = event.item.upgrades?.get(Group);
-        if (!displayGroup) return console.error('Group not found!', this, event);
-
-        this.parent.groups.delete(displayGroup.parent);
-        this.parent.updateWhole();
-    }
-    readonly onRemove_bound = this.onRemove.bind(this);
 }
 mainClasses.addUpdateObjects(mainClasses.Step, Step);
 
 
 const groupTemplate = (document.getElementById('builder-main-steps-group') as HTMLTemplateElement).content.firstElementChild as HTMLDivElement;
 /** Manages the first-party editor for FOMOD Groups */
-export class Group extends UpdatableObject {
+export class Group extends CardBase {
     parent: mainClasses.Group;
+    get parentGroup() { return this.parent.inherited?.parent?.groups; }
 
-    main: HTMLDivElement;
+    get childClass() { return mainClasses.Option; }
+    get children() { return this.parent.options; }
+    get childrenContainer() { return this.parent.optionContainers['1st-party']; }
+
     nameDisplay: HTMLSpanElement;
     optionCountDisplay: HTMLSpanElement;
 
@@ -442,9 +424,6 @@ export class Group extends UpdatableObject {
     selectionTypeMenu: HTMLMenuElement;
 
     addOptionBtn: HTMLButtonElement;
-    deleteButton: HTMLButtonElement;
-
-    sortable: InstanceType<typeof Sortable>;
 
     constructor (parent: mainClasses.Group) {
         super();
@@ -453,7 +432,7 @@ export class Group extends UpdatableObject {
         this.main = groupTemplate.cloneNode(true) as HTMLDivElement;
 
         const optionsContainer = this.main.querySelector<HTMLDivElement>('div.builder-steps-option-container')!;
-        this.parent.optionsContainers['1st-party'] = optionsContainer;
+        this.parent.optionContainers['1st-party'] = optionsContainer;
         const sortableEvents = {
             onSort: this.onSort_bound,
             onAdd: this.onAdd_bound,
@@ -525,8 +504,7 @@ export class Group extends UpdatableObject {
         this.nameDisplay.textContent = this.name;
         updatePluralDisplay(this.optionCountDisplay, this.parent.options.size);
 
-        prefabCardUpdate(this);
-        prefabSortableUpdate(this);
+        this.updateCard();
     }
 
     override updateFromInput_() {
@@ -540,50 +518,19 @@ export class Group extends UpdatableObject {
 
         this.nameDisplay.textContent = this.name;
     }
-
-    override destroy_() { prefabCardDestroy(this); }
-
-    onSort(event: Sortable__.SortableEvent) {
-        if (event.newIndex === undefined || (event.from === event.to && event.newIndex === event.oldIndex)) return console.error('Invalid sort event!', this, event);
-        const displayOption = event.item.upgrades?.get(Option);
-        if (!displayOption) return console.error('Option not found!', this, event);
-
-        this.parent.options.moveIndex(displayOption.parent, event.newIndex);
-        this.parent.update();
-    }
-    readonly onSort_bound = this.onSort.bind(this);
-
-    onAdd(event: Sortable__.SortableEvent) {
-        if (event.from === event.to || event.to !== this.parent.optionsContainers['1st-party']) return console.error('Invalid add event!', this, event);
-        const displayOption = event.item.upgrades?.get(Option);
-        if (!displayOption) return console.error('Option not found!', this, event);
-
-        displayOption.parent.inherited.parent = this.parent;
-
-        this.parent.options.add(displayOption.parent);
-        this.onSort(event);
-        this.parent.updateWhole();
-    }
-    readonly onAdd_bound = this.onAdd.bind(this);
-
-    onRemove(event: Sortable__.SortableEvent) {
-        if (event.from === event.to || event.from !== this.parent.optionsContainers['1st-party']) return console.error('Invalid remove event!', this, event);
-        const displayOption = event.item.upgrades?.get(Option);
-        if (!displayOption) return console.error('Option not found!', this, event);
-
-        this.parent.options.delete(displayOption.parent);
-        this.parent.updateWhole();
-    }
-    readonly onRemove_bound = this.onRemove.bind(this);
 }
 mainClasses.addUpdateObjects(mainClasses.Group, Group);
 
 const optionTemplate = (document.getElementById('builder-main-steps-option') as HTMLTemplateElement).content.firstElementChild as HTMLDivElement;
 
-export class Option extends UpdatableObject {
+export class Option extends CardBase {
     parent: mainClasses.Option;
+    get parentGroup() { return this.parent.inherited?.parent?.options; }
 
-    main: HTMLDivElement;
+    get childClass() { return mainClasses.DependencyFlag; }
+    get children() { return this.parent.flagsToSet; }
+    get childrenContainer() { return this.parent.flagsContainers['1st-party']; }
+
     nameDisplay: HTMLSpanElement;
     fileCountDisplay: HTMLSpanElement;
     flagCountDisplay: HTMLSpanElement;
@@ -599,8 +546,6 @@ export class Option extends UpdatableObject {
 
     editTypeButton: HTMLButtonElement;
     defaultTypeDropdown: HTMLMenuElement;
-
-    deleteButton: HTMLButtonElement;
 
     constructor (parent: mainClasses.Option) {
         super();
@@ -670,10 +615,10 @@ export class Option extends UpdatableObject {
         this.imageInput.value = this.image || '';             this.imageInput.dispatchEvent(new Event('change'));
 
         this.nameDisplay.textContent = this.name || '';
-        updatePluralDisplay(this.fileCountDisplay, this.parent.files.length);
-        updatePluralDisplay(this.flagCountDisplay, this.parent.conditionFlags.length);
+        updatePluralDisplay(this.fileCountDisplay, this.parent.files.size);
+        updatePluralDisplay(this.flagCountDisplay, this.parent.flagsToSet.size);
 
-        prefabCardUpdate(this);
+        this.updateCard();
     }
 
     override updateFromInput_() {
@@ -686,7 +631,56 @@ export class Option extends UpdatableObject {
 
         this.nameDisplay.textContent = this.name;
     }
-
-    override destroy_() { prefabCardDestroy(this); }
 }
 mainClasses.addUpdateObjects(mainClasses.Option, Option);
+
+const dependencyFlagTemplate = (document.getElementById('builder-steps-flag-template') as HTMLTemplateElement).content.firstElementChild as HTMLDivElement;
+
+class DependencyFlag extends CardBase {
+    parent: mainClasses.DependencyFlag;
+    get parentGroup() { return this.parent.inherited?.parent?.flagsToSet; }
+
+    children: undefined;
+    childrenContainer: undefined;
+    childClass: undefined;
+
+    get name(): string { return this.parent.flag; } set name(value: string) { this.parent.flag = value; }
+    nameInput: HTMLInputElement;
+
+    get value(): string { return this.parent.value; } set value(value: string) { this.parent.value = value; }
+    valueInput: HTMLInputElement;
+
+    constructor (parent: mainClasses.DependencyFlag) {
+        super();
+
+        this.parent = parent;
+
+        this.main = dependencyFlagTemplate.cloneNode(true) as HTMLDivElement;
+
+        this.nameInput = this.main.querySelector('.builder-steps-flag-name input')!;
+        registerForEvents(this.nameInput, {change: this.updateFromInput_bound});
+
+        this.valueInput = this.main.querySelector('.builder-steps-flag-value input')!;
+        registerForEvents(this.valueInput, {change: this.updateFromInput_bound});
+
+        this.deleteButton = deleteButtonTemplate.cloneNode(true) as HTMLButtonElement;
+        this.main.insertBefore(this.deleteButton, this.main.firstElementChild);
+        registerForEvents(this.deleteButton, {activate: parent.destroy.bind(parent)});
+
+        const dragHandle = dragHandleTemplate.cloneNode(true) as HTMLDivElement;
+        this.main.insertBefore(dragHandle, this.main.firstElementChild);
+    }
+
+    override update_() {
+        this.nameInput.value = this.name; this.nameInput.dispatchEvent(new Event('change'));
+        this.valueInput.value = this.value; this.valueInput.dispatchEvent(new Event('change'));
+
+        this.updateCard();
+    }
+
+    override updateFromInput_() {
+        this.name = this.nameInput.value;
+        this.value = this.valueInput.value;
+    }
+}
+mainClasses.addUpdateObjects(mainClasses.DependencyFlag, DependencyFlag);
