@@ -1,9 +1,11 @@
+@use 'colors' as *;
+
 html {
     background: #1b1b1b;
 }
 
 a {
-    color: #24b6ff;
+    color: $color-main;
     font-weight: normal;
     text-decoration: none;
 }
@@ -43,7 +45,7 @@ h5, .h5 {
     background-color: #333c;
     border: 1px solid #eeeeee08;
     border-radius: 3px;
-    color: #fff;
+    color: $color-off-white;
     margin: 1px;
     padding: 2px 3px;
 }
@@ -52,7 +54,7 @@ pre {
     background-color: #333333f0;
     border: 1px solid #eeeeee0f;
     border-radius: 6px;
-    color: #fff;
+    color: $color-off-white;
     display: block;
     overflow-x: scroll;
     padding: 8px;

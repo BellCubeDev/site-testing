@@ -3,6 +3,9 @@
 @use 'third-party/material-blue';
 
 
+// Universal Stuff
+@use 'utils';
+@use 'colors' as *;
 
 // Wide-reaching tweaks
 @use 'small-mdl-overwrites';
@@ -16,12 +19,6 @@
 @use 'site';
 
 @use 'docs';
-
-
-
-// Generic Stuff
-@use 'button-colors';
-@use 'utils';
 
 
 

@@ -1,8 +1,9 @@
 @use 'utils';
+@use 'colors' as *;
 
 .mdl-layout__drawer {
-    background-color: #222222;
-    border-right-color: #ffffff;
+    background-color: $color-bg-secondary;
+    border-right-color: #ffffff40;
     color: #ffffffbf;
 
     overflow-x: hidden;
@@ -12,7 +13,7 @@
     h3 { font-size: 20px; }
 
     h1, h2, h3 {
-        color: white;
+        color: $color-white;
 
         padding-top: 0;
         padding-right: 40px;
@@ -81,7 +82,7 @@
 }
 
 .mdl-layout-title {
-    color: #fff;
+    color: $color-white;
 
     :is(img, svg) {
         height: 48px;
@@ -92,7 +93,7 @@
 
 .mdl-navigation__link, // Next line is for specificity only
 .mdl-layout__drawer .mdl-navigation .mdl-navigation__link {
-    color: #fffffff2;
+    color: $color-off-white;
     display: block;
     padding: 16px 40px;
     margin: 0;

@@ -1,5 +1,7 @@
+@use 'colors' as *;
+
 .js-bcd-summary {
-    color: #fff;
+    color: $color-white;
     background: none;
     border: none;
 
@@ -44,7 +46,7 @@
     }
 
     &:is(:hover, :-ms-keyboard-active, :focus, :active) :not(.material-icons) {
-        text-decoration-color: #fff;
+        text-decoration-color: $color-white;
         text-shadow: #000b 2px 2px 5px;
     }
 
@@ -68,7 +70,7 @@
     }
 
     .material-icons {
-        color: #ffffffbf;
+        color: $color-off-white;
     }
 }
 

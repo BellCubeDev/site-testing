@@ -1,3 +1,5 @@
+@use 'colors' as *;
+
 // Don't mind the fact that I subtly stole a lot of the styling here from VS Code's context menu
 
 .mdl-menu__outline {
@@ -9,8 +11,8 @@
     @extend .mdl-menu__outline;
 
     &:hover, &:focus {
-        background: #0d365e;
-        color: #fff;
+        background: $color-focus;
+        color: $color-white;
     }
 
     &--full-bleed-divider {

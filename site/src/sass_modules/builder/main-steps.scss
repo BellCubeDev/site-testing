@@ -1,4 +1,4 @@
-@import 'button-colors';
+@use 'colors' as *;
 
 .fomod-editor-type {
     &:not(.active_) { display: none; }
@@ -10,11 +10,11 @@
 }
 
 .bcd-builder-input {
-    background-color: #222;
+    background-color: $color-bg-secondary;
     border-radius: 4px;
-    border: #444 solid 2px;
+    border: #333 solid 2px;
     border-style: ridge;
-    border-left: #4448 solid 4px;
+    border-left: #3338 solid 4px;
     padding: 8px;
     padding-left: 8px;
 
@@ -202,7 +202,7 @@
 }
 
 #steps-builder-container {
-    @include fomodStepsBuilderCard(184deg, 87%, 25%);
+    @include fomodStepsBuilderCard(203deg, 44%, 20%); $color-hex: #094A73;
     animation: none;
     padding-right: 16px;
     padding-left: 16px;
@@ -222,7 +222,7 @@
 }
 
 .builder-steps-step {
-    @include fomodStepsBuilderCard(215deg, 76%, 23%);
+    @include fomodStepsBuilderCard(100deg, 28%, 29%); $color-hex: #435E35;
     .animating-in { animation-name: sendInArtillery; }
 
     .animating-out {
@@ -246,7 +246,7 @@
 }
 
 .builder-steps-group {
-    @include fomodStepsBuilderCard(37deg, 69%, 16%);
+    @include fomodStepsBuilderCard(300deg, 35%, 21%, -1.5); $color-hex: #482348;
 }
 
 .builder-steps-option {

@@ -1,3 +1,5 @@
+@use 'colors' as *;
+
 .js-bcd-modal {
     @extend %modal-transition;
 
@@ -22,10 +24,10 @@
 
     border-radius: 8px;
     border-width: 5px;
-    border-color: #0af;
+    border-color: $color-main;
     border-style: solid;
 
-    background-color: #333;
+    background-color: $color-bg-secondary;
 
     box-shadow: 0 0 10px #000;
 

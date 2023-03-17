@@ -1,3 +1,5 @@
+@use 'colors' as *;
+
 .mdl-tooltip {pointer-events: none;}
 
 .mdl-tooltip, .js-bcd-tooltip {
@@ -14,7 +16,7 @@
     transform-origin: top center;
     z-index: 100;
     border-radius: 2px;
-    color: #fff;
+    color: $color-off-white;
     display: inline-block;
     font-weight: 500;
     position: fixed;

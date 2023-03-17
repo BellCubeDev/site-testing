@@ -1,4 +1,5 @@
 @use 'utils';
+@use 'colors' as *;
 
 .mdl-button {
     text-transform: none;
@@ -29,7 +30,7 @@
 }
 
 .mdl-button--raised.mdl-button--colored {
-    color: #ffffff;
+    color: $color-white;
     border-radius: 3px;
 }
 
