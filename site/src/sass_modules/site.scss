@@ -1,7 +1,8 @@
 @use 'colors' as *;
 
-html {
+body, html {
     background: #1b1b1b;
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
 }
 
 a {
@@ -10,7 +11,7 @@ a {
     text-decoration: none;
 }
 
-p, li, article  {
+p, li, article {
     font-size: 17px;
 }
 
@@ -83,8 +84,7 @@ pre {
 }
 
 html > body, textarea, input {
-    color: #fafafa;
-    font-family: Roboto, 'Helvetica', 'Arial', sans-serif;
+    color: $color-off-white;
     font-weight: 400;
     text-rendering: optimizeLegibility;
 }

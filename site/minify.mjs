@@ -148,7 +148,7 @@ const fontStylesheets = await Promise.all(fontLocations.map(async url => {
 
 function cssReplaceFontSettings(css) {
     return css.replace(/@font-face \{/g, '@font-face {font-display: swap;')
-            .replace(/font-family: '(.*?)';.*?src:/gs, '$& local("$1"),');
+            //.replace(/font-family: '(.*?)';.*?src:/gs, '$& local("$1"),');
 }
 
 const pageTemplate = await afs.readFile(`${minifyDir}/_layouts/page.html`, 'utf8');
@@ -452,7 +452,7 @@ async function minifyCSSFile(filePath) {
         return;
     }
 }
- 
+
 /** @returns {Promise<string|void>} */
 async function finishMinifyingCSS(filePath, css, startMap) {
     css ??= '';

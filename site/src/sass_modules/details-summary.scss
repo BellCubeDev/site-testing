@@ -100,23 +100,7 @@
 
     &.is-open > .js-bcd-details-inner { transition-timing-function: cubic-bezier(0, 0.3, 0.8, 1); }
 
-    &.contPad01-left > .js-bcd-details-inner {
-        padding-left: 12px;
-    }
-
-    &.contPad02-left > .js-bcd-details-inner {
-        padding-left: 16px;
-    }
-
-    &.contPad03-left > .js-bcd-details-inner {
-        padding-left: 24px;
-    }
-
-    &.contPad04-left > .js-bcd-details-inner {
-        padding-left: 32px;
-    }
-
-    &.contPad05-left > .js-bcd-details-inner {
-        padding-left: 48px;
+    &.contPad-left > .js-bcd-details-inner {
+        padding-left: 56px;
     }
 }
