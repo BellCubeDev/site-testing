@@ -67,8 +67,8 @@
 
 @keyframes sendInBigArtillery {
     0% {
-        filter: opacity(0.67);
-        transform: scale(0.99);
+        filter: opacity(0.33);
+        transform: scale(0.8);
         margin-top: -90px;
     }
 
@@ -86,16 +86,16 @@
     }
 
     100% {
-        filter: opacity(0.67);
-        transform: scale(0.99);
+        filter: opacity(0.33);
+        transform: scale(0.8);
         margin-bottom: -90px;
     }
 }
 
 @keyframes sendInArtillery {
     0% {
-        filter: opacity(0.67);
-        transform: scale(0.99);
+        filter: opacity(0.33);
+        transform: scale(0.8);
         margin-top: -84px;
     }
 
@@ -113,32 +113,63 @@
     }
 
     100% {
-        filter: opacity(0.67);
-        transform: scale(0.99);
+        filter: opacity(0.33);
+        transform: scale(0.8);
         margin-bottom: -84px;
     }
 }
 
-@mixin fomodStepsBuilderCard($hue, $sat, $val, $hueShiftMult: 1) {
-    background: hsl($hue, $sat, $val);
+@keyframes sendInArtilleryFullFade {
+    0% {
+        filter: opacity(0);
+        transform: scale(0.67);
+        margin-top: -64px;
+    }
 
-    border: 0 solid black;
-    border-left: hsl($hue + ($hueShiftMult * 48deg), $sat + 13%, $val + 17%) 8px solid;
+    100% {
+        filter: opacity(1);
+        transform: scale(1);
+        margin-top: 0;
+    }
+}
+@keyframes retractArtilleryFullFade {
+    0% {
+        filter: opacity(1);
+        transform: scale(1);
+        margin-bottom: 0;
+    }
 
-    border-radius: 8px;
-    padding: 12px;
-    margin: 32px 0;
+    100% {
+        filter: opacity(0);
+        transform: scale(0.67);
+        margin-bottom: -64px;
+    }
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scaleY(0);
+        opacity: 0;
+        margin-top: -64px;
+        transform-origin: bottom;
+    }
+
+    100% {
+        transform: scaleY(1);
+        opacity: 1;
+        margin-top: 0;
+        transform-origin: bottom;
+    }
+}
+
+%can-move {
     padding-right: 48px;
     padding-left: 32px;
 
     position: relative;
 
     transform: scale(1);
-    filter: opacity(1);
-
-    > .js-bcd-summary {
-        padding: 4px;
-    }
+    filter: contrast(1) grayscale(0) opacity(1);
 
     .animating-in {
         animation: sendInArtillery 200ms ease-out;
@@ -160,18 +191,39 @@
         @media (prefers-reduced-motion: reduce) { animation: none !important; visibility: hidden; }
     }
 
-    transition-property: filter, opacity;
+    transition-property: filter, opacity, background, border-radius;
     transition-duration: 500ms;
 
     .sortable-ghost {
         filter: contrast(0.5) grayscale(1) opacity(0.5);
-        border: black 8px dashed;
+        border: #0008 8px dashed;
         padding-top: 4px;
         padding-bottom: 4px;
 
         .builder-steps-remove-btn {
             right: 0;
         }
+    }
+}
+
+@mixin fomodStepsBuilderCard($hue, $sat, $val, $hueShiftMult: 1) {
+    @extend %can-move;
+
+    background: hsl($hue, $sat, $val);
+
+    border: 0 solid black;
+    border-left: hsl($hue + ($hueShiftMult * 48deg), $sat + 13%, $val + 17%) 8px solid;
+
+    border-radius: 8px;
+
+    padding: 12px;
+    padding-left: 32px;
+    padding-right: 48px;
+
+    margin: 32px 0;
+
+    > .js-bcd-summary {
+        padding: 4px;
     }
 }
 
@@ -252,7 +304,59 @@
 .builder-steps-option {
     @include fomodStepsBuilderCard(160deg, 0%, 9%);
 
-    .js-bcd-details-inner > * { @include imageColumn(); }
+    > .builder-steps-option-body > .js-bcd-details-inner > * { @include imageColumn(); }
+}
+
+.builder-steps-option-set-flags-container { padding-bottom: 16px; }
+
+.builder-steps-option-flag {
+    @extend %can-move;
+
+    grid-template-columns: repeat(2, minmax(64px, 1fr));
+    gap: 16px;
+    display: grid;
+
+    .mdl-textfield { width: 100%; }
+
+    padding-left: 40px;
+    .builder-steps-drag-handle { top: 24px; }
+
+    .builder-steps-remove-btn { top: 20px; }
+
+    &.animating-in {
+        animation-name: sendInArtilleryFullFade !important;
+        &:only-child { animation-name: scaleIn !important; }
+    }
+
+    &.animating-out {
+        animation-name: retractArtilleryFullFade !important;
+        margin-bottom: -64px;
+
+        // Make the last element go up instead of down
+        &:last-child {
+            animation-name: sendInArtilleryFullFade !important;
+            margin-top: -64px;
+            margin-bottom: 0 !important;
+
+            &:only-child {
+                animation-name: scaleIn !important;
+                animation-direction: reverse;
+            }
+        }
+    }
+
+    &.sortable-ghost {
+        background: #0084ff20;
+        border-radius: 28px;
+
+        border: none !important;
+        filter: contrast(.5) opacity(.5) !important;
+        padding: 0 !important;
+        padding-left: 40px !important;
+        padding-right: 48px !important;
+
+        .builder-steps-remove-btn { right: 8px !important; }
+    }
 }
 
 .builder-steps-option-image, .builder-steps-mod-image {

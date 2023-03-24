@@ -271,6 +271,34 @@ export async function openFolder_entry() {
     postLoad();
 }
 
+/** An alternative to `save` that will set the DOM elements instead. */
+export async function setOutputElements() {
+    if (saving) return;
+    saving = true;
+
+    if (!window.FOMODBuilder.trackedFomod) throw new Error('No FOMOD is currently loaded.');
+
+    const infoDoc = window.FOMODBuilder.trackedFomod!.infoDoc;
+    const moduleDoc = window.FOMODBuilder.trackedFomod!.moduleDoc;
+
+    let infoString = window.FOMODBuilder.trackedFomod!.obj.asInfoXML(infoDoc).outerHTML || '<!-- ERROR - Serialized document was empty! -->';
+    if (window.FOMODBuilder.storage.settings.formatXML) infoString = vkBeautify.xml(infoString);
+    else infoString = vkBeautify.xmlmin(infoString, true);
+
+    console.log({infoString});
+    document.getElementById('info-xml')!.textContent = infoString;
+
+    let moduleString = window.FOMODBuilder.trackedFomod!.obj.asModuleXML(moduleDoc).outerHTML || '<!-- ERROR - Serialized document was empty! -->';
+    if (window.FOMODBuilder.storage.settings.formatXML) moduleString = vkBeautify.xml(moduleString);
+    else moduleString = vkBeautify.xmlmin(moduleString, true);
+
+    console.log({moduleString});
+    document.getElementById('module-xml')!.textContent = moduleString;
+
+    // Once we're done saving, note it as such.
+    saving = false;
+}
+
 let saving = false;
 export async function save() {
     if (saving) return;
@@ -279,10 +307,8 @@ export async function save() {
     if (!window.FOMODBuilder.trackedFomod) throw new Error('No FOMOD is currently loaded.');
 
     if (!window.FOMODBuilder.directory) {
-        //const picked = await bcdFS.getUserPickedFolder(true);
-        //if (!picked)
-            return saving = false;
-        //window.FOMODBuilder.directory = picked;
+        await setOutputElements();
+        return saving = false;
     }
 
     const fomodFolder = (await window.FOMODBuilder.directory.childDirsC['fomod'])!;

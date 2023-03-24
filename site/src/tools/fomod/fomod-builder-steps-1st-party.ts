@@ -9,7 +9,7 @@
 
 import * as mainClasses from './fomod-builder-classifications.js';
 import * as mainUI from './fomod-builder-ui.js';
-import { anAnimationFrame, registerUpgrade, BCDDropdown, registerForEvents, unregisterForEvents, UpdatableObject, BCDSummary } from '../../universal.js';
+import { anAnimationFrame, registerUpgrade, BCDDropdown, registerForEvents, unregisterForEvents, UpdatableObject, BCDSummary, animationFrames } from '../../universal.js';
 import { updatePluralDisplay } from './fomod-builder-ui.js';
 import { componentHandler } from '../../assets/site/mdl/material.js';
 
@@ -20,22 +20,31 @@ import type Sortable__ from '../../../node_modules/@types/sortablejs/index';
 const Sortable = Sortable_ as unknown as typeof Sortable__;
 
 export const sortableSettings = {
-    animation: 250,
+
     ghostClass: 'sortable-ghost',
     chosenClass: 'sortable-chosen',
+    selectedClass: 'sortable-selected',
     dragClass: 'sortable-drag',
     fallbackClass: 'sortable-fallback',
-    bubbleScroll: true,
-    dataIdAttr: 'data-id',
-    delay: 200,
-    delayOnTouchOnly: true,
-    direction: 'vertical',
-
-    //emptyInsertThreshold: 5,
-    //swapThreshold: 1.05,
 
     handle: '.builder-steps-drag-handle',
+
+    dataIdAttr: 'data-id',
+
+    animation: 250,
+
+    bubbleScroll: true,
+    scroll: document.body.querySelector('main')!,
+    scrollSensitivity: 128, // in pixels
+    scrollSpeed: 64, // in pixels
+
+    delay: 200,
+    delayOnTouchOnly: true,
+
+    direction: 'vertical',
     sort: true,
+
+    multiDrag: true,
 } as const satisfies Sortable__.Options;
 
 export const sortableSettings_steps = {
@@ -59,13 +68,20 @@ export const sortableSettings_options = {
     draggable: '.builder-steps-option',
 } as const satisfies Sortable__.Options;
 
+export const sortableSettings_flags = {
+    ...sortableSettings,
+
+    group: 'flags',
+    draggable: '.builder-steps-option-flag',
+} as const satisfies Sortable__.Options;
+
 abstract class CardBase extends UpdatableObject {
     abstract parent?: mainClasses.DependencyFlag|mainClasses.Option|mainClasses.Group|mainClasses.Step|mainClasses.Fomod;
     abstract parentGroup?: Set<NonNullable<CardBase['parent']>>;
 
-    abstract children?: Set<mainClasses.FOMODElementProxy>;
-    abstract childrenContainer?: HTMLDivElement;
-    abstract childClass?: Omit<typeof mainClasses.FOMODElementProxy, 'new'> & (new(...args: any[]) => mainClasses.FOMODElementProxy);
+    abstract children: Set<mainClasses.FOMODElementProxy>|undefined;
+    abstract childrenContainer: HTMLDivElement|undefined;
+    abstract childClass: Omit<typeof CardBase, 'new'> & (new(...args: any[]) => CardBase)|undefined;
 
     main!: HTMLDivElement;
     deleteButton?: HTMLButtonElement;
@@ -84,13 +100,16 @@ abstract class CardBase extends UpdatableObject {
         this.updateCard();
     }
 
-    async updateDeleteButton() {
+    readonly minimumItemsToSort:number = 2;
+    readonly minimumChildrenToSort:number = 2;
+
+    async updateDeleteButton(forceState?: boolean) {
         if (!this.deleteButton) return;
         await anAnimationFrame();
 
-        // We set the attributes in here so that the Details/Summary pair doesn't override them.
+        // We set all kinds of attributes in here so that the Details/Summary pair doesn't override them.
 
-        if (  this.parentGroup?.size && this.parentGroup.size > 1  ) {
+        if (this.parentGroup?.size && this.parentGroup.size >= this.minimumItemsToSort) {
             this.deleteButton.style.opacity = '1';
             this.deleteButton.ariaDisabled = 'false';
             this.deleteButton.disabled = false;
@@ -117,7 +136,7 @@ abstract class CardBase extends UpdatableObject {
         if (!this.sortable) return;
         await anAnimationFrame();
 
-        if ((this.children?.size || 0) > 1) {
+        if ((this.children?.size || 0) >= this.minimumChildrenToSort) {
             this.sortable?.option('ignore', undefined);
             this.childrenContainer?.classList.remove('no-sorting');
         } else {
@@ -160,7 +179,7 @@ abstract class CardBase extends UpdatableObject {
         if (event.from === event.to || event.from !== this.childrenContainer) return console.debug('Not removing', this, event);
 
         const displayItem = event.item.upgrades?.get(this.childClass);
-        if (!displayItem) return console.error('Step not found!', this, event);
+        if (!displayItem) return console.error('The FOMOD Builder binding for this item was not found!', this, event);
 
         this.children?.delete(displayItem.parent);
 
@@ -189,6 +208,28 @@ abstract class CardBase extends UpdatableObject {
         main.addEventListener('animationend', finalize, {once: true});
     }
 
+    animateIn(container: HTMLElement) {
+        if (this.main.style.animationName === 'none') return;
+
+        const previousSibling = container.lastElementChild instanceof HTMLElement ? container.lastElementChild : undefined;
+        if (!previousSibling) return;
+
+        const main = this.main;
+
+        previousSibling.style.zIndex = '1';
+        main.classList.add('animating-in');
+
+        // eslint-disable-next-line func-style -- I only want to init the function within an if statement
+        const finalize = function() {
+            previousSibling.style.zIndex = '';
+            main.classList.remove('animating-in');
+
+            main.removeEventListener('animationend', finalize);
+        };
+
+        //afterDelay(400, removeIndex);
+        main.addEventListener('animationend', finalize, {once: true});
+    }
 }
 
 const deleteButtonTemplate = (document.getElementById('builder-main-steps-delete-button') as HTMLTemplateElement).content.firstElementChild as HTMLButtonElement;
@@ -198,7 +239,7 @@ const dragHandleTemplate = (document.getElementById('builder-main-steps-drag-han
 export class Fomod extends CardBase {
     parent: mainClasses.Fomod;
     parentGroup: undefined;
-    get childClass() { return mainClasses.Step; }
+    get childClass() { return Step; }
     get children() { return this.parent.steps; }
     get childrenContainer() { return this.parent.stepContainers['1st-party']; }
 
@@ -293,7 +334,7 @@ const stepTemplate = (document.getElementById('builder-main-steps-step') as HTML
 export class Step extends CardBase {
     parent: mainClasses.Step;
     get parentGroup() { return this.parent.inherited?.parent?.steps; }
-    get childClass() { return mainClasses.Group; }
+    get childClass() { return Group; }
     get children() { return this.parent.groups; }
     get childrenContainer() { return this.parent.groupContainers['1st-party']; }
 
@@ -346,36 +387,15 @@ export class Step extends CardBase {
         this.main.insertBefore(dragHandle, this.main.firstElementChild);
 
         registerForEvents(this.deleteButton, {activate: parent.destroy.bind(parent)});
-        registerUpgrade(this.main, this, null, false, true);
 
         const stepContainer = this.parent.inherited.containers?.['1st-party'] as HTMLDivElement;
         if (!stepContainer) {console.warn('Step container not found!'); return;}
 
-        if (this.main.style.animationName !== 'none'){
-            const previousSibling = stepContainer.lastElementChild instanceof HTMLElement ? stepContainer.lastElementChild : undefined;
-
-            if (previousSibling) {
-                const main = this.main;
-
-                previousSibling.style.zIndex = '1';
-                main.classList.add('animating-in');
-
-                // eslint-disable-next-line func-style -- I only want to init the function within an if statement
-                const removeIndex = function() {
-                    previousSibling.style.zIndex = '';
-                    main.classList.remove('animating-in');
-
-                    main.removeEventListener('animationend', removeIndex);
-                };
-
-                //afterDelay(400, removeIndex);
-                main.addEventListener('animationend', removeIndex, {once: true});
-            }
-        }
-
         stepContainer.appendChild(this.main);
+        this.animateIn(stepContainer);
 
-        queueMicrotask(()=>  componentHandler.upgradeElements(this.main)  );
+        registerUpgrade(this.main, this, null, false, true);
+        componentHandler.upgradeElements(this.main);
     }
 
     override update_() {
@@ -407,7 +427,7 @@ export class Group extends CardBase {
     parent: mainClasses.Group;
     get parentGroup() { return this.parent.inherited?.parent?.groups; }
 
-    get childClass() { return mainClasses.Option; }
+    get childClass() { return Option; }
     get children() { return this.parent.options; }
     get childrenContainer() { return this.parent.optionContainers['1st-party']; }
 
@@ -459,7 +479,6 @@ export class Group extends CardBase {
         this.main.insertBefore(this.deleteButton, this.main.firstElementChild);
 
         registerForEvents(this.deleteButton, {activate: parent.destroy.bind(parent)});
-        registerUpgrade(this.main, this, null, false, true);
 
         const dragHandle = dragHandleTemplate.cloneNode(true) as HTMLButtonElement;
         this.main.insertBefore(dragHandle, this.main.firstElementChild);
@@ -467,31 +486,11 @@ export class Group extends CardBase {
         const groupContainer = this.parent.inherited.containers?.['1st-party'] as HTMLDivElement;
         if (!groupContainer) {console.warn('Group container not found!'); return;}
 
-        if (this.main.style.animationName !== 'none'){
-            const previousSibling = groupContainer.lastElementChild instanceof HTMLElement ? groupContainer.lastElementChild : undefined;
-
-            if (previousSibling) {
-                const main = this.main;
-
-                previousSibling.style.zIndex = '1';
-                main.classList.add('animating-in');
-
-                // eslint-disable-next-line func-style, sonarjs/no-identical-functions -- I only want to init the function within an if statement
-                const removeIndex = function() {
-                    previousSibling.style.zIndex = '';
-                    main.classList.remove('animating-in');
-
-                    main.removeEventListener('animationend', removeIndex);
-                };
-
-                //afterDelay(400, removeIndex);
-                main.addEventListener('animationend', removeIndex, {once: true});
-            }
-        }
-
         groupContainer.appendChild(this.main);
+        this.animateIn(groupContainer);
 
-        queueMicrotask(()=>  componentHandler.upgradeElements(this.main)  );
+        registerUpgrade(this.main, this, null, false, true);
+        componentHandler.upgradeElements(this.main);
     }
 
     override update_() {
@@ -527,7 +526,7 @@ export class Option extends CardBase {
     parent: mainClasses.Option;
     get parentGroup() { return this.parent.inherited?.parent?.options; }
 
-    get childClass() { return mainClasses.DependencyFlag; }
+    get childClass() { return DependencyFlag; }
     get children() { return this.parent.flagsToSet; }
     get childrenContainer() { return this.parent.flagsContainers['1st-party']; }
 
@@ -547,9 +546,17 @@ export class Option extends CardBase {
     editTypeButton: HTMLButtonElement;
     defaultTypeDropdown: HTMLMenuElement;
 
+    addFlagBtn: HTMLButtonElement;
+    override readonly minimumChildrenToSort = 0;
+
+    private addFlagEvtObj;
+
     constructor (parent: mainClasses.Option) {
         super();
+
         this.parent = parent;
+
+        this.addFlagEvtObj = {activate: parent.addFlag_bound.bind(parent, undefined, undefined)};
 
         this.main = optionTemplate.cloneNode(true) as HTMLDivElement;
 
@@ -576,37 +583,30 @@ export class Option extends CardBase {
         this.main.insertBefore(this.deleteButton, this.main.firstElementChild);
         registerForEvents(this.deleteButton, {activate: parent.destroy.bind(parent)});
 
+        const flagsContainer = this.main.querySelector('div.builder-steps-option-set-flags-container') as HTMLDivElement;
+        this.parent.flagsContainers['1st-party'] = flagsContainer;
+
+        const sortableEvents = {
+            onSort: this.onSort_bound,
+            onAdd: this.onAdd_bound,
+            onRemove: this.onRemove_bound,
+        } as const satisfies Sortable__.Options;
+        this.sortable = new Sortable(flagsContainer, Object.assign(sortableEvents, sortableSettings_flags));
+
+        this.addFlagBtn = this.main.querySelector('.builder-steps-option-set-flags-body button.builder-steps-add-child-btn')!;
+        registerForEvents(this.addFlagBtn, this.addFlagEvtObj);
+
         const dragHandle = dragHandleTemplate.cloneNode(true) as HTMLDivElement;
         this.main.insertBefore(dragHandle, this.main.firstElementChild);
 
         const optionContainer = this.parent.inherited.containers?.['1st-party'] as HTMLDivElement;
         if (!optionContainer) {console.warn('Option container not found!'); return;}
 
-        if (this.main.style.animationName !== 'none'){
-            const previousSibling = optionContainer.lastElementChild instanceof HTMLElement ? optionContainer.lastElementChild : undefined;
-
-            if (previousSibling) {
-                const main = this.main;
-
-                previousSibling.style.zIndex = '1';
-                main.classList.add('animating-in');
-
-                // eslint-disable-next-line func-style, sonarjs/no-identical-functions -- I only want to init the function within an if statement
-                const removeIndex = function() {
-                    previousSibling.style.zIndex = '';
-                    main.classList.remove('animating-in');
-
-                    main.removeEventListener('animationend', removeIndex);
-                };
-
-                //afterDelay(400, removeIndex);
-                main.addEventListener('animationend', removeIndex, {once: true});
-            }
-        }
-
+        this.animateIn(optionContainer);
         optionContainer.appendChild(this.main);
 
-        queueMicrotask(()=>  componentHandler.upgradeElements(this.main)  );
+        registerUpgrade(this.main, this, null, false, true);
+        componentHandler.upgradeElements(this.main);
     }
 
     override update_() {
@@ -650,6 +650,8 @@ class DependencyFlag extends CardBase {
     get value(): string { return this.parent.value; } set value(value: string) { this.parent.value = value; }
     valueInput: HTMLInputElement;
 
+    override readonly minimumItemsToSort = 0;
+
     constructor (parent: mainClasses.DependencyFlag) {
         super();
 
@@ -669,6 +671,16 @@ class DependencyFlag extends CardBase {
 
         const dragHandle = dragHandleTemplate.cloneNode(true) as HTMLDivElement;
         this.main.insertBefore(dragHandle, this.main.firstElementChild);
+
+        const flagContainer = this.parent.inherited?.containers?.['1st-party'] as HTMLDivElement;
+        if (!flagContainer) {console.warn('Flag container not found!'); return;}
+
+
+        flagContainer.appendChild(this.main);
+        this.animateIn(flagContainer);
+
+        registerUpgrade(this.main, this, null, false, true);
+        componentHandler.upgradeElements(this.main);
     }
 
     override update_() {

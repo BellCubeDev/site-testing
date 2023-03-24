@@ -1,5 +1,5 @@
 import * as main from './fomod-builder.js'; // Brings in global things
-import { objOf, UpdatableObject } from '../../universal.js';
+import { UpdatableObject } from '../../universal.js';
 
 import * as ui from './fomod-builder-ui.js';
 
@@ -52,28 +52,42 @@ export function addUpdateObjects<TClass extends Omit<typeof FOMODElementProxy, '
 export abstract class FOMODElementProxy extends UpdatableObject {
     instanceElement: Element | undefined;
 
+    /** @type readonly (keyof this)[] */
+    abstract keysToUpdate: readonly string[];
+
     objectsToUpdate: UpdatableObject[] = [];
 
     propagateToChildren_wasTrue = false;
     updateObjects(propagateToChildren = false) {
         if (!this) return; // function sometimes gets called in the constructor - update will be called in a microtask later.
+
         this.propagateToChildren_wasTrue ||= propagateToChildren;
         queueMicrotask(()=>  this.propagateToChildren_wasTrue = false  );
 
-        if (!propagateToChildren) {
-            this.objectsToUpdate.forEach(  (obj) => obj instanceof FOMODElementProxy ? obj.updateObjects(this.propagateToChildren_wasTrue) : obj.update()  );
-            ui.autoSave();
-            return;
+        // If propagateToChildren is true,
+        // we know that it didn't come from an actual update--so let's go through the update API this time
+        // Don't worry - when the update goes through, it'll just call this function again, but this time it'll be false
+        if (propagateToChildren) return this.update();
+
+        for (const object of this.objectsToUpdate) {
+            if (object instanceof FOMODElementProxy) object.updateObjects(true);
+            else object.update();
         }
 
-        if ('steps' in this   &&   this.steps instanceof Set) this.steps.forEach(  (step) => step.updateObjects.call(step, true)  );
-        if ('groups' in this  &&  this.groups instanceof Set) this.groups.forEach(  (group) => group.updateObjects.call(group, true)  );
-        if ('options' in this && this.options instanceof Set) this.options.forEach(  (option) => option.updateObjects.call(option, true)  );
-        if ('flags'  in this  &&  this.flags  instanceof Set) this.flags   .forEach(  (flag) =>   flag.updateObjects  .call(flag,    true)  );
+        if (this.propagateToChildren_wasTrue) for (const key of this.keysToUpdate) {
+            if (  !(key in this)  ) return console.error(`Key ${key} not found in ${this.constructor.name}`, this);
+            const obj = this[key as keyof this];
 
-        // We know that it didn't come from an actual update, so let's go through the update API this time
-        // Don't worry - when the update goes through, it'll just call this function again, but this time it'll be false
-        this.update();
+            if (obj instanceof UpdatableObject) obj.update();
+            else if (obj instanceof Set || obj instanceof Array) {
+                for (const nestedObject of obj) {
+                    if (nestedObject instanceof FOMODElementProxy) nestedObject.updateObjects(true);
+                    else if (nestedObject instanceof UpdatableObject) nestedObject.update();
+                }
+            }
+        }
+
+        ui.autoSave();
     }
 
     override update_() { this.updateObjects(); }
@@ -123,6 +137,7 @@ interface InheritedFOMODData<TType extends Step|Group|Option|Dependency> {
 
 
 export abstract class Dependency extends FOMODElementProxy {
+    keysToUpdate = [];
     constructor(instanceElement: Element | undefined = undefined) {
         super(instanceElement);
     }
@@ -148,21 +163,36 @@ $$ |  $$\ $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \
 \$$$$$$  |\$$$$$$  |$$ |  $$ |\$$$$$$$ |$$ |  \$$$$  |$$ |\$$$$$$  |$$ |  $$ |$$$$$$$  |
  \______/  \______/ \__|  \__| \_______|\__|   \____/ \__| \______/ \__|  \__|\______*/
 
-export const flags:objOf<Flag> = {};
+declare global { interface Window {  flags: Record<string, Flag>;  flagClass: typeof Flag;  } }
+window.flags = {};
+
 export class Flag {
     name: string;
 
-    getters = new Set<DependencyFlag>();
-    gettersByValue: Record<string, Set<DependencyFlag>> = {};
+    getters: Set<DependencyFlag>;
+    gettersByValue: Record<string, Set<DependencyFlag>>;
 
-    setters = new Set<DependencyFlag>();
-    settersByValue: Record<string, Set<DependencyFlag>> = {};
+    setters: Set<DependencyFlag>;
+    settersByValue: Record<string, Set<DependencyFlag>>;
 
-    private cachedValues: Map<DependencyFlag, string> = new Map();
+    private cachedValues: Map<DependencyFlag, string>;
+    private static cachedNames: Map<DependencyFlag, string> = new Map();
+
+    static get(name: string): Flag { return window.flags[name] ?? new Flag(name); }
+    checkValidity() { if (this.setters.size === 0 && this.getters.size === 0) delete window.flags[this.name]; }
 
     private constructor(name: string) {
+        if (window.flags[name]) throw new Error(`Flag ${name} already exists!`);
         this.name = name;
-        flags[name] = this;
+        window.flags[name] = this;
+
+        this.getters = new Set();
+        this.setters = new Set();
+        this.gettersByValue = {};
+        this.settersByValue = {};
+        this.cachedValues = new Map();
+
+        queueMicrotask(this.checkValidity.bind(this));
     }
 
     get values(): Set<string> {
@@ -171,17 +201,26 @@ export class Flag {
         return values;
     }
 
-    static get(name: string): Flag { return flags[name] ?? new Flag(name); }
-
-    updateGetter(getter: DependencyFlag) { this.getters.add(getter); }
     updateSetter(setter: DependencyFlag) {
-        this.setters.add(setter);
+        if (setter.flag !== this.name) {
+            this.setters.delete(setter);
+
+            const oldValue = this.cachedValues.get(setter);
+            if (oldValue) this.settersByValue[oldValue]?.delete(setter);
+            this.cachedValues.delete(setter);
+
+            this.checkValidity();
+            return;
+        }
+
 
         const oldValue = this.cachedValues.get(setter);
         if (oldValue !== setter.value) {
-            if (oldValue) {
+            if (oldValue !== undefined) {
                 if (!this.settersByValue[oldValue]) this.settersByValue[oldValue] = new Set();
+
                 this.settersByValue[oldValue]!.delete(setter);
+                if (this.settersByValue[oldValue]!.size === 0) delete this.settersByValue[oldValue];
             }
 
             if (!this.settersByValue[setter.value]) this.settersByValue[setter.value] = new Set();
@@ -189,11 +228,81 @@ export class Flag {
         }
 
         this.cachedValues.set(setter, setter.value);
+        this.setters.add(setter);
     }
 
-    static updateGetter(getter: DependencyFlag) { Flag.get(getter.flag).updateGetter(getter); }
-    static updateSetter(option: Option, setter: DependencyFlag) { Flag.get(setter.flag).updateSetter(setter); }
+    updateGetter(getter: DependencyFlag) {
+        if (getter.flag !== this.name) {
+            this.getters.delete(getter);
+
+            const oldValue = this.cachedValues.get(getter);
+            if (oldValue) this.gettersByValue[oldValue]?.delete(getter);
+            this.cachedValues.delete(getter);
+
+            this.checkValidity();
+            return;
+        }
+
+        const oldValue = this.cachedValues.get(getter);
+        if (oldValue !== getter.value) {
+            if (oldValue !== undefined) {
+                if (!this.gettersByValue[oldValue]) this.gettersByValue[oldValue] = new Set();
+
+                this.gettersByValue[oldValue]!.delete(getter);
+                if (this.gettersByValue[oldValue]!.size === 0) delete this.gettersByValue[oldValue];
+            }
+
+            if (!this.gettersByValue[getter.value]) this.gettersByValue[getter.value] = new Set();
+            this.gettersByValue[getter.value]!.add(getter);
+        }
+
+        this.cachedValues.set(getter, getter.value);
+        this.getters.add(getter);
+    }
+
+    removeItem(item: DependencyFlag) {
+        this.setters.delete(item);
+        this.getters.delete(item);
+
+        const oldValue = this.cachedValues.get(item);
+        if (oldValue) {
+            this.settersByValue[oldValue]?.delete(item);
+            this.gettersByValue[oldValue]?.delete(item);
+        }
+
+        this.cachedValues.delete(item);
+
+        this.checkValidity();
+    }
+
+    static removeItem(item: DependencyFlag) {
+        const oldName = Flag.cachedNames.get(item);
+        if (oldName !== undefined) Flag.get(oldName).removeItem(item);
+        Flag.cachedNames.delete(item);
+    }
+
+    static updateSetter(setter: DependencyFlag) {
+        const oldName = Flag.cachedNames.get(setter);
+        if (oldName !== setter.flag) {
+            if (oldName !== undefined) Flag.get(oldName).updateSetter(setter);
+            Flag.cachedNames.set(setter, setter.flag);
+        }
+
+        Flag.get(setter.flag).updateSetter(setter);
+    }
+
+    static updateGetter(getter: DependencyFlag) {
+        const oldName = Flag.cachedNames.get(getter);
+        if (oldName !== getter.flag) {
+            if (oldName !== undefined) Flag.get(oldName).updateGetter(getter);
+            Flag.cachedNames.set(getter, getter.flag);
+        }
+
+        Flag.get(getter.flag).updateGetter(getter);
+    }
+
 }
+window.flagClass = Flag;
 
 export type DependencyFileState = 'Active' | 'Inactive' | 'Missing';
 export type DependencyGroupOperator = 'And' | 'Or';
@@ -249,10 +358,10 @@ export class DependencyGroup extends Dependency {
 type DependencyFlagTags = 'flag' | 'flagDependency';
 export class DependencyFlag extends Dependency {
     private _flag = '';
-    set flag(value: string) { this._flag = value; this.updateObjects(); } get flag(): string { return this._flag; }
+    set flag(value: string) { this._flag = value; this.update(); } get flag(): string { return this._flag; }
 
     private _value = '';
-    set value(value: string) { this._value = value; this.updateObjects(); } get value(): string { return this._value; }
+    set value(value: string) { this._value = value; this.update(); } get value(): string { return this._value; }
 
     readonly type:DependencyFlagTags;
     readonly inherited?: InheritedFOMODData<Dependency>;
@@ -271,7 +380,16 @@ export class DependencyFlag extends Dependency {
         if (!this.inherited) return;
 
         if (this.type === 'flagDependency') Flag.updateGetter(this);
-        else if (this.inherited.parent) Flag.updateSetter(this.inherited.parent, this);
+        else if (this.inherited.parent) Flag.updateSetter(this);
+    }
+
+    protected override destroy_(): void {
+        if (!this.inherited) return;
+
+        Flag.removeItem(this);
+        this.inherited.parent?.flagsToSet.delete(this);
+
+        super.destroy_();
     }
 
     // <flagDependency flag="" value="" />
@@ -356,6 +474,8 @@ export type OptionType =
     | 'Required'        // Permanently checked
     | 'NotUseable';     // Permanently unchecked
 export class OptionTypeDescriptor extends FOMODElementProxy {
+    keysToUpdate = ['dependencies'] as const;
+
     private _defaultType: OptionType = 'Optional';
     set defaultType(value: OptionType) { this._defaultType = value; this.updateObjects(); } get defaultType(): OptionType { return this._defaultType; }
 
@@ -426,18 +546,20 @@ export class OptionTypeDescriptor extends FOMODElementProxy {
 }
 
 export class OptionTypeDescriptorWithDependency extends FOMODElementProxy {
+    keysToUpdate = ['dependencies'] as const;
+
     private _type: OptionType = 'Optional';
     set type(value: OptionType) { this._type = value; this.updateObjects(); } get type(): OptionType { return this._type; }
 
     private _typeElement: Element | undefined = undefined;
     set typeElement(value: Element | undefined) { this._typeElement = value; this.updateObjects(); } get typeElement(): Element | undefined { return this._typeElement; }
 
-    private _dependency!: DependencyGroup;
-    set dependency(value: DependencyGroup) { this._dependency = value; this.updateObjects(); } get dependency(): DependencyGroup { return this._dependency; }
+    private _dependencies!: DependencyGroup;
+    set dependencies(value: DependencyGroup) { this._dependencies = value; this.updateObjects(); } get dependencies(): DependencyGroup { return this._dependencies; }
 
     constructor(instanceElement?: Element, dependency?: DependencyGroup, type: OptionType = 'Optional') {
         super(instanceElement);
-        this.dependency = dependency ?? new DependencyGroup();
+        this.dependencies = dependency ?? new DependencyGroup();
         this.type = type;
     }
 
@@ -449,7 +571,7 @@ export class OptionTypeDescriptorWithDependency extends FOMODElementProxy {
                                     ?? this.instanceElement.appendChild(document.createElement('type'));
         this.typeElement.setAttribute('name', this.type);
 
-        this.instanceElement.appendChild(this.dependency.asModuleXML(document));
+        this.instanceElement.appendChild(this.dependencies.asModuleXML(document));
 
         return this.instanceElement;
     }
@@ -487,6 +609,8 @@ function parseFiles(elem: Element|undefined): Install[] {
 }
 
 export class Install extends FOMODElementProxy {
+    keysToUpdate = ['dependencies'] as const;
+
     private _source: string[] = [];
     set source(value: string[]) { this._source = value; this.updateObjects(); } get source(): string[] { return this._source; }
 
@@ -565,6 +689,7 @@ export type SortOrder =
     | 'Explicit';  // Explicit order
 
 export class Step extends FOMODElementProxy {
+    keysToUpdate = ['groups', 'conditions'] as const;
     inherited: InheritedFOMODData<Step>;
 
     private _name = '';
@@ -650,6 +775,7 @@ export type GroupSelectType =
     | 'SelectAtLeastOne'    // Requires users to select at least one option
     | 'SelectExactlyOne';   // Requires users to select exactly one option
 export class Group extends FOMODElementProxy {
+    keysToUpdate = ['options'] as const;
     inherited: InheritedFOMODData<Group>;
 
     private _name = '';
@@ -725,6 +851,7 @@ export class Group extends FOMODElementProxy {
 }
 
 export class Option extends FOMODElementProxy {
+    keysToUpdate = ['flagsToSet', 'files', 'typeDescriptor'] as const;
     inherited: InheritedFOMODData<Option>;
     protected override destroy_(): void {
         this.inherited.parent?.options.delete(this);
@@ -774,6 +901,17 @@ export class Option extends FOMODElementProxy {
             {}// this.files.add(new FomodFile(file));
     }
 
+    addFlag(xmlElement?: ConstructorParameters<typeof Option>[1]) {
+        this.flagsToSet.add(new DependencyFlag('flag', {
+            base: this.inherited.base,
+            containers: this.flagsContainers,
+            parent: this,
+        }, xmlElement));
+
+        this.updateWhole();
+    }
+    readonly addFlag_bound = this.addFlag.bind(this, undefined);
+
     override asModuleXML(document: XMLDocument): Element {
         this.instanceElement =
             this.instanceElement ?? document.createElement('plugin');
@@ -821,6 +959,8 @@ export class Option extends FOMODElementProxy {
 }
 
 export class Fomod extends FOMODElementProxy {
+    keysToUpdate = ['installs', 'conditions', 'steps'] as const;
+
     private _metaName: string = '';
     set metaName(value: string) {
         this._metaName = value;
@@ -879,7 +1019,7 @@ export class Fomod extends FOMODElementProxy {
     }
 
 
-    installs: Install[];
+    installs: Set<Install>;
 
     conditions: DependencyGroup | undefined;
     steps: Set<Step>;
@@ -927,7 +1067,7 @@ export class Fomod extends FOMODElementProxy {
 
         const conditionalInstallsElem = instanceElement?.getElementsByTagName('conditionalFileInstalls')[0]?.getElementsByTagName('patterns')[0];
         const requiredInstallsElem = instanceElement?.getElementsByTagName('requiredInstallFiles')[0];
-        this.installs = [...parseFiles(conditionalInstallsElem), ...parseFiles(requiredInstallsElem)];
+        this.installs = new Set([...parseFiles(conditionalInstallsElem), ...parseFiles(requiredInstallsElem)]);
 
         const moduleDependencies = instanceElement?.getElementsByTagName('moduleDependencies')[0];
         if (moduleDependencies) this.conditions = new DependencyGroup(moduleDependencies);

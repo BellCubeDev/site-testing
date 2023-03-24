@@ -66,10 +66,6 @@
                 {
                     "base": "$tsc-watch",
                     "fileLocation": [ "relative", "${workspaceFolder}\\site" ],
-                },
-                {
-                    "owner": "BACKGROUND FINISHED DETECTOR",
-                    /* Dummy pattern matcher --> */"pattern": [{"regexp": "(1)23456789012345678901234567890","file": 1,"message": 1,"kind": "file"}],
                     "background": {
                         "activeOnStart": true,
                         "beginsPattern": "^(?:\\d+:\\d+:\\d+ \\w+ - File change detected\\. Starting incremental compilation\\.\\.\\.|   ROBOCOPY     ::     Robust File Copy for Windows)$",
@@ -164,7 +160,7 @@
             "label": "Open Site Locally (SERVE)",
             "type": "shell",
 
-            "command": "sleep 1\nxdg-open http://http://127.0.0.1:4000/site-testing/",
+            "command": "sleep 1\n xdg-open http://http://127.0.0.1:4000/site-testing/",
             "windows": {
                 "command": "timeout 1 > nul && start http://127.0.0.1:4000/site-testing/",
 

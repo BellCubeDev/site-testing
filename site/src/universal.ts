@@ -80,13 +80,6 @@ export function anAnimationFrame(): Promise<void> {
     return animationFrames(1);
 }
 
-// ================================
-// ======== TYPE UTILITIES ========
-// ================================
-
-/** Convenience type to quickly create an indexed Object with the specified type */
-export type objOf<T> = {[key:string]: T};
-
 // ==================================
 // ======== STRING UTILITIES ========
 // ==================================
@@ -435,10 +428,10 @@ declare global {
         layout: mdl.MaterialLayout
 
         /** A list of Query Parameters from the URI */
-        queryParams: objOf<string>;
+        queryParams: Record<string, string>;
 
         /** A list of functions used when loading scripts */
-        bcd_init_functions: objOf<Function>;
+        bcd_init_functions: Record<string, Function>;
 
         /** A special class used to track components across multiple module scripts */
         bcd_ComponentTracker: bcd_ComponentTracker;
@@ -566,7 +559,7 @@ $$$$$$$$\                               $$\
 
 /** A single item listed in the Component Tracker */
 export interface componentTrackingItem<TConstructor> {
-    obj:objOf<TConstructor>,
+    obj:Record<string, TConstructor>,
     arr:TConstructor[]
 }
 
@@ -578,7 +571,7 @@ export interface trackableConstructor<TClass> extends Function {
 
 /** Wrapped in a class to get around the complexities of exporting. */
 export class bcd_ComponentTracker {
-    static registered_components:objOf<componentTrackingItem<unknown>> = {};
+    static registered_components:Record<string, componentTrackingItem<unknown>> = {};
 
 
     static registerComponent<TClass>(component:TClass, constructor: trackableConstructor<TClass>, element:HTMLElement):void{
@@ -865,17 +858,23 @@ export class BCDDetails extends BCD_CollapsibleParent {
             if (!temp_summary) /* Throw an error*/ {console.log(strs.errItem, this); throw new TypeError("[BCD-DETAILS] Error: Non-adjacent Details elements must have a Summary element with a `for` attribute matching the Details element's id.");}
             this.summary = temp_summary as HTMLElement;
         }
+
         this.openIcons90deg = this.summary.getElementsByClassName('open-icon-90CC');
-        new ResizeObserver(this.reEvalOnSizeChange.bind(this)).observe(this.details_inner);
+
+        const boundReEval = this.reEvalIfClosed.bind(this);
+
+        const observer = new ResizeObserver(boundReEval);
+        observer.observe(this.details_inner);
 
         bcd_ComponentTracker.registerComponent(this, BCDDetails, this.details);
+
         this.reEval(true, true);
         this.self.classList.add('initialized');
 
         registerUpgrade(this.self, this, this.summary, true);
     }
 
-    reEvalOnSizeChange(entries: ResizeObserverEntry[], observer: ResizeObserver) {
+    reEvalIfClosed() {
         if (!this.isOpen()) this.reEval(true, true);
     }
 }
@@ -1164,7 +1163,7 @@ export enum menuCorners {
     bottomRight = 'mdl-menu--top-right'
 }
 
-type optionObj = objOf<Function|null>
+type optionObj = Record<string, Function|null>
 
 export abstract class BCDDropdown extends mdl.MaterialMenu {
 
@@ -1388,9 +1387,14 @@ export class bcdDropdown_AwesomeButton extends BCDDropdown {
         super(element, undefined, false);
     }
 
-    override options(): objOf<Function|null> {
+    override options(): Record<string, Function|null> {
         return {
-            'View Debug Page': () => {document.getElementById('debug-link')?.click();}
+            'View Debug Page': () => {document.getElementById('debug-link')?.click();},
+            'Toggle Page Monochrome': () => {
+                let [, start, percentage, end] = document.body.style.filter.match(/(.*)grayscale\((.*?)\)(.*)/) ?? [];
+                start ??= ''; percentage ??= ''; end ??= '';
+                document.body.style.filter = `${start}grayscale(${percentage === '100%' ? '0%' : '100%'})${end}`;
+            },
         };
     }
 }

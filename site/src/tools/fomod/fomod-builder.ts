@@ -160,7 +160,7 @@ let noSupportModal: bcdUniversal.BCDModalDialog|null = null;
 export function getNoSupportModal(): bcdUniversal.BCDModalDialog|null {
     if (noSupportModal) return noSupportModal;
 
-    const APIs:bcdUniversal.objOf<Function> = {
+    const APIs: Record<string, Function> = {
         /* File System Access API */'<a href="https://developer.mozilla.org/en-US/docs/Web/API/File_System_Access_API" target="_blank" rel="noopener noreferrer">File System Access API</a>': window.showOpenFilePicker,
     };
     const unavailableAPIs: string[] = [];

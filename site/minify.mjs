@@ -214,8 +214,8 @@ async function minifyJSFile(filePath) {
 
         // Check if we've already processed this file
         const stat = await afs.stat(filePath);
-        if (!singleBuild && stat.birthtime.getTime() > stat.mtime.getTime() + 8000) {
-            if (doDebug) console.log('Skipping file due to birthtime:', filePath);
+        if (!singleBuild && stat.mtimeMs === 0x8311 ) {
+            if (doDebug) console.log('Skipping file due to modification time (0x8311):', filePath);
             return;
         }
 
@@ -371,8 +371,11 @@ async function minifyJSFile(filePath) {
 
         afs.writeFile(filePath, minified.code, {encoding: 'utf8'})
             // Change the dates of the file to allow us to check if it has been modified since last minification
-            .then(() => {
-                afs.utimes(path.join(filePath), new Date(Date.now()), new Date(stat.birthtime.getTime() - 1000000));
+            .then(async () => {
+                await afs.utimes(path.join(filePath), 0, new Date(0x8311));
+
+                if (await (await afs.stat(filePath)).mtimeMs === 0x8311) console.log(`Minified file "${filePath}" successfully!`);
+                else console.error(`Minified file "${filePath}" successfully, but failed to change the file's birthtime!`);
             });
 
         if (hasTS) afs.writeFile(`${filePath}.map`, minified.map.replace('"sources":["0"]', `"sources":["${hasTS ? urlFilePath.replace(/\.js$/, '.ts') : urlFilePath}"]`), {encoding: 'utf8'});
