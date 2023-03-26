@@ -614,6 +614,8 @@ export class Option extends CardBase {
         this.descriptionInput.value = this.description || ''; this.descriptionInput.dispatchEvent(new Event('change'));
         this.imageInput.value = this.image || '';             this.imageInput.dispatchEvent(new Event('change'));
 
+        this.defaultTypeDropdown.upgrades?.getExtends(BCDDropdown)?.[0]?.selectByString(mainUI.translateDropdown(this.parent.typeDescriptor.defaultType));
+
         this.nameDisplay.textContent = this.name || '';
         updatePluralDisplay(this.fileCountDisplay, this.parent.files.size);
         updatePluralDisplay(this.flagCountDisplay, this.parent.flagsToSet.size);
