@@ -67,7 +67,7 @@ redirect_from:
             <div class="builder-steps-body-left builder-steps-body-left--enforce-width">
                 <!-- Step Name -->
                 <div class="item-with-fake-label"><h2 class="h4">Step Name</h2>
-                    <input class="builder-steps-step-name bcd-builder-input" placeholder="Step Name" value="" />
+                    <input class="builder-steps-step-name bcd-builder-input" placeholder="Step Name" value="ERROR" />
                 </div>
 
                 <!-- Group Sorting Order -->
@@ -77,7 +77,7 @@ redirect_from:
                 </div>
 
                 <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn">
-                    Edit Visibility Conditions
+                    Edit Step Visibility Conditions
                 </button>
             </div>
 
@@ -107,17 +107,17 @@ redirect_from:
             <div class="builder-steps-body-left builder-steps-body-left--enforce-width">
                 <!-- Option Name -->
                 <div class="item-with-fake-label"><h3 class="h4">Group Name</h3>
-                    <input class="builder-steps-group-name bcd-builder-input" placeholder="Group Name" value="" />
+                    <input class="builder-steps-group-name bcd-builder-input" placeholder="Group Name" value="ERROR" />
                 </div>
 
                 <!-- Group Sorting Order -->
-                <div class="item-with-fake-label item-with-fake-label--one-liner"><h3 class="h4">Group Sorting Order</h3>
+                <div class="item-with-fake-label item-with-fake-label--one-liner"><h3 class="h4">Option Sorting Order</h3>
                     <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
                     <menu class="bcd-dropdown-sorting-order mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
                 </div>
 
                 <!-- Group Selection Type -->
-                <div class="item-with-fake-label item-with-fake-label--one-liner"><h3 class="h4">Group Selection Type</h3>
+                <div class="item-with-fake-label item-with-fake-label--one-liner"><h3 class="h4">Selection Type</h3>
                     <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
                     <menu class="bcd-dropdown-group-type mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
                 </div>
@@ -149,7 +149,7 @@ redirect_from:
             <div class="builder-steps-option-image">
                 <img>
                 <div class="js-relative-file-picker--container">
-                    <input class="bcd-builder-input js-relative-image-picker" relative-to="FOMODBuilder" placeholder="Option Image Path" value="" />
+                    <input class="bcd-builder-input js-relative-image-picker" relative-to="FOMODBuilder" placeholder="Option Image Path" value="ERROR" />
                 </div>
             </div>
 
@@ -157,21 +157,21 @@ redirect_from:
 
                 <!-- Option Name -->
                 <div class="item-with-fake-label"><h4 class="h4">Option Name</h4>
-                    <input class="bcd-builder-input builder-steps-option-name" placeholder="Option Name" value="" />
+                    <input class="bcd-builder-input builder-steps-option-name" placeholder="Option Name" value="ERROR" />
                 </div>
 
                 <!-- Option Description -->
                 <div class="item-with-fake-label"><h4 class="h4">Description</h4>
-                    <textarea class="bcd-builder-input js-dynamic-textarea-height builder-steps-option-description" placeholder="Option Description" rows="1">This is the single texture version of the mod. It will replace the texture of the scroll with a single texture.</textarea>
+                    <textarea class="bcd-builder-input js-dynamic-textarea-height builder-steps-option-description" placeholder="Option Description" rows="1">ERROR</textarea>
                 </div>
 
                 <!-- Plugin Type -->
-                <div class="item-with-fake-label item-with-fake-label--one-liner"><h4 class="h4">Default Selection Type:</h4>
+                <div class="item-with-fake-label item-with-fake-label--one-liner"><h4 class="h4">Default Option State:</h4>
                     <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
                     <menu class="bcd-dropdown-option-state mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
                 </div>
 
-                <div class="item-with-fake-label"><h4 class="h4">Selection Type Conditions</h4>
+                <div class="item-with-fake-label"><h4 class="h4">Option State Condition Logic</h4>
                     <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn">
                         Edit
                     </button>
@@ -210,11 +210,11 @@ redirect_from:
 <template id="builder-steps-flag-template">
     <div class="builder-steps-option-flag">
         <div class="builder-steps-flag-name mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
-            <input class="mdl-textfield__input " type="text">
+            <input class="mdl-textfield__input " type="text" value="ERROR">
             <label class="mdl-textfield__label">Flag Name</label>
         </div>
         <div class="builder-steps-flag-value mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
-            <input class="mdl-textfield__input" type="text">
+            <input class="mdl-textfield__input" type="text" value="ERROR">
             <label class="mdl-textfield__label">Value to Set</label>
         </div>
     </div>
@@ -345,12 +345,12 @@ redirect_from:
         <p>Tab: Metadata</p>
         <div id="metadata-container">
             <div id="metadata-mod-name" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
-                <input class="mdl-textfield__input" type="text">
+                <input class="mdl-textfield__input" type="text" value="ERROR">
                 <label class="mdl-textfield__label">Mod Name</label>
             </div>
 
             <div id="metadata-mod-id" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
-                <input class="mdl-textfield__input" type="number" pattern="\d+">
+                <input class="mdl-textfield__input" type="number" pattern="\d+" value="ERROR">
                 <label class="mdl-textfield__label">Mod ID</label>
             </div>
             <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
@@ -360,7 +360,7 @@ redirect_from:
             </p></div>
 
             <div id="metadata-mod-author" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
-                <input class="mdl-textfield__input" type="text">
+                <input class="mdl-textfield__input" type="text" value="ERROR">
                 <label class="mdl-textfield__label">Mod Author</label>
             </div>
             <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
@@ -370,7 +370,7 @@ redirect_from:
             </p></div>
 
             <div id="metadata-mod-version" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
-                <input class="mdl-textfield__input" type="version">
+                <input class="mdl-textfield__input" type="version" value="ERROR">
                 <label class="mdl-textfield__label">Mod Version</label>
             </div>
             <div class="js-bcd-tooltip" tooltip-relation="proceeding" tooltip-position="bottom"><p>
@@ -380,7 +380,7 @@ redirect_from:
             </p></div>
 
             <div id="metadata-mod-url" class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" tabindex="-1">
-                <input class="mdl-textfield__input" type="url" pattern="^([a-z0-9+.-]+):(?:\/\/(?:((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*)@)?((?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*)(?::(\d*))?(\/(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?|(\/?(?:[a-z0-9-._~!$&'()*+,;=:@]|%[0-9A-F]{2})+(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?)(?:\?((?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*))?(?:#(?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*)?$">
+                <input class="mdl-textfield__input" type="url" pattern="^([a-z0-9+.-]+):(?:\/\/(?:((?:[a-z0-9-._~!$&'()*+,;=:]|%[0-9A-F]{2})*)@)?((?:[a-z0-9-._~!$&'()*+,;=]|%[0-9A-F]{2})*)(?::(\d*))?(\/(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?|(\/?(?:[a-z0-9-._~!$&'()*+,;=:@]|%[0-9A-F]{2})+(?:[a-z0-9-._~!$&'()*+,;=:@\/]|%[0-9A-F]{2})*)?)(?:\?((?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*))?(?:#(?:[a-z0-9-._~!$&'()*+,;=:\/?@]|%[0-9A-F]{2})*)?$" value="ERROR">
                 <label class="mdl-textfield__label">Website</label>
                 <span class="mdl-textfield__error">If specified, this should be a valid URI</span>
             </div>
@@ -431,14 +431,14 @@ redirect_from:
                     </div>
 
                     <!-- Steps Sorting Order -->
-                    <div class="item-with-fake-label item-with-fake-label--one-liner"><h1 class="h3">Sorting Order</h1>
+                    <div class="item-with-fake-label item-with-fake-label--one-liner"><h1 class="h3">Step Sorting Order</h1>
                         <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect"><span class="bcd-dropdown_value">ERROR</span></button>
                         <menu class="bcd-dropdown-sorting-order mdl-menu mdl-menu--bottom-left mdl-js-ripple-effect"></menu>
                     </div>
 
                     <!-- FOMOD Conditions -->
                     <button type="button" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect builder-steps-condition-edit-btn">
-                        Edit Visibility Conditions
+                        Edit FOMOD Prerequisites
                     </button>
                 </div>
 

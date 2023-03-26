@@ -35,9 +35,9 @@ export enum DropdownToLang {
 
     SelectAny = "Allow Any Selections",
     SelectAll = "Force-Select Everything",
-    SelectExactlyOne = "Require One Selection",
+    SelectExactlyOne = "Require Exactly One Selection",
     SelectAtMostOne = "Require One or No Selections",
-    SelectAtLeastOne = "Require One or More Selections",
+    SelectAtLeastOne = "Require At Least One Selection",
 
     NotUsable = "Not Useable",
     CouldBeUsable = "Could Be Useable",
@@ -50,9 +50,9 @@ export enum LangToDropdown {
 
     "Allow Any Selections" = "SelectAny",
     "Force-Select Everything" = "SelectAll",
-    "Require One Selection" = "SelectExactlyOne",
+    "Require Exactly One Selection" = "SelectExactlyOne",
     "Require One or No Selections" = "SelectAtMostOne",
-    "Require One or More Selections" = "SelectAtLeastOne",
+    "Require At Least One Selection" = "SelectAtLeastOne",
 
     "Not Useable" = "NotUsable",
     "Could Be Useable" = "CouldBeUsable",
@@ -96,9 +96,9 @@ export class BCDDropdownGroupType extends bcdUniversal.BCDDropdown {
         return {
             "Allow Any Selections": null,
             "Force-Select Everything": null,
-            "Require One Selection": null,
+            "Require Exactly One Selection": null,
             "Require One or No Selections": null,
-            "Require One or More Selections": null,
+            "Require At Least One Selection": null,
         };
     }
 }

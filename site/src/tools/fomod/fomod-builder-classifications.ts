@@ -1079,8 +1079,8 @@ export class Fomod extends FOMODElementProxy {
             this.instanceElement = document.getOrCreateChildByTag('config');
         }
 
-        this.instanceElement.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-        this.instanceElement.setAttribute('xsi:noNamespaceSchemaLocation', 'http://qconsulting.ca/fo3/ModConfig5.0.xsd');
+        this.instanceElement.setAttribute('xmlns:xsi', 'https://www.w3.org/2001/XMLSchema-instance');
+        this.instanceElement.setAttribute('xsi:noNamespaceSchemaLocation', 'https://qconsulting.ca/fo3/ModConfig5.0.xsd');
 
         const moduleName = this.instanceElement.getOrCreateChildByTag('moduleName');
         moduleName.textContent = this.metaName;
@@ -1138,7 +1138,7 @@ export class Fomod extends FOMODElementProxy {
         }
 
         // Set schema info
-        this.infoInstanceElement.setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+        this.infoInstanceElement.setAttribute('xmlns:xsi', 'https://www.w3.org/2001/XMLSchema-instance');
         if (window.FOMODBuilder.storage.settings.includeInfoSchema)
             this.infoInstanceElement.setAttribute('xsi:noNamespaceSchemaLocation', 'https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd');
         else if (this.infoInstanceElement.getAttribute('xsi:noNamespaceSchemaLocation') === 'https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd')

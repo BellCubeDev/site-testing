@@ -50,9 +50,9 @@ FOMODBuilder:
     options:
       SelectAny: Allow Any Selections
       SelectAll: Force-Select Everything
-      SelectExactlyOne: Require One Selection
+      SelectExactlyOne: Require Exactly One Selection
       SelectAtMostOne: Require One or No Selections
-      SelectAtLeastOne: Require One or More Selections
+      SelectAtLeastOne: Require At Least One Selection
 
   formatXML:
     type: bool
