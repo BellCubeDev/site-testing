@@ -33,14 +33,16 @@ function JsonStringifyFomod(key: string, value: any) {
     ...makes this code *so* much easier to maintain... you know, 'cuz I can find my functions in VSCode's Minimap
 */
 
- /*$$$$\  $$\                   $$\                                     $$\
-$$  __$$\ $$ |                  $$ |                                    $$ |
-$$ /  $$ |$$$$$$$\   $$$$$$$\ $$$$$$\    $$$$$$\   $$$$$$\   $$$$$$$\ $$$$$$\    $$$$$$$\
-$$$$$$$$ |$$  __$$\ $$  _____|\_$$  _|  $$  __$$\  \____$$\ $$  _____|\_$$  _|  $$  _____|
-$$  __$$ |$$ |  $$ |\$$$$$$\    $$ |    $$ |  \__| $$$$$$$ |$$ /        $$ |    \$$$$$$\
-$$ |  $$ |$$ |  $$ | \____$$\   $$ |$$\ $$ |      $$  __$$ |$$ |        $$ |$$\  \____$$\
-$$ |  $$ |$$$$$$$  |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |\$$$$$$$\   \$$$$  |$$$$$$$  |
-\__|  \__|\_______/ \_______/    \____/ \__|       \_______| \_______|   \____/ \______*/
+/***
+ *    $$$$$$$$\ $$\                                               $$\
+ *    $$  _____|$$ |                                              $$ |
+ *    $$ |      $$ | $$$$$$\  $$$$$$\$$$$\   $$$$$$\  $$$$$$$\  $$$$$$\    $$$$$$$\
+ *    $$$$$\    $$ |$$  __$$\ $$  _$$  _$$\ $$  __$$\ $$  __$$\ \_$$  _|  $$  _____|
+ *    $$  __|   $$ |$$$$$$$$ |$$ / $$ / $$ |$$$$$$$$ |$$ |  $$ |  $$ |    \$$$$$$\
+ *    $$ |      $$ |$$   ____|$$ | $$ | $$ |$$   ____|$$ |  $$ |  $$ |$$\  \____$$\
+ *    $$$$$$$$\ $$ |\$$$$$$$\ $$ | $$ | $$ |\$$$$$$$\ $$ |  $$ |  \$$$$  |$$$$$$$  |
+ *    \________|\__| \_______|\__| \__| \__| \_______|\__|  \__|   \____/ \_______/
+ */
 
 /** A map of FOMODElementProxy classes and the classes they should create alongside themselves for update purposes */
 export const UpdateObjects = new Map<FOMODElementProxy|Function, ({new(param: any): UpdatableObject} & Omit<typeof UpdatableObject, 'new'>)[]>();
@@ -135,33 +137,19 @@ interface InheritedFOMODData<TType extends Step|Group|Option|Dependency> {
     containers?: Record<string, HTMLDivElement>,
 }
 
-
-export abstract class Dependency extends FOMODElementProxy {
-    keysToUpdate = [];
-    constructor(instanceElement: Element | undefined = undefined) {
-        super(instanceElement);
-    }
-
-    abstract override asModuleXML(document: XMLDocument): Element;
-}
-
-
-
-export abstract class DependencyBaseVersionCheck extends Dependency {
-    private _version = '';
-    set version(value: string) { this._version = value; this.updateObjects(); } get version(): string { return this._version; }
-}
-
-
-
-/*$$$$$\                            $$\ $$\   $$\     $$\
-$$  __$$\                           $$ |\__|  $$ |    \__|
-$$ /  \__| $$$$$$\  $$$$$$$\   $$$$$$$ |$$\ $$$$$$\   $$\  $$$$$$\  $$$$$$$\   $$$$$$$\
-$$ |      $$  __$$\ $$  __$$\ $$  __$$ |$$ |\_$$  _|  $$ |$$  __$$\ $$  __$$\ $$  _____|
-$$ |      $$ /  $$ |$$ |  $$ |$$ /  $$ |$$ |  $$ |    $$ |$$ /  $$ |$$ |  $$ |\$$$$$$\
-$$ |  $$\ $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \____$$\
-\$$$$$$  |\$$$$$$  |$$ |  $$ |\$$$$$$$ |$$ |  \$$$$  |$$ |\$$$$$$  |$$ |  $$ |$$$$$$$  |
- \______/  \______/ \__|  \__| \_______|\__|   \____/ \__| \______/ \__|  \__|\______*/
+/***
+ *    $$$$$$$$\ $$\
+ *    $$  _____|$$ |
+ *    $$ |      $$ | $$$$$$\   $$$$$$\   $$$$$$$\
+ *    $$$$$\    $$ | \____$$\ $$  __$$\ $$  _____|
+ *    $$  __|   $$ | $$$$$$$ |$$ /  $$ |\$$$$$$\
+ *    $$ |      $$ |$$  __$$ |$$ |  $$ | \____$$\
+ *    $$ |      $$ |\$$$$$$$ |\$$$$$$$ |$$$$$$$  |
+ *    \__|      \__| \_______| \____$$ |\_______/
+ *                            $$\   $$ |
+ *                            \$$$$$$  |
+ *                             \______/
+ */
 
 declare global { interface Window {  flags: Record<string, Flag>;  flagClass: typeof Flag;  } }
 window.flags = {};
@@ -304,7 +292,34 @@ export class Flag {
 }
 window.flagClass = Flag;
 
-export type DependencyFileState = 'Active' | 'Inactive' | 'Missing';
+
+/***
+ *     $$$$$$\                            $$\ $$\   $$\     $$\
+ *    $$  __$$\                           $$ |\__|  $$ |    \__|
+ *    $$ /  \__| $$$$$$\  $$$$$$$\   $$$$$$$ |$$\ $$$$$$\   $$\  $$$$$$\  $$$$$$$\   $$$$$$$\
+ *    $$ |      $$  __$$\ $$  __$$\ $$  __$$ |$$ |\_$$  _|  $$ |$$  __$$\ $$  __$$\ $$  _____|
+ *    $$ |      $$ /  $$ |$$ |  $$ |$$ /  $$ |$$ |  $$ |    $$ |$$ /  $$ |$$ |  $$ |\$$$$$$\
+ *    $$ |  $$\ $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \____$$\
+ *    \$$$$$$  |\$$$$$$  |$$ |  $$ |\$$$$$$$ |$$ |  \$$$$  |$$ |\$$$$$$  |$$ |  $$ |$$$$$$$  |
+ *     \______/  \______/ \__|  \__| \_______|\__|   \____/ \__| \______/ \__|  \__|\_______/
+ */
+
+export abstract class Dependency extends FOMODElementProxy {
+    keysToUpdate = [];
+    constructor(instanceElement: Element | undefined = undefined) {
+        super(instanceElement);
+    }
+
+    abstract override asModuleXML(document: XMLDocument): Element;
+}
+
+
+
+export abstract class DependencyBaseVersionCheck extends Dependency {
+    private _version = '';
+    set version(value: string) { this._version = value; this.updateObjects(); } get version(): string { return this._version; }
+}
+
 export type DependencyGroupOperator = 'And' | 'Or';
 export class DependencyGroup extends Dependency {
     private _operator: DependencyGroupOperator = 'And';
@@ -355,7 +370,8 @@ export class DependencyGroup extends Dependency {
     }
 }
 
-type DependencyFlagTags = 'flag' | 'flagDependency';
+export type DependencyFileState = 'Active' | 'Inactive' | 'Missing';
+export type DependencyFlagTags = 'flag' | 'flagDependency';
 export class DependencyFlag extends Dependency {
     private _flag = '';
     set flag(value: string) { this._flag = value; this.update(); } get flag(): string { return this._flag; }
@@ -430,6 +446,7 @@ export class DependencyScriptExtender extends DependencyBaseVersionCheck {
         return thisElement;
     }
 }
+
 export class DependencyGameVersion extends DependencyBaseVersionCheck {
     // <gameDependency version="" />
     override asModuleXML(document: XMLDocument): Element {
@@ -438,6 +455,7 @@ export class DependencyGameVersion extends DependencyBaseVersionCheck {
         return thisElement;
     }
 }
+
 export class DependencyModManager extends DependencyBaseVersionCheck {
     // <fommDependency version="1" />
     override asModuleXML(document: XMLDocument): Element {
@@ -466,6 +484,31 @@ function parseDependency(dependency: Element, inherited?: InheritedFOMODData<Dep
             throw new TypeError(`Unknown dependency type: ${type}`);
     }
 }
+
+/***
+ *     $$$$$$\              $$\     $$\                  $$$$$$\    $$\                 $$\
+ *    $$  __$$\             $$ |    $  |                $$  __$$\   $$ |                $$ |
+ *    $$ /  $$ | $$$$$$\  $$$$$$\   \_/ $$$$$$$\        $$ /  \__|$$$$$$\    $$$$$$\  $$$$$$\    $$$$$$\
+ *    $$ |  $$ |$$  __$$\ \_$$  _|      $$  __$$\       \$$$$$$\  \_$$  _|   \____$$\ \_$$  _|  $$  __$$\
+ *    $$ |  $$ |$$ /  $$ |  $$ |        $$ |  $$ |       \____$$\   $$ |     $$$$$$$ |  $$ |    $$$$$$$$ |
+ *    $$ |  $$ |$$ |  $$ |  $$ |$$\     $$ |  $$ |      $$\   $$ |  $$ |$$\ $$  __$$ |  $$ |$$\ $$   ____|
+ *     $$$$$$  |$$$$$$$  |  \$$$$  |    $$ |  $$ |      \$$$$$$  |  \$$$$  |\$$$$$$$ |  \$$$$  |\$$$$$$$\
+ *     \______/ $$  ____/    \____/     \__|  \__|       \______/    \____/  \_______|   \____/  \_______|
+ *              $$ |
+ *              $$ |
+ *              \__|
+ *    $$$$$$$\                                          $$\             $$\
+ *    $$  __$$\                                         \__|            $$ |
+ *    $$ |  $$ | $$$$$$\   $$$$$$$\  $$$$$$$\  $$$$$$\  $$\  $$$$$$\  $$$$$$\    $$$$$$\   $$$$$$\   $$$$$$$\
+ *    $$ |  $$ |$$  __$$\ $$  _____|$$  _____|$$  __$$\ $$ |$$  __$$\ \_$$  _|  $$  __$$\ $$  __$$\ $$  _____|
+ *    $$ |  $$ |$$$$$$$$ |\$$$$$$\  $$ /      $$ |  \__|$$ |$$ /  $$ |  $$ |    $$ /  $$ |$$ |  \__|\$$$$$$\
+ *    $$ |  $$ |$$   ____| \____$$\ $$ |      $$ |      $$ |$$ |  $$ |  $$ |$$\ $$ |  $$ |$$ |       \____$$\
+ *    $$$$$$$  |\$$$$$$$\ $$$$$$$  |\$$$$$$$\ $$ |      $$ |$$$$$$$  |  \$$$$  |\$$$$$$  |$$ |      $$$$$$$  |
+ *    \_______/  \_______|\_______/  \_______|\__|      \__|$$  ____/    \____/  \______/ \__|      \_______/
+ *                                                          $$ |
+ *                                                          $$ |
+ *                                                          \__|
+ */
 
 export type OptionState =
     | 'Optional'        // Unchecked but checkable
@@ -577,14 +620,16 @@ export class OptionStateConditionStatement extends FOMODElementProxy {
     }
 }
 
-/*$$$$$\                       $$\               $$\ $$\
-\-$$$ **|                      $$ |              $$ |$$ |
-   $$ |  $$$$$$$\   $$$$$$$\ $$$$$$\    $$$$$$\  $$ |$$ | $$$$$$$\
-   $$ |  $$  __$$\ $$  _____|\_$$  _|   \____$$\ $$ |$$ |$$  _____|
-   $$ |  $$ |  $$ |\$$$$$$\    $$ |     $$$$$$$ |$$ |$$ |\$$$$$$\
-   $$ |  $$ |  $$ | \____$$\   $$ |$$\ $$  __$$ |$$ |$$ | \____$$\
--$$$$$$\ $$ |  $$ |$$$$$$$  |  \$$$$  |\$$$$$$$ |$$ |$$ |$$$$$$$  |
-\_______|\__|  \__|\_______/    \____/  \_______|\__|\__|\______*/
+/***
+ *    $$$$$$\                       $$\               $$\ $$\
+ *    \_$$  _|                      $$ |              $$ |$$ |
+ *      $$ |  $$$$$$$\   $$$$$$$\ $$$$$$\    $$$$$$\  $$ |$$ | $$$$$$$\
+ *      $$ |  $$  __$$\ $$  _____|\_$$  _|   \____$$\ $$ |$$ |$$  _____|
+ *      $$ |  $$ |  $$ |\$$$$$$\    $$ |     $$$$$$$ |$$ |$$ |\$$$$$$\
+ *      $$ |  $$ |  $$ | \____$$\   $$ |$$\ $$  __$$ |$$ |$$ | \____$$\
+ *    $$$$$$\ $$ |  $$ |$$$$$$$  |  \$$$$  |\$$$$$$$ |$$ |$$ |$$$$$$$  |
+ *    \______|\__|  \__|\_______/    \____/  \_______|\__|\__|\_______/
+ */
 
 
 export const installs = new Set<Install>();
@@ -624,13 +669,11 @@ export class Install extends FOMODElementProxy {
 
     async updateFile(pathOrFile: string|string[] | FileSystemHandle): Promise<void> {
 
-        if (pathOrFile instanceof FileSystemHandle)
-        pathOrFile = await window.FOMODBuilder.directory?.handle.resolve(pathOrFile) ?? '';
-
-        if (typeof pathOrFile === 'string')
-            pathOrFile = pathOrFile.split('/');
-
+        if (pathOrFile instanceof FileSystemHandle) pathOrFile = await window.FOMODBuilder.directory?.handle.resolve(pathOrFile) ?? '';
+        if (pathOrFile instanceof File)
+        if (typeof pathOrFile === 'string') pathOrFile = pathOrFile.replace(/\\/g, '/').split('/');
         if ( !(pathOrFile instanceof Array) ) throw new Error('Could not resolve path - most likely outside of the root directory');
+
 
         this.source = pathOrFile;
     }
@@ -650,9 +693,6 @@ export class Install extends FOMODElementProxy {
 
         this.source = instanceElement.getAttribute('source')?.split(/[/\\]/) ?? [];
         this.destination = instanceElement.getAttribute('destination')?.split(/[/\\]/) ?? [];
-
-
-
     }
 
     override asModuleXML(document: XMLDocument): Element {
@@ -669,19 +709,19 @@ export class Install extends FOMODElementProxy {
     }
 }
 
-
-
-/*$$$$$\              $$\     $$\
-$$  __$$\             $$ |    \__|
-$$ /  $$ | $$$$$$\  $$$$$$\   $$\  $$$$$$\  $$$$$$$\   $$$$$$$\
-$$ |  $$ |$$  __$$\ \_$$  _|  $$ |$$  __$$\ $$  __$$\ $$  _____|
-$$ |  $$ |$$ /  $$ |  $$ |    $$ |$$ /  $$ |$$ |  $$ |\$$$$$$\
-$$ |  $$ |$$ |  $$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \____$$\
- $$$$$$  |$$$$$$$  |  \$$$$  |$$ |\$$$$$$  |$$ |  $$ |$$$$$$$  |
- \______/ $$  ____/    \____/ \__| \______/ \__|  \__|\_______/
-          $$ |
-          $$ |
-          \_*/
+/***
+ *     $$$$$$\    $$\
+ *    $$  __$$\   $$ |
+ *    $$ /  \__|$$$$$$\    $$$$$$\   $$$$$$\   $$$$$$$\
+ *    \$$$$$$\  \_$$  _|  $$  __$$\ $$  __$$\ $$  _____|
+ *     \____$$\   $$ |    $$$$$$$$ |$$ /  $$ |\$$$$$$\
+ *    $$\   $$ |  $$ |$$\ $$   ____|$$ |  $$ | \____$$\
+ *    \$$$$$$  |  \$$$$  |\$$$$$$$\ $$$$$$$  |$$$$$$$  |
+ *     \______/    \____/  \_______|$$  ____/ \_______/
+ *                                  $$ |
+ *                                  $$ |
+ *                                  \__|
+ */
 
 export type SortOrder =
     | 'Ascending'  // Alphabetical
@@ -768,6 +808,20 @@ export class Step extends FOMODElementProxy {
     }
 }
 
+/***
+ *     $$$$$$\
+ *    $$  __$$\
+ *    $$ /  \__| $$$$$$\   $$$$$$\  $$\   $$\  $$$$$$\   $$$$$$$\
+ *    $$ |$$$$\ $$  __$$\ $$  __$$\ $$ |  $$ |$$  __$$\ $$  _____|
+ *    $$ |\_$$ |$$ |  \__|$$ /  $$ |$$ |  $$ |$$ /  $$ |\$$$$$$\
+ *    $$ |  $$ |$$ |      $$ |  $$ |$$ |  $$ |$$ |  $$ | \____$$\
+ *    \$$$$$$  |$$ |      \$$$$$$  |\$$$$$$  |$$$$$$$  |$$$$$$$  |
+ *     \______/ \__|       \______/  \______/ $$  ____/ \_______/
+ *                                            $$ |
+ *                                            $$ |
+ *                                            \__|
+ */
+
 export type GroupSelectType =
     | 'SelectAll'           // Force-selects all options
     | 'SelectAny'           // Allows users to select any number of options
@@ -849,6 +903,20 @@ export class Group extends FOMODElementProxy {
         return this.instanceElement;
     }
 }
+
+/***
+ *     $$$$$$\              $$\     $$\
+ *    $$  __$$\             $$ |    \__|
+ *    $$ /  $$ | $$$$$$\  $$$$$$\   $$\  $$$$$$\  $$$$$$$\   $$$$$$$\
+ *    $$ |  $$ |$$  __$$\ \_$$  _|  $$ |$$  __$$\ $$  __$$\ $$  _____|
+ *    $$ |  $$ |$$ /  $$ |  $$ |    $$ |$$ /  $$ |$$ |  $$ |\$$$$$$\
+ *    $$ |  $$ |$$ |  $$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \____$$\
+ *     $$$$$$  |$$$$$$$  |  \$$$$  |$$ |\$$$$$$  |$$ |  $$ |$$$$$$$  |
+ *     \______/ $$  ____/    \____/ \__| \______/ \__|  \__|\_______/
+ *              $$ |
+ *              $$ |
+ *              \__|
+ */
 
 export class Option extends FOMODElementProxy {
     keysToUpdate = ['flagsToSet', 'files', 'typeDescriptor'] as const;
@@ -957,6 +1025,17 @@ export class Option extends FOMODElementProxy {
         return this.instanceElement;
     }
 }
+
+/***
+ *    $$$$$$$$\  $$$$$$\  $$\      $$\  $$$$$$\  $$$$$$$\        $$$$$$$\
+ *    $$  _____|$$  __$$\ $$$\    $$$ |$$  __$$\ $$  __$$\       $$  __$$\
+ *    $$ |      $$ /  $$ |$$$$\  $$$$ |$$ /  $$ |$$ |  $$ |      $$ |  $$ | $$$$$$\   $$$$$$$\  $$$$$$\
+ *    $$$$$\    $$ |  $$ |$$\$$\$$ $$ |$$ |  $$ |$$ |  $$ |      $$$$$$$\ | \____$$\ $$  _____|$$  __$$\
+ *    $$  __|   $$ |  $$ |$$ \$$$  $$ |$$ |  $$ |$$ |  $$ |      $$  __$$\  $$$$$$$ |\$$$$$$\  $$$$$$$$ |
+ *    $$ |      $$ |  $$ |$$ |\$  /$$ |$$ |  $$ |$$ |  $$ |      $$ |  $$ |$$  __$$ | \____$$\ $$   ____|
+ *    $$ |       $$$$$$  |$$ | \_/ $$ | $$$$$$  |$$$$$$$  |      $$$$$$$  |\$$$$$$$ |$$$$$$$  |\$$$$$$$\
+ *    \__|       \______/ \__|     \__| \______/ \_______/       \_______/  \_______|\_______/  \_______|
+ */
 
 export class Fomod extends FOMODElementProxy {
     keysToUpdate = ['installs', 'conditions', 'steps'] as const;
