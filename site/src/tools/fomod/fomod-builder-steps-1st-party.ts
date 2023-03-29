@@ -543,8 +543,10 @@ export class Option extends CardBase {
     get image(): string { return this.parent.image; } set image(value: string) { this.parent.image = value; }
     imageInput: HTMLInputElement;
 
-    editTypeButton: HTMLButtonElement;
-    defaultTypeDropdown: HTMLMenuElement;
+    editStateConditionsButton: HTMLButtonElement;
+
+    get defaultState(): mainClasses.OptionState { return this.parent.typeDescriptor.defaultState; } set defaultState(value: mainClasses.OptionState) { this.parent.typeDescriptor.defaultState = value; }
+    defaultStateDropdown: HTMLMenuElement;
 
     addFlagBtn: HTMLButtonElement;
     override readonly minimumChildrenToSort = 0;
@@ -569,11 +571,11 @@ export class Option extends CardBase {
         this.imageInput = this.main.querySelector('input.js-relative-image-picker')!;
         registerForEvents(this.imageInput, {change: this.updateFromInput_bound});
 
-        this.editTypeButton = this.main.querySelector('button.builder-steps-condition-edit-btn')!;
+        this.editStateConditionsButton = this.main.querySelector('button.builder-steps-condition-edit-btn')!;
         //registerForEvents(this.editTypeButton, {activate: this.editType_bound});
 
-        this.defaultTypeDropdown = this.main.querySelector('menu.bcd-dropdown-option-state')!;
-        registerForEvents(this.defaultTypeDropdown, {dropdownInput: this.updateFromInput_bound});
+        this.defaultStateDropdown = this.main.querySelector('menu.bcd-dropdown-option-state')!;
+        registerForEvents(this.defaultStateDropdown, {dropdownInput: this.updateFromInput_bound});
 
         this.nameDisplay = this.main.querySelector('span.name')!;
         this.fileCountDisplay = this.main.querySelector('span.builder-steps-option-file-count')!;
@@ -614,7 +616,7 @@ export class Option extends CardBase {
         this.descriptionInput.value = this.description || ''; this.descriptionInput.dispatchEvent(new Event('change'));
         this.imageInput.value = this.image || '';             this.imageInput.dispatchEvent(new Event('change'));
 
-        this.defaultTypeDropdown.upgrades?.getExtends(BCDDropdown)?.[0]?.selectByString(mainUI.translateDropdown(this.parent.typeDescriptor.defaultType));
+        this.defaultStateDropdown.upgrades?.getExtends(BCDDropdown)?.[0]?.selectByString(mainUI.translateDropdown(this.parent.typeDescriptor.defaultState));
 
         this.nameDisplay.textContent = this.name || '';
         updatePluralDisplay(this.fileCountDisplay, this.parent.files.size);
@@ -628,8 +630,8 @@ export class Option extends CardBase {
         this.description = this.descriptionInput.value || '';
         this.image = this.imageInput.value || '';
 
-        const dropdownObj = this.defaultTypeDropdown.upgrades?.getExtends(BCDDropdown)?.[0];
-        if (dropdownObj) this.parent.typeDescriptor.defaultType = mainUI.translateDropdown(dropdownObj.selectedOption) as mainClasses.OptionType;
+        const dropdownObj = this.defaultStateDropdown.upgrades?.getExtends(BCDDropdown)?.[0];
+        if (dropdownObj) this.parent.typeDescriptor.defaultState = mainUI.translateDropdown(dropdownObj.selectedOption) as mainClasses.OptionState;
 
         this.nameDisplay.textContent = this.name;
     }

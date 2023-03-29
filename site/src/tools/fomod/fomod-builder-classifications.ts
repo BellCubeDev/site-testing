@@ -467,44 +467,44 @@ function parseDependency(dependency: Element, inherited?: InheritedFOMODData<Dep
     }
 }
 
-export type OptionType =
+export type OptionState =
     | 'Optional'        // Unchecked but checkable
     | 'Recommended'     // Checked but uncheckable
     | 'CouldBeUseable'  // TODO: Check if this has a use - UPDATE: No use in Vortex
     | 'Required'        // Permanently checked
     | 'NotUseable';     // Permanently unchecked
-export class OptionTypeDescriptor extends FOMODElementProxy {
-    keysToUpdate = ['dependencies'] as const;
+export class OptionStateDescriptor extends FOMODElementProxy {
+    keysToUpdate = ['conditions'] as const;
 
-    private _defaultType: OptionType = 'Optional';
-    set defaultType(value: OptionType) { this._defaultType = value; this.updateObjects(); } get defaultType(): OptionType { return this._defaultType; }
+    private _defaultState: OptionState = 'Optional';
+    set defaultState(value: OptionState) { this._defaultState = value; this.updateObjects(); } get defaultState(): OptionState { return this._defaultState; }
 
-    dependencies: OptionTypeDescriptorWithDependency[] = [];
+    conditions: OptionStateConditionStatement[] = [];
 
     constructor(
         instanceElement?: Element,
-        defaultType: OptionType = 'Optional',
-        dependencies: OptionTypeDescriptorWithDependency[] = []
+        defaultState: OptionState = 'Optional',
+        conditions: OptionStateConditionStatement[] = []
     ) {
         super(instanceElement);
-        this.defaultType = defaultType;
-        this.dependencies = dependencies;
+        this.defaultState = defaultState;
+        this.conditions = conditions;
 
         const basicElement = instanceElement?.getElementsByTagName('type')[0];
         const complexElement = instanceElement?.getElementsByTagName('dependencyType')[0];
 
         if (basicElement) {
-            this.defaultType = basicElement.getAttribute('name') as OptionType;
+            this.defaultState = basicElement.getAttribute('name') as OptionState;
 
         }
 
         if (complexElement) {
             const defaultTypeElement = complexElement.getElementsByTagName('defaultType')[0];
-            if (defaultTypeElement) this.defaultType = defaultTypeElement.getAttribute('name') as OptionType || 'Optional';
+            if (defaultTypeElement) this.defaultState = defaultTypeElement.getAttribute('name') as OptionState || 'Optional';
 
             const patternElement = complexElement.getElementsByTagName('patterns')[0];
             for (const dependency of patternElement?.children || [])
-                this.dependencies.push(new OptionTypeDescriptorWithDependency(dependency));
+                this.conditions.push(new OptionStateConditionStatement(dependency));
         }
     }
 
@@ -515,13 +515,13 @@ export class OptionTypeDescriptor extends FOMODElementProxy {
         let complexElement = this.instanceElement.getElementsByTagName('dependencyType')[0];
 
 
-        if (this.dependencies.length == 0) {
+        if (this.conditions.length == 0) {
             complexElement?.remove();
 
             basicElement = this.instanceElement.getOrCreateChildByTag('type');
             this.instanceElement.appendChild(basicElement);
 
-            basicElement.setAttribute('name', this.defaultType);
+            basicElement.setAttribute('name', this.defaultState);
 
             return this.instanceElement;
         }
@@ -533,11 +533,11 @@ export class OptionTypeDescriptor extends FOMODElementProxy {
         this.instanceElement.appendChild(complexElement);
 
         const complexTypeElement = complexElement.getOrCreateChildByTag('defaultType');
-        complexTypeElement.setAttribute('default', this.defaultType);
+        complexTypeElement.setAttribute('default', this.defaultState);
         complexElement.appendChild(complexTypeElement);
 
         const complexPatternElement = complexElement.getOrCreateChildByTag('patterns');
-        for (const dependency of this.dependencies)
+        for (const dependency of this.conditions)
             complexPatternElement.appendChild(  dependency.asModuleXML(document) );
         complexElement.appendChild(complexPatternElement);
 
@@ -545,11 +545,11 @@ export class OptionTypeDescriptor extends FOMODElementProxy {
     }
 }
 
-export class OptionTypeDescriptorWithDependency extends FOMODElementProxy {
+export class OptionStateConditionStatement extends FOMODElementProxy {
     keysToUpdate = ['dependencies'] as const;
 
-    private _type: OptionType = 'Optional';
-    set type(value: OptionType) { this._type = value; this.updateObjects(); } get type(): OptionType { return this._type; }
+    private _type: OptionState = 'Optional';
+    set type(value: OptionState) { this._type = value; this.updateObjects(); } get type(): OptionState { return this._type; }
 
     private _typeElement: Element | undefined = undefined;
     set typeElement(value: Element | undefined) { this._typeElement = value; this.updateObjects(); } get typeElement(): Element | undefined { return this._typeElement; }
@@ -557,7 +557,7 @@ export class OptionTypeDescriptorWithDependency extends FOMODElementProxy {
     private _dependencies!: DependencyGroup;
     set dependencies(value: DependencyGroup) { this._dependencies = value; this.updateObjects(); } get dependencies(): DependencyGroup { return this._dependencies; }
 
-    constructor(instanceElement?: Element, dependency?: DependencyGroup, type: OptionType = 'Optional') {
+    constructor(instanceElement?: Element, dependency?: DependencyGroup, type: OptionState = 'Optional') {
         super(instanceElement);
         this.dependencies = dependency ?? new DependencyGroup();
         this.type = type;
@@ -873,15 +873,15 @@ export class Option extends FOMODElementProxy {
     files: Set<DependencyFile> = new Set();
     filesContainers: Record<string, HTMLDivElement> = {};
 
-    private _typeDescriptor!: OptionTypeDescriptor;
-    set typeDescriptor(value: OptionTypeDescriptor) { this._typeDescriptor = value; this.updateObjects(); } get typeDescriptor(): OptionTypeDescriptor { return this._typeDescriptor; }
+    private _typeDescriptor!: OptionStateDescriptor;
+    set typeDescriptor(value: OptionStateDescriptor) { this._typeDescriptor = value; this.updateObjects(); } get typeDescriptor(): OptionStateDescriptor { return this._typeDescriptor; }
 
     constructor(inherited: InheritedFOMODData<Option>, instanceElement?: Element | undefined) {
         super(instanceElement);
         this.inherited = inherited;
 
         const typeDescriptor: Element|undefined = this.instanceElement?.getElementsByTagName('typeDescriptor')[0];
-        this.typeDescriptor = new OptionTypeDescriptor(typeDescriptor);
+        this.typeDescriptor = new OptionStateDescriptor(typeDescriptor);
 
         if (!this.instanceElement) return;
 
