@@ -632,10 +632,10 @@ export class OptionStateConditionStatement extends FOMODElementProxy {
  */
 
 
-export const installs = new Set<Install>();
+export const installs = new Set<InstallElement>();
 
-function parseFiles(elem: Element|undefined): Install[] {
-    const localInstalls: Install[] = [];
+function parseFiles(elem: Element|undefined): InstallElement[] {
+    const localInstalls: InstallElement[] = [];
     if (!elem) return localInstalls;
 
     const dependenciesElem = elem.getElementsByTagName('dependencies')[0];
@@ -645,7 +645,7 @@ function parseFiles(elem: Element|undefined): Install[] {
     if (dependenciesElem) dependencies = new DependencyGroup(dependenciesElem);
 
     for (const file of filesElem.children) {
-        const install = new Install(file, dependencies);
+        const install = new InstallElement(file, dependencies);
         localInstalls.push(install);
         installs.add(install);
     }
@@ -653,7 +653,7 @@ function parseFiles(elem: Element|undefined): Install[] {
     return localInstalls;
 }
 
-export class Install extends FOMODElementProxy {
+export class InstallElement extends FOMODElementProxy {
     keysToUpdate = ['dependencies'] as const;
 
     private _source: string[] = [];
@@ -1098,7 +1098,7 @@ export class Fomod extends FOMODElementProxy {
     }
 
 
-    installs: Set<Install>;
+    installs: Set<InstallElement>;
 
     conditions: DependencyGroup | undefined;
     steps: Set<Step>;

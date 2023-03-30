@@ -255,14 +255,8 @@ export async function openFolder_entry() {
     window.FOMODBuilder.directory = picked;
 
     const fomodDir = await picked.childDirsC['fomod']!;
-
-    const moduleStr_ = fomodDir.childFilesC['ModuleConfig.xml']!
-                                .then(handle => handle.getFile())
-                                .then(file => file.text());
-
-    const infoStr_ = fomodDir.childFilesC['Info.xml']!
-                                .then(handle => handle.getFile())
-                                .then(file => file.text());
+    const moduleStr_ = fomodDir.childFilesC['ModuleConfig.xml']!.then(file => file.readAsText());
+    const infoStr_ = fomodDir.childFilesC['Info.xml']!.then(file => file.readAsText());
 
     const [moduleStr, infoStr] = await Promise.all([moduleStr_, infoStr_]);
 
@@ -299,6 +293,11 @@ export async function setOutputElements() {
     saving = false;
 }
 
+function formatXml(string: string) {
+    if (window.FOMODBuilder.storage.settings.formatXML) return vkBeautify.xml(string);
+    else return vkBeautify.xmlmin(string, true);
+}
+
 let saving = false;
 export async function save() {
     if (saving) return;
@@ -317,28 +316,16 @@ export async function save() {
     const fomodModule_ = fomodFolder.childFilesC['ModuleConfig.xml']!;
     const [fomodInfo, fomodModule] = await Promise.all([fomodInfo_, fomodModule_]);
 
+
     const infoDoc = window.FOMODBuilder.trackedFomod!.infoDoc;
-    const moduleDoc = window.FOMODBuilder.trackedFomod!.moduleDoc;
-
-
-
-    // Tell the browser to save Info.xml
-    let infoString = window.FOMODBuilder.trackedFomod!.obj.asInfoXML(infoDoc).outerHTML || '<!-- ERROR - Serialized document was empty! -->';
-    if (window.FOMODBuilder.storage.settings.formatXML) infoString = vkBeautify.xml(infoString);
-    else infoString = vkBeautify.xmlmin(infoString, true);
-
+    const infoString = formatXml(window.FOMODBuilder.trackedFomod!.obj.asInfoXML(infoDoc).outerHTML || '<!-- ERROR - Serialized document was empty! -->');
+    const writeInfoPromise = fomodInfo.write(infoString);
     console.log({infoString});
 
-    const writeInfoPromise = fomodInfo.createWritable().then(writable => writable.write(infoString).then(()=>writable.close()));
-
-    // Tell the browser to save ModuleConfig.xml
-    let moduleString = window.FOMODBuilder.trackedFomod!.obj.asModuleXML(moduleDoc).outerHTML || '<!-- ERROR - Serialized document was empty! -->';
-    if (window.FOMODBuilder.storage.settings.formatXML) moduleString = vkBeautify.xml(moduleString);
-    else moduleString = vkBeautify.xmlmin(moduleString, true);
-
+    const moduleDoc = window.FOMODBuilder.trackedFomod!.moduleDoc;
+    const moduleString = formatXml(window.FOMODBuilder.trackedFomod!.obj.asModuleXML(moduleDoc).outerHTML || '<!-- ERROR - Serialized document was empty! -->');
+    const writeModulePromise = fomodModule.write(moduleString);
     console.log({moduleString});
-
-    const writeModulePromise = fomodModule.createWritable().then(writable => writable.write(moduleString).then(()=>writable.close()));
 
 
 

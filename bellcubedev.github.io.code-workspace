@@ -229,7 +229,6 @@
 		"recommendations": [
 			"streetsidesoftware.code-spell-checker",
 			"ginfuru.ginfuru-vscode-jekyll-syntax",
-			"christian-kohler.npm-intellisense",
 			"christian-kohler.path-intellisense",
 			"natqe.reload",
 			"gencer.html-slim-scss-css-class-completion",

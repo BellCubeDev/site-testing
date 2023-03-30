@@ -1886,15 +1886,15 @@ class RelativeFilePicker {
     element: HTMLInputElement;
     button: HTMLButtonElement;
 
-    relativeTo?: fs.Folder|{directory: fs.Folder}|string[];
-    get directory(): fs.Folder|undefined {
+    relativeTo?: fs.BellFolder|{directory: fs.BellFolder}|string[];
+    get directory(): fs.BellFolder|undefined {
         if (!this.relativeTo) return undefined;
         if ('handle' in this.relativeTo) return this.relativeTo;
         if ('directory' in this.relativeTo) return this.relativeTo.directory;
         return SettingsGrid.getSetting(this.relativeTo, 'directory');
     }
 
-    constructor(element: HTMLInputElement, relativeTo?: fs.Folder|{directory: fs.Folder}) {
+    constructor(element: HTMLInputElement, relativeTo?: fs.BellFolder|{directory: fs.BellFolder}) {
         this.element = element;
         this.relativeTo = relativeTo;
 
@@ -1939,18 +1939,22 @@ class RelativeFilePicker {
     readonly boundOnChange = this.onChange.bind(this);
 
     async onButtonClick() {
-        //console.log('onButtonClick', this.element.value, this);
+        const fs = await import('./filesystem-interface.js');
 
-        let fileHandle: FileSystemFileHandle;
+        const relativeTo = this.relativeTo instanceof fs.BellFolder ? this.relativeTo : this.directory;
+        if (!relativeTo) return console.warn('The relative file picker has no relative-to folder specified', this);
+
+        let fileHandle: fs.BellFile|undefined;
         try {
-            [fileHandle] = await window.showOpenFilePicker({multiple: false});
+            [fileHandle] = await relativeTo.openFilePicker();
         } catch (e) {
             if (e && e instanceof DOMException && e.name === 'AbortError') return; // The user canceled the file picker (which is fine)
             console.warn('The file picker threw some sort of error', e);
             return;
         }
+        if (!fileHandle) return console.warn('The file picker returned no file', this);
 
-        const nameArr = await this.directory?.handle.resolve(fileHandle);
+        const nameArr = await this.directory?.resolveChildPath(fileHandle, true);
         if (!nameArr) return console.debug('The file picker returned a file that is not in the specified directory', fileHandle, this.directory);
 
         this.element.value = nameArr.join('/');
@@ -1970,7 +1974,7 @@ class RelativeImagePicker extends RelativeFilePicker {
 
     static noImageDoc?: Document | Promise<string>;
 
-    constructor(element: HTMLInputElement, relativeTo?: fs.Folder|{directory: fs.Folder}) {
+    constructor(element: HTMLInputElement, relativeTo?: fs.BellFolder|{directory: fs.BellFolder}) {
         super(element, relativeTo);
 
         this.relation = element.getAttribute('relation') as 'previous'|'next'|'parent'|'selector' ?? 'previous';
@@ -2085,7 +2089,7 @@ class RelativeImagePicker extends RelativeFilePicker {
                 return console.info('The relative image picker does not have a file handle to update the image with.', this);
             }
 
-            this.imageElem.src = await fs.readFileAsDataURI(fileHandle);
+            this.imageElem.src = await (fileHandle.at(-1)! as fs.BellFile).readAsDataURL();
             this.showImage();
         } catch {
             this.hideImage();
