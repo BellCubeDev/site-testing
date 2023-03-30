@@ -11,12 +11,11 @@
 
 .bcd-builder-input {
     background-color: $color-bg-secondary;
-    border-radius: 4px;
-    border: #333 solid 2px;
-    border-style: ridge;
-    border-left: #3338 solid 4px;
+    border-radius: 5px;
+    border: #333 solid 3px;
+    border-style: solid;
     padding: 8px;
-    padding-left: 8px;
+    padding-left: 10px;
 
     &--warn {
         border-left-color: #ff0;
@@ -419,7 +418,7 @@
 }
 
 .builder-steps-condition-edit-btn {
-    width: min(256px, 100%);
+    width: min(288px, 100%);
 }
 
 .mdl-button--raised.mdl-button--colored {
