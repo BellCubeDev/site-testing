@@ -1,5 +1,5 @@
 import * as main from './fomod-builder.js'; // Brings in global things
-import { UpdatableObject } from '../../universal.js';
+import { UpdatableObject, getSetIndex, wait } from '../../universal.js';
 
 import * as ui from './fomod-builder-ui.js';
 
@@ -133,7 +133,7 @@ export abstract class FOMODElementProxy extends UpdatableObject {
     asInfoXML?(document: XMLDocument): Element;
 }
 
-interface InheritedFOMODData<TType extends Step|Group|Option|Dependency> {
+interface InheritedFOMODData<TType extends Step|Group|Option|DependencyBase> {
     base?: Fomod,
     parent?: TType extends Step ? Fomod
         : TType extends Group ? Step
@@ -309,7 +309,9 @@ window.flagClass = Flag;
  *     \______/  \______/ \__|  \__| \_______|\__|   \____/ \__| \______/ \__|  \__|\_______/
  */
 
-export abstract class Dependency extends FOMODElementProxy {
+export type Dependency = DependencyBase | Option;
+
+export abstract class DependencyBase extends FOMODElementProxy {
     keysToUpdate = [];
     constructor(instanceElement: Element | undefined = undefined) {
         super(instanceElement);
@@ -320,13 +322,13 @@ export abstract class Dependency extends FOMODElementProxy {
 
 
 
-export abstract class DependencyBaseVersionCheck extends Dependency {
+export abstract class DependencyBaseVersionCheck extends DependencyBase {
     private _version = '';
     set version(value: string) { this._version = value; this.updateObjects(); } get version(): string { return this._version; }
 }
 
 export type DependencyGroupOperator = 'And' | 'Or';
-export class DependencyGroup extends Dependency {
+export class DependencyGroup extends DependencyBase {
     private _operator: DependencyGroupOperator = 'And';
     set operator(value: DependencyGroupOperator) { this._operator = value; this.updateObjects(); } get operator(): DependencyGroupOperator { return this._operator; }
 
@@ -347,11 +349,16 @@ export class DependencyGroup extends Dependency {
                 ) as DependencyGroupOperator) || operator;
         }
 
-        if (!parseChildren || !instanceElement) return;
+        if (parseChildren) this.parseDependencies();
+    }
 
-        for (const child of instanceElement.children) {
-            this.children.push(parseDependency(child));
-        }
+    private async parseDependencies(){
+        if (!this.instanceElement) return;
+
+        for (const child of this.instanceElement.children)
+            this.children.push(await parseDependency(child));
+
+        queueMicrotask(() => this.update());
     }
 
     // <moduleDependencies operator="And">
@@ -377,7 +384,7 @@ export class DependencyGroup extends Dependency {
 
 export type DependencyFileState = 'Active' | 'Inactive' | 'Missing';
 export type DependencyFlagTags = 'flag' | 'flagDependency';
-export class DependencyFlag extends Dependency {
+export class DependencyFlag extends DependencyBase {
     private _flag = '';
     set flag(value: string) { this._flag = value; this.update(); } get flag(): string { return this._flag; }
 
@@ -385,9 +392,9 @@ export class DependencyFlag extends Dependency {
     set value(value: string) { this._value = value; this.update(); } get value(): string { return this._value; }
 
     readonly type:DependencyFlagTags;
-    readonly inherited?: InheritedFOMODData<Dependency>;
+    readonly inherited?: InheritedFOMODData<DependencyBase>;
 
-    constructor(type: DependencyFlagTags, inherited?: InheritedFOMODData<Dependency>, instanceElement: Element | undefined = undefined) {
+    constructor(type: DependencyFlagTags, inherited?: InheritedFOMODData<DependencyBase>, instanceElement: Element | undefined = undefined) {
         super(instanceElement);
         this.type = type;
         this.inherited = inherited;
@@ -426,7 +433,7 @@ export class DependencyFlag extends Dependency {
         return this.instanceElement;
     }
 }
-export class DependencyFile extends Dependency {
+export class DependencyFile extends DependencyBase {
     private _file = '';
     set file(value: string) { this._file = value; this.updateObjects(); } get file(): string { return this._file; }
 
@@ -470,7 +477,7 @@ export class DependencyModManager extends DependencyBaseVersionCheck {
     }
 }
 
-function parseDependency(dependency: Element, inherited?: InheritedFOMODData<Dependency>): Dependency {
+async function parseDependency(dependency: Element, inherited?: InheritedFOMODData<DependencyBase>): Promise<Dependency> {
     const type = dependency.tagName;
     switch (type) {
         case 'dependencies':
@@ -478,7 +485,11 @@ function parseDependency(dependency: Element, inherited?: InheritedFOMODData<Dep
         case 'fileDependency':
             return new DependencyFile(dependency);
         case 'flagDependency':
-            return new DependencyFlag('flagDependency', inherited, dependency);
+            if (dependency.previousSibling?.nodeType !== Node.COMMENT_NODE || !inherited?.base) return new DependencyFlag('flagDependency', inherited, dependency);
+
+            // eslint-disable-next-line no-case-declarations
+            const [, stepNumStr, groupNumStr, optionNumStr] = dependency.previousSibling.textContent?.match(/Option (\d+)-(\d+)-(\d+)/) ?? [];
+            return await parseOptionDependency(stepNumStr, groupNumStr, optionNumStr, inherited.base) ?? new DependencyFlag('flagDependency', inherited, dependency);
         case 'foseDependency':
             return new DependencyScriptExtender(dependency);
         case 'gameDependency':
@@ -488,6 +499,17 @@ function parseDependency(dependency: Element, inherited?: InheritedFOMODData<Dep
         default:
             throw new TypeError(`Unknown dependency type: ${type}`);
     }
+}
+
+async function parseOptionDependency(stepNumStr: string|undefined, groupNumStr: string|undefined, optionNumStr: string|undefined, base: Fomod): Promise<Option | null> {
+    if (!stepNumStr || !groupNumStr || !optionNumStr) return null;
+    while (ui.loadingFomod.state) await wait(5);
+
+    const step = getSetIndex(base.steps, parseInt(stepNumStr));
+    const group = step ? getSetIndex(step.groups, parseInt(groupNumStr)) : null;
+    const option = group ? getSetIndex(group.options, parseInt(optionNumStr)) : null;
+    
+    return option ?? null;
 }
 
 /***

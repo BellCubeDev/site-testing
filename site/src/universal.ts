@@ -213,20 +213,6 @@ export function setProxies<TObj>(obj: TObj, handler: TObj extends Record<string,
     return obj;
 }
 
-// =================================
-// ======== ARRAY UTILITIES ========
-// =================================
-
-/** Sorts the items in one array to match those in another. Items not included in the reference array are placed at the end of the result.
-    @param arr Array of items to sort
-    @param refArr Array to pull the order from
-*/
-export function sortArr<TUnknown>(arr: TUnknown[], refArr: TUnknown[]) {
-    arr.sort(function(a, b){
-        return refArr.indexOf(a) - refArr.indexOf(b);
-    });
-}
-
 // ==================================
 // ======== NUMBER UTILITIES ========
 // ==================================
@@ -372,6 +358,14 @@ function ___moveIndex<T>(this: Set<T>, item:T, newIndex: number): boolean {
     return true;
 }
 Set.prototype.moveIndex = ___moveIndex;
+
+export function getSetIndex<TStepType>(set: Set<TStepType>, index: number): TStepType|undefined {
+    let i = 0;
+    for (const item of set) {
+        if (i === index) return item;
+        i++;
+    }
+}
 
 
 /*$$$$$\                      $$\                 $$$$$$\           $$\   $$\
