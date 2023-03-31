@@ -196,15 +196,14 @@ export async function showOpenAnotherFolderDialog() {
 
 let tabList: HTMLDivElement|null = null;
 export async function openFolder(test = false) {
-    if (loadingFomod) return;
+    if (loadingFomod.state) return;
 
 
     if ( (window.FOMODBuilder.directory || window.FOMODBuilder.trackedFomod) && !await showOpenAnotherFolderDialog())
         return;
 
     if (test) {
-        if (loadingFomod) return;
-        loadingFomod = true;
+        loadingFomod.state = true;
 
         window.loadTestFOMOD();
 
@@ -223,7 +222,7 @@ export async function openFolder(test = false) {
 
 export async function postLoad(loaded = true) {
     await bcdUniversal.wait(100);
-    loadingFomod = false;
+    loadingFomod.state = false;
 
     tabList ??= document.getElementById('tablist') as HTMLDivElement;
 
@@ -236,17 +235,16 @@ export async function postLoad(loaded = true) {
     }
 }
 
-// eslint-disable-next-line import/no-mutable-exports
-export let loadingFomod = false;
+export const loadingFomod = {state: false};
 
 export async function openFolder_entry() {
-    if (loadingFomod) return;
-    loadingFomod = true;
+    if (loadingFomod.state) return;
+    loadingFomod.state = true;
 
     console.debug('Opening a folder!');
 
     const picked = await bcdFS.getUserPickedFolder(true);
-    if (!picked) return loadingFomod = false;
+    if (!picked) return loadingFomod.state = false;
 
     console.debug('Picked folder:', picked);
     console.debug('Picked folder name:', picked?.handle.name);
@@ -348,7 +346,7 @@ export async function cleanSave(){
 let saveTimeout:null|number = null;
 let hasUnsavedChanges = false;
 export function autoSave() {
-    if (saving || loadingFomod) return;
+    if (saving || loadingFomod.state) return;
     if (!window.FOMODBuilder.trackedFomod) return;
 
     hasUnsavedChanges = true;

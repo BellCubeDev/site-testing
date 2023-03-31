@@ -212,7 +212,7 @@
 			"zoomable"
 		],
 
-		"commentAnchors.workspace.excludeFiles": "**/{node_modules,.git,_generated,highlight_js,mdl}/**/*",
+		"commentAnchors.workspace.excludeFiles": "**/{node_modules,.git,_generated,mdl,highlight_js,included_node_modules}/**/*",
 		"terminal.integrated.cwd": "${workspaceFolder}/site",
 
 		"cSpell.ignorePaths": [
@@ -223,7 +223,10 @@
 		],
 
 		"files.trimFinalNewlines": true,
-		"files.trimTrailingWhitespace": true
+		"files.trimTrailingWhitespace": true,
+		"github-actions.workflows.pinned.workflows": [
+			".github/workflows/github-pages-build-and-deploy.yml"
+		]
 	},
 	"extensions": {
 		"recommendations": [

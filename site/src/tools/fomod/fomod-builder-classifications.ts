@@ -94,6 +94,11 @@ export abstract class FOMODElementProxy extends UpdatableObject {
 
     override update_() { this.updateObjects(); }
 
+    override destroy() {
+        super.destroy();
+        this.instanceElement?.remove();
+    }
+
     updateWhole() {
         if (  !('inherited' in this && this.inherited && typeof this.inherited === 'object')  ) return this.updateObjects(true);
 
