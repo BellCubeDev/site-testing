@@ -13,7 +13,6 @@ import './fomod-builder-steps-mo2.js';
 import * as bcdFS from '../../filesystem-interface.js';
 import * as xml from './fomod-builder-xml-translator.js';
 
-import jszip from '../../included_node_modules/jszip/dist/jszip.js';
 
 import pluralize_ from '../../included_node_modules/plural/index.js';
 const pluralize = pluralize_ as (word: string, count: number) => string;

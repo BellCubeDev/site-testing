@@ -23,7 +23,6 @@
     "cssnano-preset-advanced": "^5.3.9",
     "discord.js": "^14.6.0",
     "js-module-formats": "^0.1.2",
-    "jszip": "^3.10.1",
     "plural": "^1.1.0",
     "postcss": "^8.4.19",
     "sass": "^1.56.1",

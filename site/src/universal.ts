@@ -106,25 +106,36 @@ export function preventPropagation(event: Event): void {
 }
 
 type EventElement = HTMLElement|typeof window|typeof document;
+type EventCallback<TEventType extends Event, TElement extends EventElement = EventElement> = (this: TElement, ev: TEventType) => unknown;
 
 interface EventTypes<TElement extends EventElement = EventElement> {
-    activate?: (this: TElement, ev: TElement extends HTMLElement ? (MouseEvent|KeyboardEvent) : (Event|KeyboardEvent)) => unknown;
+    activate?: EventCallback<TElement extends HTMLElement ? (MouseEvent|KeyboardEvent) : (Event|KeyboardEvent), TElement>
 
-    change?: (this: TElement, ev: Event) => unknown;
+    change?: EventCallback<Event, TElement>
 
-    dropdownInput?: (this: TElement, ev: Event) => unknown;
+    dropdownInput?: EventCallback<Event, TElement>
 
-    exit?: (this: TElement, ev: KeyboardEvent) => unknown;
+    exit?: EventCallback<KeyboardEvent, TElement>
 
-    anyKey?: (this: TElement, ev: KeyboardEvent) => unknown;
-    key?: (this: TElement, ev: KeyboardEvent) => unknown;
+    undo?: EventCallback<KeyboardEvent, TElement>
+    redo?: EventCallback<KeyboardEvent, TElement>
+
+    anyKey?: EventCallback<KeyboardEvent, TElement>
+    key?: EventCallback<KeyboardEvent, TElement>
 }
 
-const keyTypes: Record<string, keyof EventTypes> = {
-    'Enter': 'activate',
-    ' ': 'activate',
-    'Escape': 'exit',
-    'Esc': 'exit',
+type modifierKeys = 'ctrl' | 'shift' | 'alt' | 'meta';
+
+const keyTypes: Record<string, [modifierKeys[], keyof EventTypes][]> = {
+    'Enter': [[[], 'activate']],
+    ' ': [[[], 'activate']],
+    'Escape': [[[], 'exit']],
+    'Esc': [[[], 'exit']],
+    'z': [
+        [['ctrl'], 'undo'], [['meta'], 'undo'],
+        [['ctrl', 'shift'], 'redo'], [['meta', 'shift'], 'redo']
+    ],
+    'y': [[['ctrl'], 'redo']],
 };
 
 export function unregisterForEvents<TElement extends EventElement>(element: TElement, events: EventTypes<TElement>, options?: boolean|AddEventListenerOptions): void {
@@ -168,8 +179,19 @@ function registerForEvents_<TElement extends EventElement>(element: TElement, ev
     if (!handleKey) {
         handleKey = function(this: TElement, ev: Event) {
             if ( !(ev instanceof KeyboardEvent) ) return;
-            const functionName = keyTypes[ev.key] || 'anyKey';
-            events[functionName]?.call(element, ev);
+
+            // Find and call the appropriate callback
+            const functionName = keyTypes[ev.key]?.find(([modifiers, _]) => modifiers.every(mod => ev[`${mod}Key`]))?.[1] || 'anyKey';
+            const callback = events[functionName];
+
+            if (!callback) return;
+
+            if (functionName !== 'anyKey') {
+                ev.preventDefault();
+                ev.stopPropagation();
+            }
+
+            callback.call(element, ev);
         };
 
         registerForEvents_handledKeys.set(events, handleKey);
@@ -187,14 +209,14 @@ function registerForEvents_<TElement extends EventElement>(element: TElement, ev
             setListener('input', events[evt]!, options);
             break;
 
-        case 'exit':
-            break;
-
-        case 'anyKey':
-            break;
-
         case 'dropdownInput':
             setListener('bcd-dropdown-change', events[evt]!, options);
+            break;
+
+        case 'exit': break;
+        case 'undo': break;
+        case 'redo': break;
+        case 'anyKey': break;
     }
 }
 window.registerForEvents = registerForEvents;
