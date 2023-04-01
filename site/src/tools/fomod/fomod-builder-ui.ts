@@ -367,3 +367,17 @@ window.addEventListener('beforeunload', (event) => {
     event.returnValue = '';
     return '';
 });
+
+export function init() {
+    bcdUniversal.registerBCDComponents(BCDDropdownSortingOrder, BCDDropdownOptionState, BCDDropdownGroupType);
+    setStepEditorType(window.FOMODBuilder.storage.preferences.stepsBuilder);
+
+    // @ts-ignore
+    window.fomodUndoManager = fomodUndoManager;
+
+    window.registerForEvents(document, {
+        save: () => save(),
+    });
+
+    console.log('FOMOD Builder UI initialized.');
+}

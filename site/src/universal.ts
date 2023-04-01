@@ -23,6 +23,67 @@ $$ |  $$ |  $$ |$$\ $$ |$$ |$$ |  $$ |$$\ $$ |$$   ____| \____$$\
 \$$$$$$  |  \$$$$  |$$ |$$ |$$ |  \$$$$  |$$ |\$$$$$$$\ $$$$$$$  |
  \______/    \____/ \__|\__|\__|   \____/ \__| \_______|\______*/
 
+interface DocAndElementInjections {
+    /** Returns the first element with the specified tag name or creates one if it does not exist */
+    getOrCreateChildByTag<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
+    getOrCreateChildByTag(tagName: string):Element;
+
+    removeChildByTag<K extends keyof HTMLElementTagNameMap>(tagName: K, count?: number): void;
+    removeChildByTag(tagName: string, count?: number): void;
+}
+
+declare global {
+    interface Element extends DocAndElementInjections {
+        upgrades?: ComponentMap;
+        targetingComponents?: ComponentMap;
+    }
+    interface Document extends DocAndElementInjections {}
+
+    interface HTMLElement extends DocAndElementInjections {
+        onclick: EventTypes<HTMLElement>['activate']|null;
+    }
+
+    interface Set<T> {
+        /** Changes the position of an item in the set relative to another item
+         * @returns Whether or not the item could be moved
+        */
+        moveItem: typeof ___moveItem;
+
+        /** Changes the position of an item in the set using a provided index
+         * @returns Whether or not the item could be moved
+        */
+        moveIndex: typeof ___moveIndex;
+    }
+
+    interface Window {
+        domParser: DOMParser;
+
+        /** Variables set by the page */
+        //bcdPageVars: Partial<{}>
+
+        /** Browser-Supported Click Event */
+        clickEvt: 'click'|'mousedown'
+
+        /** The MDL layout element */
+        layout: mdl.MaterialLayout
+
+        /** A list of Query Parameters from the URI */
+        queryParams: Record<string, string>;
+
+        /** A list of functions used when loading scripts */
+        bcd_init_functions: Record<string, Function>;
+
+        copyCode(elem: HTMLElement): void;
+
+        lazyStylesLoaded: true|undefined;
+
+        BCDSettingsDropdown: typeof BCDSettingsDropdown;
+
+        registerForEvents: typeof registerForEvents;
+    }
+}
+window.domParser = new DOMParser();
+
 
 
 /** Rearranged and better-typed parameters for `setTimeout` */
@@ -97,17 +158,50 @@ export function trimWhitespace(str: string, trailingNewline = false): string {
                 + (trailingNewline ? '\n' : '') // Add a trailing newline if requested
 ;}
 
-// ================================
-// ======= EVENT  UTILITIES =======
-// ================================
+/***
+ *    $$$$$$$$\                                  $$\
+ *    $$  _____|                                 $$ |
+ *    $$ |      $$\    $$\  $$$$$$\  $$$$$$$\  $$$$$$\
+ *    $$$$$\    \$$\  $$  |$$  __$$\ $$  __$$\ \_$$  _|
+ *    $$  __|    \$$\$$  / $$$$$$$$ |$$ |  $$ |  $$ |
+ *    $$ |        \$$$  /  $$   ____|$$ |  $$ |  $$ |$$\
+ *    $$$$$$$$\    \$  /   \$$$$$$$\ $$ |  $$ |  \$$$$  |
+ *    \________|    \_/     \_______|\__|  \__|   \____/
+ *
+ *
+ *
+ *    $$\   $$\                           $$\ $$\ $$\
+ *    $$ |  $$ |                          $$ |$$ |\__|
+ *    $$ |  $$ | $$$$$$\  $$$$$$$\   $$$$$$$ |$$ |$$\ $$$$$$$\   $$$$$$\
+ *    $$$$$$$$ | \____$$\ $$  __$$\ $$  __$$ |$$ |$$ |$$  __$$\ $$  __$$\
+ *    $$  __$$ | $$$$$$$ |$$ |  $$ |$$ /  $$ |$$ |$$ |$$ |  $$ |$$ /  $$ |
+ *    $$ |  $$ |$$  __$$ |$$ |  $$ |$$ |  $$ |$$ |$$ |$$ |  $$ |$$ |  $$ |
+ *    $$ |  $$ |\$$$$$$$ |$$ |  $$ |\$$$$$$$ |$$ |$$ |$$ |  $$ |\$$$$$$$ |
+ *    \__|  \__| \_______|\__|  \__| \_______|\__|\__|\__|  \__| \____$$ |
+ *                                                              $$\   $$ |
+ *                                                              \$$$$$$  |
+ *                                                               \______/
+ */
 
-export function preventPropagation(event: Event): void {
-    event.stopPropagation();
+declare global {
+    interface Window {
+        /** Browser-Supported Click Event */
+        clickEvt: 'click'|'mousedown'
+
+        /** Add the provided event listener object to the element */
+        registerForEvents: typeof registerForEvents;
+        /** Remove the provided event listener object from the element */
+        unregisterForEvents: typeof unregisterForEvents;
+    }
 }
 
+/** An item that can receive an event */
 type EventElement = HTMLElement|typeof window|typeof document;
+
+/** Constructs an event callback from the event and element types */
 type EventCallback<TEventType extends Event, TElement extends EventElement = EventElement> = (this: TElement, ev: TEventType) => unknown;
 
+/** The various types of registerable events and their callback types */
 interface EventTypes<TElement extends EventElement = EventElement> {
     activate?: EventCallback<TElement extends HTMLElement ? (MouseEvent|KeyboardEvent) : (Event|KeyboardEvent), TElement>
 
@@ -120,12 +214,16 @@ interface EventTypes<TElement extends EventElement = EventElement> {
     undo?: EventCallback<KeyboardEvent, TElement>
     redo?: EventCallback<KeyboardEvent, TElement>
 
+    save?: EventCallback<KeyboardEvent, TElement>
+
     anyKey?: EventCallback<KeyboardEvent, TElement>
     key?: EventCallback<KeyboardEvent, TElement>
 }
 
+/** Various keys that can be held to modify the use of another key */
 type modifierKeys = 'ctrl' | 'shift' | 'alt' | 'meta';
 
+/** A list of keys and their associated actions */
 const keyTypes: Record<string, [modifierKeys[], keyof EventTypes][]> = {
     'Enter': [[[], 'activate']],
     ' ': [[[], 'activate']],
@@ -136,17 +234,27 @@ const keyTypes: Record<string, [modifierKeys[], keyof EventTypes][]> = {
         [['ctrl', 'shift'], 'redo'], [['meta', 'shift'], 'redo']
     ],
     'y': [[['ctrl'], 'redo']],
+    's': [[['ctrl'], 'save']],
 };
 
-export function unregisterForEvents<TElement extends EventElement>(element: TElement, events: EventTypes<TElement>, options?: boolean|AddEventListenerOptions): void {
-    registerForEvents_(element, events, options, true);
-}
-
+/** Add the provided event listener object to the element.
+ * WARNING: If you wish to unregister these events later, you WILL need to use the same options object.
+ */
 export function registerForEvents<TElement extends EventElement>(element: TElement, events: EventTypes<TElement>, options?: boolean|AddEventListenerOptions): void {
     registerForEvents_(element, events, options, false);
 }
 
+/** Remove the provided event listener object from the element
+ * WARNING: To unregister these events, you WILL need to use the same options object as when you registered it.
+*/
+export function unregisterForEvents<TElement extends EventElement>(element: TElement, events: EventTypes<TElement>, options?: boolean|AddEventListenerOptions): void {
+    registerForEvents_(element, events, options, true);
+}
+
+/** A mapping of event callbacks to their wrapped versions (stored so the event can be later removed) */
 export const registerForEvents_wrappedFunctions = new Map<Function, Function>();
+
+/** A mapping of event objects to their keyboard event handlers (stored so the event can be later removed) */
 export const registerForEvents_handledKeys = new Map<EventTypes<any>, (this: any, ev: Event)=>void>();
 
 function registerForEvents_<TElement extends EventElement>(element: TElement, events: EventTypes<TElement>, options?: boolean|AddEventListenerOptions, unregister = false): void {
@@ -182,16 +290,15 @@ function registerForEvents_<TElement extends EventElement>(element: TElement, ev
 
             // Find and call the appropriate callback
             const functionName = keyTypes[ev.key]?.find(([modifiers, _]) => modifiers.every(mod => ev[`${mod}Key`]))?.[1] || 'anyKey';
-            const callback = events[functionName];
+            const requestedCallback = events[functionName];
 
-            if (!callback) return;
-
-            if (functionName !== 'anyKey') {
+            if (requestedCallback && functionName !== 'anyKey') {
                 ev.preventDefault();
                 ev.stopPropagation();
             }
 
-            callback.call(element, ev);
+            const callback = requestedCallback || events['anyKey'];
+            callback?.call(element, ev);
         };
 
         registerForEvents_handledKeys.set(events, handleKey);
@@ -221,18 +328,168 @@ function registerForEvents_<TElement extends EventElement>(element: TElement, ev
 }
 window.registerForEvents = registerForEvents;
 
-export function setProxies<TObj>(obj: TObj, handler: TObj extends Record<string, any> ? ProxyHandler<TObj> : ProxyHandler<any>): TObj {
+/***
+ *    $$$$$$$\                                                 $$$$$$\    $$\                $$$$$$\   $$$$$$\
+ *    $$  __$$\                                               $$  __$$\   $$ |              $$  __$$\ $$  __$$\
+ *    $$ |  $$ | $$$$$$\   $$$$$$\  $$\   $$\ $$\   $$\       $$ /  \__|$$$$$$\   $$\   $$\ $$ /  \__|$$ /  \__|
+ *    $$$$$$$  |$$  __$$\ $$  __$$\ \$$\ $$  |$$ |  $$ |      \$$$$$$\  \_$$  _|  $$ |  $$ |$$$$\     $$$$\
+ *    $$  ____/ $$ |  \__|$$ /  $$ | \$$$$  / $$ |  $$ |       \____$$\   $$ |    $$ |  $$ |$$  _|    $$  _|
+ *    $$ |      $$ |      $$ |  $$ | $$  $$<  $$ |  $$ |      $$\   $$ |  $$ |$$\ $$ |  $$ |$$ |      $$ |
+ *    $$ |      $$ |      \$$$$$$  |$$  /\$$\ \$$$$$$$ |      \$$$$$$  |  \$$$$  |\$$$$$$  |$$ |      $$ |
+ *    \__|      \__|       \______/ \__/  \__| \____$$ |       \______/    \____/  \______/ \__|      \__|
+ *                                            $$\   $$ |
+ *                                            \$$$$$$  |
+ *                                             \______/
+ */
+
+// Watch out - Generics are scarry!
+
+type AnyFunction = (...args: any) => any;
+type AnyConstructor = (new (...args: any) => any) | (abstract new (...args: any) => any);
+type AnyConstructorWithCallSignature = AnyConstructor & AnyFunction;
+
+interface ImprovedProxyHandler_Constructor<TObj extends AnyConstructor> extends ImprovedProxyHandler_Object<TObj> {
+    /**
+     * A trap for the `new` operator.
+     * @param target The original object which is being proxied.
+     * @param argArray The arguments for the call.
+     * @param newTarget The constructor that was originally called.
+     */
+    construct?(target: TObj, argArray: any[], newTarget: (ConstructorParameters<TObj>)): object;
+}
+interface ImprovedProxyHandler_Function<TObj extends AnyFunction> extends ImprovedProxyHandler_Object<TObj> {
+    /**
+     * A trap method for a function call.
+     * @param target The original callable object which is being proxied.
+     * @param thisArg The `this` argument for the call.
+     * @param argArray The arguments for the call.
+     */
+    apply?(target: TObj, thisArg: ThisParameterType<TObj>, argArray: Parameters<TObj>): any;
+}
+
+type ImprovedProxyHandler_ConstructorWithCallSignature<TObj extends AnyConstructorWithCallSignature> = ImprovedProxyHandler_Constructor<TObj> & ImprovedProxyHandler_Function<TObj>;
+
+// @ts-ignore: TypeScript doesn't like me overwriting the bad default types.
+interface ImprovedProxyHandler_Object<TObj extends object> extends ProxyHandler<TObj> {
+    /** DO NOT USE - THIS OBJECT CANNOT BE CONSTRUCTED */
+    apply?: any;
+
+    /** DO NOT USE - THIS OBJECT CANNOT BE CONSTRUCTED */
+    construct?: any;
+
+    /**
+     * A trap for `Object.defineProperty()`.
+     * @param target The original object which is being proxied.
+     * @returns A `Boolean` indicating whether or not the property has been defined.
+     */
+    defineProperty?(target: TObj, property: keyof TObj, attributes: PropertyDescriptor): boolean;
+
+    /**
+     * A trap for the `delete` operator.
+     * @param target The original object which is being proxied.
+     * @param property The name or `Symbol` of the property to delete.
+     * @returns A `Boolean` indicating whether or not the property was deleted.
+     */
+    deleteProperty?(target: TObj, property: keyof TObj): boolean;
+
+    /**
+     * A trap for getting a property value.
+     * @param target The original object which is being proxied.
+     * @param propertyThe name or `Symbol` of the property to get.
+     * @param receiver The proxy or an object that inherits from the proxy.
+     */
+    get?<TProperty extends keyof TObj>(target: TObj, property: TProperty, receiver: any): TObj[TProperty];
+
+    /**
+     * A trap for `Object.getOwnPropertyDescriptor()`.
+     * @param target The original object which is being proxied.
+     * @param propertyThe name of the property whose description should be retrieved.
+     */
+    getOwnPropertyDescriptor?<TProperty extends keyof TObj>(target: TObj, property: TProperty): PropertyDescriptor | undefined;
+
+    /**
+     * A trap for the `[[GetPrototypeOf]]` internal method.
+     * @param target The original object which is being proxied.
+     */
+    getPrototypeOf?(target: TObj): object | null;
+
+    /**
+     * A trap for the `in` operator.
+     * @param target The original object which is being proxied.
+     * @param propertyThe name or `Symbol` of the property to check for existence.
+     */
+    has?(target: TObj, property: string|number|symbol): boolean;
+
+    /**
+     * A trap for `Object.isExtensible()`.
+     * @param target The original object which is being proxied.
+     */
+    isExtensible?(target: TObj): boolean;
+
+    /**
+     * A trap for `Reflect.ownKeys()`.
+     * @param target The original object which is being proxied.
+     */
+    ownKeys?(target: TObj): ArrayLike<keyof TObj>;
+
+    /**
+     * A trap for `Object.preventExtensions()`.
+     * @param target The original object which is being proxied.
+     */
+    preventExtensions?(target: TObj): boolean;
+
+    /**
+     * A trap for setting a property value.
+     * @param target The original object which is being proxied.
+     * @param propertyThe name or `Symbol` of the property to set.
+     * @param receiver The object to which the assignment was originally directed.
+     * @returns A `Boolean` indicating whether or not the property was set.
+     */
+    set?<TProperty extends keyof TObj>(target: TObj, property: TProperty, newValue: TObj[TProperty], receiver: any): boolean;
+
+    /**
+     * A trap for `Object.setPrototypeOf()`.
+     * @param target The original object which is being proxied.
+     * @param newPrototype The object's new prototype or `null`.
+     */
+    setPrototypeOf?(target: TObj, newPrototype: object | null): boolean;
+}
+
+declare global {
+    type ImprovedProxyHandler<TObj extends object> =
+      TObj extends AnyConstructorWithCallSignature ? ImprovedProxyHandler_ConstructorWithCallSignature<TObj>
+    : TObj extends AnyConstructor                  ? ImprovedProxyHandler_Constructor<TObj>
+    : TObj extends AnyFunction                     ? ImprovedProxyHandler_Function<TObj>
+    :                                                ImprovedProxyHandler_Object<TObj>
+}
+
+
+export function setProxies<TObj extends object>(obj: TObj, handler: ImprovedProxyHandler<TObj>, runOnEach?: (obj: TObj) => unknown): TObj {
     if (!obj || typeof obj !== 'object') return obj;
 
-    for (const [key, value] of Object.entries(obj)) {
-        if (typeof value !== 'object') continue;
 
-        setProxies(value, handler);
-        obj[key as keyof TObj] = new Proxy(value ?? {}, handler);
+
+    if (handler.set) {
+        const oldSetter = handler.set;
+        const wrappedSetter: ImprovedProxyHandler<TObj>['set'] = (target, prop, value, receiver) => {
+            if (prop in target && target[prop] === value) return true;
+
+            if (value && typeof value === 'object') value = setProxies(value, handler, runOnEach) as any;
+
+            return oldSetter.call(handler, target, prop, value, receiver) ?? true;
+        };
+
+        handler.set = wrappedSetter;
     }
 
-    obj = new Proxy(obj, handler);
-    return obj;
+    for (const [key, value] of Object.entries(obj)) {
+        runOnEach?.(value);
+
+        if (!value || typeof value !== 'object') continue;
+        obj[key as keyof TObj] = new Proxy(setProxies(value, handler, runOnEach), handler) as any;
+    }
+
+    return new Proxy(obj, handler) as TObj;
 }
 
 // ==================================
@@ -256,9 +513,52 @@ export function randomNumber(min = 0, max = 1, places = 0):number{
 }
 
 
-// ===============================
-// ======== DOM UTILITIES ========
-// ===============================
+/***
+ *    $$$$$$$\   $$$$$$\  $$\      $$\       $$\   $$\   $$\     $$\ $$\ $$\   $$\     $$\
+ *    $$  __$$\ $$  __$$\ $$$\    $$$ |      $$ |  $$ |  $$ |    \__|$$ |\__|  $$ |    \__|
+ *    $$ |  $$ |$$ /  $$ |$$$$\  $$$$ |      $$ |  $$ |$$$$$$\   $$\ $$ |$$\ $$$$$$\   $$\  $$$$$$\   $$$$$$$\
+ *    $$ |  $$ |$$ |  $$ |$$\$$\$$ $$ |      $$ |  $$ |\_$$  _|  $$ |$$ |$$ |\_$$  _|  $$ |$$  __$$\ $$  _____|
+ *    $$ |  $$ |$$ |  $$ |$$ \$$$  $$ |      $$ |  $$ |  $$ |    $$ |$$ |$$ |  $$ |    $$ |$$$$$$$$ |\$$$$$$\
+ *    $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |      $$ |  $$ |  $$ |$$\ $$ |$$ |$$ |  $$ |$$\ $$ |$$   ____| \____$$\
+ *    $$$$$$$  | $$$$$$  |$$ | \_/ $$ |      \$$$$$$  |  \$$$$  |$$ |$$ |$$ |  \$$$$  |$$ |\$$$$$$$\ $$$$$$$  |
+ *    \_______/  \______/ \__|     \__|       \______/    \____/ \__|\__|\__|   \____/ \__| \_______|\_______/
+ *
+ *
+ *
+ */
+
+interface DocAndElementInjections {
+    /** Returns the first element with the specified tag name or creates one if it does not exist */
+    getOrCreateChildByTag<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
+    getOrCreateChildByTag(tagName: string):Element;
+
+    removeChildByTag<K extends keyof HTMLElementTagNameMap>(tagName: K, count?: number): void;
+    removeChildByTag(tagName: string, count?: number): void;
+}
+
+declare global {
+    interface Element extends DocAndElementInjections {
+        upgrades?: ComponentMap;
+        targetingComponents?: ComponentMap;
+    }
+    interface Document extends DocAndElementInjections {}
+
+    interface HTMLElement extends DocAndElementInjections {
+        onclick: EventTypes<HTMLElement>['activate']|null;
+    }
+
+    interface Window {
+        domParser: DOMParser;
+
+        /** A list of functions used when loading scripts */
+        bcd_init_functions: Record<string, Function>;
+
+        copyCode(elem: HTMLElement): void;
+
+        BCDSettingsDropdown: typeof BCDSettingsDropdown;
+    }
+}
+window.domParser = new DOMParser();
 
 /** Forces an HTMLElement to be focusable by the user and then focuses it
     @param element The element to focus
@@ -335,6 +635,34 @@ function ___removeChildByTag(this:Document|Element, tagName: string, count: numb
 Element.prototype.removeChildByTag = ___removeChildByTag;
 Document.prototype.removeChildByTag = ___removeChildByTag;
 
+/***
+ *     $$$$$$\              $$\           $$\   $$\   $$\     $$\ $$\ $$\   $$\     $$\
+ *    $$  __$$\             $$ |          $$ |  $$ |  $$ |    \__|$$ |\__|  $$ |    \__|
+ *    $$ /  \__| $$$$$$\  $$$$$$\         $$ |  $$ |$$$$$$\   $$\ $$ |$$\ $$$$$$\   $$\  $$$$$$\   $$$$$$$\
+ *    \$$$$$$\  $$  __$$\ \_$$  _|        $$ |  $$ |\_$$  _|  $$ |$$ |$$ |\_$$  _|  $$ |$$  __$$\ $$  _____|
+ *     \____$$\ $$$$$$$$ |  $$ |          $$ |  $$ |  $$ |    $$ |$$ |$$ |  $$ |    $$ |$$$$$$$$ |\$$$$$$\
+ *    $$\   $$ |$$   ____|  $$ |$$\       $$ |  $$ |  $$ |$$\ $$ |$$ |$$ |  $$ |$$\ $$ |$$   ____| \____$$\
+ *    \$$$$$$  |\$$$$$$$\   \$$$$  |      \$$$$$$  |  \$$$$  |$$ |$$ |$$ |  \$$$$  |$$ |\$$$$$$$\ $$$$$$$  |
+ *     \______/  \_______|   \____/        \______/    \____/ \__|\__|\__|   \____/ \__| \_______|\_______/
+ *
+ *
+ *
+ */
+
+declare global {
+    interface Set<T> {
+        /** Changes the position of an item in the set relative to another item
+         * @returns Whether or not the item could be moved
+        */
+        moveItem: typeof ___moveItem;
+
+        /** Changes the position of an item in the set using a provided index
+         * @returns Whether or not the item could be moved
+        */
+        moveIndex: typeof ___moveIndex;
+    }
+}
+
 /** Changes the position of an item in the set
  * @returns Whether or not the item could be moved
 */
@@ -388,80 +716,6 @@ export function getSetIndex<TStepType>(set: Set<TStepType>, index: number): TSte
         i++;
     }
 }
-
-
-/*$$$$$\                      $$\                 $$$$$$\           $$\   $$\
-$$ ___$$\                     \__|                \_$$  _|          \__|  $$ |
-$$/   $$ | $$$$$$\   $$$$$$$\ $$\  $$$$$$$\         $$ |  $$$$$$$\  $$\ $$$$$$\
-$$$$$$$\ | \____$$\ $$  _____|$$ |$$  _____|        $$ |  $$  __$$\ $$ |\_$$  _|
-$$  __$$\  $$$$$$$ |\$$$$$$\  $$ |$$ /              $$ |  $$ |  $$ |$$ |  $$ |
-$$ |  $$ |$$  __$$ | \____$$\ $$ |$$ |              $$ |  $$ |  $$ |$$ |  $$ |$$\
-$$$$$$$  |\$$$$$$$ |$$$$$$$  |$$ |\$$$$$$$\       $$$$$$\ $$ |  $$ |$$ |  \$$$$  |
- \______/  \_______|\_______/ \__| \_______|      \______|\__|  \__|\__|   \___*/
-
-interface DocAndElementInjections {
-    /** Returns the first element with the specified tag name or creates one if it does not exist */
-    getOrCreateChildByTag<K extends keyof HTMLElementTagNameMap>(tagName: K): HTMLElementTagNameMap[K];
-    getOrCreateChildByTag(tagName: string):Element;
-
-    removeChildByTag<K extends keyof HTMLElementTagNameMap>(tagName: K, count?: number): void;
-    removeChildByTag(tagName: string, count?: number): void;
-}
-
-declare global {
-    interface Element extends DocAndElementInjections {
-        upgrades?: ComponentMap;
-        targetingComponents?: ComponentMap;
-    }
-    interface Document extends DocAndElementInjections {}
-
-    interface HTMLElement extends DocAndElementInjections {
-        onclick: EventTypes<HTMLElement>['activate']|null;
-    }
-
-    interface Set<T> {
-        /** Changes the position of an item in the set relative to another item
-         * @returns Whether or not the item could be moved
-        */
-        moveItem: typeof ___moveItem;
-
-        /** Changes the position of an item in the set using a provided index
-         * @returns Whether or not the item could be moved
-        */
-        moveIndex: typeof ___moveIndex;
-    }
-
-    interface Window {
-        domParser: DOMParser;
-
-        /** Variables set by the page */
-        //bcdPageVars: Partial<{}>
-
-        /** Browser-Supported Click Event */
-        clickEvt: 'click'|'mousedown'
-
-        /** The MDL layout element */
-        layout: mdl.MaterialLayout
-
-        /** A list of Query Parameters from the URI */
-        queryParams: Record<string, string>;
-
-        /** A list of functions used when loading scripts */
-        bcd_init_functions: Record<string, Function>;
-
-        /** A special class used to track components across multiple module scripts */
-        bcd_ComponentTracker: bcd_ComponentTracker;
-
-        copyCode(elem: HTMLElement): void;
-
-        lazyStylesLoaded: true|undefined;
-
-        BCDSettingsDropdown: typeof BCDSettingsDropdown;
-
-        registerForEvents: typeof registerForEvents;
-    }
-}
-window.domParser = new DOMParser();
 
 function ___getExtends<K extends abstract new (...args: any[]) => unknown>(this: ComponentMap, type: K) {
     const returnVal:InstanceType<K>[] = [];
@@ -526,11 +780,37 @@ if (window.location.search[0] === '?')
                             .forEach(param => window.queryParams[param[0]!.trim()] = param[1]?.trim() ?? '');
 
 
+/***
+ *     $$$$$$\                                                                              $$\
+ *    $$  __$$\                                                                             $$ |
+ *    $$ /  \__| $$$$$$\  $$$$$$\$$$$\   $$$$$$\   $$$$$$\  $$$$$$$\   $$$$$$\  $$$$$$$\  $$$$$$\
+ *    $$ |      $$  __$$\ $$  _$$  _$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ \_$$  _|
+ *    $$ |      $$ /  $$ |$$ / $$ / $$ |$$ /  $$ |$$ /  $$ |$$ |  $$ |$$$$$$$$ |$$ |  $$ |  $$ |
+ *    $$ |  $$\ $$ |  $$ |$$ | $$ | $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |  $$ |$$\
+ *    \$$$$$$  |\$$$$$$  |$$ | $$ | $$ |$$$$$$$  |\$$$$$$  |$$ |  $$ |\$$$$$$$\ $$ |  $$ |  \$$$$  |
+ *     \______/  \______/ \__| \__| \__|$$  ____/  \______/ \__|  \__| \_______|\__|  \__|   \____/
+ *                                      $$ |
+ *                                      $$ |
+ *                                      \__|
+ *    $$$$$$$$\                               $$\
+ *    \__$$  __|                              $$ |
+ *       $$ |    $$$$$$\   $$$$$$\   $$$$$$$\ $$ |  $$\  $$$$$$\   $$$$$$\
+ *       $$ |   $$  __$$\  \____$$\ $$  _____|$$ | $$  |$$  __$$\ $$  __$$\
+ *       $$ |   $$ |  \__| $$$$$$$ |$$ /      $$$$$$  / $$$$$$$$ |$$ |  \__|
+ *       $$ |   $$ |      $$  __$$ |$$ |      $$  _$$<  $$   ____|$$ |
+ *       $$ |   $$ |      \$$$$$$$ |\$$$$$$$\ $$ | \$$\ \$$$$$$$\ $$ |
+ *       \__|   \__|       \_______| \_______|\__|  \__| \_______|\__|
+ *
+ *
+ *
+ */
+
+/** Any component that can be automatically created by Material Design Lite */
 export interface Component {
     new(element: any, ...args: any[]): any;
 }
 
-/** Interface defining the readonly properties cssClass and asString to make identifying MDL Classes set up for my custom, painless registration functions a breeze */
+/** Any component that defines the readonly `cssClass` and `asString` properties */
 export interface BCDComponent extends Component {
     readonly asString: string;
     readonly cssClass: string;
@@ -545,95 +825,65 @@ export type ComponentMap = Map<Component, InstanceType<Component>> & {
     getExtends<K extends abstract new(...args:any[])=>unknown>(key: K): InstanceType<K>[];
 }
 
-
 /** Variable to store components that we'll be registering on DOM initialization */
-const bcdComponents:BCDComponent[] = [];
+const componentsToRegister:BCDComponent[] = [];
 
+/** Registers a single MDL component that has the static readonly properties `cssClass` and `asString` defined
+    @param component The BCDComponent to register
+    @throws nothing - this function gracefully handles errors in the form of `console.error` calls instead of throwing actual errors
+    @returns whether or not an error occurred with the error as the return value
+*/
+export function registerBCDComponent(component:BCDComponent):boolean|Error {
+    try{
 
+        mdl.componentHandler.register({
+            constructor: component,
+            classAsString: component.asString,
+            cssClass: component.cssClass,
+            widget: false
+        });
+        mdl.componentHandler.upgradeElements(document.getElementsByClassName(component.cssClass));
 
-/*$$$$$\                                                                              $$\
-$$  __$$\                                                                             $$ |
-$$ /  \__| $$$$$$\  $$$$$$\$$$$\   $$$$$$\   $$$$$$\  $$$$$$$\   $$$$$$\  $$$$$$$\  $$$$$$\
-$$ |      $$  __$$\ $$  _$$  _$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ \_$$  _|
-$$ |      $$ /  $$ |$$ / $$ / $$ |$$ /  $$ |$$ /  $$ |$$ |  $$ |$$$$$$$$ |$$ |  $$ |  $$ |
-$$ |  $$\ $$ |  $$ |$$ | $$ | $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |  $$ |$$\
-\$$$$$$  |\$$$$$$  |$$ | $$ | $$ |$$$$$$$  |\$$$$$$  |$$ |  $$ |\$$$$$$$\ $$ |  $$ |  \$$$$  |
- \______/  \______/ \__| \__| \__|$$  ____/  \______/ \__|  \__| \_______|\__|  \__|   \____/
-                                  $$ |
-                                  $$ |
-                                  \__|
-$$$$$$$$\                               $$\
-\__$$  __|                              $$ |
-   $$ |    $$$$$$\   $$$$$$\   $$$$$$$\ $$ |  $$\  $$$$$$\   $$$$$$\
-   $$ |   $$  __$$\  \____$$\ $$  _____|$$ | $$  |$$  __$$\ $$  __$$\
-   $$ |   $$ |  \__| $$$$$$$ |$$ /      $$$$$$  / $$$$$$$$ |$$ |  \__|
-   $$ |   $$ |      $$  __$$ |$$ |      $$  _$$<  $$   ____|$$ |
-   $$ |   $$ |      \$$$$$$$ |\$$$$$$$\ $$ | \$$\ \$$$$$$$\ $$ |
-   \__|   \__|       \_______| \_______|\__|  \__| \_______|\_*/
+    }catch(e:unknown){
+        console.error("[BCD-Components] Error registering component", component.asString, "with class", component.cssClass, ":\n", e);
+        return e as Error;
 
+    }
 
-
-/** A single item listed in the Component Tracker */
-export interface componentTrackingItem<TConstructor> {
-    obj:Record<string, TConstructor>,
-    arr:TConstructor[]
+    return false;
 }
 
 
-export interface trackableConstructor<TClass> extends Function {
-    asString: string;
-    new(...args:any[]):TClass;
+/** Tell MDL about our shiny new components
+    @param components The components to register. Defaults to the global bcdComponents array if not specified.
+*/
+export function registerBCDComponents(...components:BCDComponent[]):void{
+
+    const componentArr = components.length ? components : componentsToRegister;
+
+    // Tell mdl about our shiny new components
+    for (let i = 0; i < componentArr.length; i++) {
+        registerBCDComponent(componentArr[i]!);
+    }
+
+    //console.debug("[BCD-Components] Registered the following components:", componentArr.map(c => `\n    ${c.asString}`).join(''));
 }
 
-/** Wrapped in a class to get around the complexities of exporting. */
-export class bcd_ComponentTracker {
-    static registered_components:Record<string, componentTrackingItem<unknown>> = {};
 
 
-    static registerComponent<TClass>(component:TClass, constructor: trackableConstructor<TClass>, element:HTMLElement):void{
-        bcd_ComponentTracker.createTrackedComponent(constructor);
-
-        if (element.id !== '')
-            bcd_ComponentTracker.registered_components[constructor.asString]!.obj[element.id] = component;
-        else
-            bcd_ComponentTracker.registered_components[constructor.asString]!.arr.push(component);
-    }
-
-    static createTrackedComponent(constructor:trackableConstructor<any>){
-        if (typeof bcd_ComponentTracker.registered_components[constructor.asString] === 'undefined')
-            bcd_ComponentTracker.registered_components[constructor.asString] = {obj: {}, arr: []};
-    }
-
-    static getTrackedConstructor<TConstructor>(constructor:trackableConstructor<TConstructor>):componentTrackingItem<TConstructor>{
-        bcd_ComponentTracker.createTrackedComponent(constructor);
-        return bcd_ComponentTracker.registered_components[constructor.asString] as componentTrackingItem<TConstructor>;
-    }
-
-
-    static findItem<TConstructor>(constructor: trackableConstructor<TConstructor>, element:HTMLElement, findPredicate?: (arg0:TConstructor) => boolean): TConstructor|undefined {
-        if (element.id)
-            return bcd_ComponentTracker.registered_components[constructor.asString]!.obj[element.id] as TConstructor;
-        else if (findPredicate)
-            return bcd_ComponentTracker.getTrackedConstructor(constructor).arr.find(findPredicate);
-        else
-            return undefined;
-    }
-}
-window.bcd_ComponentTracker = bcd_ComponentTracker;
-
-
-
-/*$$$$$\            $$\ $$\                               $$\ $$\       $$\
-$$  __$$\           $$ |$$ |                              \__|$$ |      $$ |
-$$ /  \__| $$$$$$\  $$ |$$ | $$$$$$\   $$$$$$\   $$$$$$$\ $$\ $$$$$$$\  $$ | $$$$$$\
-$$ |      $$  __$$\ $$ |$$ | \____$$\ $$  __$$\ $$  _____|$$ |$$  __$$\ $$ |$$  __$$\
-$$ |      $$ /  $$ |$$ |$$ | $$$$$$$ |$$ /  $$ |\$$$$$$\  $$ |$$ |  $$ |$$ |$$$$$$$$ |
-$$ |  $$\ $$ |  $$ |$$ |$$ |$$  __$$ |$$ |  $$ | \____$$\ $$ |$$ |  $$ |$$ |$$   ____|
-\$$$$$$  |\$$$$$$  |$$ |$$ |\$$$$$$$ |$$$$$$$  |$$$$$$$  |$$ |$$$$$$$  |$$ |\$$$$$$$\
- \______/  \______/ \__|\__| \_______|$$  ____/ \_______/ \__|\_______/ \__| \_______|
-                                      $$ |
-                                      $$ |
-                                      \_*/
+/***
+ *     $$$$$$\            $$\ $$\                               $$\ $$\       $$\
+ *    $$  __$$\           $$ |$$ |                              \__|$$ |      $$ |
+ *    $$ /  \__| $$$$$$\  $$ |$$ | $$$$$$\   $$$$$$\   $$$$$$$\ $$\ $$$$$$$\  $$ | $$$$$$\
+ *    $$ |      $$  __$$\ $$ |$$ | \____$$\ $$  __$$\ $$  _____|$$ |$$  __$$\ $$ |$$  __$$\
+ *    $$ |      $$ /  $$ |$$ |$$ | $$$$$$$ |$$ /  $$ |\$$$$$$\  $$ |$$ |  $$ |$$ |$$$$$$$$ |
+ *    $$ |  $$\ $$ |  $$ |$$ |$$ |$$  __$$ |$$ |  $$ | \____$$\ $$ |$$ |  $$ |$$ |$$   ____|
+ *    \$$$$$$  |\$$$$$$  |$$ |$$ |\$$$$$$$ |$$$$$$$  |$$$$$$$  |$$ |$$$$$$$  |$$ |\$$$$$$$\
+ *     \______/  \______/ \__|\__| \_______|$$  ____/ \_______/ \__|\_______/ \__| \_______|
+ *                                          $$ |
+ *                                          $$ |
+ *                                          \__|
+ */
 
 
 
@@ -882,8 +1132,6 @@ export class BCDDetails extends BCD_CollapsibleParent {
         const observer = new ResizeObserver(boundReEval);
         observer.observe(this.details_inner);
 
-        bcd_ComponentTracker.registerComponent(this, BCDDetails, this.details);
-
         this.reEval(true, true);
         this.self.classList.add('initialized');
 
@@ -894,7 +1142,7 @@ export class BCDDetails extends BCD_CollapsibleParent {
         if (!this.isOpen()) this.reEval(true, true);
     }
 }
-bcdComponents.push(BCDDetails);
+componentsToRegister.push(BCDDetails);
 
 export class BCDSummary extends BCD_CollapsibleParent {
     static readonly cssClass = 'js-bcd-summary';
@@ -925,9 +1173,9 @@ export class BCDSummary extends BCD_CollapsibleParent {
 
         const temp_inner = this.details.querySelector(`.${strs.classDetailsInner}`);
         if (!temp_inner) {this.divertedCompletion(); return;}
-            else this.details_inner = temp_inner as HTMLElement;
 
-        bcd_ComponentTracker.registerComponent(this, BCDSummary, this.details);
+        this.details_inner = temp_inner as HTMLElement;
+
         this.reEval(true, true);
         this.self.classList.add('initialized');
     });}
@@ -955,12 +1203,26 @@ export class BCDSummary extends BCD_CollapsibleParent {
         this.correctFocus(event instanceof KeyboardEvent);
     }
 }
-bcdComponents.push(BCDSummary);
+componentsToRegister.push(BCDSummary);
+
+/***
+ *    $$$$$$$\                        $$\       $$\                  $$$$$\  $$$$$$\   $$$$$$\  $$\   $$\
+ *    $$  __$$\                       $$ |      $$ |                 \__$$ |$$  __$$\ $$  __$$\ $$$\  $$ |
+ *    $$ |  $$ | $$$$$$\   $$$$$$\  $$$$$$\   $$$$$$\   $$\   $$\       $$ |$$ /  \__|$$ /  $$ |$$$$\ $$ |
+ *    $$$$$$$  |$$  __$$\ $$  __$$\ \_$$  _|  \_$$  _|  $$ |  $$ |      $$ |\$$$$$$\  $$ |  $$ |$$ $$\$$ |
+ *    $$  ____/ $$ |  \__|$$$$$$$$ |  $$ |      $$ |    $$ |  $$ |$$\   $$ | \____$$\ $$ |  $$ |$$ \$$$$ |
+ *    $$ |      $$ |      $$   ____|  $$ |$$\   $$ |$$\ $$ |  $$ |$$ |  $$ |$$\   $$ |$$ |  $$ |$$ |\$$$ |
+ *    $$ |      $$ |      \$$$$$$$\   \$$$$  |  \$$$$  |\$$$$$$$ |\$$$$$$  |\$$$$$$  | $$$$$$  |$$ | \$$ |
+ *    \__|      \__|       \_______|   \____/    \____/  \____$$ | \______/  \______/  \______/ \__|  \__|
+ *                                                      $$\   $$ |
+ *                                                      \$$$$$$  |
+ *                                                       \______/
+ */
 
 /** Simple MDL Class to handle making JSON pretty again
     Takes the textContent of the element and parses it as JSON, then re-serializes it with 2 spaces per indent.
 */
-export class bcd_prettyJSON {
+export class PrettyJSON {
     static readonly cssClass = 'js-bcd-prettyJSON';
     static readonly asString = 'bcd_prettyJSON';
     element_:HTMLElement;
@@ -974,22 +1236,23 @@ export class bcd_prettyJSON {
         this.element_.classList.add('initialized');
     }
 }
-bcdComponents.push(bcd_prettyJSON);
+componentsToRegister.push(PrettyJSON);
 /*
 
 
-$$\      $$\                 $$\           $$\       $$\ $$$$$$$\  $$\           $$\
-$$$\    $$$ |                $$ |          $$ |     $$  |$$  __$$\ \__|          $$ |
-$$$$\  $$$$ | $$$$$$\   $$$$$$$ | $$$$$$\  $$ |    $$  / $$ |  $$ |$$\  $$$$$$\  $$ | $$$$$$\   $$$$$$\
-$$\$$\$$ $$ |$$  __$$\ $$  __$$ | \____$$\ $$ |   $$  /  $$ |  $$ |$$ | \____$$\ $$ |$$  __$$\ $$  __$$\
-$$ \$$$  $$ |$$ /  $$ |$$ /  $$ | $$$$$$$ |$$ |  $$  /   $$ |  $$ |$$ | $$$$$$$ |$$ |$$ /  $$ |$$ /  $$ |
-$$ |\$  /$$ |$$ |  $$ |$$ |  $$ |$$  __$$ |$$ | $$  /    $$ |  $$ |$$ |$$  __$$ |$$ |$$ |  $$ |$$ |  $$ |
-$$ | \_/ $$ |\$$$$$$  |\$$$$$$$ |\$$$$$$$ |$$ |$$  /     $$$$$$$  |$$ |\$$$$$$$ |$$ |\$$$$$$  |\$$$$$$$ |
-\__|     \__| \______/  \_______| \_______|\__|\__/      \_______/ \__| \_______|\__| \______/  \____$$ |
-                                                                                               $$\   $$ |
-                                                                                               \$$$$$$  |
-                                                                                                \_____*/
-
+/***
+ *    $$\      $$\                 $$\           $$\       $$$$$$$\  $$\           $$\
+ *    $$$\    $$$ |                $$ |          $$ |      $$  __$$\ \__|          $$ |
+ *    $$$$\  $$$$ | $$$$$$\   $$$$$$$ | $$$$$$\  $$ |      $$ |  $$ |$$\  $$$$$$\  $$ | $$$$$$\   $$$$$$\
+ *    $$\$$\$$ $$ |$$  __$$\ $$  __$$ | \____$$\ $$ |      $$ |  $$ |$$ | \____$$\ $$ |$$  __$$\ $$  __$$\
+ *    $$ \$$$  $$ |$$ /  $$ |$$ /  $$ | $$$$$$$ |$$ |      $$ |  $$ |$$ | $$$$$$$ |$$ |$$ /  $$ |$$ /  $$ |
+ *    $$ |\$  /$$ |$$ |  $$ |$$ |  $$ |$$  __$$ |$$ |      $$ |  $$ |$$ |$$  __$$ |$$ |$$ |  $$ |$$ |  $$ |
+ *    $$ | \_/ $$ |\$$$$$$  |\$$$$$$$ |\$$$$$$$ |$$ |      $$$$$$$  |$$ |\$$$$$$$ |$$ |\$$$$$$  |\$$$$$$$ |
+ *    \__|     \__| \______/  \_______| \_______|\__|      \_______/ \__| \_______|\__| \______/  \____$$ |
+ *                                                                                               $$\   $$ |
+ *                                                                                               \$$$$$$  |
+ *                                                                                                \______/
+ */
 
 
 export class BCDModalDialog extends EventTarget {
@@ -1154,23 +1417,24 @@ export class BCDModalDialog extends EventTarget {
     }
 
 }
-bcdComponents.push(BCDModalDialog);
+componentsToRegister.push(BCDModalDialog);
 
 
-/*$$$$$\                                      $$\
-$$  __$$\                                     $$ |
-$$ |  $$ | $$$$$$\   $$$$$$\   $$$$$$\   $$$$$$$ | $$$$$$\  $$\  $$\  $$\ $$$$$$$\
-$$ |  $$ |$$  __$$\ $$  __$$\ $$  __$$\ $$  __$$ |$$  __$$\ $$ | $$ | $$ |$$  __$$\
-$$ |  $$ |$$ |  \__|$$ /  $$ |$$ /  $$ |$$ /  $$ |$$ /  $$ |$$ | $$ | $$ |$$ |  $$ |
-$$ |  $$ |$$ |      $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ | $$ | $$ |$$ |  $$ |
-$$$$$$$  |$$ |      \$$$$$$  |$$$$$$$  |\$$$$$$$ |\$$$$$$  |\$$$$$\$$$$  |$$ |  $$ |
-\_______/ \__|       \______/ $$  ____/  \_______| \______/  \_____\____/ \__|  \__|
-                              $$ |
-                              $$ |
-                              \_*/
+/***
+ *    $$$$$$$\                                      $$\
+ *    $$  __$$\                                     $$ |
+ *    $$ |  $$ | $$$$$$\   $$$$$$\   $$$$$$\   $$$$$$$ | $$$$$$\  $$\  $$\  $$\ $$$$$$$\
+ *    $$ |  $$ |$$  __$$\ $$  __$$\ $$  __$$\ $$  __$$ |$$  __$$\ $$ | $$ | $$ |$$  __$$\
+ *    $$ |  $$ |$$ |  \__|$$ /  $$ |$$ /  $$ |$$ /  $$ |$$ /  $$ |$$ | $$ | $$ |$$ |  $$ |
+ *    $$ |  $$ |$$ |      $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ | $$ | $$ |$$ |  $$ |
+ *    $$$$$$$  |$$ |      \$$$$$$  |$$$$$$$  |\$$$$$$$ |\$$$$$$  |\$$$$$\$$$$  |$$ |  $$ |
+ *    \_______/ \__|       \______/ $$  ____/  \_______| \______/  \_____\____/ \__|  \__|
+ *                                  $$ |
+ *                                  $$ |
+ *                                  \__|
+ */
 
-
-
+/** Classes that determine where the menu is aligned relative to the button */
 export enum menuCorners {
     unaligned = 'mdl-menu--unaligned',
     topLeft = 'mdl-menu--bottom-left',
@@ -1369,31 +1633,6 @@ export abstract class BCDDropdown extends mdl.MaterialMenu {
         super.hide();
     }
 }
-/*
-
-
-$$$$$$$\                                      $$\
-$$  __$$\                                     $$ |
-$$ |  $$ | $$$$$$\   $$$$$$\   $$$$$$\   $$$$$$$ | $$$$$$\  $$\  $$\  $$\ $$$$$$$\
-$$ |  $$ |$$  __$$\ $$  __$$\ $$  __$$\ $$  __$$ |$$  __$$\ $$ | $$ | $$ |$$  __$$\
-$$ |  $$ |$$ |  \__|$$ /  $$ |$$ /  $$ |$$ /  $$ |$$ /  $$ |$$ | $$ | $$ |$$ |  $$ |
-$$ |  $$ |$$ |      $$ |  $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$ | $$ | $$ |$$ |  $$ |
-$$$$$$$  |$$ |      \$$$$$$  |$$$$$$$  |\$$$$$$$ |\$$$$$$  |\$$$$$\$$$$  |$$ |  $$ |
-\_______/ \__|       \______/ $$  ____/  \_______| \______/  \_____\____/ \__|  \__|
-                              $$ |
-                              $$ |
-                              \__|
-
-$$\    $$\                     $$\                       $$\
-$$ |   $$ |                    \__|                      $$ |
-$$ |   $$ | $$$$$$\   $$$$$$\  $$\  $$$$$$\  $$$$$$$\  $$$$$$\    $$$$$$$\
-\$$\  $$  | \____$$\ $$  __$$\ $$ | \____$$\ $$  __$$\ \_$$  _|  $$  _____|
- \$$\$$  /  $$$$$$$ |$$ |  \__|$$ | $$$$$$$ |$$ |  $$ |  $$ |    \$$$$$$\
-  \$$$  /  $$  __$$ |$$ |      $$ |$$  __$$ |$$ |  $$ |  $$ |$$\  \____$$\
-   \$  /   \$$$$$$$ |$$ |      $$ |\$$$$$$$ |$$ |  $$ |  \$$$$  |$$$$$$$  |
-    \_/     \_______|\__|      \__| \_______|\__|  \__|   \____/ \______*/
-
-
 
 export class bcdDropdown_AwesomeButton extends BCDDropdown {
     static readonly asString = 'BCD - Debugger\'s All-Powerful Button';
@@ -1414,23 +1653,34 @@ export class bcdDropdown_AwesomeButton extends BCDDropdown {
         };
     }
 }
-bcdComponents.push(bcdDropdown_AwesomeButton);
-/*
+componentsToRegister.push(bcdDropdown_AwesomeButton);
 
 
 
-$$$$$$$$\           $$\                        $$$$$$\    $$\                $$$$$$\   $$$$$$\
-\__$$  __|          $$ |                      $$  __$$\   $$ |              $$  __$$\ $$  __$$\
-   $$ |    $$$$$$\  $$$$$$$\   $$$$$$$\       $$ /  \__|$$$$$$\   $$\   $$\ $$ /  \__|$$ /  \__|
-   $$ |    \____$$\ $$  __$$\ $$  _____|      \$$$$$$\  \_$$  _|  $$ |  $$ |$$$$\     $$$$\
-   $$ |    $$$$$$$ |$$ |  $$ |\$$$$$$\         \____$$\   $$ |    $$ |  $$ |$$  _|    $$  _|
-   $$ |   $$  __$$ |$$ |  $$ | \____$$\       $$\   $$ |  $$ |$$\ $$ |  $$ |$$ |      $$ |
-   $$ |   \$$$$$$$ |$$$$$$$  |$$$$$$$  |      \$$$$$$  |  \$$$$  |\$$$$$$  |$$ |      $$ |
-   \__|    \_______|\_______/ \_______/        \______/    \____/  \______/ \__|      \__|
-
-
-
-*/
+/***
+ *    $$$$$$$$\           $$\       $$\                       $$\
+ *    \__$$  __|          $$ |      $$ |                      $$ |
+ *       $$ |    $$$$$$\  $$$$$$$\  $$$$$$$\   $$$$$$\   $$$$$$$ |
+ *       $$ |    \____$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$ |
+ *       $$ |    $$$$$$$ |$$ |  $$ |$$ |  $$ |$$$$$$$$ |$$ /  $$ |
+ *       $$ |   $$  __$$ |$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |
+ *       $$ |   \$$$$$$$ |$$$$$$$  |$$$$$$$  |\$$$$$$$\ \$$$$$$$ |
+ *       \__|    \_______|\_______/ \_______/  \_______| \_______|
+ *
+ *
+ *
+ *    $$\                                                 $$\
+ *    $$ |                                                $$ |
+ *    $$ |       $$$$$$\  $$\   $$\  $$$$$$\  $$\   $$\ $$$$$$\
+ *    $$ |       \____$$\ $$ |  $$ |$$  __$$\ $$ |  $$ |\_$$  _|
+ *    $$ |       $$$$$$$ |$$ |  $$ |$$ /  $$ |$$ |  $$ |  $$ |
+ *    $$ |      $$  __$$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |  $$ |$$\
+ *    $$$$$$$$\ \$$$$$$$ |\$$$$$$$ |\$$$$$$  |\$$$$$$  |  \$$$$  |
+ *    \________| \_______| \____$$ | \______/  \______/    \____/
+ *                        $$\   $$ |
+ *                        \$$$$$$  |
+ *                         \______/
+ */
 
 export class BCDTabButton extends mdl.MaterialButton {
     static readonly asString = 'BCD - Tab List Button';
@@ -1565,22 +1815,24 @@ export class BCDTabButton extends mdl.MaterialButton {
         this.element_.blur();
     }
 }
-bcdComponents.push(BCDTabButton);
+componentsToRegister.push(BCDTabButton);
 
 
 
 
-/*$$$$$$*\                    $$\   $$\     $$\
-\__$$  __|                    $$ |  $$ |    \__|
-   $$ |    $$$$$$\   $$$$$$\  $$ |$$$$$$\   $$\  $$$$$$\   $$$$$$$\
-   $$ |   $$  __$$\ $$  __$$\ $$ |\_$$  _|  $$ |$$  __$$\ $$  _____|
-   $$ |   $$ /  $$ |$$ /  $$ |$$ |  $$ |    $$ |$$ /  $$ |\$$$$$$\
-   $$ |   $$ |  $$ |$$ |  $$ |$$ |  $$ |$$\ $$ |$$ |  $$ | \____$$\
-   $$ |   \$$$$$$  |\$$$$$$  |$$ |  \$$$$  |$$ |$$$$$$$  |$$$$$$$  |
-   \__|    \______/  \______/ \__|   \____/ \__|$$  ____/ \_______/
-                                                $$ |
-                                                $$ |
-                                                \_*/
+/***
+ *    $$$$$$$$\                     $$\   $$\     $$\
+ *    \__$$  __|                    $$ |  $$ |    \__|
+ *       $$ |    $$$$$$\   $$$$$$\  $$ |$$$$$$\   $$\  $$$$$$\   $$$$$$$\
+ *       $$ |   $$  __$$\ $$  __$$\ $$ |\_$$  _|  $$ |$$  __$$\ $$  _____|
+ *       $$ |   $$ /  $$ |$$ /  $$ |$$ |  $$ |    $$ |$$ /  $$ |\$$$$$$\
+ *       $$ |   $$ |  $$ |$$ |  $$ |$$ |  $$ |$$\ $$ |$$ |  $$ | \____$$\
+ *       $$ |   \$$$$$$  |\$$$$$$  |$$ |  \$$$$  |$$ |$$$$$$$  |$$$$$$$  |
+ *       \__|    \______/  \______/ \__|   \____/ \__|$$  ____/ \_______/
+ *                                                    $$ |
+ *                                                    $$ |
+ *                                                    \__|
+ */
 
 
 export class BCDTooltip {
@@ -1645,7 +1897,7 @@ export class BCDTooltip {
         const boundTouch = this.handleTouch.bind(this);
 
         window.addEventListener('contextmenu', boundLeave);
-        this.element.addEventListener('contextmenu', preventPropagation);
+        this.element.addEventListener('contextmenu', (e) => e.stopPropagation());
 
         this.boundElement.addEventListener('mouseenter',  boundEnter);                  this.element.addEventListener('mouseenter',  boundEnter);
         this.boundElement.addEventListener('mouseleave',  boundLeave);                  this.element.addEventListener('mouseleave',  boundLeave);
@@ -1806,22 +2058,34 @@ export class BCDTooltip {
     }
 
 }
-bcdComponents.push(BCDTooltip);
+componentsToRegister.push(BCDTooltip);
 
 
 
-/*
-
-
-
-$$\      $$\ $$\                                $$$$$$\  $$\
-$$$\    $$$ |\__|                              $$  __$$\ $$ |
-$$$$\  $$$$ |$$\  $$$$$$$\  $$$$$$$\           $$ /  \__|$$ | $$$$$$\   $$$$$$$\  $$$$$$$\  $$$$$$\   $$$$$$$\
-$$\$$\$$ $$ |$$ |$$  _____|$$  _____|          $$ |      $$ | \____$$\ $$  _____|$$  _____|$$  __$$\ $$  _____|
-$$ \$$$  $$ |$$ |\$$$$$$\  $$ /                $$ |      $$ | $$$$$$$ |\$$$$$$\  \$$$$$$\  $$$$$$$$ |\$$$$$$\
-$$ |\$  /$$ |$$ | \____$$\ $$ |                $$ |  $$\ $$ |$$  __$$ | \____$$\  \____$$\ $$   ____| \____$$\
-$$ | \_/ $$ |$$ |$$$$$$$  |\$$$$$$$\ $$\       \$$$$$$  |$$ |\$$$$$$$ |$$$$$$$  |$$$$$$$  |\$$$$$$$\ $$$$$$$  |
-\__|     \__|\__|\_______/  \_______|\__|       \______/ \__| \_______|\_______/ \_______/  \_______|\______*/
+/***
+ *    $$$$$$$\                                              $$\
+ *    $$  __$$\                                             \__|
+ *    $$ |  $$ |$$\   $$\ $$$$$$$\   $$$$$$\  $$$$$$\$$$$\  $$\  $$$$$$$\
+ *    $$ |  $$ |$$ |  $$ |$$  __$$\  \____$$\ $$  _$$  _$$\ $$ |$$  _____|
+ *    $$ |  $$ |$$ |  $$ |$$ |  $$ | $$$$$$$ |$$ / $$ / $$ |$$ |$$ /
+ *    $$ |  $$ |$$ |  $$ |$$ |  $$ |$$  __$$ |$$ | $$ | $$ |$$ |$$ |
+ *    $$$$$$$  |\$$$$$$$ |$$ |  $$ |\$$$$$$$ |$$ | $$ | $$ |$$ |\$$$$$$$\
+ *    \_______/  \____$$ |\__|  \__| \_______|\__| \__| \__|\__| \_______|
+ *              $$\   $$ |
+ *              \$$$$$$  |
+ *               \______/
+ *    $$$$$$$$\                       $$\            $$$$$$\
+ *    \__$$  __|                      $$ |          $$  __$$\
+ *       $$ |    $$$$$$\  $$\   $$\ $$$$$$\         $$ /  $$ | $$$$$$\   $$$$$$\   $$$$$$\   $$$$$$$\
+ *       $$ |   $$  __$$\ \$$\ $$  |\_$$  _|        $$$$$$$$ |$$  __$$\ $$  __$$\  \____$$\ $$  _____|
+ *       $$ |   $$$$$$$$ | \$$$$  /   $$ |          $$  __$$ |$$ |  \__|$$$$$$$$ | $$$$$$$ |\$$$$$$\
+ *       $$ |   $$   ____| $$  $$<    $$ |$$\       $$ |  $$ |$$ |      $$   ____|$$  __$$ | \____$$\
+ *       $$ |   \$$$$$$$\ $$  /\$$\   \$$$$  |      $$ |  $$ |$$ |      \$$$$$$$\ \$$$$$$$ |$$$$$$$  |
+ *       \__|    \_______|\__/  \__|   \____/       \__|  \__|\__|       \_______| \_______|\_______/
+ *
+ *
+ *
+ */
 
 
 
@@ -1869,7 +2133,7 @@ export class bcdDynamicTextAreaHeight extends bcdDynamicTextArea_base {
     }
 
 }
-bcdComponents.push(bcdDynamicTextAreaHeight);
+componentsToRegister.push(bcdDynamicTextAreaHeight);
 
 export class bcdDynamicTextAreaWidth extends bcdDynamicTextArea_base {
     static readonly asString = 'BCD - Dynamic TextArea - Width';
@@ -1893,7 +2157,34 @@ export class bcdDynamicTextAreaWidth extends bcdDynamicTextArea_base {
     }
 
 }
-bcdComponents.push(bcdDynamicTextAreaWidth);
+componentsToRegister.push(bcdDynamicTextAreaWidth);
+
+
+
+/***
+ *    $$$$$$$\            $$\             $$\     $$\
+ *    $$  __$$\           $$ |            $$ |    \__|
+ *    $$ |  $$ | $$$$$$\  $$ | $$$$$$\  $$$$$$\   $$\ $$\    $$\  $$$$$$\
+ *    $$$$$$$  |$$  __$$\ $$ | \____$$\ \_$$  _|  $$ |\$$\  $$  |$$  __$$\
+ *    $$  __$$< $$$$$$$$ |$$ | $$$$$$$ |  $$ |    $$ | \$$\$$  / $$$$$$$$ |
+ *    $$ |  $$ |$$   ____|$$ |$$  __$$ |  $$ |$$\ $$ |  \$$$  /  $$   ____|
+ *    $$ |  $$ |\$$$$$$$\ $$ |\$$$$$$$ |  \$$$$  |$$ |   \$  /   \$$$$$$$\
+ *    \__|  \__| \_______|\__| \_______|   \____/ \__|    \_/     \_______|
+ *
+ *
+ *
+ *    $$$$$$$$\ $$\ $$\                 $$$$$$$\  $$\           $$\
+ *    $$  _____|\__|$$ |                $$  __$$\ \__|          $$ |
+ *    $$ |      $$\ $$ | $$$$$$\        $$ |  $$ |$$\  $$$$$$$\ $$ |  $$\  $$$$$$\   $$$$$$\
+ *    $$$$$\    $$ |$$ |$$  __$$\       $$$$$$$  |$$ |$$  _____|$$ | $$  |$$  __$$\ $$  __$$\
+ *    $$  __|   $$ |$$ |$$$$$$$$ |      $$  ____/ $$ |$$ /      $$$$$$  / $$$$$$$$ |$$ |  \__|
+ *    $$ |      $$ |$$ |$$   ____|      $$ |      $$ |$$ |      $$  _$$<  $$   ____|$$ |
+ *    $$ |      $$ |$$ |\$$$$$$$\       $$ |      $$ |\$$$$$$$\ $$ | \$$\ \$$$$$$$\ $$ |
+ *    \__|      \__|\__| \_______|      \__|      \__| \_______|\__|  \__| \_______|\__|
+ *
+ *
+ *
+ */
 
 class RelativeFilePicker {
     static asString = 'BCD - Relative File Picker';
@@ -1978,7 +2269,34 @@ class RelativeFilePicker {
     }
     readonly boundOnButtonClick = this.onButtonClick.bind(this);
 }
-bcdComponents.push(RelativeFilePicker);
+componentsToRegister.push(RelativeFilePicker);
+
+
+/***
+ *    $$$$$$$\            $$\             $$\     $$\
+ *    $$  __$$\           $$ |            $$ |    \__|
+ *    $$ |  $$ | $$$$$$\  $$ | $$$$$$\  $$$$$$\   $$\ $$\    $$\  $$$$$$\
+ *    $$$$$$$  |$$  __$$\ $$ | \____$$\ \_$$  _|  $$ |\$$\  $$  |$$  __$$\
+ *    $$  __$$< $$$$$$$$ |$$ | $$$$$$$ |  $$ |    $$ | \$$\$$  / $$$$$$$$ |
+ *    $$ |  $$ |$$   ____|$$ |$$  __$$ |  $$ |$$\ $$ |  \$$$  /  $$   ____|
+ *    $$ |  $$ |\$$$$$$$\ $$ |\$$$$$$$ |  \$$$$  |$$ |   \$  /   \$$$$$$$\
+ *    \__|  \__| \_______|\__| \_______|   \____/ \__|    \_/     \_______|
+ *
+ *
+ *
+ *    $$$$$$\                                                   $$$$$$$\  $$\           $$\
+ *    \_$$  _|                                                  $$  __$$\ \__|          $$ |
+ *      $$ |  $$$$$$\$$$$\   $$$$$$\   $$$$$$\   $$$$$$\        $$ |  $$ |$$\  $$$$$$$\ $$ |  $$\  $$$$$$\   $$$$$$\
+ *      $$ |  $$  _$$  _$$\  \____$$\ $$  __$$\ $$  __$$\       $$$$$$$  |$$ |$$  _____|$$ | $$  |$$  __$$\ $$  __$$\
+ *      $$ |  $$ / $$ / $$ | $$$$$$$ |$$ /  $$ |$$$$$$$$ |      $$  ____/ $$ |$$ /      $$$$$$  / $$$$$$$$ |$$ |  \__|
+ *      $$ |  $$ | $$ | $$ |$$  __$$ |$$ |  $$ |$$   ____|      $$ |      $$ |$$ |      $$  _$$<  $$   ____|$$ |
+ *    $$$$$$\ $$ | $$ | $$ |\$$$$$$$ |\$$$$$$$ |\$$$$$$$\       $$ |      $$ |\$$$$$$$\ $$ | \$$\ \$$$$$$$\ $$ |
+ *    \______|\__| \__| \__| \_______| \____$$ | \_______|      \__|      \__| \_______|\__|  \__| \_______|\__|
+ *                                    $$\   $$ |
+ *                                    \$$$$$$  |
+ *                                     \______/
+ */
+
 
 class RelativeImagePicker extends RelativeFilePicker {
     static override readonly asString = 'BCD - Relative Image Picker';
@@ -2112,8 +2430,24 @@ class RelativeImagePicker extends RelativeFilePicker {
         }
     }
 }
-bcdComponents.push(RelativeImagePicker);
+componentsToRegister.push(RelativeImagePicker);
 
+/***
+ *    $$$$$$$\   $$$$$$\  $$\      $$\  $$$$$$\
+ *    $$  __$$\ $$  __$$\ $$$\    $$$ |$$  __$$\
+ *    $$ |  $$ |$$ /  $$ |$$$$\  $$$$ |$$ /  \__|$$\    $$\  $$$$$$\
+ *    $$ |  $$ |$$ |  $$ |$$\$$\$$ $$ |\$$$$$$\  \$$\  $$  |$$  __$$\
+ *    $$ |  $$ |$$ |  $$ |$$ \$$$  $$ | \____$$\  \$$\$$  / $$ /  $$ |
+ *    $$ |  $$ |$$ |  $$ |$$ |\$  /$$ |$$\   $$ |  \$$$  /  $$ |  $$ |
+ *    $$$$$$$  | $$$$$$  |$$ | \_/ $$ |\$$$$$$  |   \$  /   \$$$$$$$ |
+ *    \_______/  \______/ \__|     \__| \______/     \_/     \____$$ |
+ *                                                          $$\   $$ |
+ *                                                          \$$$$$$  |
+ *                                                           \______/
+ */
+
+
+/** Unsafely loads an external SVG file and inserts it into the DOM. */
 class DOMSvg {
     static readonly asString = 'BCD - DOM SVG';
     static readonly cssClass = 'js-dom-svg';
@@ -2159,7 +2493,8 @@ class DOMSvg {
         }
     }
 }
-bcdComponents.push(DOMSvg);
+componentsToRegister.push(DOMSvg);
+
 
 
 /*$$$$$\              $$\       $$\     $$\                                      $$$$$$\            $$\       $$\
@@ -2173,7 +2508,6 @@ $$\   $$ |$$   ____|  $$ |$$\   $$ |$$\ $$ |$$ |  $$ |$$ |  $$ | \____$$\       
                                                       $$\   $$ |
                                                       \$$$$$$  |
                                                        \_____*/
-
 
 interface settingsGridObj {
     type: 'bool'|'string'
@@ -2338,7 +2672,7 @@ export class SettingsGrid {
         }
     }
 }
-bcdComponents.push(SettingsGrid);
+componentsToRegister.push(SettingsGrid);
 
 /** Variable to work around the complexities of Constructors and whatnot */
 let tempKeyMap = {};
@@ -2383,77 +2717,10 @@ export class BCDSettingsDropdown extends BCDDropdown {
         return options;
     }
 }
-bcdComponents.push(BCDSettingsDropdown);
+componentsToRegister.push(BCDSettingsDropdown);
 window.BCDSettingsDropdown = BCDSettingsDropdown;
 
 
-
-/*$$$$$\                                                                              $$\
-$$  __$$\                                                                             $$ |
-$$ /  \__| $$$$$$\  $$$$$$\$$$$\   $$$$$$\   $$$$$$\  $$$$$$$\   $$$$$$\  $$$$$$$\  $$$$$$\
-$$ |      $$  __$$\ $$  _$$  _$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ $$  __$$\ \_$$  _|
-$$ |      $$ /  $$ |$$ / $$ / $$ |$$ /  $$ |$$ /  $$ |$$ |  $$ |$$$$$$$$ |$$ |  $$ |  $$ |
-$$ |  $$\ $$ |  $$ |$$ | $$ | $$ |$$ |  $$ |$$ |  $$ |$$ |  $$ |$$   ____|$$ |  $$ |  $$ |$$\
-\$$$$$$  |\$$$$$$  |$$ | $$ | $$ |$$$$$$$  |\$$$$$$  |$$ |  $$ |\$$$$$$$\ $$ |  $$ |  \$$$$  |
- \______/  \______/ \__| \__| \__|$$  ____/  \______/ \__|  \__| \_______|\__|  \__|   \____/
-                                  $$ |
-                                  $$ |
-                                  \__|
-
-$$$$$$$\                      $$\             $$\                           $$\     $$\
-$$  __$$\                     \__|            $$ |                          $$ |    \__|
-$$ |  $$ | $$$$$$\   $$$$$$\  $$\  $$$$$$$\ $$$$$$\    $$$$$$\   $$$$$$\  $$$$$$\   $$\  $$$$$$\  $$$$$$$\
-$$$$$$$  |$$  __$$\ $$  __$$\ $$ |$$  _____|\_$$  _|  $$  __$$\  \____$$\ \_$$  _|  $$ |$$  __$$\ $$  __$$\
-$$  __$$< $$$$$$$$ |$$ /  $$ |$$ |\$$$$$$\    $$ |    $$ |  \__| $$$$$$$ |  $$ |    $$ |$$ /  $$ |$$ |  $$ |
-$$ |  $$ |$$   ____|$$ |  $$ |$$ | \____$$\   $$ |$$\ $$ |      $$  __$$ |  $$ |$$\ $$ |$$ |  $$ |$$ |  $$ |
-$$ |  $$ |\$$$$$$$\ \$$$$$$$ |$$ |$$$$$$$  |  \$$$$  |$$ |      \$$$$$$$ |  \$$$$  |$$ |\$$$$$$  |$$ |  $$ |
-\__|  \__| \_______| \____$$ |\__|\_______/    \____/ \__|       \_______|   \____/ \__| \______/ \__|  \__|
-                    $$\   $$ |
-                    \$$$$$$  |
-                     \_____*/
-
-
-
-/** Registers a single MDL component that has the static readonly properties `cssClass` and `asString` defined
-    @param component The BCDComponent to register
-    @throws nothing - this function gracefully handles errors in the form of `console.error` calls instead of throwing actual errors
-    @returns whether or not an error occurred with the error as the return value
-*/
-export function registerBCDComponent(component:BCDComponent):boolean|Error {
-    try{
-
-        mdl.componentHandler.register({
-            constructor: component,
-            classAsString: component.asString,
-            cssClass: component.cssClass,
-            widget: false
-        });
-        mdl.componentHandler.upgradeElements(document.getElementsByClassName(component.cssClass));
-
-    }catch(e:unknown){
-        console.error("[BCD-Components] Error registering component", component.asString, "with class", component.cssClass, ":\n", e);
-        return e as Error;
-
-    }
-
-    return false;
-}
-
-
-/** Tell MDL about our shiny new components
-    @param components The components to register. Defaults to the global bcdComponents array if not specified.
-*/
-export function registerBCDComponents(...components:BCDComponent[]):void{
-
-    const componentArr = components.length ? components : bcdComponents;
-
-    // Tell mdl about our shiny new components
-    for (let i = 0; i < componentArr.length; i++) {
-        registerBCDComponent(componentArr[i]!);
-    }
-
-    //console.debug("[BCD-Components] Registered the following components:", componentArr.map(c => `\n    ${c.asString}`).join(''));
-}
 /*
 
 

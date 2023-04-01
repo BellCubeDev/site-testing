@@ -144,16 +144,11 @@ function saveStorage() {
     return true;
 }
 
-function storageProxyHandler_get<TObj, TKey extends keyof TObj>(target: TObj, prop: TKey) : TObj[TKey] {
-    return target[prop];
-}
-
-function storageProxyHandler_set<TObj>(target: TObj, prop: keyof TObj, value: TObj[keyof TObj], _receiver: unknown): boolean {
-    target[prop] = bcdUniversal.setProxies(value, {get: storageProxyHandler_get, set: storageProxyHandler_set}) as TObj[keyof TObj]; // I wish TypeScript would keep that type, but no...
-    return saveStorage();
-}
-
-window.FOMODBuilder.storage = bcdUniversal.setProxies(window.FOMODBuilder.storage, {get: storageProxyHandler_get, set: storageProxyHandler_set});
+window.FOMODBuilder.storage = bcdUniversal.setProxies(window.FOMODBuilder.storage, {
+    set(): boolean {
+        return saveStorage();
+    }
+});
 saveStorage();
 
 let noSupportModal: bcdUniversal.BCDModalDialog|null = null;
@@ -198,13 +193,13 @@ export function getNoSupportModal(): bcdUniversal.BCDModalDialog|null {
 }
 
 window.bcd_init_functions.fomodBuilder = function fomodBuilderInit() {
-
     console.debug('Initializing the FOMOD Builder!');
 
-    bcdUniversal.registerBCDComponents(fomodUI.BCDDropdownSortingOrder, fomodUI.BCDDropdownOptionState, fomodUI.BCDDropdownGroupType);
+    getNoSupportModal();
+
+    fomodUI.init();
+
     bcdUniversal.updateSettings();
 
-    window.FOMODBuilder.ui.setStepEditorType(window.FOMODBuilder.storage.preferences.stepsBuilder);
-
-    getNoSupportModal();
+    console.debug('FOMOD Builder initialized!');
 };
