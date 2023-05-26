@@ -1,4 +1,4 @@
-<a  href="{% if include.item.url | slice: 0 == "/" %}{{ site.baseurl }}{% endif %}{{ include.item.url }}"
+<a  href="{% if include.item.url | slice: 0 == "/" %}{% endif %}{{ include.item.url }}"
 
     {% if include.item.newTab %}
         target="_blank"

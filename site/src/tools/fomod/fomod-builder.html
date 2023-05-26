@@ -14,11 +14,11 @@ redirect_from:
   - /tools/fomod-builder/
 ---
 
-{% capture vortexSVG %}{{site.baseurl}}{% link assets/site/images/SVGs/Vortex.svg %}{% endcapture %}
-{% capture mo2SVG %}{{site.baseurl}}{% link assets/site/images/SVGs/MO2.svg %}{% endcapture %}
+{% capture vortexSVG %}{% link assets/site/images/SVGs/Vortex.svg %}{% endcapture %}
+{% capture mo2SVG %}{% link assets/site/images/SVGs/MO2.svg %}{% endcapture %}
 
 <div hidden id="lazy-styles">
-    "{{site.baseurl}}{% link assets/site/css/vortex_fomod.css %}"
+    "{% link assets/site/css/vortex_fomod.css %}"
 </div>
 
 <template id="builder-settings-toggle">
@@ -573,7 +573,7 @@ redirect_from:
                                     <div class="vortex-layout-container vortex-layout-container-column vortex-layout-fill" type="column" style="flex-direction: column;">
 
                                         <div class="vortex-layout-flex"><div class="vortex-layout-flex-inner"> <div class="vortex-installer-image">
-                                            <img src="/site-testing/assets/site/images/example-image.png" class="vortex-zoomable-image">
+                                            <img src="/assets/site/images/example-image.png" class="vortex-zoomable-image">
                                         </div></div></div>
 
                                         <div class="vortex-layout-flex vortex-description-outer"><div class="vortex-description vortex-layout-flex-inner vortex-layout-flex-fill">
@@ -590,7 +590,7 @@ redirect_from:
                         <div class="vortex-layout-container vortex-layout-container-column vortex-layout-fill" type="column" style="flex-direction: column;">
 
                             <div class="vortex-layout-flex"><div class="vortex-layout-flex-inner">
-                                <div class="vortex-installer-image"><img src="{{site.baseurl}}{% link assets/site/images/example-image.webp %}" class="vortex-zoomable-image"></div>
+                                <div class="vortex-installer-image"><img src="{% link assets/site/images/example-image.webp %}" class="vortex-zoomable-image"></div>
                             </div></div>
 
                             <div class="vortex-layout-flex vortex-description-outer"><div class="vortex-description vortex-layout-flex-inner vortex-layout-flex-fill">

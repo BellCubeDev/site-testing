@@ -508,7 +508,7 @@ async function parseOptionDependency(stepNumStr: string|undefined, groupNumStr: 
     const step = getSetIndex(base.steps, parseInt(stepNumStr));
     const group = step ? getSetIndex(step.groups, parseInt(groupNumStr)) : null;
     const option = group ? getSetIndex(group.options, parseInt(optionNumStr)) : null;
-    
+
     return option ?? null;
 }
 
@@ -1246,8 +1246,8 @@ export class Fomod extends FOMODElementProxy {
         // Set schema info
         this.infoInstanceElement.setAttribute('xmlns:xsi', 'https://www.w3.org/2001/XMLSchema-instance');
         if (window.FOMODBuilder.storage.settings.includeInfoSchema)
-            this.infoInstanceElement.setAttribute('xsi:noNamespaceSchemaLocation', 'https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd');
-        else if (this.infoInstanceElement.getAttribute('xsi:noNamespaceSchemaLocation') === 'https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd')
+            this.infoInstanceElement.setAttribute('xsi:noNamespaceSchemaLocation', 'https://testing.bellcubedev.dev/assets/site/misc/Info.xsd');
+        else if (this.infoInstanceElement.getAttribute('xsi:noNamespaceSchemaLocation') === 'https://testing.bellcubedev.dev/assets/site/misc/Info.xsd')
             this.infoInstanceElement.removeAttribute('xsi:noNamespaceSchemaLocation');
 
         // Set actual data

@@ -160,9 +160,9 @@
             "label": "Open Site Locally (SERVE)",
             "type": "shell",
 
-            "command": "sleep 1\n xdg-open http://http://127.0.0.1:4000/site-testing/",
+            "command": "sleep 1\n xdg-open http://http://127.0.0.1:4000",
             "windows": {
-                "command": "timeout 1 > nul && start http://127.0.0.1:4000/site-testing/",
+                "command": "timeout 1 > nul && start http://127.0.0.1:4000",
 
                 "options": {
                     "cwd": "C:\\" // Workaround for (what I presume to be) a bug in code-server

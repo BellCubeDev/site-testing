@@ -2,4 +2,4 @@
 layout: null
 sitemap: false
 ---
-{"baseurl": {{ site.fullurl | jsonify }},"pages": {{ site.pages | jsonify }},"translation": {{ site.data.sitemap-translation | jsonify}}}
+{"pages": {{ site.pages | jsonify }},"translation": {{ site.data.sitemap-translation | jsonify}}}

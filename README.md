@@ -1,6 +1,6 @@
 [![Build & Deploy Site](https://github.com/BellCubeDev/site-testing/actions/workflows/github-pages-build-and-deploy.yml/badge.svg?branch=main&event=push)](https://github.com/BellCubeDev/site-testing/actions/workflows/github-pages-build-and-deploy.yml)
 
-# BellCubeDev.GitHub.IO
+# BellCubeDev.dev
 
 This repository is the website for BellCube Dev, a mod author and occasionally a utility developer.
 
@@ -89,4 +89,3 @@ Finally, run the `jekyll build` command in the `site` directory to build the sit
 ```bash
 bundle exec jekyll build --config site/_config.yml --source _generated/ts_out/ --destination _generated/_jekyll-out/ --verbose --safe --trace
 ```
-

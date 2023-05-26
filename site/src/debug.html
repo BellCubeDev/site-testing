@@ -8,7 +8,7 @@ redirect_from:
     -   /debug
 ---
 
-<a href="{{ site.baseurl }}{% link debug-extended.html %}" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Extended Debug Page</a> (where some of the larger variables are printed)
+<a href="{% link debug-extended.html %}" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Extended Debug Page</a> (where some of the larger variables are printed)
 
 <script>
     document.getElementById("js-insert-builder-storage").textContent = JSON.stringify(JSON.parse(localStorage.getItem('BellCubeDev_FOMOD_BUILDER_DATA') ?? '{}'), null, 4)
@@ -44,7 +44,6 @@ redirect_from:
 <div class="js-bcd-details adjacent is-open">
     <br>FOMOD Builder Storage: <pre><code id="js-insert-builder-storage"></code></pre>
     <br />site.author:<pre><code class="js-bcd-prettyJSON">{{ site.author | jsonify | escape }}</code></pre>
-    <br />site.baseurl:<pre><code class="js-bcd-prettyJSON">{{ site.baseurl | jsonify | escape }}</code></pre>
     <br />site.categories:<pre><code class="js-bcd-prettyJSON">{{ site.categories | jsonify | escape }}</code></pre>
     <br />site.compress_css:<pre><code class="js-bcd-prettyJSON">{{ site.compress_css | jsonify | escape }}</code></pre>
     <br />site.compress_javascript:<pre><code class="js-bcd-prettyJSON">{{ site.compress_javascript | jsonify | escape }}</code></pre>

@@ -1,6 +1,6 @@
 # Credits
 
-BellCubeDev.GitHub.IO is a collection of ambitious projects under one ambitious roof, and its development would be significantly more difficult without the help of the following open-source projects:
+BellCube.dev is a collection of ambitious projects under one ambitious roof, and its development would be significantly more difficult without the help of the following open-source projects:
 
 ## Distributed - In Whole Or In Part
 

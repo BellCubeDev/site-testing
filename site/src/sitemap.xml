@@ -6,7 +6,7 @@ layout: compress_html
   {% for page in site.html_pages %}
     {% if page.sitemap != false and page.index != false and page.layout != 'compress_html' %}
       <url>
-        <loc>{{ site.fullurl }}{{ page.url }}</loc>
+        <loc>{{ site.mainurl }}{{ page.url }}</loc>
         <lastmod>{{ page.lastMod | date_to_xmlschema }}</lastmod>
         {% if page.layout == 'docs' %}
           <priority>{{ page.sm_priority | default: 1 }}</priority>

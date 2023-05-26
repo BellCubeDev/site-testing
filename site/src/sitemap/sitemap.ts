@@ -4,7 +4,6 @@ const cssDetails_ = 'js-bcd-details_';
 const cssSummary_ = 'js-bcd-summary_';
 
 interface jekyllPages {
-    baseurl: string;
     pages: Array<{
         content: string;
         dir: string;
@@ -122,7 +121,7 @@ async function sitemapInit(){
         if (tempTextCont in obj.translation) a.textContent = obj.translation[tempTextCont]!;
         else a.textContent = tempTextCont;
 
-        a.setAttribute('href', obj.baseurl + page.url);
+        a.setAttribute('href', page.url);
 
 
         console.debug('Directory to append within:', lastDir);

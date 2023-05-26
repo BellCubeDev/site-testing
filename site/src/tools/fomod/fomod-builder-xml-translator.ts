@@ -32,7 +32,7 @@ declare global {
 }
 
 const testInfo = `
-<fomod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://bellcubedev.github.io/site-testing/assets/site/misc/Info.xsd">
+<fomod xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://testing.bellcubedev.dev/assets/site/misc/Info.xsd">
     <Name>Some Name™</Name>
     <Author>Best Author Ever!</Author>
     <Id>51238068465248570</Id>
