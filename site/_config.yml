@@ -7,7 +7,7 @@ first_publication_year: 2022
 
 # URL Root (used in URIs) - THESE SHOULD NOT END IN "/"
 repourl: https://github.com/BellCubeDev/site-testing
-mainurl: https://testing.bellcubedev.dev
+mainurl: https://testing.bellcube.dev
 
 # ============================
 # SEO
@@ -17,7 +17,7 @@ tagline: The open-source site for BellCube and the home of a decent hobbyist pro
 author:
   name: BellCube
   picture: /assets/site/images/icon.png
-  url: https://testing.bellcubedev.dev
+  url: https://testing.bellcube.dev
 logo: /assets/site/images/icon.png
 defaults:
   - scope:

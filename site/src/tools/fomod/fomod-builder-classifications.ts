@@ -1246,8 +1246,8 @@ export class Fomod extends FOMODElementProxy {
         // Set schema info
         this.infoInstanceElement.setAttribute('xmlns:xsi', 'https://www.w3.org/2001/XMLSchema-instance');
         if (window.FOMODBuilder.storage.settings.includeInfoSchema)
-            this.infoInstanceElement.setAttribute('xsi:noNamespaceSchemaLocation', 'https://testing.bellcubedev.dev/assets/site/misc/Info.xsd');
-        else if (this.infoInstanceElement.getAttribute('xsi:noNamespaceSchemaLocation') === 'https://testing.bellcubedev.dev/assets/site/misc/Info.xsd')
+            this.infoInstanceElement.setAttribute('xsi:noNamespaceSchemaLocation', 'https://testing.bellcube.dev/assets/site/misc/Info.xsd');
+        else if (this.infoInstanceElement.getAttribute('xsi:noNamespaceSchemaLocation') === 'https://testing.bellcube.dev/assets/site/misc/Info.xsd')
             this.infoInstanceElement.removeAttribute('xsi:noNamespaceSchemaLocation');
 
         // Set actual data

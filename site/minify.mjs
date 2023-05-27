@@ -243,7 +243,7 @@ async function minifyJSFile(filePath) {
                 .replace(/^module ([^\s]+) from "/gm, 'import $1 from "')
                 // Handle JSON imports
                 .replace(/import (\w+) from ("|')(\.?)(\.?)((?:\\\2|["'](?<!\2)|[^"'])*\.[Jj][Ss][Oo][Nn])\2;?/g, (str, varName, quoteType, leadingDot01, leadingDot02, jsonPath) =>
-                leadingDot01 ? `const ${varName} = await fetch(${quoteType}${leadingDot02}${path.normalize(path.join(path.normalize(filePath).replace(/[\\/][^\\/]+$/, '').replace(path.normalize(minifyDir), ''), jsonPath)).replace(/\\/g, '/')}${quoteType}).then(r => r.json())`
+                leadingDot01 ? `const ${varName} = await fetch(${quoteType}${leadingDot02}${path.normalize(path.join('/', path.normalize(filePath).replace(/[\\/][^\\/]+$/, '').replace(path.normalize(minifyDir), ''), jsonPath)).replace(/\\/g, '/')}${quoteType}).then(r => r.json())`
                              : `const ${varName} = await fetch(${quoteType}${                                                                                jsonPath.replace(/^\//, '')                                                                               }${quoteType}).then(r => r.json())`
                 );
         }
