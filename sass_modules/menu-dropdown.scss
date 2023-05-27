@@ -1,0 +1,23 @@
+@use 'colors' as *;
+
+// Don't mind the fact that I subtly stole a lot of the styling here from VS Code's context menu
+
+.mdl-menu__outline {
+    background: #303031;
+    color: #ccc;
+}
+
+.mdl-menu__item {
+    @extend .mdl-menu__outline;
+
+    &:hover, &:focus {
+        background: $color-focus;
+        color: $color-white;
+    }
+
+    &--full-bleed-divider {
+        border-bottom-color: #ffffff20;
+    }
+}
+
+.mdl-menu__container:not(.is-visible) { pointer-events: none; }

@@ -1,0 +1,80 @@
+@use 'colors' as *;
+
+.tab-content {
+    min-width: 100%;
+    overflow-y: clip;
+
+    opacity: 0; &.active { opacity: 1; }
+    &--hidden { visibility: hidden; height: 0; }
+
+    transition-duration: inherit;
+    transition-timing-function: inherit;
+}
+
+.tabs-content-container {
+    padding: 0;
+    overflow: visible;
+    height: max-content;
+
+    > * {
+        padding: 0;
+        padding-top: 16px;
+
+        transition-property: margin-left;
+        margin-left: 0; // overridden later in JavaScript
+
+        height: max-content;
+        width: max-content;
+
+        overflow: hidden;
+        overflow-y: visible;
+
+        display: grid;
+        justify-content: start;
+        align-items: start;
+        grid-template-columns: repeat(16, calc(100vw - 52px));
+        grid-template-rows: 100%;
+        gap: 52px;
+    }
+}
+
+.tabs-list-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    align-content: center;
+
+    gap: 16px;
+
+    padding-left: 316px;
+
+    height: max-content;
+    width: calc(100vw + 300px);
+
+    overflow: hidden;
+    overflow-x: auto;
+
+    background-color: #666d;
+    vertical-align: top;
+
+    position: sticky;
+    margin-top: -60px;
+    padding-top: 50px;
+    margin-left: -300px;
+    z-index: 2;
+
+    &--hidden {
+        opacity: 0;
+        margin-top: -120px !important;
+    }
+
+    transition-property: opacity, margin-top;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0, 0.3, 0.9, 1);
+}
+
+.js-tab-list-button.mdl-button {
+    @include customColoredButton(160deg, 33%, 30%, 1, 1, 1);
+}

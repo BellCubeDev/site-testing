@@ -1,0 +1,148 @@
+@use 'utils';
+@use 'colors' as *;
+
+.mdl-layout__drawer {
+    background-color: $color-bg-secondary;
+    border-right-color: #ffffff40;
+    color: #ffffffbf;
+
+    overflow-x: hidden;
+
+    h1 { font-size: 30px; }
+    h2 { font-size: 25px; }
+    h3 { font-size: 20px; }
+
+    h1, h2, h3 {
+        color: $color-white;
+
+        padding-top: 0;
+        padding-right: 40px;
+        padding-bottom: 0;
+        margin-bottom: 0;
+        padding-left: 24px;
+
+        &:first-child {
+            margin-top: -24px;
+        }
+    }
+
+    .js-bcd-summary { h1, h2, h3 {
+        margin-top: 0;
+        padding-left: 0;
+    }}
+
+    .mdl-layout-title {
+        padding-top: 0;
+        padding-left: 0;
+
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .center-vert {
+        gap: 24px;
+    }
+}
+
+%nexus-icon-transition {
+    // VISH DID IT TO ME
+    transition-timing-function: cubic-bezier(0, 0, 0.85, 0.65);
+    transition-duration: 250ms;
+    transition-delay: 10ms;
+}
+
+.icon--nexus {
+
+    .nexus-SVG-primary {
+        @extend %nexus-icon-transition;
+        fill: #222;
+    }
+
+    .nexus-SVG-secondary {
+        @extend %nexus-icon-transition;
+        fill: #000;
+    }
+
+    >:first-child {
+        @extend %nexus-icon-transition;
+        transition-duration: 100ms !important;
+        fill: #333;
+    }
+
+    &:is(:hover, :-ms-keyboard-active, :focus, :active) {
+        .nexus-SVG-primary { fill: #da8e35; }
+        .nexus-SVG-secondary { fill: #b4762c; }
+
+        >:first-child { fill: #000; }
+    }
+}
+
+.mdl-navigation {
+    overflow: hidden;
+}
+
+.mdl-layout-title {
+    color: $color-white;
+
+    :is(img, svg) {
+        height: 48px;
+        margin-right: 8px;
+    }
+
+}
+
+.mdl-navigation__link, // Next line is for specificity only
+.mdl-layout__drawer .mdl-navigation .mdl-navigation__link {
+    color: $color-white;
+    display: block;
+    padding: 16px 40px;
+    margin: 0;
+    white-space: nowrap;
+    width: 100%;
+    outline: none;
+
+    &:is(:hover, :-ms-keyboard-active, :focus, :active) {
+        background-color: #ffffff40;
+    }
+}
+
+.mdl-navigation__link--icon {
+    display: flex;
+    justify-content: flex-start;
+    align-content: center;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    .material-icons {
+        width: 24px;
+    }
+
+    > :not(.material-icons, .center-vert) {
+        width: 24px;
+        padding-left: 24px;
+    }
+}
+
+.drawer-init-open .mdl-layout__obfuscator {
+    background-color: #0008 !important;
+    visibility: visible !important;
+}
+
+.mdl-layout__header {
+    background: none;
+
+    .mdl-layout__drawer-button {
+        background: none;
+        user-select: none;
+    }
+
+}
+
+.mdl-layout__header-row > .mdl-layout-title, .mdl-button--colored {
+    @extend .needs-shadow;
+}
+
+.mdl-layout__header-row {
+    z-index: 3;
+}

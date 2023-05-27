@@ -1,0 +1,38 @@
+.js-relative-file-picker, .js-relative-image-picker {
+    &--container {
+        white-space: nowrap;
+
+        margin-top: 8px;
+
+        // Grid stuff for the grid layout that is used in the builder
+        grid-column: 1 / -1;
+        grid-row: 2;
+    }
+
+    max-width: 100%;
+
+    width: stretch; // Thank you to PostCSS for relieving me of cross-browser headaches
+
+    padding-right: 36px;
+
+    &--button {
+        position: relative;
+        right: 33px;
+        top: -1.5px;
+
+        height: 28px;
+        width: 28px;
+        min-width: 28px; // Needed to overwrite the MDL rule
+
+        i { font-size: 90%; }
+    }
+}
+
+.js-relative-image-picker--no-image {
+    fill: #ddd;
+    grid-column: 2;
+    grid-row: 1;
+    height: 100%;
+
+    +img { grid-row: 1; }
+}

@@ -1,0 +1,2 @@
+function qs(){return{name:"Julia REPL",contains:[{className:"meta.prompt",begin:/^julia>/,relevance:10,starts:{end:/^(?![ ]{6})/,subLanguage:"julia"}}],aliases:["jldoctest"]}}export{qs as default};
+//# sourceMappingURL=https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/assets/site/highlight_js/languages/julia-repl.js.map

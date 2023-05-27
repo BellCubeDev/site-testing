@@ -1,0 +1,2 @@
+function Ai(){return{name:"Plain text",aliases:["text","txt"],disableAutodetect:!0}}export{Ai as default};
+//# sourceMappingURL=https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/assets/site/highlight_js/languages/plaintext.js.map

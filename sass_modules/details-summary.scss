@@ -1,0 +1,106 @@
+@use 'colors' as *;
+
+.js-bcd-summary {
+    color: $color-white;
+    background: none;
+    border: none;
+
+    height: max-content;
+    width: 100%;
+
+    pointer-events: all;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: flex-start;
+    align-items: center;
+
+    padding: 16px 24px;
+    padding-bottom: 4px;
+
+    &.noTopPad, &:first-child {
+        padding-top: 0;
+    }
+
+    &.min-padding {
+        padding: 6px;
+        padding-bottom: 4px;
+    }
+
+    > :is(h1, h2, h3, h4, h5, h6) {
+        margin: 0;
+        padding: 0;
+    }
+
+    outline: none;
+
+    :not(.material-icons) {
+        transition-duration: 100ms;
+        transition-timing-function: ease-in-out;
+
+        text-shadow: #fff0 0 0 1px;
+        text-decoration: underline #fff0 7.5%;
+    }
+
+    &:is(:hover, :-ms-keyboard-active, :focus, :active) :not(.material-icons) {
+        text-decoration-color: $color-white;
+        text-shadow: #000b 2px 2px 5px;
+    }
+
+
+    * {
+        -webkit-user-select: none;
+        user-select: none;
+    }
+
+
+    &.is-open > .open-icon-90CC { rotate: 0deg; }
+    > .open-icon-90CC {
+        transition: rotate;
+        transition-duration: 0ms; // Overridden by JS
+
+        rotate: -90deg;
+    }
+
+    .open-icon-90CC + * {
+        padding-left: 16px !important;
+    }
+
+    .material-icons {
+        color: $color-off-white;
+    }
+}
+
+.mdl-button--fab + .js-bcd-summary {
+    padding-top: 0;
+}
+
+.js-bcd-details {
+    overflow: hidden;
+    outline: none;
+
+    > :not(.js-bcd-details-inner) { display: none; }
+
+    > .js-bcd-details-inner {
+        transition-property: height, margin-top;
+
+        transition-timing-function: cubic-bezier(0.7, 0.8, 0.5, 0.8);
+        @media (prefers-reduced-motion: reduce) { transition-duration: 0s !important; }
+
+        height: max-content;
+        outline: none;
+
+        // overridden by universal.ts
+        transition-duration: 1s;
+        margin-top: -9999vh;
+    }
+
+    &.is-open > .js-bcd-details-inner { transition-timing-function: cubic-bezier(0, 0.3, 0.8, 1); }
+
+    &.contPad-left > .js-bcd-details-inner {
+        padding-left: 56px;
+    }
+}

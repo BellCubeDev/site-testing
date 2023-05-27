@@ -1,0 +1,69 @@
+$color-main: hsl(205, 100%, 50%);
+$color-green-light: hsl(78, 49%, 51%);
+$color-green-dark: hsl(123, 27%, 40%);
+$color-red: hsl(336, 100%, 39%);
+$color-purple: hsl(284, 26%, 47%);
+$color-bg-main: hsl(0, 0%, 11%);
+$color-bg-secondary: hsl(0, 0%, 13%);
+$color-white: hsl(0, 0%, 100%);
+$color-off-white: hsl(0, 0%, 87%);
+$color-focus: hsl(210, 76%, 21%);
+
+/** Create a custom-colored MDL button with all of the necessary bells and whistles to make the button look and act great! */
+@mixin customColoredButton($hue, $sat, $lum, $alpha: 1, $satShiftIntensity: 0.5, $lumShiftIntensity: 0.3, $doAltRipple: false) {
+
+    @if $doAltRipple {
+        .mdl-ripple {
+            background-color: #0008;
+        }
+    }
+
+    padding: 0 40px;
+    margin: 6px 0 5px;
+    height: 40px;
+
+    border-radius: 4px;
+    color: #ffffff;
+    -webkit-tap-highlight-color: #fff4;
+
+    // Normal State
+    background-color: hsla($hue, $sat, $lum, $alpha - 0.05);
+
+    box-shadow: 2px 2px 3px #0001;
+
+    text-shadow: 2px 2px 10px #000b;
+
+    // Hover State
+    &:is(:hover, :focus):not(:active, .active) {
+        background-color: hsla($hue, $sat  - ((10 * $satShiftIntensity) * 1%), $lum + ((13 * $lumShiftIntensity * 1%)), $alpha);
+        box-shadow: 3px 3px 4.5px #00000028;
+
+        text-shadow: 1.5px 1.5px 7px #000d;
+    }
+
+    // Active State
+    &:is(:active, .active) {
+        background-color: hsla($hue, $sat  - ((10 * $satShiftIntensity) * 1%), $lum + ((27 * $lumShiftIntensity) * 1%), $alpha + .25);
+        box-shadow: 4px 4px 7px #0004;
+
+        text-shadow: 1px 1px 10px #000f;
+    }
+}
+
+.mdl-button--raised.mdl-button--colored {
+    &.bcd-button-open {
+        @include customColoredButton(209, 90%, 50%);
+    }
+
+    &.bcd-button-openDir {
+        @include customColoredButton(187, 90%, 36%);
+    }
+
+    &.bcd-button-openFile {
+        @include customColoredButton(229, 90%, 62%);
+    }
+
+    &.bcd-button-save {
+        @include customColoredButton(151, 90%, 30%);
+    }
+}

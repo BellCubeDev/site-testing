@@ -1,0 +1,434 @@
+@use 'colors' as *;
+
+.fomod-editor-type {
+    &:not(.active_) { display: none; }
+
+    opacity: 0; &.active { opacity: 1; }
+    transition-duration: 200ms;
+    transition-timing-function: ease-in-out;
+    transition-property: opacity;
+}
+
+.bcd-builder-input {
+    background-color: $color-bg-secondary;
+    border-radius: 5px;
+    border: #333 solid 3px;
+    border-style: solid;
+    padding: 8px;
+    padding-left: 10px;
+
+    &--warn {
+        border-left-color: #ff0;
+    }
+
+    &--error {
+        border-left-color: #f00;
+    }
+}
+
+.builder-steps-option-body .bcd-builder-input {
+    margin-right: 0;
+}
+
+// Time to make an appearance!
+@keyframes builder-steps-remove-btn-fadeIn {
+    0% { filter: opacity(0); }
+    5% { filter: opacity(0.1); }
+    100% { filter: opacity(1); }
+}
+
+.builder-steps-remove-btn {
+    position: absolute;
+    right: 8px;
+
+    animation-name: builder-steps-remove-btn-fadeIn;
+    animation-duration: 210ms;
+    animation-timing-function: ease-in-out;
+
+    @media (prefers-reduced-motion: reduce) { animation-name: none; }
+}
+
+.builder-steps-drag-handle {
+    opacity: .5;
+
+    user-select: none;
+    cursor: grab;
+
+    position: absolute;
+    top: 16px;
+    left: 8px;
+}
+
+.no-sorting > * > .builder-steps-drag-handle {
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes sendInBigArtillery {
+    0% {
+        filter: opacity(0.33);
+        transform: scale(0.8);
+        margin-top: -90px;
+    }
+
+    100% {
+        filter: opacity(1);
+        transform: scale(1);
+        margin-top: 0;
+    }
+}
+@keyframes retractBigArtillery {
+    0% {
+        filter: opacity(1);
+        transform: scale(1);
+        margin-bottom: 0;
+    }
+
+    100% {
+        filter: opacity(0.33);
+        transform: scale(0.8);
+        margin-bottom: -90px;
+    }
+}
+
+@keyframes sendInArtillery {
+    0% {
+        filter: opacity(0.33);
+        transform: scale(0.8);
+        margin-top: -84px;
+    }
+
+    100% {
+        filter: opacity(1);
+        transform: scale(1);
+        margin-top: 0;
+    }
+}
+@keyframes retractArtillery {
+    0% {
+        filter: opacity(1);
+        transform: scale(1);
+        margin-bottom: 0;
+    }
+
+    100% {
+        filter: opacity(0.33);
+        transform: scale(0.8);
+        margin-bottom: -84px;
+    }
+}
+
+@keyframes sendInArtilleryFullFade {
+    0% {
+        filter: opacity(0);
+        transform: scale(0.67);
+        margin-top: -64px;
+    }
+
+    100% {
+        filter: opacity(1);
+        transform: scale(1);
+        margin-top: 0;
+    }
+}
+@keyframes retractArtilleryFullFade {
+    0% {
+        filter: opacity(1);
+        transform: scale(1);
+        margin-bottom: 0;
+    }
+
+    100% {
+        filter: opacity(0);
+        transform: scale(0.67);
+        margin-bottom: -64px;
+    }
+}
+
+@keyframes scaleIn {
+    0% {
+        transform: scaleY(0);
+        opacity: 0;
+        margin-top: -64px;
+        transform-origin: bottom;
+    }
+
+    100% {
+        transform: scaleY(1);
+        opacity: 1;
+        margin-top: 0;
+        transform-origin: bottom;
+    }
+}
+
+%can-move {
+    padding-right: 48px;
+    padding-left: 32px;
+
+    position: relative;
+
+    transform: scale(1);
+    filter: contrast(1) grayscale(0) opacity(1);
+
+    .animating-in {
+        animation: sendInArtillery 200ms ease-out;
+        @media (prefers-reduced-motion: reduce) { animation: none; }
+    }
+
+    .animating-out {
+        animation: retractArtillery 200ms ease-in-out;
+        margin-bottom: -84px;
+
+        // Make the last element go up instead of down
+        &:last-child {
+            animation-name: sendInArtillery;
+            animation-direction: reverse;
+            margin-top: -84px;
+            margin-bottom: 32px;
+        }
+
+        @media (prefers-reduced-motion: reduce) { animation: none !important; visibility: hidden; }
+    }
+
+    transition-property: filter, opacity, background, border-radius;
+    transition-duration: 500ms;
+
+    .sortable-ghost {
+        filter: contrast(0.5) grayscale(1) opacity(0.5);
+        border: #0008 8px dashed;
+        padding-top: 4px;
+        padding-bottom: 4px;
+
+        .builder-steps-remove-btn {
+            right: 0;
+        }
+    }
+}
+
+@mixin fomodStepsBuilderCard($hue, $sat, $val, $hueShiftMult: 1) {
+    @extend %can-move;
+
+    background: hsl($hue, $sat, $val);
+
+    border: 0 solid black;
+    border-left: hsl($hue + ($hueShiftMult * 48deg), $sat + 13%, $val + 17%) 8px solid;
+
+    border-radius: 8px;
+
+    padding: 12px;
+    padding-left: 32px;
+    padding-right: 48px;
+
+    margin: 32px 0;
+
+    > .js-bcd-summary {
+        padding: 4px;
+    }
+}
+
+@mixin imageColumn() {
+    display: grid;
+    justify-content: space-between;
+    gap: 32px;
+    align-items: start;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 40vw);
+    grid-template-rows: 1fr;
+}
+
+.builder-steps-option-outcomes {
+    @include imageColumn();
+
+    row-gap: 0;
+
+    grid-column: 1/-1;
+    > hr { grid-column: 1/-1; }
+
+    >:nth-child(2), >:nth-child(3) { grid-column: 1; }
+    >:nth-child(4), >:last-child  { grid-column: 2; }
+
+    > .js-bcd-summary { grid-row: 2; }
+    > .js-bcd-details { grid-row: 3; }
+
+    padding-bottom: 16px;
+}
+
+#steps-builder-container {
+    @include fomodStepsBuilderCard(203deg, 44%, 20%); $color-hex: #094A73;
+    animation: none;
+    padding-right: 16px;
+    padding-left: 16px;
+
+    >:first-child {
+        @include imageColumn();
+
+        >.builder-steps-mod-image {
+            max-height: 50vmin;
+
+            padding: 10px 8px;
+            border-radius: 4px;
+
+            background: #1c1c1c;
+        }
+    }
+}
+
+.builder-steps-step {
+    @include fomodStepsBuilderCard(100deg, 28%, 29%); $color-hex: #435E35;
+    .animating-in { animation-name: sendInArtillery; }
+
+    .animating-out {
+        animation-name: retractBigArtillery;
+        margin-bottom: -90px;
+
+        // Make the last element go up instead of down
+        &:last-child {
+            animation-name: sendInBigArtillery;
+            margin-top: -90px;
+        }
+    }
+
+    > .builder-steps-drag-handle {
+        top: 19px;
+    }
+
+    > .builder-steps-remove-btn {
+        margin-top: 2px;
+    }
+}
+
+.builder-steps-group {
+    @include fomodStepsBuilderCard(300deg, 35%, 21%, -1.5); $color-hex: #482348;
+}
+
+.builder-steps-option {
+    @include fomodStepsBuilderCard(160deg, 0%, 9%);
+
+    > .builder-steps-option-body > .js-bcd-details-inner > * { @include imageColumn(); }
+}
+
+.builder-steps-option-set-flags-container { padding-bottom: 16px; }
+
+.builder-steps-option-flag {
+    @extend %can-move;
+
+    grid-template-columns: repeat(2, minmax(64px, 1fr));
+    gap: 16px;
+    display: grid;
+
+    .mdl-textfield { width: 100%; }
+
+    padding-left: 40px;
+    .builder-steps-drag-handle { top: 24px; }
+
+    .builder-steps-remove-btn { top: 20px; }
+
+    &.animating-in {
+        animation-name: sendInArtilleryFullFade !important;
+        &:only-child { animation-name: scaleIn !important; }
+    }
+
+    &.animating-out {
+        animation-name: retractArtilleryFullFade !important;
+        margin-bottom: -64px;
+
+        // Make the last element go up instead of down
+        &:last-child {
+            animation-name: sendInArtilleryFullFade !important;
+            margin-top: -64px;
+            margin-bottom: 0 !important;
+
+            &:only-child {
+                animation-name: scaleIn !important;
+                animation-direction: reverse;
+            }
+        }
+    }
+
+    &.sortable-ghost {
+        background: #0084ff20;
+        border-radius: 28px;
+
+        border: none !important;
+        filter: contrast(.5) opacity(.5) !important;
+        padding: 0 !important;
+        padding-left: 40px !important;
+        padding-right: 48px !important;
+
+        .builder-steps-remove-btn { right: 8px !important; }
+    }
+}
+
+.builder-steps-option-image, .builder-steps-mod-image {
+    height: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    grid-template-rows: auto max-content;
+    align-items: start;
+
+    justify-content: center;
+    justify-items: stretch;
+
+    > img {
+        max-height: calc(50vmin - 42px);
+        max-width: 100%;
+        grid-column: 2;
+    }
+}
+
+.builder-steps-body-left {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: auto;
+    grid-row: 1;
+    gap: 24px;
+
+    &--enforce-width {
+        max-width: 40vw;
+    }
+}
+
+.item-with-fake-label {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 8px;
+
+    &--one-liner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    width: 100%;
+
+    > :is(h1,h2,h3,h4,h5,h6) {
+        margin: 0;
+    }
+}
+
+// Disabled down here for clarity purposes
+// scss-lint:disable MergeableSelector
+
+#steps-builder-container sub {
+    margin-left: 16px;
+}
+
+.builder-steps-condition-edit-btn {
+    width: min(288px, 100%);
+}
+
+.mdl-button--raised.mdl-button--colored {
+    &.builder-steps-add-child-btn {
+        @include customColoredButton(286deg, 56%, 48%, 1, 0.2, 0.5, true);
+        width: 160px;
+        border-radius: 32px;
+    }
+
+    &.builder-steps-condition-edit-btn {
+        @include customColoredButton(105deg, 74%, 35%)
+    }
+}

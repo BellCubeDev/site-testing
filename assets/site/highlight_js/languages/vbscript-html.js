@@ -1,0 +1,2 @@
+function gu(){return{name:"VBScript in HTML",subLanguage:"xml",contains:[{begin:"<%",end:"%>",subLanguage:"vbscript"}]}}export{gu as default};
+//# sourceMappingURL=https://raw.githubusercontent.com/BellCubeDev/site-testing/deployment/assets/site/highlight_js/languages/vbscript-html.js.map

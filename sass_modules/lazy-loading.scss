@@ -1,0 +1,16 @@
+.preload * {
+    transition-duration: 0s !important;
+    animation-duration: 0s !important;
+}
+
+.lazy-styles-not-loaded .needs-lazy {
+    animation: none !important;
+    &,* { display: none !important; }
+}
+
+.needs-lazy {
+    // Animate the lazy-loaded content in via opacity
+    animation: fadeIn .5s cubic-bezier(0.55, 0, 0.4, 1) !important;
+}
+
+@keyframes fadeIn { 0% { display: none; opacity: 0; } 25% { opacity: 0; } 100% { opacity: 1; } }

@@ -1,0 +1,65 @@
+@use 'colors' as *;
+
+%message-block {
+    padding: 8px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    color: #ddd;
+
+    :first-child {
+        color: $color-white;
+        margin-top: 0;
+    }
+
+    :last-child {
+        margin-bottom: 0;
+    }
+}
+
+.danger-block {
+    @extend %message-block;
+    background-color: #f003;
+}
+
+.warning-block {
+    @extend %message-block;
+    background-color: #ff04;
+}
+
+.notice-block {
+    @extend %message-block;
+    background-color: #0cf3;
+}
+
+.w144 {
+    width: 144px;
+}
+
+.w192 {
+    width: 192px;
+}
+
+.mr8 {
+    margin-right: 8px;
+}
+
+.needs-shadow {
+    text-shadow: 2px 2px 10px #000000a0;
+}
+
+.center-vert {
+    display: flex !important;
+    justify-content: flex-start;
+    align-content: center;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+
+    text-align: center;
+}
+
+.centered {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}

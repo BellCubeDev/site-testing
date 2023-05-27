@@ -1,0 +1,40 @@
+@use 'colors' as *;
+
+$warn-color: #d5b900ee;
+$warn-color-dim: #d5b90088;
+
+#manage-fomod-container {
+    margin: 8px;
+    > button:first-child { width: 240px; }
+    > button { width: 144px; }
+}
+
+#metadata-mod-url {
+    &.is-invalid .mdl-textfield__label {
+        color: $warn-color;
+
+        &::after {
+            background-color: $warn-color;
+        }
+    }
+
+    &.is-invalid .mdl-textfield__input {
+        border-color: $warn-color-dim;
+    }
+
+    .mdl-textfield__error {
+        color: $warn-color;
+    }
+}
+
+#bcd-stepBTN-builder {
+    @include customColoredButton(209deg, 100%, 50%, 1, 0.2, 0.1, true);
+}
+
+#bcd-stepBTN-vortex {
+    @include customColoredButton(31deg, 67%, 50%, 1, 0.1, 0.6, true);
+}
+
+#bcd-stepBTN-mo2 {
+    @include customColoredButton(199deg, 82%, 61%, 1, 0.1, 0.1, true);
+}

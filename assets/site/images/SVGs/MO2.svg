@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" stroke-linecap="square" stroke-miterlimit="10" viewBox="0 0 250.9 140.8">
+    <!--
+        THIS VECTOR GRAPHIC WAS RECREATED FROM THE 48x48 PNG FOUND AT
+        https://github.com/ModOrganizer2/modorganizer/blob/master/src/resources/mo_icon.png
+        Copyright © 2022 BellCube, GNU General Public License v3.0
+    -->
+    <circle cx="180" cy="70" r="60" fill="#3ebcee" />
+    <path fill="#3ebcee" d="m98 10.6 32 20.6s8.6 97.6 8 102.4l-127.7-3.9L11.7 9.6Z" />
+    <path fill="#000"
+        d="M132.707 124.8H22.701c-4.6 0-6.7-2.6-6.7-5.9V21.904c0-3.4 2-5.9 6.8-5.9h59.403a50.503 50.499 0 0 1 47.903 34 54.303 54.299 0 0 1 104.205 21.799 54.403 54.399 0 0 1-101.605 27.3ZM180.009 1.504c-19 0-36.301 7.4-49.002 19.8A66.704 66.698 0 0 0 82.004.003H22.901A22.501 22.5 0 0 0 0 21.904V118.9c0 12 10.3 21.899 22.801 21.899h118.006a8 8 0 0 0 8-8c40.703 20.6 89.706-.2 100.206-44.599A70.504 70.498 0 0 0 180.01 1.504Z" />
+</svg>

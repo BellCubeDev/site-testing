@@ -1,0 +1,46 @@
+@use 'colors' as *;
+
+#footer {
+    align-items: center;
+    background-color: $color-bg-secondary;
+    bottom: 0;
+    display: flex;
+    height: min-content;
+    justify-content: center;
+    overflow: visible;
+    padding: 12px;
+    padding-left: 312px;
+    padding-bottom: 12px;
+    position: sticky;
+    vertical-align: middle;
+
+    max-height: 10ex;
+
+    p {
+        bottom: auto;
+        font-size: medium;
+        margin: 0;
+        position: relative;
+        text-align: center;
+        top: auto;
+    }
+}
+
+#cont {
+    height: calc(100vh - 152px);
+    margin-top: -8px;
+    padding-top: 24px; // 16 for the header + the 8 we took out from margin-top
+}
+
+.has-article {
+    display: grid;
+    grid-template-columns: 4fr max-content 7fr;
+}
+
+article {
+    // Firefox, why? Why do you need to be different?
+    max-width: min(100% - 52px, 11in);
+    max-width: min(100cqw - 52px, 11in);
+
+    grid-column: 2;
+}

@@ -1,0 +1,37 @@
+@use 'utils';
+@use 'colors' as *;
+
+.mdl-button {
+    text-transform: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.mdl-textfield {
+    vertical-align: middle;
+}
+
+.mdl-textfield__label {
+    color: #ffffff80;
+    transition-property: top, font-size, color, visibility;
+}
+
+.mdl-textfield__input {
+    border-bottom-color: #ffffe03d;
+}
+
+.mdl-switch {
+    width: fit-content;
+    margin-right: 64px;
+}
+
+.mdl-switch__track {
+    background: #ffffff26;
+}
+
+.mdl-button--raised.mdl-button--colored {
+    color: $color-white;
+    border-radius: 3px;
+}
+
+.mdl-button--colored { @extend .needs-shadow; }

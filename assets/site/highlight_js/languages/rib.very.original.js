@@ -1,0 +1,28 @@
+function rib(hljs) {
+    return {
+        name: 'RenderMan RIB',
+        keywords: 'ArchiveRecord AreaLightSource Atmosphere Attribute AttributeBegin AttributeEnd Basis '
+            + 'Begin Blobby Bound Clipping ClippingPlane Color ColorSamples ConcatTransform Cone '
+            + 'CoordinateSystem CoordSysTransform CropWindow Curves Cylinder DepthOfField Detail '
+            + 'DetailRange Disk Displacement Display End ErrorHandler Exposure Exterior Format '
+            + 'FrameAspectRatio FrameBegin FrameEnd GeneralPolygon GeometricApproximation Geometry '
+            + 'Hider Hyperboloid Identity Illuminate Imager Interior LightSource '
+            + 'MakeCubeFaceEnvironment MakeLatLongEnvironment MakeShadow MakeTexture Matte '
+            + 'MotionBegin MotionEnd NuPatch ObjectBegin ObjectEnd ObjectInstance Opacity Option '
+            + 'Orientation Paraboloid Patch PatchMesh Perspective PixelFilter PixelSamples '
+            + 'PixelVariance Points PointsGeneralPolygons PointsPolygons Polygon Procedural Projection '
+            + 'Quantize ReadArchive RelativeDetail ReverseOrientation Rotate Scale ScreenWindow '
+            + 'ShadingInterpolation ShadingRate Shutter Sides Skew SolidBegin SolidEnd Sphere '
+            + 'SubdivisionMesh Surface TextureCoordinates Torus Transform TransformBegin TransformEnd '
+            + 'TransformPoints Translate TrimCurve WorldBegin WorldEnd',
+        illegal: '</',
+        contains: [
+            hljs.HASH_COMMENT_MODE,
+            hljs.C_NUMBER_MODE,
+            hljs.APOS_STRING_MODE,
+            hljs.QUOTE_STRING_MODE
+        ]
+    };
+}
+export { rib as default };
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicmliLmpzIiwic291cmNlUm9vdCI6Imh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9CZWxsQ3ViZURldi9zaXRlLXRlc3RpbmcvZGVwbG95bWVudC8iLCJzb3VyY2VzIjpbImFzc2V0cy9zaXRlL2hpZ2hsaWdodF9qcy9sYW5ndWFnZXMvcmliLmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQVFBLFNBQVMsR0FBRyxDQUFDLElBQUk7SUFDZixPQUFPO1FBQ0wsSUFBSSxFQUFFLGVBQWU7UUFDckIsUUFBUSxFQUNOLHVGQUF1RjtjQUNyRixvRkFBb0Y7Y0FDcEYsb0ZBQW9GO2NBQ3BGLGtGQUFrRjtjQUNsRixzRkFBc0Y7Y0FDdEYsb0VBQW9FO2NBQ3BFLDhFQUE4RTtjQUM5RSxvRkFBb0Y7Y0FDcEYsOEVBQThFO2NBQzlFLDBGQUEwRjtjQUMxRixtRkFBbUY7Y0FDbkYsaUZBQWlGO2NBQ2pGLHlGQUF5RjtjQUN6Rix5REFBeUQ7UUFDN0QsT0FBTyxFQUFFLElBQUk7UUFDYixRQUFRLEVBQUU7WUFDUixJQUFJLENBQUMsaUJBQWlCO1lBQ3RCLElBQUksQ0FBQyxhQUFhO1lBQ2xCLElBQUksQ0FBQyxnQkFBZ0I7WUFDckIsSUFBSSxDQUFDLGlCQUFpQjtTQUN2QjtLQUNGLENBQUM7QUFDSixDQUFDO0FBRUQsT0FBTyxFQUFFLEdBQUcsSUFBSSxPQUFPLEVBQUUsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbIi8qXG5MYW5ndWFnZTogUmVuZGVyTWFuIFJJQlxuQXV0aG9yOiBLb25zdGFudGluIEV2ZG9raW1lbmtvIDxxZXdlcnR5QGdtYWlsLmNvbT5cbkNvbnRyaWJ1dG9yczogU2h1ZW4tSHVlaSBHdWFuIDxkcmFrZS5ndWFuQGdtYWlsLmNvbT5cbldlYnNpdGU6IGh0dHBzOi8vcmVuZGVybWFuLnBpeGFyLmNvbS9yZXNvdXJjZXMvUmVuZGVyTWFuXzIwL3JpYkJpbmRpbmcuaHRtbFxuQ2F0ZWdvcnk6IGdyYXBoaWNzXG4qL1xuXG5mdW5jdGlvbiByaWIoaGxqcykge1xuICByZXR1cm4ge1xuICAgIG5hbWU6ICdSZW5kZXJNYW4gUklCJyxcbiAgICBrZXl3b3JkczpcbiAgICAgICdBcmNoaXZlUmVjb3JkIEFyZWFMaWdodFNvdXJjZSBBdG1vc3BoZXJlIEF0dHJpYnV0ZSBBdHRyaWJ1dGVCZWdpbiBBdHRyaWJ1dGVFbmQgQmFzaXMgJ1xuICAgICAgKyAnQmVnaW4gQmxvYmJ5IEJvdW5kIENsaXBwaW5nIENsaXBwaW5nUGxhbmUgQ29sb3IgQ29sb3JTYW1wbGVzIENvbmNhdFRyYW5zZm9ybSBDb25lICdcbiAgICAgICsgJ0Nvb3JkaW5hdGVTeXN0ZW0gQ29vcmRTeXNUcmFuc2Zvcm0gQ3JvcFdpbmRvdyBDdXJ2ZXMgQ3lsaW5kZXIgRGVwdGhPZkZpZWxkIERldGFpbCAnXG4gICAgICArICdEZXRhaWxSYW5nZSBEaXNrIERpc3BsYWNlbWVudCBEaXNwbGF5IEVuZCBFcnJvckhhbmRsZXIgRXhwb3N1cmUgRXh0ZXJpb3IgRm9ybWF0ICdcbiAgICAgICsgJ0ZyYW1lQXNwZWN0UmF0aW8gRnJhbWVCZWdpbiBGcmFtZUVuZCBHZW5lcmFsUG9seWdvbiBHZW9tZXRyaWNBcHByb3hpbWF0aW9uIEdlb21ldHJ5ICdcbiAgICAgICsgJ0hpZGVyIEh5cGVyYm9sb2lkIElkZW50aXR5IElsbHVtaW5hdGUgSW1hZ2VyIEludGVyaW9yIExpZ2h0U291cmNlICdcbiAgICAgICsgJ01ha2VDdWJlRmFjZUVudmlyb25tZW50IE1ha2VMYXRMb25nRW52aXJvbm1lbnQgTWFrZVNoYWRvdyBNYWtlVGV4dHVyZSBNYXR0ZSAnXG4gICAgICArICdNb3Rpb25CZWdpbiBNb3Rpb25FbmQgTnVQYXRjaCBPYmplY3RCZWdpbiBPYmplY3RFbmQgT2JqZWN0SW5zdGFuY2UgT3BhY2l0eSBPcHRpb24gJ1xuICAgICAgKyAnT3JpZW50YXRpb24gUGFyYWJvbG9pZCBQYXRjaCBQYXRjaE1lc2ggUGVyc3BlY3RpdmUgUGl4ZWxGaWx0ZXIgUGl4ZWxTYW1wbGVzICdcbiAgICAgICsgJ1BpeGVsVmFyaWFuY2UgUG9pbnRzIFBvaW50c0dlbmVyYWxQb2x5Z29ucyBQb2ludHNQb2x5Z29ucyBQb2x5Z29uIFByb2NlZHVyYWwgUHJvamVjdGlvbiAnXG4gICAgICArICdRdWFudGl6ZSBSZWFkQXJjaGl2ZSBSZWxhdGl2ZURldGFpbCBSZXZlcnNlT3JpZW50YXRpb24gUm90YXRlIFNjYWxlIFNjcmVlbldpbmRvdyAnXG4gICAgICArICdTaGFkaW5nSW50ZXJwb2xhdGlvbiBTaGFkaW5nUmF0ZSBTaHV0dGVyIFNpZGVzIFNrZXcgU29saWRCZWdpbiBTb2xpZEVuZCBTcGhlcmUgJ1xuICAgICAgKyAnU3ViZGl2aXNpb25NZXNoIFN1cmZhY2UgVGV4dHVyZUNvb3JkaW5hdGVzIFRvcnVzIFRyYW5zZm9ybSBUcmFuc2Zvcm1CZWdpbiBUcmFuc2Zvcm1FbmQgJ1xuICAgICAgKyAnVHJhbnNmb3JtUG9pbnRzIFRyYW5zbGF0ZSBUcmltQ3VydmUgV29ybGRCZWdpbiBXb3JsZEVuZCcsXG4gICAgaWxsZWdhbDogJzwvJyxcbiAgICBjb250YWluczogW1xuICAgICAgaGxqcy5IQVNIX0NPTU1FTlRfTU9ERSxcbiAgICAgIGhsanMuQ19OVU1CRVJfTU9ERSxcbiAgICAgIGhsanMuQVBPU19TVFJJTkdfTU9ERSxcbiAgICAgIGhsanMuUVVPVEVfU1RSSU5HX01PREVcbiAgICBdXG4gIH07XG59XG5cbmV4cG9ydCB7IHJpYiBhcyBkZWZhdWx0IH07XG4iXX0=

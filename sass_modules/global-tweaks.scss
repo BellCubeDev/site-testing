@@ -1,0 +1,50 @@
+[disabled] {
+    * { pointer-events: none; }
+}
+
+[disabled="visual"] {
+    filter: grayscale(25%) saturate(75%) contrast(75%) brightness(75%) blur(1px);
+    cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) { * {transition-duration: 0s !important;} }
+
+*, .builder-steps-remove-btn {
+    transition-duration: 0.2s;
+    transition-property: color, background-color, border-color, fill, text-shadow, box-shadow, opacity, filter, text-decoration-color, transform, clip-path;
+    transition-timing-function: ease-out;
+    filter: none;
+    &:where(:not([transform])) { transform: none; } // uses `where` because it has zero specificity - it won't overwrite anything
+    scroll-behavior: smooth;
+}
+
+[aria-hidden="true"], [aria-hidden="true"] * {
+    pointer-events: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+}
+
+.hidden {
+    border: 0 !important;
+    display: none !important;
+    height: 0 !important;
+    margin: 0 !important;
+    opacity: 0 !important;
+    padding: 0 !important;
+    transform: scale(0) !important;
+    width: 0 !important;
+    z-index: -1 !important;
+}
+
+img {
+    max-width: 100%;
+}
+
+.noOverflow {
+    overflow: hidden;
+}
+
+/* Remove extra margin above the first heading of a page. */
+:is(h1, h2, h3):first-child {
+    margin-top: 0;
+}

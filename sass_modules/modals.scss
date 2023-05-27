@@ -1,0 +1,89 @@
+@use 'colors' as *;
+
+.js-bcd-modal {
+    @extend %modal-transition;
+
+    margin: auto;
+    position: fixed;
+
+    top: 64px;
+    left: 32px;
+    right: 32px;
+    bottom: 128px;
+
+    overflow-wrap: break-word;
+    overflow: auto;
+
+    min-width: 40%;
+    min-height: 40%;
+    max-width: 80%;
+    max-height: 80%;
+
+    // Resolves height issues in Safari
+    height: min-content;
+
+    border-radius: 8px;
+    border-width: 5px;
+    border-color: $color-main;
+    border-style: solid;
+
+    background-color: $color-bg-secondary;
+
+    box-shadow: 0 0 10px #000;
+
+    z-index: 256;
+
+    padding: 16px;
+
+    // BODY & BUTTONS areas
+    display: grid;
+    grid-template-rows: min-content auto;
+    grid-template-columns: 1fr;
+    align-content: space-between;
+    justify-items: start;
+
+
+}
+
+.js-bcd-modal-body {
+    grid-column: 1;
+    grid-row: 1;
+}
+
+.js-bcd-modal-buttons {
+    margin: 0;
+    margin-left: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: center;
+    align-content: center;
+
+    gap: 16px;
+
+    grid-row: 2;
+
+    button {
+        width: 2in;
+    }
+}
+
+//
+// Obfuscator & Visibility
+//
+
+.js-bcd-modal-obfuscator {
+    @extend %modal-transition;
+    transition-duration: 400ms;
+}
+
+%modal-transition {
+    opacity: 0;
+    transition-duration: 250ms;
+    transition-timing-function: ease-in-out;
+}
+
+.js-bcd-modal[open], .js-bcd-modal-obfuscator.is-visible {
+    opacity: 1;
+}

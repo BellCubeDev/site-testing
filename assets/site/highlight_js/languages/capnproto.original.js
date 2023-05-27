@@ -1,0 +1,90 @@
+function capnproto(hljs) {
+    const KEYWORDS = [
+        "struct",
+        "enum",
+        "interface",
+        "union",
+        "group",
+        "import",
+        "using",
+        "const",
+        "annotation",
+        "extends",
+        "in",
+        "of",
+        "on",
+        "as",
+        "with",
+        "from",
+        "fixed"
+    ];
+    const TYPES = [
+        "Void",
+        "Bool",
+        "Int8",
+        "Int16",
+        "Int32",
+        "Int64",
+        "UInt8",
+        "UInt16",
+        "UInt32",
+        "UInt64",
+        "Float32",
+        "Float64",
+        "Text",
+        "Data",
+        "AnyPointer",
+        "AnyStruct",
+        "Capability",
+        "List"
+    ];
+    const LITERALS = [
+        "true",
+        "false"
+    ];
+    const CLASS_DEFINITION = {
+        variants: [
+            { match: [
+                    /(struct|enum|interface)/,
+                    /\s+/,
+                    hljs.IDENT_RE
+                ] },
+            { match: [
+                    /extends/,
+                    /\s*\(/,
+                    hljs.IDENT_RE,
+                    /\s*\)/
+                ] }
+        ],
+        scope: {
+            1: "keyword",
+            3: "title.class"
+        }
+    };
+    return {
+        name: 'Cap’n Proto',
+        aliases: ['capnp'],
+        keywords: {
+            keyword: KEYWORDS,
+            type: TYPES,
+            literal: LITERALS
+        },
+        contains: [
+            hljs.QUOTE_STRING_MODE,
+            hljs.NUMBER_MODE,
+            hljs.HASH_COMMENT_MODE,
+            {
+                className: 'meta',
+                begin: /@0x[\w\d]{16};/,
+                illegal: /\n/
+            },
+            {
+                className: 'symbol',
+                begin: /@\d+\b/
+            },
+            CLASS_DEFINITION
+        ]
+    };
+}
+export { capnproto as default };
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY2FwbnByb3RvLmpzIiwic291cmNlUm9vdCI6Imh0dHBzOi8vcmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbS9CZWxsQ3ViZURldi9zaXRlLXRlc3RpbmcvZGVwbG95bWVudC8iLCJzb3VyY2VzIjpbImFzc2V0cy9zaXRlL2hpZ2hsaWdodF9qcy9sYW5ndWFnZXMvY2FwbnByb3RvLmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQVNBLFNBQVMsU0FBUyxDQUFDLElBQUk7SUFDckIsTUFBTSxRQUFRLEdBQUc7UUFDZixRQUFRO1FBQ1IsTUFBTTtRQUNOLFdBQVc7UUFDWCxPQUFPO1FBQ1AsT0FBTztRQUNQLFFBQVE7UUFDUixPQUFPO1FBQ1AsT0FBTztRQUNQLFlBQVk7UUFDWixTQUFTO1FBQ1QsSUFBSTtRQUNKLElBQUk7UUFDSixJQUFJO1FBQ0osSUFBSTtRQUNKLE1BQU07UUFDTixNQUFNO1FBQ04sT0FBTztLQUNSLENBQUM7SUFDRixNQUFNLEtBQUssR0FBRztRQUNaLE1BQU07UUFDTixNQUFNO1FBQ04sTUFBTTtRQUNOLE9BQU87UUFDUCxPQUFPO1FBQ1AsT0FBTztRQUNQLE9BQU87UUFDUCxRQUFRO1FBQ1IsUUFBUTtRQUNSLFFBQVE7UUFDUixTQUFTO1FBQ1QsU0FBUztRQUNULE1BQU07UUFDTixNQUFNO1FBQ04sWUFBWTtRQUNaLFdBQVc7UUFDWCxZQUFZO1FBQ1osTUFBTTtLQUNQLENBQUM7SUFDRixNQUFNLFFBQVEsR0FBRztRQUNmLE1BQU07UUFDTixPQUFPO0tBQ1IsQ0FBQztJQUNGLE1BQU0sZ0JBQWdCLEdBQUc7UUFDdkIsUUFBUSxFQUFFO1lBQ1IsRUFBRSxLQUFLLEVBQUU7b0JBQ1AseUJBQXlCO29CQUN6QixLQUFLO29CQUNMLElBQUksQ0FBQyxRQUFRO2lCQUNkLEVBQUU7WUFDSCxFQUFFLEtBQUssRUFBRTtvQkFDUCxTQUFTO29CQUNULE9BQU87b0JBQ1AsSUFBSSxDQUFDLFFBQVE7b0JBQ2IsT0FBTztpQkFDUixFQUFFO1NBQ0o7UUFDRCxLQUFLLEVBQUU7WUFDTCxDQUFDLEVBQUUsU0FBUztZQUNaLENBQUMsRUFBRSxhQUFhO1NBQ2pCO0tBQ0YsQ0FBQztJQUNGLE9BQU87UUFDTCxJQUFJLEVBQUUsYUFBYTtRQUNuQixPQUFPLEVBQUUsQ0FBRSxPQUFPLENBQUU7UUFDcEIsUUFBUSxFQUFFO1lBQ1IsT0FBTyxFQUFFLFFBQVE7WUFDakIsSUFBSSxFQUFFLEtBQUs7WUFDWCxPQUFPLEVBQUUsUUFBUTtTQUNsQjtRQUNELFFBQVEsRUFBRTtZQUNSLElBQUksQ0FBQyxpQkFBaUI7WUFDdEIsSUFBSSxDQUFDLFdBQVc7WUFDaEIsSUFBSSxDQUFDLGlCQUFpQjtZQUN0QjtnQkFDRSxTQUFTLEVBQUUsTUFBTTtnQkFDakIsS0FBSyxFQUFFLGdCQUFnQjtnQkFDdkIsT0FBTyxFQUFFLElBQUk7YUFDZDtZQUNEO2dCQUNFLFNBQVMsRUFBRSxRQUFRO2dCQUNuQixLQUFLLEVBQUUsUUFBUTthQUNoQjtZQUNELGdCQUFnQjtTQUNqQjtLQUNGLENBQUM7QUFDSixDQUFDO0FBRUQsT0FBTyxFQUFFLFNBQVMsSUFBSSxPQUFPLEVBQUUsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbIi8qXG5MYW5ndWFnZTogQ2Fw4oCZbiBQcm90b1xuQXV0aG9yOiBPbGVnIEVmaW1vdiA8ZWZpbW92b3ZAZ21haWwuY29tPlxuRGVzY3JpcHRpb246IENhcOKAmW4gUHJvdG8gbWVzc2FnZSBkZWZpbml0aW9uIGZvcm1hdFxuV2Vic2l0ZTogaHR0cHM6Ly9jYXBucHJvdG8ub3JnL2NhcG5wLXRvb2wuaHRtbFxuQ2F0ZWdvcnk6IHByb3RvY29sc1xuKi9cblxuLyoqIEB0eXBlIExhbmd1YWdlRm4gKi9cbmZ1bmN0aW9uIGNhcG5wcm90byhobGpzKSB7XG4gIGNvbnN0IEtFWVdPUkRTID0gW1xuICAgIFwic3RydWN0XCIsXG4gICAgXCJlbnVtXCIsXG4gICAgXCJpbnRlcmZhY2VcIixcbiAgICBcInVuaW9uXCIsXG4gICAgXCJncm91cFwiLFxuICAgIFwiaW1wb3J0XCIsXG4gICAgXCJ1c2luZ1wiLFxuICAgIFwiY29uc3RcIixcbiAgICBcImFubm90YXRpb25cIixcbiAgICBcImV4dGVuZHNcIixcbiAgICBcImluXCIsXG4gICAgXCJvZlwiLFxuICAgIFwib25cIixcbiAgICBcImFzXCIsXG4gICAgXCJ3aXRoXCIsXG4gICAgXCJmcm9tXCIsXG4gICAgXCJmaXhlZFwiXG4gIF07XG4gIGNvbnN0IFRZUEVTID0gW1xuICAgIFwiVm9pZFwiLFxuICAgIFwiQm9vbFwiLFxuICAgIFwiSW50OFwiLFxuICAgIFwiSW50MTZcIixcbiAgICBcIkludDMyXCIsXG4gICAgXCJJbnQ2NFwiLFxuICAgIFwiVUludDhcIixcbiAgICBcIlVJbnQxNlwiLFxuICAgIFwiVUludDMyXCIsXG4gICAgXCJVSW50NjRcIixcbiAgICBcIkZsb2F0MzJcIixcbiAgICBcIkZsb2F0NjRcIixcbiAgICBcIlRleHRcIixcbiAgICBcIkRhdGFcIixcbiAgICBcIkFueVBvaW50ZXJcIixcbiAgICBcIkFueVN0cnVjdFwiLFxuICAgIFwiQ2FwYWJpbGl0eVwiLFxuICAgIFwiTGlzdFwiXG4gIF07XG4gIGNvbnN0IExJVEVSQUxTID0gW1xuICAgIFwidHJ1ZVwiLFxuICAgIFwiZmFsc2VcIlxuICBdO1xuICBjb25zdCBDTEFTU19ERUZJTklUSU9OID0ge1xuICAgIHZhcmlhbnRzOiBbXG4gICAgICB7IG1hdGNoOiBbXG4gICAgICAgIC8oc3RydWN0fGVudW18aW50ZXJmYWNlKS8sXG4gICAgICAgIC9cXHMrLyxcbiAgICAgICAgaGxqcy5JREVOVF9SRVxuICAgICAgXSB9LFxuICAgICAgeyBtYXRjaDogW1xuICAgICAgICAvZXh0ZW5kcy8sXG4gICAgICAgIC9cXHMqXFwoLyxcbiAgICAgICAgaGxqcy5JREVOVF9SRSxcbiAgICAgICAgL1xccypcXCkvXG4gICAgICBdIH1cbiAgICBdLFxuICAgIHNjb3BlOiB7XG4gICAgICAxOiBcImtleXdvcmRcIixcbiAgICAgIDM6IFwidGl0bGUuY2xhc3NcIlxuICAgIH1cbiAgfTtcbiAgcmV0dXJuIHtcbiAgICBuYW1lOiAnQ2Fw4oCZbiBQcm90bycsXG4gICAgYWxpYXNlczogWyAnY2FwbnAnIF0sXG4gICAga2V5d29yZHM6IHtcbiAgICAgIGtleXdvcmQ6IEtFWVdPUkRTLFxuICAgICAgdHlwZTogVFlQRVMsXG4gICAgICBsaXRlcmFsOiBMSVRFUkFMU1xuICAgIH0sXG4gICAgY29udGFpbnM6IFtcbiAgICAgIGhsanMuUVVPVEVfU1RSSU5HX01PREUsXG4gICAgICBobGpzLk5VTUJFUl9NT0RFLFxuICAgICAgaGxqcy5IQVNIX0NPTU1FTlRfTU9ERSxcbiAgICAgIHtcbiAgICAgICAgY2xhc3NOYW1lOiAnbWV0YScsXG4gICAgICAgIGJlZ2luOiAvQDB4W1xcd1xcZF17MTZ9Oy8sXG4gICAgICAgIGlsbGVnYWw6IC9cXG4vXG4gICAgICB9LFxuICAgICAge1xuICAgICAgICBjbGFzc05hbWU6ICdzeW1ib2wnLFxuICAgICAgICBiZWdpbjogL0BcXGQrXFxiL1xuICAgICAgfSxcbiAgICAgIENMQVNTX0RFRklOSVRJT05cbiAgICBdXG4gIH07XG59XG5cbmV4cG9ydCB7IGNhcG5wcm90byBhcyBkZWZhdWx0IH07XG4iXX0=

@@ -1,0 +1,62 @@
+// Dynamic Width/Height Text Areas
+.js-dynamic-textarea-width,
+.js-dynamic-textarea-height {
+    resize: none;
+    overflow: visible;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+}
+
+// Settings Grid
+.js-settings-grid {
+    display: grid;
+
+    gap: 16px;
+    margin-top: 32px;
+    padding-left: 16px;
+
+    justify-items: start;
+    align-content: center;
+
+    grid-template-columns: minmax(425px, max-content);
+}
+
+// Projects List
+
+.bcd-projects {
+    display: flex;
+
+    gap: 32px;
+
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+
+    > * { height: min-content; }
+
+    margin-bottom: 64px;
+}
+
+.gh-stats-card {
+    outline: none;
+
+    width: 400px;
+    min-height: 120px;
+
+    background: #0d1117;
+
+    border: 3px solid #e3e5e7c9;
+    border-radius: 5px;
+
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.28);
+    transform: translateY(0) scale(1.05);
+
+    &:is(:hover, :focus, :active) {
+        box-shadow: 0 17px 29px rgba(0, 0, 0, 0.3), 0 10px 10px rgba(0, 0, 0, 0.22);
+        transform: translateY(-1px) scale(1.1);
+        background: #13203f;
+    }
+}
+
+.js-dom-svg {
+    display: inline-block;
+}

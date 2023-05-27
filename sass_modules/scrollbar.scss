@@ -1,0 +1,20 @@
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: #fff2;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #fff9;
+    transition-property: background-color;
+    transition-duration: 150ms;
+    transition-timing-function: ease-in-out;
+
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #fffd;
+}

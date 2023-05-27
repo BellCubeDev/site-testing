@@ -1,0 +1,91 @@
+@use 'colors' as *;
+
+body, html {
+    background: #1b1b1b;
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+}
+
+a {
+    color: $color-main;
+    font-weight: normal;
+    text-decoration: none;
+}
+
+p, li, article {
+    font-size: 17px;
+}
+
+hr {
+    height: 0;
+    border: 1px solid #eeeeeeab;
+    border-radius: 1px;
+}
+
+nav > hr { margin: 8px 0; }
+
+h3, .h3 {
+    font-size: 20px;
+    line-height: 30px;
+    margin: 30px 0 20px;
+}
+
+h4, .h4 {
+    font-size: 16px;
+    line-height: 24px;
+    margin: 24px 0 16px;
+}
+
+h5, .h5 {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 21px;
+    margin: 21px 0 14px;
+}
+
+:not(pre) > code, .code {
+    background-color: #333c;
+    border: 1px solid #eeeeee08;
+    border-radius: 3px;
+    color: $color-off-white;
+    margin: 1px;
+    padding: 2px 3px;
+}
+
+pre {
+    background-color: #333333f0;
+    border: 1px solid #eeeeee0f;
+    border-radius: 6px;
+    color: $color-off-white;
+    display: block;
+    overflow-x: scroll;
+    padding: 8px;
+    scrollbar-gutter: stable both-edges;
+
+    min-height: 48px;
+
+    code {
+        margin-top: auto;
+        margin-bottom: auto - 8px;
+    }
+
+    button:first-child {
+        position: absolute;
+        right: 32px;
+
+        +code {
+            margin-top: -12px;
+        }
+    }
+}
+
+::selection {
+    background: #60a0ff73;
+    text-shadow: 0 0 5px #00000033;
+}
+
+html > body, textarea, input {
+    color: $color-off-white;
+    font-weight: 400;
+    text-rendering: optimizeLegibility;
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+}
